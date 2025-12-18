@@ -36,9 +36,10 @@
         <div class="flex justify-between items-center max-w-lg mx-auto">
             <div>
                 <h1 class="text-2xl font-bold">🍱 กะเพรา52</h1>
-                <p class="text-green-100 text-sm">เลือกเมนูแล้วส่งเข้าไลน์ได้เลย</p>
+                <!-- เปลี่ยนคำโปรยใหม่ -->
+                <p class="text-green-100 text-sm mt-1">ไม่รีบผัด ไม่ลัดขั้นตอน เผ็ดจากพริก ใจจากคนผัด</p>
             </div>
-            <i class="fab fa-line text-4xl"></i>
+            <!-- ลบ Logo LINE ออกแล้ว -->
         </div>
     </header>
 
@@ -140,7 +141,7 @@
                     </label>
 
                     <!-- ไข่เยี่ยวม้า -->
-                    <label class="cursor-pointer relative group col-span-2"> <!-- col-span-2 ให้เต็มบรรทัด -->
+                    <label class="cursor-pointer relative group col-span-2">
                         <input type="checkbox" id="opt-kaiyiewma" class="peer sr-only">
                         <div class="bg-white border-2 border-gray-200 p-3 rounded-xl flex flex-row justify-center items-center gap-3 transition-all peer-checked:border-yellow-400 peer-checked:bg-yellow-50 hover:bg-gray-50">
                             <span class="text-2xl">⚫</span>
@@ -189,8 +190,9 @@
                 <p class="text-xs text-gray-500">ราคารวม</p>
                 <p class="text-2xl font-bold text-green-600 leading-none" id="total-price">0 ฿</p>
             </div>
+            <!-- เปลี่ยนข้อความปุ่มสั่งซื้อ -->
             <button onclick="submitOrderToLine()" id="btn-submit" class="flex-[2] bg-[#06C755] hover:bg-[#05b64d] text-white font-bold text-lg py-3 px-6 rounded-xl shadow-lg transition-transform active:scale-95 flex justify-center items-center gap-2">
-                <span>ส่งเข้า LINE</span>
+                <span>ยืนยันการสั่ง</span>
                 <i class="fab fa-line text-2xl"></i>
             </button>
         </div>
@@ -213,7 +215,7 @@
             { id: 12, name: "ข้าวไข่ข้น", price: 40, icon: "🍚", reqMeat: false, desc: "ไข่ 2 ฟอง" },
             { id: 13, name: "ข้าวใข่เจียวพริกสด", price: 50, icon: "🥘", reqMeat: false },
             { id: 14, name: "ข้าวไข่ดาว 3 ฟอง", price: 50, icon: "🍳", reqMeat: false },
-            { id: 15, name: "หน่อไม้ผัดไข่", price: 50, icon: "🎋", reqMeat: true }, // เมนูใหม่
+            { id: 15, name: "หน่อไม้ผัดไข่", price: 50, icon: "🎋", reqMeat: true },
         ];
 
         let state = { menuId: null, meat: null };
@@ -283,7 +285,6 @@
             calculateTotal();
         }
 
-        // List of all addon checkboxes
         const addonIds = ['opt-special', 'opt-kaikhon', 'opt-kaidao', 'opt-kaijiao', 'opt-kaitom', 'opt-kaiyiewma'];
 
         function calculateTotal() {
@@ -291,7 +292,7 @@
             // Base Price
             if (state.menuId) total += menuItems.find(i => i.id === state.menuId).price;
             
-            // Add-ons Price (All are +10)
+            // Add-ons Price
             addonIds.forEach(id => {
                 if (document.getElementById(id).checked) total += 10;
             });
@@ -301,7 +302,6 @@
         }
 
         // --- EVENT LISTENERS ---
-        // Add listener to all addons
         addonIds.forEach(id => {
             document.getElementById(id).addEventListener('change', calculateTotal);
         });
