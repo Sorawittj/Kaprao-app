@@ -29,7 +29,7 @@
         .hide-scroll::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="text-gray-700 pb-32">
+<body class="text-gray-700 pb-36">
 
     <!-- Header -->
     <header class="bg-[#06C755] text-white p-6 rounded-b-[2rem] shadow-lg sticky top-0 z-20">
@@ -93,29 +93,67 @@
                     <span class="text-green-600 font-bold text-sm">+10.-</span>
                 </label>
 
-                <!-- ไข่ต่างๆ -->
+                <!-- รายการไข่ต่างๆ -->
                 <div class="grid grid-cols-2 gap-3">
+                    <!-- ไข่ข้น -->
                     <label class="cursor-pointer relative group">
                         <input type="checkbox" id="opt-kaikhon" class="peer sr-only">
-                        <div class="bg-white border-2 border-gray-200 p-3 rounded-xl flex flex-col items-center gap-1 transition-all peer-checked:border-yellow-400 peer-checked:bg-yellow-50">
+                        <div class="bg-white border-2 border-gray-200 p-3 rounded-xl flex flex-col items-center gap-1 transition-all peer-checked:border-yellow-400 peer-checked:bg-yellow-50 hover:bg-gray-50">
                             <span class="text-2xl">🍳</span>
                             <span class="font-medium text-sm text-gray-700">เพิ่มไข่ข้น</span>
                             <span class="text-xs font-bold text-green-600">+10.-</span>
-                            <!-- ติ๊กถูกมุมขวาบน -->
                             <i class="fas fa-check-circle text-yellow-500 absolute top-2 right-2 opacity-0 peer-checked:opacity-100 transition-opacity"></i>
                         </div>
                     </label>
 
+                    <!-- ไข่ดาว -->
                     <label class="cursor-pointer relative group">
                         <input type="checkbox" id="opt-kaidao" class="peer sr-only">
-                        <div class="bg-white border-2 border-gray-200 p-3 rounded-xl flex flex-col items-center gap-1 transition-all peer-checked:border-yellow-400 peer-checked:bg-yellow-50">
+                        <div class="bg-white border-2 border-gray-200 p-3 rounded-xl flex flex-col items-center gap-1 transition-all peer-checked:border-yellow-400 peer-checked:bg-yellow-50 hover:bg-gray-50">
                             <span class="text-2xl">🥚</span>
                             <span class="font-medium text-sm text-gray-700">เพิ่มไข่ดาว</span>
                             <span class="text-xs font-bold text-green-600">+10.-</span>
                             <i class="fas fa-check-circle text-yellow-500 absolute top-2 right-2 opacity-0 peer-checked:opacity-100 transition-opacity"></i>
                         </div>
                     </label>
-               
+
+                    <!-- ไข่เจียว -->
+                    <label class="cursor-pointer relative group">
+                        <input type="checkbox" id="opt-kaijiao" class="peer sr-only">
+                        <div class="bg-white border-2 border-gray-200 p-3 rounded-xl flex flex-col items-center gap-1 transition-all peer-checked:border-yellow-400 peer-checked:bg-yellow-50 hover:bg-gray-50">
+                            <span class="text-2xl">🥞</span>
+                            <span class="font-medium text-sm text-gray-700">เพิ่มไข่เจียว</span>
+                            <span class="text-xs font-bold text-green-600">+10.-</span>
+                            <i class="fas fa-check-circle text-yellow-500 absolute top-2 right-2 opacity-0 peer-checked:opacity-100 transition-opacity"></i>
+                        </div>
+                    </label>
+
+                    <!-- ไข่ต้ม -->
+                    <label class="cursor-pointer relative group">
+                        <input type="checkbox" id="opt-kaitom" class="peer sr-only">
+                        <div class="bg-white border-2 border-gray-200 p-3 rounded-xl flex flex-col items-center gap-1 transition-all peer-checked:border-yellow-400 peer-checked:bg-yellow-50 hover:bg-gray-50">
+                            <span class="text-2xl">🥚</span>
+                            <span class="font-medium text-sm text-gray-700">เพิ่มไข่ต้ม</span>
+                            <span class="text-xs font-bold text-green-600">+10.-</span>
+                            <i class="fas fa-check-circle text-yellow-500 absolute top-2 right-2 opacity-0 peer-checked:opacity-100 transition-opacity"></i>
+                        </div>
+                    </label>
+
+                    <!-- ไข่เยี่ยวม้า -->
+                    <label class="cursor-pointer relative group col-span-2"> <!-- col-span-2 ให้เต็มบรรทัด -->
+                        <input type="checkbox" id="opt-kaiyiewma" class="peer sr-only">
+                        <div class="bg-white border-2 border-gray-200 p-3 rounded-xl flex flex-row justify-center items-center gap-3 transition-all peer-checked:border-yellow-400 peer-checked:bg-yellow-50 hover:bg-gray-50">
+                            <span class="text-2xl">⚫</span>
+                            <div class="flex flex-col items-start">
+                                <span class="font-medium text-sm text-gray-700">เพิ่มไข่เยี่ยวม้า</span>
+                                <span class="text-xs font-bold text-green-600">+10.-</span>
+                            </div>
+                            <i class="fas fa-check-circle text-yellow-500 absolute top-2 right-2 opacity-0 peer-checked:opacity-100 transition-opacity"></i>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
 
         <!-- 4. ข้อมูลผู้สั่ง -->
         <div class="mt-8 mb-4">
@@ -133,6 +171,15 @@
                 </div>
             </div>
         </div>
+        
+        <!-- DEVELOPER CREDIT -->
+        <div class="text-center mt-8 mb-4 opacity-60">
+            <p class="text-[10px] text-gray-500 font-light tracking-wider leading-relaxed">
+                Developed by Sorawit Thunthakij<br>
+                Version 1.1 18/12/2025
+            </p>
+        </div>
+        
     </div>
 
     <!-- Sticky Footer -->
@@ -166,7 +213,7 @@
             { id: 12, name: "ข้าวไข่ข้น", price: 40, icon: "🍚", reqMeat: false, desc: "ไข่ 2 ฟอง" },
             { id: 13, name: "ข้าวใข่เจียวพริกสด", price: 50, icon: "🥘", reqMeat: false },
             { id: 14, name: "ข้าวไข่ดาว 3 ฟอง", price: 50, icon: "🍳", reqMeat: false },
-            
+            { id: 15, name: "หน่อไม้ผัดไข่", price: 50, icon: "🎋", reqMeat: true }, // เมนูใหม่
         ];
 
         let state = { menuId: null, meat: null };
@@ -176,9 +223,6 @@
         
         menuItems.forEach(item => {
             const card = document.createElement('div');
-            // สร้างโครงสร้าง HTML สำหรับแต่ละเมนู
-            // เพิ่ม id="menu-card-{id}" เพื่อใช้อ้างอิงตอนเปลี่ยนสี
-            // เพิ่มส่วน check-icon (ซ่อนไว้ก่อนด้วย class hidden)
             card.id = `menu-card-${item.id}`;
             card.className = `menu-item relative flex items-center justify-between p-4 bg-white rounded-xl border-2 border-transparent shadow-sm cursor-pointer transition-all active:scale-[0.98] select-none hover:shadow-md`;
             card.onclick = () => selectMenu(item.id);
@@ -194,12 +238,10 @@
                 </div>
                 <div class="flex flex-col items-end">
                     <div class="text-lg font-bold text-green-600">${item.price}.-</div>
-                    <!-- ไอคอนติ๊กถูก (จะแสดงเมื่อถูกเลือก) -->
                     <div class="check-icon hidden text-green-600 mt-1">
                         <i class="fas fa-check-circle text-xl"></i>
                     </div>
                 </div>
-                <!-- Border Effect overlay -->
                 <div class="absolute inset-0 rounded-xl border-2 border-transparent pointer-events-none transition-colors" id="border-${item.id}"></div>
             `;
             menuGrid.appendChild(card);
@@ -209,32 +251,27 @@
         function selectMenu(id) {
             state.menuId = id;
 
-            // 1. Loop ล้างสถานะเก่า และตั้งค่าสถานะใหม่
+            // Update UI
             menuItems.forEach(item => {
                 const el = document.getElementById(`menu-card-${item.id}`);
                 const checkIcon = el.querySelector('.check-icon');
-                
                 if (item.id === id) {
-                    // ถ้าเป็นตัวที่เลือก
-                    el.classList.add('menu-selected', 'select-anim'); // ใส่สีเขียว + อนิเมชั่น
-                    checkIcon.classList.remove('hidden');           // โชว์ติ๊กถูก
+                    el.classList.add('menu-selected', 'select-anim');
+                    checkIcon.classList.remove('hidden');
                 } else {
-                    // ตัวที่ไม่เลือก
                     el.classList.remove('menu-selected', 'select-anim');
                     checkIcon.classList.add('hidden');
                 }
             });
 
-            // 2. Logic จัดการเนื้อสัตว์
+            // Handle Meat Selection
             const item = menuItems.find(i => i.id === id);
             const meatSection = document.getElementById('meat-section');
             
             if (item.reqMeat) {
                 meatSection.classList.remove('hidden');
-                // Reset meat selection
                 document.querySelectorAll('input[name="meat"]').forEach(el => el.checked = false);
                 state.meat = null;
-                // Auto scroll เล็กน้อยให้เห็นตัวเลือกหมู
                 setTimeout(() => {
                     meatSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }, 100);
@@ -246,23 +283,29 @@
             calculateTotal();
         }
 
+        // List of all addon checkboxes
+        const addonIds = ['opt-special', 'opt-kaikhon', 'opt-kaidao', 'opt-kaijiao', 'opt-kaitom', 'opt-kaiyiewma'];
+
         function calculateTotal() {
             let total = 0;
+            // Base Price
             if (state.menuId) total += menuItems.find(i => i.id === state.menuId).price;
-            if (document.getElementById('opt-special').checked) total += 10;
-            if (document.getElementById('opt-kaikhon').checked) total += 10;
-            if (document.getElementById('opt-kaidao').checked) total += 10;
             
-
+            // Add-ons Price (All are +10)
+            addonIds.forEach(id => {
+                if (document.getElementById(id).checked) total += 10;
+            });
 
             const priceEl = document.getElementById('total-price');
             priceEl.innerText = `${total} ฿`;
         }
 
         // --- EVENT LISTENERS ---
-        ['opt-special', 'opt-kaikhon', 'opt-kaidao'].forEach(id => {
+        // Add listener to all addons
+        addonIds.forEach(id => {
             document.getElementById(id).addEventListener('change', calculateTotal);
         });
+        
         document.querySelectorAll('input[name="meat"]').forEach(el => {
             el.addEventListener('change', (e) => state.meat = e.target.value);
         });
@@ -283,21 +326,28 @@
                 return document.getElementById('user-name').focus();
             }
 
-            // Construct Message
+            // 1. Menu Name
             let fullMenuName = item.name;
             if (state.meat) fullMenuName += ` (${state.meat})`;
 
+            // 2. Options
             let options = [];
             if(document.getElementById('opt-special').checked) options.push("พิเศษ");
             if(document.getElementById('opt-kaikhon').checked) options.push("เพิ่มไข่ข้น");
             if(document.getElementById('opt-kaidao').checked) options.push("เพิ่มไข่ดาว");
+            if(document.getElementById('opt-kaijiao').checked) options.push("เพิ่มไข่เจียว");
+            if(document.getElementById('opt-kaitom').checked) options.push("เพิ่มไข่ต้ม");
+            if(document.getElementById('opt-kaiyiewma').checked) options.push("เพิ่มไข่เยี่ยวม้า");
             
             if(options.length > 0) fullMenuName += ` + ${options.join(" + ")}`;
 
+            // 3. Note
             const finalNote = noteInput ? noteInput : '-';
+            
+            // 4. Final Message
             const message = `คุณ ${name} สั่ง ${fullMenuName} (${finalNote})`;
 
-            // Animation Loading
+            // Loading & Redirect
             const btn = document.getElementById('btn-submit');
             const originalHtml = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังเปิด LINE...';
@@ -306,7 +356,6 @@
             setTimeout(() => {
                 window.location.href = 'https://line.me/R/msg/text/?' + encodeURIComponent(message);
                 
-                // Restore button state
                 setTimeout(() => {
                     btn.innerHTML = originalHtml;
                     btn.classList.remove('opacity-75');
