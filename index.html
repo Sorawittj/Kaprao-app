@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kaprao52-App</title>
+    <title>Kaprao52-App (Discount)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -90,7 +90,6 @@
                 <button onclick="switchCategory('garlic')" id="tab-garlic" class="tab-inactive px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2">
                     <span>🧄</span> กระเทียม
                 </button>
-                <!-- เพิ่ม Tab เมนูเส้น -->
                 <button onclick="switchCategory('noodle')" id="tab-noodle" class="tab-inactive px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2">
                     <span>🍜</span> เมนูเส้น
                 </button>
@@ -104,16 +103,13 @@
     <!-- MAIN CONTENT -->
     <div class="max-w-lg mx-auto px-5 mt-6 relative z-0">
         
-        <!-- เพิ่มหัวข้อ เลือกเมนูที่ต้องการ -->
         <h2 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
             <span class="w-1.5 h-6 bg-rose-500 rounded-full"></span>
             เลือกเมนูที่ต้องการ
         </h2>
 
         <!-- Menu Grid -->
-        <div id="menu-grid" class="grid grid-cols-1 gap-4 min-h-[300px]">
-            <!-- Items rendered via JS -->
-        </div>
+        <div id="menu-grid" class="grid grid-cols-1 gap-4 min-h-[300px]"></div>
 
         <!-- Cart Section -->
         <div id="cart-section" class="hidden mt-10 mb-8 fade-enter">
@@ -126,9 +122,35 @@
             
             <div id="cart-items" class="space-y-3"></div>
 
-            <div class="mt-4 bg-white p-5 rounded-2xl shadow-sm border border-rose-100 flex justify-between items-center">
-                <span class="text-slate-500 font-medium">ยอดรวมสุทธิ</span>
-                <span id="grand-total" class="text-3xl font-bold text-rose-600 tracking-tight">0 ฿</span>
+            <!-- ส่วนกรอกโค้ดส่วนลด (NEW) -->
+            <div class="mt-6 bg-white p-5 rounded-2xl shadow-sm border border-rose-100">
+                <label class="block text-slate-700 font-bold mb-2 text-sm flex items-center gap-2">
+                    <i class="fas fa-ticket text-orange-500"></i> โค้ดส่วนลด
+                </label>
+                <div class="flex gap-2">
+                    <input type="text" id="discount-code" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-orange-400 text-sm uppercase" placeholder="กรอกโค้ด">
+                    <button onclick="applyDiscount()" id="btn-apply-code" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-xl text-sm font-bold transition-colors shadow-md shadow-orange-200">
+                        ใช้โค้ด
+                    </button>
+                </div>
+                <p id="discount-msg" class="text-xs mt-2 font-medium hidden"></p>
+            </div>
+
+            <!-- แสดงยอดเงินแบบละเอียด (Updated) -->
+            <div class="mt-4 bg-white p-5 rounded-2xl shadow-sm border border-rose-100 space-y-2">
+                <div class="flex justify-between items-center text-sm text-slate-500">
+                    <span>รวมค่าอาหาร</span>
+                    <span id="sub-total">0 ฿</span>
+                </div>
+                <div class="flex justify-between items-center text-sm text-green-600 font-medium hidden" id="discount-row">
+                    <span>ส่วนลด</span>
+                    <span id="discount-val">-0 ฿</span>
+                </div>
+                <div class="h-px bg-slate-100 my-2"></div>
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-800 font-bold">ยอดสุทธิ</span>
+                    <span id="grand-total" class="text-3xl font-bold text-rose-600 tracking-tight">0 ฿</span>
+                </div>
             </div>
 
             <div class="mt-4 bg-white p-5 rounded-2xl shadow-sm border border-rose-100">
@@ -141,7 +163,7 @@
 
         <div class="text-center mt-12 opacity-40 pb-4">
             <p class="text-[10px] font-medium tracking-wide text-slate-400">
-                DEVELOPED BY SORAWIT THUNTHAKIJ<br>VERSION 3.2 19.12.2025
+                DEVELOPED BY SORAWIT THUNTHAKIJ<br>VERSION 3.3 (DISCOUNT ADDED)
             </p>
         </div>
     </div>
@@ -162,7 +184,7 @@
     <div id="modal-overlay" class="fixed inset-0 bg-slate-900/60 z-50 hidden backdrop-blur-sm transition-opacity opacity-0" onclick="closeModal()"></div>
     
     <div id="modal-content" class="fixed bottom-0 left-0 right-0 bg-white rounded-t-[2rem] z-50 transform translate-y-full transition-transform duration-300 max-h-[90vh] overflow-y-auto hide-scroll shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.3)] max-w-lg mx-auto">
-        
+        <!-- Decoration Header -->
         <div class="h-28 bg-rose-50 relative overflow-hidden">
             <div class="absolute -right-6 -top-6 w-32 h-32 bg-rose-200 rounded-full blur-2xl opacity-50"></div>
             <div class="absolute -left-6 -bottom-6 w-32 h-32 bg-orange-200 rounded-full blur-2xl opacity-50"></div>
@@ -175,6 +197,7 @@
         </div>
 
         <div class="px-6 py-6 pb-10">
+            <!-- Header Info -->
             <div class="flex justify-between items-start mb-6">
                 <div>
                     <h3 id="modal-title" class="text-2xl font-bold text-slate-800 leading-tight">ชื่อเมนู</h3>
@@ -296,7 +319,7 @@
             { id: 5, name: "กะเพราสันคอ", price: 50, icon: "🥩", category: "kaprao", reqMeat: false },
             { id: 6, name: "กะเพราไข่เยี่ยวม้า", price: 60, icon: "⚫", category: "kaprao", reqMeat: false },
             
-            // เมนูเส้น (Noodle) - ย้ายมาม่าและวุ้นเส้นมาที่นี่
+            // เมนูเส้น (Noodle)
             { id: 10, name: "มาม่าผัดกะเพราหอยลาย", price: 50, icon: "🍜", category: "noodle", reqMeat: true },
             { id: 1, name: "กะเพราวุ้นเส้น", price: 55, icon: "🍝", category: "noodle", reqMeat: true },
 
@@ -316,11 +339,11 @@
         let cart = [];
         let currentItem = null;
         let activeCategory = 'kaprao';
+        // ตัวแปรเก็บส่วนลด
+        let discountValue = 0;
 
         function switchCategory(cat) {
             activeCategory = cat;
-            
-            // เพิ่ม 'noodle' ในรายการที่ต้องเช็ค
             ['kaprao', 'garlic', 'noodle', 'others'].forEach(c => {
                 const btn = document.getElementById(`tab-${c}`);
                 if(c === cat) {
@@ -329,22 +352,18 @@
                     btn.className = "tab-inactive px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2 bg-white hover:bg-rose-50";
                 }
             });
-
             renderMenu();
         }
 
         function renderMenu() {
             const grid = document.getElementById('menu-grid');
             grid.innerHTML = '';
-            
             const filteredItems = menuItems.filter(i => i.category === activeCategory);
-
             filteredItems.forEach((item, index) => {
                 const el = document.createElement('div');
                 el.style.animationDelay = `${index * 0.05}s`;
                 el.className = "fade-enter bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex justify-between items-center cursor-pointer active:scale-[0.98] transition-all hover:shadow-md hover:border-rose-200 group";
                 el.onclick = () => openModal(item);
-                
                 el.innerHTML = `
                     <div class="flex items-center gap-4">
                         <div class="w-14 h-14 bg-gradient-to-br from-rose-50 to-orange-50 text-2xl flex items-center justify-center rounded-2xl shadow-inner group-hover:scale-110 transition-transform duration-300">
@@ -366,26 +385,154 @@
             });
         }
 
+        // --- DISCOUNT LOGIC ---
+        function applyDiscount() {
+            const codeInput = document.getElementById('discount-code');
+            const code = codeInput.value.trim();
+            const msg = document.getElementById('discount-msg');
+            const btn = document.getElementById('btn-apply-code');
+
+            if (code === 'เจสุดหล่อDIS5') {
+                discountValue = 5;
+                msg.innerHTML = '<i class="fas fa-check-circle mr-1"></i> โค้ดถูกต้อง ลด 5 บาท';
+                msg.className = 'text-xs mt-2 font-bold text-green-500 fade-enter';
+                msg.classList.remove('hidden');
+                
+                // Disable input & button style change
+                codeInput.disabled = true;
+                codeInput.classList.add('bg-gray-100', 'text-gray-500');
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+                btn.innerText = 'ใช้แล้ว';
+            } else {
+                discountValue = 0;
+                msg.innerHTML = '<i class="fas fa-times-circle mr-1"></i> โค้ดไม่ถูกต้อง';
+                msg.className = 'text-xs mt-2 font-bold text-red-500 fade-enter';
+                msg.classList.remove('hidden');
+            }
+            renderCart(); // Re-calculate total
+        }
+
+        // --- CART RENDER WITH DISCOUNT ---
+        function renderCart() {
+            const section = document.getElementById('cart-section');
+            const list = document.getElementById('cart-items');
+            const footer = document.getElementById('footer-bar');
+            
+            // Elements for calculation
+            const subTotalEl = document.getElementById('sub-total');
+            const discountRow = document.getElementById('discount-row');
+            const discountValEl = document.getElementById('discount-val');
+            const grandTotalEl = document.getElementById('grand-total');
+
+            if (cart.length === 0) {
+                section.classList.add('hidden');
+                footer.classList.add('translate-y-[150%]');
+                return;
+            }
+
+            section.classList.remove('hidden');
+            footer.classList.remove('translate-y-[150%]');
+            list.innerHTML = '';
+            
+            let subTotal = 0;
+            cart.forEach((item, idx) => {
+                subTotal += item.total;
+                const meatStr = item.meat ? `<span class="text-rose-500">(${item.meat})</span>` : '';
+                const addonStr = item.addons.length > 0 ? `<div class="text-[11px] text-slate-400 mt-0.5">+ ${item.addons.join(', ')}</div>` : '';
+                const noteStr = item.note ? `<div class="text-[11px] text-orange-500 mt-0.5"><i class="fas fa-comment-dots mr-1"></i>${item.note}</div>` : '';
+
+                const div = document.createElement('div');
+                div.className = "bg-white p-4 rounded-xl border border-rose-50 shadow-sm flex justify-between items-start fade-enter relative overflow-hidden";
+                div.innerHTML = `
+                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-rose-400 to-orange-400"></div>
+                    <div class="flex-1 pl-2">
+                        <div class="font-bold text-slate-700 text-sm">
+                            <span class="text-slate-300 mr-1 font-light">#${idx+1}</span>
+                            ${item.menuName} ${meatStr}
+                        </div>
+                        ${addonStr}
+                        ${noteStr}
+                    </div>
+                    <div class="flex flex-col items-end gap-2">
+                        <span class="font-bold text-slate-800">${item.total}.-</span>
+                        <button onclick="removeFromCart(${item.id})" class="text-[10px] text-red-400 bg-red-50 hover:bg-red-100 px-2 py-1 rounded transition-colors">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+
+            // Calculate Final Price
+            const netTotal = Math.max(0, subTotal - discountValue);
+
+            document.getElementById('cart-count-badge').innerText = `${cart.length} รายการ`;
+            
+            // Display Math
+            subTotalEl.innerText = `${subTotal} ฿`;
+            if (discountValue > 0) {
+                discountRow.classList.remove('hidden');
+                discountValEl.innerText = `-${discountValue} ฿`;
+            } else {
+                discountRow.classList.add('hidden');
+            }
+            grandTotalEl.innerText = `${netTotal} ฿`;
+        }
+
+        // --- SUBMIT WITH DISCOUNT ---
+        function submitOrderToLine() {
+            const name = document.getElementById('user-name').value.trim();
+            if(!name) {
+                alert('กรุณาระบุชื่อผู้สั่งด้วยครับ');
+                document.getElementById('user-name').focus();
+                return;
+            }
+
+            let msg = `🔥 ออเดอร์จาก: คุณ ${name}\n========================\n`;
+            let subTotal = 0;
+            
+            cart.forEach((item, i) => {
+                subTotal += item.total;
+                let detail = item.menuName;
+                if(item.meat) detail += ` (${item.meat})`;
+                if(item.addons.length) detail += ` + ${item.addons.join('+')}`;
+                
+                msg += `${i+1}. ${detail}`;
+                if(item.note) msg += `\n   (📝 ${item.note})`;
+                msg += `\n`;
+            });
+
+            const netTotal = Math.max(0, subTotal - discountValue);
+
+            msg += `========================\n`;
+            msg += `💵 ยอดรวม: ${subTotal} บาท\n`;
+            if(discountValue > 0) {
+                msg += `🏷️ ส่วนลด: -${discountValue} บาท (Code)\n`;
+            }
+            msg += `💰 ยอดสุทธิ: ${netTotal} บาท\n`;
+            msg += `========================\n`;
+            msg += `Developed by Sorawit (v3.3)`;
+
+            window.location.href = `https://line.me/R/msg/text/?${encodeURIComponent(msg)}`;
+        }
+
+        // --- Other Functions (Same as before) ---
         const modalOverlay = document.getElementById('modal-overlay');
         const modalContent = document.getElementById('modal-content');
         const addonIds = ['special', 'kaikhon', 'kaidao', 'kaijiao', 'kaitom', 'kaiyiewma'];
 
         function openModal(item) {
             currentItem = item;
-            
             document.getElementById('modal-title').innerText = item.name;
             document.getElementById('modal-icon').innerText = item.icon;
             document.getElementById('modal-note').value = '';
-
             document.querySelectorAll('input[name="modal-meat"]').forEach(el => el.checked = false);
             addonIds.forEach(id => document.getElementById(`modal-opt-${id}`).checked = false);
-
             const meatSec = document.getElementById('modal-meat-section');
             if(item.reqMeat) meatSec.classList.remove('hidden');
             else meatSec.classList.add('hidden');
-
             updateModalPrice();
-
             modalOverlay.classList.remove('hidden');
             setTimeout(() => {
                 modalOverlay.classList.remove('opacity-0');
@@ -419,14 +566,12 @@
 
         function addToCart() {
             if (!currentItem) return;
-
             let selectedMeat = null;
             if (currentItem.reqMeat) {
                 const meatRadio = document.querySelector('input[name="modal-meat"]:checked');
                 if (!meatRadio) return alert('กรุณาเลือกเนื้อสัตว์ก่อนครับ');
                 selectedMeat = meatRadio.value;
             }
-
             let addons = [];
             let addonPrice = 0;
             const checks = [
@@ -437,14 +582,12 @@
                 {id: 'kaitom', name: 'ไข่ต้ม', price: 10},
                 {id: 'kaiyiewma', name: 'ไข่เยี่ยวม้า', price: 10},
             ];
-
             checks.forEach(opt => {
                 if(document.getElementById(`modal-opt-${opt.id}`).checked) {
                     addons.push(opt.name);
                     addonPrice += opt.price;
                 }
             });
-
             const orderItem = {
                 id: Date.now(),
                 menuName: currentItem.name,
@@ -454,11 +597,9 @@
                 total: currentItem.price + addonPrice,
                 note: document.getElementById('modal-note').value.trim()
             };
-
             cart.push(orderItem);
             renderCart();
             closeModal();
-
             setTimeout(() => {
                 document.getElementById('cart-section').scrollIntoView({ behavior: 'smooth' });
             }, 300);
@@ -467,84 +608,6 @@
         function removeFromCart(id) {
             cart = cart.filter(i => i.id !== id);
             renderCart();
-        }
-
-        function renderCart() {
-            const section = document.getElementById('cart-section');
-            const list = document.getElementById('cart-items');
-            const footer = document.getElementById('footer-bar');
-
-            if (cart.length === 0) {
-                section.classList.add('hidden');
-                footer.classList.add('translate-y-[150%]');
-                return;
-            }
-
-            section.classList.remove('hidden');
-            footer.classList.remove('translate-y-[150%]');
-            list.innerHTML = '';
-            
-            let total = 0;
-            cart.forEach((item, idx) => {
-                total += item.total;
-                const meatStr = item.meat ? `<span class="text-rose-500">(${item.meat})</span>` : '';
-                const addonStr = item.addons.length > 0 ? `<div class="text-[11px] text-slate-400 mt-0.5">+ ${item.addons.join(', ')}</div>` : '';
-                const noteStr = item.note ? `<div class="text-[11px] text-orange-500 mt-0.5"><i class="fas fa-comment-dots mr-1"></i>${item.note}</div>` : '';
-
-                const div = document.createElement('div');
-                div.className = "bg-white p-4 rounded-xl border border-rose-50 shadow-sm flex justify-between items-start fade-enter relative overflow-hidden";
-                div.innerHTML = `
-                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-rose-400 to-orange-400"></div>
-                    <div class="flex-1 pl-2">
-                        <div class="font-bold text-slate-700 text-sm">
-                            <span class="text-slate-300 mr-1 font-light">#${idx+1}</span>
-                            ${item.menuName} ${meatStr}
-                        </div>
-                        ${addonStr}
-                        ${noteStr}
-                    </div>
-                    <div class="flex flex-col items-end gap-2">
-                        <span class="font-bold text-slate-800">${item.total}.-</span>
-                        <button onclick="removeFromCart(${item.id})" class="text-[10px] text-red-400 bg-red-50 hover:bg-red-100 px-2 py-1 rounded transition-colors">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                `;
-                list.appendChild(div);
-            });
-
-            document.getElementById('cart-count-badge').innerText = `${cart.length} รายการ`;
-            document.getElementById('grand-total').innerText = `${total} ฿`;
-        }
-
-        function submitOrderToLine() {
-            const name = document.getElementById('user-name').value.trim();
-            if(!name) {
-                alert('กรุณาระบุชื่อผู้สั่งด้วยครับ');
-                document.getElementById('user-name').focus();
-                return;
-            }
-
-            let msg = `🔥 ออเดอร์จาก: คุณ ${name}\n========================\n`;
-            let total = 0;
-            
-            cart.forEach((item, i) => {
-                total += item.total;
-                let detail = item.menuName;
-                if(item.meat) detail += ` (${item.meat})`;
-                if(item.addons.length) detail += ` + ${item.addons.join('+')}`;
-                
-                msg += `${i+1}. ${detail}`;
-                if(item.note) msg += `\n   (📝 ${item.note})`;
-                msg += `\n`;
-            });
-
-            msg += `========================\n`;
-            msg += `💰 ยอดรวม: ${total} บาท\n`;
-            msg += `========================\n`;
-
-
-            window.location.href = `https://line.me/R/msg/text/?${encodeURIComponent(msg)}`;
         }
 
         renderMenu(); 
