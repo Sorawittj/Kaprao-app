@@ -2,317 +2,431 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kaprao52-App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>สั่งอาหารเข้า LINE (Pro UI)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#F43F5E',
+                        secondary: '#F97316',
+                    },
+                    fontFamily: {
+                        sans: ['Kanit', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        body { font-family: 'Kanit', sans-serif; background-color: #FFF7ED; }
+        body { background-color: #FFF1F2; -webkit-tap-highlight-color: transparent; }
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
-        .slide-up { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .fade-in { animation: fadeIn 0.2s ease-in; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
         
-        /* Animation ตัวเลขราคาเด้ง */
-        .price-bump { animation: priceBump 0.2s ease-in-out; }
-        @keyframes priceBump { 0% { transform: scale(1); } 50% { transform: scale(1.2); color: #ea580c; } 100% { transform: scale(1); } }
+        .fade-enter { animation: fadeEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeEnter { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .modal-up { animation: modalUp 0.4s cubic-bezier(0.33, 1, 0.68, 1); }
+        @keyframes modalUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        .price-bump { animation: priceBump 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes priceBump { 0% { transform: scale(1); } 50% { transform: scale(1.15); color: #F43F5E; } 100% { transform: scale(1); } }
+
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .tab-active {
+            background: linear-gradient(135deg, #F43F5E 0%, #F97316 100%);
+            color: white;
+            box-shadow: 0 4px 15px -3px rgba(244, 63, 94, 0.4);
+            transform: translateY(-1px);
+        }
+        .tab-inactive {
+            background: white;
+            color: #64748B;
+            border: 1px solid #E2E8F0;
+        }
     </style>
 </head>
-<body class="text-gray-800 pb-40">
+<body class="text-slate-700 pb-32">
 
-    <!-- Header -->
-    <header class="bg-gradient-to-br from-orange-500 via-red-500 to-rose-600 text-white p-8 rounded-b-[2.5rem] shadow-xl sticky top-0 z-10">
-        <div class="max-w-lg mx-auto flex justify-between items-start">
+    <!-- HEADER -->
+    <header class="relative bg-gradient-to-br from-rose-600 via-rose-500 to-orange-500 text-white pt-10 pb-12 px-6 rounded-b-[2.5rem] shadow-2xl shadow-rose-500/20 z-0 overflow-hidden">
+        <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/food.png')]"></div>
+        <div class="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+        
+        <div class="relative z-10 flex justify-between items-center max-w-lg mx-auto">
             <div>
-                <h1 class="text-3xl font-extrabold tracking-tight drop-shadow-md">🔥 กะเพรา52</h1>
-                <p class="text-orange-100 text-sm mt-1 font-light opacity-90">ไม่รีบผัด ไม่ลัดขั้นตอน<br>เผ็ดจากพริก ใจจากคนผัด</p>
+                <h1 class="text-4xl font-extrabold tracking-tight drop-shadow-md flex items-center gap-3">
+                    กะเพรา52 <span class="text-3xl filter drop-shadow-lg transform -translate-y-1">🍚</span>
+                </h1>
+                <p class="text-rose-50 text-base mt-2 font-medium tracking-wide">
+                    ถ้าคุณชอบกะเพรา เราคือเพื่อนกัน
+                </p>
             </div>
-            <div class="bg-white/20 p-3 rounded-2xl backdrop-blur-md shadow-inner">
-                <i class="fas fa-utensils text-2xl text-white"></i>
+            <div class="bg-white/20 p-3.5 rounded-2xl backdrop-blur-md shadow-inner border border-white/10">
+                <i class="fas fa-fire-burner text-2xl text-white"></i>
             </div>
         </div>
     </header>
 
-    <div class="max-w-lg mx-auto px-5 mt-8">
+    <!-- STICKY CATEGORY TABS -->
+    <div class="sticky top-0 z-40 glass-nav pt-4 pb-4 shadow-sm">
+        <div class="max-w-lg mx-auto overflow-x-auto hide-scroll px-5">
+            <div class="flex space-x-3 min-w-max">
+                <button onclick="switchCategory('kaprao')" id="tab-kaprao" class="tab-active px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2">
+                    <span>🌶️</span> กะเพรา
+                </button>
+                <button onclick="switchCategory('garlic')" id="tab-garlic" class="tab-inactive px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2">
+                    <span>🧄</span> กระเทียม
+                </button>
+                <!-- เพิ่ม Tab เมนูเส้น -->
+                <button onclick="switchCategory('noodle')" id="tab-noodle" class="tab-inactive px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2">
+                    <span>🍜</span> เมนูเส้น
+                </button>
+                <button onclick="switchCategory('others')" id="tab-others" class="tab-inactive px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2">
+                    <span>🍳</span> ไข่/อื่นๆ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="max-w-lg mx-auto px-5 mt-6 relative z-0">
         
-        <!-- Menu Grid -->
-        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <span class="w-2 h-6 bg-orange-500 rounded-full"></span>
+        <!-- เพิ่มหัวข้อ เลือกเมนูที่ต้องการ -->
+        <h2 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <span class="w-1.5 h-6 bg-rose-500 rounded-full"></span>
             เลือกเมนูที่ต้องการ
         </h2>
-        <div id="menu-grid" class="grid grid-cols-1 gap-4"></div>
 
-        <!-- Cart Summary -->
-        <div id="cart-section" class="hidden mt-10 fade-in">
-            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <span class="w-2 h-6 bg-gray-800 rounded-full"></span>
-                รายการในตะกร้า (<span id="cart-count">0</span>)
-            </h2>
-            <div id="cart-items" class="space-y-3"></div>
+        <!-- Menu Grid -->
+        <div id="menu-grid" class="grid grid-cols-1 gap-4 min-h-[300px]">
+            <!-- Items rendered via JS -->
+        </div>
+
+        <!-- Cart Section -->
+        <div id="cart-section" class="hidden mt-10 mb-8 fade-enter">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fas fa-receipt text-rose-500"></i> สรุปรายการ
+                </h2>
+                <span class="bg-rose-100 text-rose-600 text-xs font-bold px-2 py-1 rounded-lg" id="cart-count-badge">0 รายการ</span>
+            </div>
             
-            <div class="mt-4 flex justify-between items-center bg-white p-4 rounded-xl border border-orange-100 shadow-sm">
-                <span class="text-gray-500">ยอดรวมทั้งหมด</span>
-                <span id="grand-total" class="text-2xl font-bold text-orange-600">0 ฿</span>
+            <div id="cart-items" class="space-y-3"></div>
+
+            <div class="mt-4 bg-white p-5 rounded-2xl shadow-sm border border-rose-100 flex justify-between items-center">
+                <span class="text-slate-500 font-medium">ยอดรวมสุทธิ</span>
+                <span id="grand-total" class="text-3xl font-bold text-rose-600 tracking-tight">0 ฿</span>
             </div>
 
-            <div class="mt-6 bg-white p-5 rounded-2xl shadow-sm border border-orange-100">
-                <label class="block text-gray-700 font-bold mb-2 text-sm"><i class="fas fa-user mr-2 text-orange-500"></i>ชื่อผู้สั่ง <span class="text-red-500">*</span></label>
-                <input type="text" id="user-name" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-400 transition-all" placeholder="ระบุชื่อเล่น...">
+            <div class="mt-4 bg-white p-5 rounded-2xl shadow-sm border border-rose-100">
+                <label class="block text-slate-700 font-bold mb-2 text-sm">
+                    <i class="fas fa-user-circle mr-1 text-rose-500"></i> ชื่อผู้สั่ง <span class="text-red-500">*</span>
+                </label>
+                <input type="text" id="user-name" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 outline-none focus:ring-2 focus:ring-rose-400 focus:bg-white transition-all text-slate-800 placeholder-slate-400" placeholder="เช่น พี่จอย, น้องนนท์">
             </div>
         </div>
 
-        <div class="text-center mt-12 mb-8 opacity-40">
-            <p class="text-[10px] text-gray-500">Developed by Sorawit Thunthakij<br>Version 2.1 (Dynamic Price)</p>
+        <div class="text-center mt-12 opacity-40 pb-4">
+            <p class="text-[10px] font-medium tracking-wide text-slate-400">
+                DEVELOPED BY SORAWIT THUNTHAKIJ<br>VERSION 3.2
+            </p>
         </div>
     </div>
 
-    <!-- Footer Button -->
-    <div id="footer-bar" class="fixed bottom-0 left-0 right-0 glass border-t border-gray-100 p-4 z-30 transition-transform transform translate-y-full">
-        <div class="max-w-lg mx-auto">
-            <button onclick="submitOrderToLine()" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold text-lg py-4 rounded-2xl shadow-lg transition-all active:scale-95 flex justify-center items-center gap-2">
+    <!-- FLOATING ACTION BUTTON -->
+    <div id="footer-bar" class="fixed bottom-6 left-0 right-0 z-30 transition-transform transform translate-y-[150%] px-5 pointer-events-none">
+        <div class="max-w-lg mx-auto pointer-events-auto">
+            <button onclick="submitOrderToLine()" class="w-full bg-slate-900 text-white font-bold text-lg py-4 rounded-2xl shadow-xl shadow-slate-900/20 active:scale-[0.98] transition-all flex justify-center items-center gap-3 group">
                 <span>ยืนยันการสั่ง</span>
-                <i class="fas fa-paper-plane text-orange-400"></i>
+                <div class="bg-white/20 rounded-full w-8 h-8 flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                    <i class="fas fa-arrow-right text-sm"></i>
+                </div>
             </button>
         </div>
     </div>
 
-    <!-- ================= MODAL ================= -->
-    <div id="modal-overlay" class="fixed inset-0 bg-black/60 z-40 hidden fade-in backdrop-blur-sm" onclick="closeModal()"></div>
+    <!-- MODAL -->
+    <div id="modal-overlay" class="fixed inset-0 bg-slate-900/60 z-50 hidden backdrop-blur-sm transition-opacity opacity-0" onclick="closeModal()"></div>
     
-    <div id="modal-content" class="fixed bottom-0 left-0 right-0 bg-white rounded-t-[2rem] z-50 transform translate-y-full transition-transform duration-300 max-h-[90vh] overflow-y-auto hide-scroll shadow-2xl max-w-lg mx-auto">
+    <div id="modal-content" class="fixed bottom-0 left-0 right-0 bg-white rounded-t-[2rem] z-50 transform translate-y-full transition-transform duration-300 max-h-[90vh] overflow-y-auto hide-scroll shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.3)] max-w-lg mx-auto">
         
-        <!-- Header Modal -->
-        <div class="h-24 bg-orange-100 flex items-center justify-center relative rounded-t-[2rem] overflow-hidden">
-            <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/food.png')]"></div>
-            <span id="modal-icon" class="text-6xl drop-shadow-sm transform translate-y-2">🍜</span>
-            <button onclick="closeModal()" class="absolute top-4 right-4 bg-white/50 hover:bg-white rounded-full p-2 w-8 h-8 flex items-center justify-center transition-colors">
-                <i class="fas fa-times text-gray-600"></i>
+        <div class="h-28 bg-rose-50 relative overflow-hidden">
+            <div class="absolute -right-6 -top-6 w-32 h-32 bg-rose-200 rounded-full blur-2xl opacity-50"></div>
+            <div class="absolute -left-6 -bottom-6 w-32 h-32 bg-orange-200 rounded-full blur-2xl opacity-50"></div>
+            <div class="absolute inset-0 flex items-center justify-center pt-4">
+                <span id="modal-icon" class="text-7xl drop-shadow-md transform transition-transform hover:scale-110 duration-300">🍛</span>
+            </div>
+            <button onclick="closeModal()" class="absolute top-4 right-4 bg-white/60 hover:bg-white rounded-full p-2 w-9 h-9 flex items-center justify-center transition-all shadow-sm backdrop-blur-sm">
+                <i class="fas fa-times text-slate-500"></i>
             </button>
         </div>
 
-        <div class="p-6 pb-24">
-            <!-- หัวข้อ และ ราคา (ที่เปลี่ยนได้) -->
+        <div class="px-6 py-6 pb-10">
             <div class="flex justify-between items-start mb-6">
                 <div>
-                    <h3 id="modal-title" class="text-2xl font-bold text-gray-800 leading-tight">ชื่อเมนู</h3>
-                    <p class="text-sm text-gray-400 mt-1">ปรับแต่งรายการอาหารของคุณ</p>
+                    <h3 id="modal-title" class="text-2xl font-bold text-slate-800 leading-tight">ชื่อเมนู</h3>
+                    <p class="text-xs font-medium text-rose-500 mt-1 bg-rose-50 inline-block px-2 py-0.5 rounded">Signature Menu</p>
                 </div>
-                <!-- ID modal-price สำหรับอัปเดตราคา -->
-                <span id="modal-price" class="text-3xl font-extrabold text-orange-600 bg-orange-50 px-4 py-2 rounded-xl border border-orange-100 shadow-sm transition-all">50</span>
+                <div class="flex flex-col items-end">
+                    <span id="modal-price" class="text-3xl font-bold text-rose-600">50</span>
+                    <span class="text-[10px] text-slate-400">บาท</span>
+                </div>
             </div>
 
-            <!-- เลือกเนื้อสัตว์ -->
+            <div class="h-px bg-slate-100 mb-6"></div>
+
             <div id="modal-meat-section" class="mb-6 hidden">
-                <h4 class="font-bold text-gray-700 mb-3 text-sm uppercase tracking-wide">เลือกเนื้อสัตว์ <span class="text-red-500">*</span></h4>
+                <h4 class="font-bold text-slate-700 mb-3 text-sm flex items-center gap-2">
+                    <span class="w-1 h-4 bg-rose-500 rounded-full"></span> เลือกเนื้อสัตว์ <span class="text-rose-500">*</span>
+                </h4>
+                <div class="grid grid-cols-3 gap-2">
+                    <label class="cursor-pointer relative group">
+                        <input type="radio" name="modal-meat" value="สันคอ" class="peer sr-only">
+                        <div class="py-3 px-2 text-center rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-600 transition-all peer-checked:border-rose-500 peer-checked:bg-rose-50 peer-checked:text-rose-700 peer-checked:shadow-sm group-hover:border-rose-200">
+                            สันคอ
+                        </div>
+                    </label>
+                    <label class="cursor-pointer relative group">
+                        <input type="radio" name="modal-meat" value="หมูสับ" class="peer sr-only">
+                        <div class="py-3 px-2 text-center rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-600 transition-all peer-checked:border-rose-500 peer-checked:bg-rose-50 peer-checked:text-rose-700 peer-checked:shadow-sm group-hover:border-rose-200">
+                            หมูสับ
+                        </div>
+                    </label>
+                    <label class="cursor-pointer relative group">
+                        <input type="radio" name="modal-meat" value="หมูเด้ง" class="peer sr-only">
+                        <div class="py-3 px-2 text-center rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-600 transition-all peer-checked:border-rose-500 peer-checked:bg-rose-50 peer-checked:text-rose-700 peer-checked:shadow-sm group-hover:border-rose-200">
+                            หมูเด้ง
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h4 class="font-bold text-slate-700 mb-3 text-sm flex items-center gap-2">
+                    <span class="w-1 h-4 bg-orange-500 rounded-full"></span> เพิ่มเติมความอร่อย
+                </h4>
                 <div class="space-y-2">
-                    <label class="flex items-center p-3 border rounded-xl cursor-pointer hover:bg-orange-50 transition-colors has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50">
-                        <input type="radio" name="modal-meat" value="สันคอ" class="accent-orange-600 w-5 h-5 mr-3">
-                        <span class="font-medium text-gray-700">สันคอ</span>
+                    <label class="flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-orange-200 cursor-pointer transition-all has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50/50 has-[:checked]:shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" id="modal-opt-special" class="addon-checkbox w-5 h-5 rounded text-orange-500 focus:ring-orange-500 border-gray-300" value="10">
+                            <span class="text-sm font-medium text-slate-700">💎 พิเศษ</span>
+                        </div>
+                        <span class="text-xs font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded">+10</span>
                     </label>
-                    <label class="flex items-center p-3 border rounded-xl cursor-pointer hover:bg-orange-50 transition-colors has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50">
-                        <input type="radio" name="modal-meat" value="หมูสับ" class="accent-orange-600 w-5 h-5 mr-3">
-                        <span class="font-medium text-gray-700">หมูสับ</span>
-                    </label>
-                    <label class="flex items-center p-3 border rounded-xl cursor-pointer hover:bg-orange-50 transition-colors has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50">
-                        <input type="radio" name="modal-meat" value="หมูเด้ง" class="accent-orange-600 w-5 h-5 mr-3">
-                        <span class="font-medium text-gray-700">หมูเด้ง</span>
+
+                    <div class="grid grid-cols-2 gap-2">
+                         <label class="flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-orange-200 cursor-pointer transition-all has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50/50">
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" id="modal-opt-kaikhon" class="addon-checkbox w-4 h-4 rounded text-orange-500 focus:ring-orange-500 border-gray-300" value="10">
+                                <span class="text-sm text-slate-700">🍳 ไข่ข้น</span>
+                            </div>
+                            <span class="text-xs font-bold text-orange-500">+10</span>
+                        </label>
+                        <label class="flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-orange-200 cursor-pointer transition-all has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50/50">
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" id="modal-opt-kaidao" class="addon-checkbox w-4 h-4 rounded text-orange-500 focus:ring-orange-500 border-gray-300" value="10">
+                                <span class="text-sm text-slate-700">🥚 ไข่ดาว</span>
+                            </div>
+                            <span class="text-xs font-bold text-orange-500">+10</span>
+                        </label>
+                        <label class="flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-orange-200 cursor-pointer transition-all has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50/50">
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" id="modal-opt-kaijiao" class="addon-checkbox w-4 h-4 rounded text-orange-500 focus:ring-orange-500 border-gray-300" value="10">
+                                <span class="text-sm text-slate-700">🥞 ไข่เจียว</span>
+                            </div>
+                            <span class="text-xs font-bold text-orange-500">+10</span>
+                        </label>
+                        <label class="flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-orange-200 cursor-pointer transition-all has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50/50">
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" id="modal-opt-kaitom" class="addon-checkbox w-4 h-4 rounded text-orange-500 focus:ring-orange-500 border-gray-300" value="10">
+                                <span class="text-sm text-slate-700">🥚 ไข่ต้ม</span>
+                            </div>
+                            <span class="text-xs font-bold text-orange-500">+10</span>
+                        </label>
+                    </div>
+
+                    <label class="flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-orange-200 cursor-pointer transition-all has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50/50">
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" id="modal-opt-kaiyiewma" class="addon-checkbox w-5 h-5 rounded text-orange-500 focus:ring-orange-500 border-gray-300" value="10">
+                            <span class="text-sm font-medium text-slate-700">⚫ ไข่เยี่ยวม้า</span>
+                        </div>
+                        <span class="text-xs font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded">+10</span>
                     </label>
                 </div>
             </div>
 
-            <!-- Add-ons (Checkbox) -->
-            <div class="mb-6">
-                <h4 class="font-bold text-gray-700 mb-3 text-sm uppercase tracking-wide">เพิ่มเติม (Add-ons)</h4>
-                <div class="grid grid-cols-2 gap-3">
-                    <label class="border p-3 rounded-xl flex items-center justify-between cursor-pointer hover:bg-orange-50 has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50 transition-all">
-                        <span class="text-sm font-medium">💎 พิเศษ</span>
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs font-bold text-orange-600">+10</span>
-                            <!-- เพิ่ม class addon-checkbox -->
-                            <input type="checkbox" id="modal-opt-special" class="addon-checkbox accent-orange-600 w-4 h-4" value="10">
-                        </div>
-                    </label>
-                    <label class="border p-3 rounded-xl flex items-center justify-between cursor-pointer hover:bg-orange-50 has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50 transition-all">
-                        <span class="text-sm font-medium">🍳 ไข่ข้น</span>
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs font-bold text-orange-600">+10</span>
-                            <input type="checkbox" id="modal-opt-kaikhon" class="addon-checkbox accent-orange-600 w-4 h-4" value="10">
-                        </div>
-                    </label>
-                    <label class="border p-3 rounded-xl flex items-center justify-between cursor-pointer hover:bg-orange-50 has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50 transition-all">
-                        <span class="text-sm font-medium">🥚 ไข่ดาว</span>
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs font-bold text-orange-600">+10</span>
-                            <input type="checkbox" id="modal-opt-kaidao" class="addon-checkbox accent-orange-600 w-4 h-4" value="10">
-                        </div>
-                    </label>
-                    <label class="border p-3 rounded-xl flex items-center justify-between cursor-pointer hover:bg-orange-50 has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50 transition-all">
-                        <span class="text-sm font-medium">🥞 ไข่เจียว</span>
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs font-bold text-orange-600">+10</span>
-                            <input type="checkbox" id="modal-opt-kaijiao" class="addon-checkbox accent-orange-600 w-4 h-4" value="10">
-                        </div>
-                    </label>
-                    <label class="border p-3 rounded-xl flex items-center justify-between cursor-pointer hover:bg-orange-50 has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50 transition-all">
-                        <span class="text-sm font-medium">🥚 ไข่ต้ม</span>
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs font-bold text-orange-600">+10</span>
-                            <input type="checkbox" id="modal-opt-kaitom" class="addon-checkbox accent-orange-600 w-4 h-4" value="10">
-                        </div>
-                    </label>
-                    <label class="border p-3 rounded-xl flex items-center justify-between cursor-pointer hover:bg-orange-50 has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50 transition-all">
-                        <span class="text-sm font-medium">⚫ ไข่เยี่ยวม้า</span>
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs font-bold text-orange-600">+10</span>
-                            <input type="checkbox" id="modal-opt-kaiyiewma" class="addon-checkbox accent-orange-600 w-4 h-4" value="10">
-                        </div>
-                    </label>
+            <div class="mb-8">
+                <h4 class="font-bold text-slate-700 mb-3 text-sm flex items-center gap-2">
+                    <span class="w-1 h-4 bg-slate-400 rounded-full"></span> หมายเหตุ (Note)
+                </h4>
+                <div class="relative">
+                    <input type="text" id="modal-note" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-3.5 outline-none focus:ring-2 focus:ring-rose-400 focus:bg-white transition-all text-sm" placeholder="เช่น ไม่เผ็ด, ไม่ใส่ใบกะเพรา">
+                    <i class="fas fa-pen absolute left-3.5 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs"></i>
                 </div>
             </div>
 
-            <!-- Note -->
-            <div class="mb-6">
-                <h4 class="font-bold text-gray-700 mb-3 text-sm uppercase tracking-wide">หมายเหตุเมนูนี้</h4>
-                <input type="text" id="modal-note" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-400" placeholder="เช่น ไม่เผ็ด, ไม่ใส่ใบกะเพรา">
-            </div>
-
-            <!-- Add Button -->
-            <button onclick="addToCart()" class="w-full bg-gradient-to-r from-orange-500 to-red-600 text-white font-bold text-lg py-4 rounded-2xl shadow-lg shadow-orange-200 active:scale-95 transition-transform flex justify-center items-center gap-2">
-                <span>เพิ่มลงตะกร้า</span>
-                <i class="fas fa-plus"></i>
+            <button onclick="addToCart()" class="w-full bg-gradient-to-r from-rose-500 to-orange-500 text-white font-bold text-lg py-4 rounded-2xl shadow-lg shadow-rose-200 active:scale-[0.98] transition-transform flex justify-center items-center gap-2 relative overflow-hidden group">
+                <span class="relative z-10">ใส่ตะกร้าเลย</span>
+                <i class="fas fa-basket-shopping relative z-10 group-hover:rotate-12 transition-transform"></i>
+                <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
             </button>
         </div>
     </div>
 
     <script>
+        // DATA
         const menuItems = [
-            { id: 1, name: "กะเพราวุ้นเส้น", price: 55, icon: "🍝", reqMeat: true },
-            { id: 2, name: "กะเพราหน่อไม้", price: 55, icon: "🎍", reqMeat: true },
-            { id: 3, name: "กะเพราหมูสับ", price: 50, icon: "🐷", reqMeat: false },
-            { id: 4, name: "กะเพราหมูเด้ง", price: 50, icon: "🥓", reqMeat: false },
-            { id: 5, name: "กะเพราสันคอ", price: 50, icon: "🥩", reqMeat: false },
-            { id: 6, name: "กะเพราไข่เยี่ยวม้า", price: 60, icon: "🥚", reqMeat: false },
-            { id: 7, name: "หมูสับกระเทียม", price: 50, icon: "🧄", reqMeat: false },
-            { id: 8, name: "สันคอกระเทียม", price: 50, icon: "🍖", reqMeat: false },
-            { id: 9, name: "หมูเด้งกระเทียม", price: 50, icon: "🍘", reqMeat: false },
-            { id: 10, name: "มาม่าผัดกะเพราหอยลาย", price: 50, icon: "🍜", reqMeat: true },
-            { id: 11, name: "ข้าวไข่ข้นน้ำพริกเผา", price: 40, icon: "🌶️", reqMeat: false, desc: "ไข่ 2 ฟอง" },
-            { id: 12, name: "ข้าวไข่ข้น", price: 40, icon: "🍚", reqMeat: false, desc: "ไข่ 2 ฟอง" },
-            { id: 13, name: "ข้าวใข่เจียวพริกสด", price: 50, icon: "🥘", reqMeat: false },
-            { id: 14, name: "ข้าวไข่ดาว 3 ฟอง", price: 50, icon: "🍳", reqMeat: false },
-            { id: 15, name: "หน่อไม้ผัดไข่", price: 50, icon: "🎋", reqMeat: true },
+            // กะเพรา (Kaprao)
+            { id: 2, name: "กะเพราหน่อไม้", price: 55, icon: "🎍", category: "kaprao", reqMeat: true },
+            { id: 3, name: "กะเพราหมูสับ", price: 50, icon: "🐷", category: "kaprao", reqMeat: false },
+            { id: 4, name: "กะเพราหมูเด้ง", price: 50, icon: "🥓", category: "kaprao", reqMeat: false },
+            { id: 5, name: "กะเพราสันคอ", price: 50, icon: "🥩", category: "kaprao", reqMeat: false },
+            { id: 6, name: "กะเพราไข่เยี่ยวม้า", price: 60, icon: "⚫", category: "kaprao", reqMeat: false },
+            
+            // เมนูเส้น (Noodle) - ย้ายมาม่าและวุ้นเส้นมาที่นี่
+            { id: 10, name: "มาม่าผัดกะเพราหอยลาย", price: 50, icon: "🍜", category: "noodle", reqMeat: true },
+            { id: 1, name: "กะเพราวุ้นเส้น", price: 55, icon: "🍝", category: "noodle", reqMeat: true },
+
+            // กระเทียม (Garlic)
+            { id: 7, name: "หมูสับกระเทียม", price: 50, icon: "🧄", category: "garlic", reqMeat: false },
+            { id: 8, name: "สันคอกระเทียม", price: 50, icon: "🍖", category: "garlic", reqMeat: false },
+            { id: 9, name: "หมูเด้งกระเทียม", price: 50, icon: "🍘", category: "garlic", reqMeat: false },
+
+            // อื่นๆ (Others/Eggs)
+            { id: 11, name: "ข้าวไข่ข้นน้ำพริกเผา", price: 40, icon: "🌶️", category: "others", reqMeat: false, desc: "ไข่ 2 ฟอง" },
+            { id: 12, name: "ข้าวไข่ข้น", price: 40, icon: "🍚", category: "others", reqMeat: false, desc: "ไข่ 2 ฟอง" },
+            { id: 13, name: "ข้าวไข่เจียวพริกสด", price: 50, icon: "🥘", category: "others", reqMeat: false },
+            { id: 14, name: "ข้าวไข่ดาว 3 ฟอง", price: 50, icon: "🍳", category: "others", reqMeat: false },
+            { id: 15, name: "หน่อไม้ผัดไข่", price: 50, icon: "🎋", category: "others", reqMeat: true },
         ];
 
         let cart = [];
         let currentItem = null;
+        let activeCategory = 'kaprao';
 
-        const menuGrid = document.getElementById('menu-grid');
-        
-        menuItems.forEach(item => {
-            const card = document.createElement('div');
-            card.className = `bg-white p-4 rounded-2xl shadow-sm border border-transparent hover:border-orange-200 hover:shadow-md transition-all cursor-pointer flex justify-between items-center active:scale-[0.98]`;
-            card.onclick = () => openModal(item);
-            card.innerHTML = `
-                <div class="flex items-center gap-4">
-                    <div class="text-3xl bg-orange-50 text-orange-600 w-12 h-12 flex items-center justify-center rounded-xl">${item.icon}</div>
-                    <div>
-                        <h3 class="font-bold text-gray-800 text-base">${item.name}</h3>
-                        <p class="text-xs text-gray-400">${item.reqMeat ? 'เลือกเนื้อสัตว์ได้' : 'เมนูแนะนำ'}</p>
+        function switchCategory(cat) {
+            activeCategory = cat;
+            
+            // เพิ่ม 'noodle' ในรายการที่ต้องเช็ค
+            ['kaprao', 'garlic', 'noodle', 'others'].forEach(c => {
+                const btn = document.getElementById(`tab-${c}`);
+                if(c === cat) {
+                    btn.className = "tab-active px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2";
+                } else {
+                    btn.className = "tab-inactive px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2 bg-white hover:bg-rose-50";
+                }
+            });
+
+            renderMenu();
+        }
+
+        function renderMenu() {
+            const grid = document.getElementById('menu-grid');
+            grid.innerHTML = '';
+            
+            const filteredItems = menuItems.filter(i => i.category === activeCategory);
+
+            filteredItems.forEach((item, index) => {
+                const el = document.createElement('div');
+                el.style.animationDelay = `${index * 0.05}s`;
+                el.className = "fade-enter bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex justify-between items-center cursor-pointer active:scale-[0.98] transition-all hover:shadow-md hover:border-rose-200 group";
+                el.onclick = () => openModal(item);
+                
+                el.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 bg-gradient-to-br from-rose-50 to-orange-50 text-2xl flex items-center justify-center rounded-2xl shadow-inner group-hover:scale-110 transition-transform duration-300">
+                            ${item.icon}
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-[15px] leading-tight">${item.name}</h3>
+                            <p class="text-xs text-slate-400 mt-1">${item.desc || (item.reqMeat ? 'เลือกเนื้อสัตว์' : 'พร้อมทาน')}</p>
+                        </div>
                     </div>
-                </div>
-                <div class="text-orange-600 font-bold bg-orange-50 px-3 py-1 rounded-lg text-sm">${item.price}.-</div>
-            `;
-            menuGrid.appendChild(card);
-        });
+                    <div class="flex flex-col items-end">
+                        <span class="text-rose-600 font-bold bg-rose-50 px-2.5 py-1 rounded-lg text-sm group-hover:bg-rose-600 group-hover:text-white transition-colors">${item.price}.-</span>
+                        <div class="mt-1 w-6 h-6 rounded-full bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-orange-100 group-hover:text-orange-500 transition-colors">
+                            <i class="fas fa-plus text-xs"></i>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(el);
+            });
+        }
 
-        // --- MODAL & PRICE LOGIC ---
         const modalOverlay = document.getElementById('modal-overlay');
         const modalContent = document.getElementById('modal-content');
-        
-        // รายการ Checkbox Addons
         const addonIds = ['special', 'kaikhon', 'kaidao', 'kaijiao', 'kaitom', 'kaiyiewma'];
 
         function openModal(item) {
             currentItem = item;
             
-            // Set UI Data
             document.getElementById('modal-title').innerText = item.name;
             document.getElementById('modal-icon').innerText = item.icon;
             document.getElementById('modal-note').value = '';
 
-            // Reset Inputs
             document.querySelectorAll('input[name="modal-meat"]').forEach(el => el.checked = false);
             addonIds.forEach(id => document.getElementById(`modal-opt-${id}`).checked = false);
 
-            // Hide/Show Meat
             const meatSec = document.getElementById('modal-meat-section');
             if(item.reqMeat) meatSec.classList.remove('hidden');
             else meatSec.classList.add('hidden');
 
-            // คำนวณราคาเริ่มต้น (ราคาพื้นฐาน)
-            updateModalTotalPrice();
+            updateModalPrice();
 
-            // เปิด Animation
             modalOverlay.classList.remove('hidden');
-            modalContent.classList.remove('translate-y-full');
+            setTimeout(() => {
+                modalOverlay.classList.remove('opacity-0');
+                modalContent.classList.remove('translate-y-full');
+            }, 10);
         }
 
         function closeModal() {
-            modalOverlay.classList.add('hidden');
+            modalOverlay.classList.add('opacity-0');
             modalContent.classList.add('translate-y-full');
-            currentItem = null;
+            setTimeout(() => {
+                modalOverlay.classList.add('hidden');
+                currentItem = null;
+            }, 300);
         }
 
-        // ฟังก์ชันคำนวณราคา Real-time
-        function updateModalTotalPrice() {
+        function updateModalPrice() {
             if (!currentItem) return;
-            
-            let total = currentItem.price; // ราคาฐาน
-            
-            // วนลูปเช็ค Add-ons ทุกตัว
+            let total = currentItem.price;
             addonIds.forEach(id => {
-                const el = document.getElementById(`modal-opt-${id}`);
-                if (el.checked) {
-                    total += parseInt(el.value); // บวกเพิ่มตาม value (10)
-                }
+                if(document.getElementById(`modal-opt-${id}`).checked) total += 10;
             });
-
-            // อัปเดตตัวเลข
             const priceEl = document.getElementById('modal-price');
-            priceEl.innerText = total + ".-";
-            
-            // Animation เด้งๆ
+            priceEl.innerText = total;
             priceEl.classList.remove('price-bump');
-            void priceEl.offsetWidth; // trigger reflow
+            void priceEl.offsetWidth;
             priceEl.classList.add('price-bump');
         }
 
-        // Event Listener: เมื่อมีการติ๊ก Checkbox ให้คำนวณราคาใหม่ทันที
-        addonIds.forEach(id => {
-            document.getElementById(`modal-opt-${id}`).addEventListener('change', updateModalTotalPrice);
-        });
+        addonIds.forEach(id => document.getElementById(`modal-opt-${id}`).addEventListener('change', updateModalPrice));
 
-        // --- CART LOGIC ---
         function addToCart() {
             if (!currentItem) return;
 
-            // 1. Check Meat
             let selectedMeat = null;
             if (currentItem.reqMeat) {
                 const meatRadio = document.querySelector('input[name="modal-meat"]:checked');
-                if (!meatRadio) {
-                    alert('กรุณาเลือกเนื้อสัตว์ก่อนครับ');
-                    return;
-                }
+                if (!meatRadio) return alert('กรุณาเลือกเนื้อสัตว์ก่อนครับ');
                 selectedMeat = meatRadio.value;
             }
 
-            // 2. Options
             let addons = [];
             let addonPrice = 0;
             const checks = [
@@ -323,7 +437,7 @@
                 {id: 'kaitom', name: 'ไข่ต้ม', price: 10},
                 {id: 'kaiyiewma', name: 'ไข่เยี่ยวม้า', price: 10},
             ];
-            
+
             checks.forEach(opt => {
                 if(document.getElementById(`modal-opt-${opt.id}`).checked) {
                     addons.push(opt.name);
@@ -331,115 +445,109 @@
                 }
             });
 
-            const note = document.getElementById('modal-note').value.trim();
-
             const orderItem = {
                 id: Date.now(),
                 menuName: currentItem.name,
                 basePrice: currentItem.price,
                 meat: selectedMeat,
                 addons: addons,
-                addonPrice: addonPrice,
-                note: note,
-                total: currentItem.price + addonPrice
+                total: currentItem.price + addonPrice,
+                note: document.getElementById('modal-note').value.trim()
             };
 
             cart.push(orderItem);
             renderCart();
             closeModal();
-            
+
             setTimeout(() => {
                 document.getElementById('cart-section').scrollIntoView({ behavior: 'smooth' });
             }, 300);
         }
 
         function removeFromCart(id) {
-            cart = cart.filter(item => item.id !== id);
+            cart = cart.filter(i => i.id !== id);
             renderCart();
         }
 
         function renderCart() {
-            const cartSection = document.getElementById('cart-section');
-            const cartItemsContainer = document.getElementById('cart-items');
-            const footerBar = document.getElementById('footer-bar');
-            
+            const section = document.getElementById('cart-section');
+            const list = document.getElementById('cart-items');
+            const footer = document.getElementById('footer-bar');
+
             if (cart.length === 0) {
-                cartSection.classList.add('hidden');
-                footerBar.classList.add('translate-y-full');
+                section.classList.add('hidden');
+                footer.classList.add('translate-y-[150%]');
                 return;
             }
 
-            cartSection.classList.remove('hidden');
-            footerBar.classList.remove('translate-y-full');
-            cartItemsContainer.innerHTML = '';
+            section.classList.remove('hidden');
+            footer.classList.remove('translate-y-[150%]');
+            list.innerHTML = '';
             
-            let grandTotal = 0;
-
-            cart.forEach((item, index) => {
-                grandTotal += item.total;
-                
-                const meatStr = item.meat ? `<span class="text-orange-600 font-medium">(${item.meat})</span>` : '';
-                const addonStr = item.addons.length > 0 ? `<span class="text-gray-500 text-xs">+ ${item.addons.join(', ')}</span>` : '';
-                const noteStr = item.note ? `<div class="text-xs text-red-400 mt-1"><i class="fas fa-pen mr-1"></i>${item.note}</div>` : '';
+            let total = 0;
+            cart.forEach((item, idx) => {
+                total += item.total;
+                const meatStr = item.meat ? `<span class="text-rose-500">(${item.meat})</span>` : '';
+                const addonStr = item.addons.length > 0 ? `<div class="text-[11px] text-slate-400 mt-0.5">+ ${item.addons.join(', ')}</div>` : '';
+                const noteStr = item.note ? `<div class="text-[11px] text-orange-500 mt-0.5"><i class="fas fa-comment-dots mr-1"></i>${item.note}</div>` : '';
 
                 const div = document.createElement('div');
-                div.className = 'bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex justify-between items-start slide-up';
+                div.className = "bg-white p-4 rounded-xl border border-rose-50 shadow-sm flex justify-between items-start fade-enter relative overflow-hidden";
                 div.innerHTML = `
-                    <div class="flex-1">
-                        <div class="font-bold text-gray-800 text-lg">
-                            <span class="text-gray-400 mr-2 text-sm">#${index+1}</span>
+                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-rose-400 to-orange-400"></div>
+                    <div class="flex-1 pl-2">
+                        <div class="font-bold text-slate-700 text-sm">
+                            <span class="text-slate-300 mr-1 font-light">#${idx+1}</span>
                             ${item.menuName} ${meatStr}
                         </div>
-                        <div class="flex flex-col">
-                            ${addonStr}
-                            ${noteStr}
-                        </div>
+                        ${addonStr}
+                        ${noteStr}
                     </div>
                     <div class="flex flex-col items-end gap-2">
-                        <div class="font-bold text-gray-800">${item.total}.-</div>
-                        <button onclick="removeFromCart(${item.id})" class="text-xs text-red-500 hover:text-red-700 bg-red-50 px-2 py-1 rounded">ลบ</button>
+                        <span class="font-bold text-slate-800">${item.total}.-</span>
+                        <button onclick="removeFromCart(${item.id})" class="text-[10px] text-red-400 bg-red-50 hover:bg-red-100 px-2 py-1 rounded transition-colors">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </div>
                 `;
-                cartItemsContainer.appendChild(div);
+                list.appendChild(div);
             });
 
-            document.getElementById('cart-count').innerText = cart.length;
-            document.getElementById('grand-total').innerText = grandTotal + " ฿";
+            document.getElementById('cart-count-badge').innerText = `${cart.length} รายการ`;
+            document.getElementById('grand-total').innerText = `${total} ฿`;
         }
 
         function submitOrderToLine() {
             const name = document.getElementById('user-name').value.trim();
-            if (cart.length === 0) return alert('ตะกร้ายังว่างอยู่เลยครับ');
-            if (!name) {
+            if(!name) {
                 alert('กรุณาระบุชื่อผู้สั่งด้วยครับ');
                 document.getElementById('user-name').focus();
                 return;
             }
 
-            let msg = `🔥 ออเดอร์ใหม่จาก: คุณ ${name}\n`;
-            msg += `----------------------------\n`;
+            let msg = `🔥 ออเดอร์จาก: คุณ ${name}\n========================\n`;
+            let total = 0;
             
-            let grandTotal = 0;
             cart.forEach((item, i) => {
-                grandTotal += item.total;
-                
+                total += item.total;
                 let detail = item.menuName;
                 if(item.meat) detail += ` (${item.meat})`;
-                if(item.addons.length > 0) detail += ` + ${item.addons.join('+')}`;
+                if(item.addons.length) detail += ` + ${item.addons.join('+')}`;
                 
                 msg += `${i+1}. ${detail}`;
                 if(item.note) msg += `\n   (📝 ${item.note})`;
                 msg += `\n`;
             });
-            
-            msg += `----------------------------\n`;
-            msg += `💰 ยอดรวมทั้งหมด: ${grandTotal} บาท\n`;
-            msg += `----------------------------\n`;
-            msg += `Developed by Sorawit (v2.1)`;
 
-            const encoded = encodeURIComponent(msg);
-            window.location.href = `https://line.me/R/msg/text/?${encoded}`;
+            msg += `========================\n`;
+            msg += `💰 ยอดรวม: ${total} บาท\n`;
+            msg += `========================\n`;
+            msg += `Developed by Sorawit (v3.2 - 19/12/2025)`;
+
+            window.location.href = `https://line.me/R/msg/text/?${encodeURIComponent(msg)}`;
         }
+
+        renderMenu(); 
     </script>
 </body>
 </html>
