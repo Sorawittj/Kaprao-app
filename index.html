@@ -8,7 +8,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
     
-    <title>Kaprao52 - V5.4</title>
+    <title>Kaprao52 - V5.6</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -92,6 +92,56 @@
             background-size: 30px 30px;
             opacity: 0.1;
         }
+
+        /* --- GRAND WAVE ANIMATION FOR KAPRAO52 --- */
+        @keyframes waveBounce {
+            0%, 100% { 
+                transform: translateY(0); 
+                filter: drop-shadow(0 2px 2px rgba(124, 119, 214, 0.3));
+            }
+            50% { 
+                transform: translateY(-8px) scale(1.1); 
+                filter: drop-shadow(0 8px 6px rgba(124, 119, 214, 0.2));
+            }
+        }
+
+        .grand-title {
+            display: flex;
+            align-items: baseline;
+        }
+
+        .bouncy-letter {
+            display: inline-block;
+            font-weight: 900;
+            font-size: 2.25rem; /* ขนาดตัวอักษรใหญ่สะใจ */
+            line-height: 1;
+            
+            /* Gradient ม่วง -> ชมพู */
+            background: linear-gradient(135deg, #7C77D6 20%, #FF6B6B 80%); 
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            
+            animation: waveBounce 2s ease-in-out infinite;
+        }
+
+        /* สีทองสำหรับเลข 52 */
+        .bouncy-letter.highlight {
+            background: linear-gradient(135deg, #FFD755 20%, #FFA000 80%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* ตั้งเวลา Delay ให้เป็นคลื่น */
+        .bouncy-letter:nth-child(1) { animation-delay: 0.0s; }
+        .bouncy-letter:nth-child(2) { animation-delay: 0.1s; }
+        .bouncy-letter:nth-child(3) { animation-delay: 0.2s; }
+        .bouncy-letter:nth-child(4) { animation-delay: 0.3s; }
+        .bouncy-letter:nth-child(5) { animation-delay: 0.4s; }
+        .bouncy-letter:nth-child(6) { animation-delay: 0.5s; }
+        .bouncy-letter:nth-child(7) { animation-delay: 0.6s; }
+        .bouncy-letter:nth-child(8) { animation-delay: 0.7s; }
     </style>
 </head>
 <body class="pb-32 font-sans select-none relative overflow-x-hidden">
@@ -122,10 +172,19 @@
                      <i class="fas fa-user text-yellow-600 text-xl"></i>
                 </div>
                 <div class="flex flex-col justify-center">
-                    <p class="text-xs text-gray-400 font-medium mb-0.5">สวัสดี ลูกค้าคนพิเศษ ✨</p>
-                    <h1 class="text-2xl font-extrabold text-brand-purple leading-none tracking-tight mb-1">
-                        ร้านกะเพรา52 <span class="text-xl">🍚</span>
+                    <p class="text-xs text-gray-400 font-medium mb-1">สวัสดี ลูกค้าคนพิเศษ ✨</p>
+                    
+                    <h1 class="grand-title leading-none tracking-tight mb-2 relative z-10 pt-1">
+                        <span class="bouncy-letter">K</span>
+                        <span class="bouncy-letter">A</span>
+                        <span class="bouncy-letter">P</span>
+                        <span class="bouncy-letter">R</span>
+                        <span class="bouncy-letter">A</span>
+                        <span class="bouncy-letter">O</span>
+                        <span class="bouncy-letter highlight">5</span>
+                        <span class="bouncy-letter highlight">2</span>
                     </h1>
+
                 </div>
             </div>
             
@@ -194,8 +253,7 @@
         <div id="menu-grid" class="flex flex-col gap-4"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ</p>
-            <p class="text-[10px] font-medium text-gray-400 mt-1">VERSION 5.4.0 </p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V5.6</p>
         </div>
 
     </div>
@@ -830,7 +888,7 @@
             sfxOrder.play();
             triggerHaptic();
 
-            // --- 3. FIRE CONFETTI ---
+            // Fire Confetti
             confetti({
                 particleCount: 150,
                 spread: 70,
