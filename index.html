@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kaprao52-App</title>
+    <title>Kaprao52-App (Sound FX Edition)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -209,7 +209,7 @@
 
         <div class="text-center mt-12 opacity-40 pb-4">
             <p class="text-[10px] font-medium tracking-wide text-slate-400">
-                DEVELOPED BY SORAWIT THUNTHAKIJ<br>VERSION 4.0 (19/12/2025)
+                DEVELOPED BY SORAWIT THUNTHAKIJ<br>VERSION 4.2 (19/12/2025)
             </p>
         </div>
     </div>
@@ -248,6 +248,10 @@
                 <div class="flex flex-col items-end">
                     <span id="modal-price" class="text-3xl font-bold text-rose-600">50</span>
                     <span class="text-[10px] text-slate-400">บาท</span>
+                    
+                    <div id="modal-kcal-badge" class="mt-1 bg-orange-100 text-orange-600 px-2 py-0.5 rounded-md text-[10px] font-bold flex items-center gap-1">
+                        <i class="fas fa-fire"></i> <span id="modal-kcal">0</span> kcal
+                    </div>
                 </div>
             </div>
 
@@ -352,30 +356,39 @@
     </div>
 
     <script>
-        // DATA MENU
+        // [SOUND] Setup Audio Objects
+        // ใช้ไฟล์เสียงมาตรฐานจากเว็บแจกฟรี (ไม่มีลิขสิทธิ์)
+        const soundPop = new Audio('https://www.soundjay.com/buttons/sounds/button-3.mp3');
+        const soundBell = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
+        
+        // ปรับความดังนิดหน่อย
+        soundPop.volume = 0.5;
+        soundBell.volume = 0.6;
+
+        // [UPDATED] DATA MENU with KCAL
         const menuItems = [
             // กะเพรา (Kaprao)
-            { id: 2, name: "กะเพราหน่อไม้", price: 55, icon: "🎍", category: "kaprao", reqMeat: true },
-            { id: 3, name: "กะเพราหมูสับ", price: 50, icon: "🐷", category: "kaprao", reqMeat: false },
-            { id: 4, name: "กะเพราหมูเด้ง", price: 50, icon: "🥓", category: "kaprao", reqMeat: false },
-            { id: 5, name: "กะเพราสันคอ", price: 50, icon: "🥩", category: "kaprao", reqMeat: false },
-            { id: 6, name: "กะเพราไข่เยี่ยวม้า", price: 60, icon: "⚫", category: "kaprao", reqMeat: false },
+            { id: 2, name: "กะเพราหน่อไม้", price: 55, icon: "🎍", category: "kaprao", reqMeat: true, kcal: 350 },
+            { id: 3, name: "กะเพราหมูสับ", price: 50, icon: "🐷", category: "kaprao", reqMeat: false, kcal: 520 },
+            { id: 4, name: "กะเพราหมูเด้ง", price: 50, icon: "🥓", category: "kaprao", reqMeat: false, kcal: 550 },
+            { id: 5, name: "กะเพราสันคอ", price: 50, icon: "🥩", category: "kaprao", reqMeat: false, kcal: 600 },
+            { id: 6, name: "กะเพราไข่เยี่ยวม้า", price: 60, icon: "⚫", category: "kaprao", reqMeat: false, kcal: 650 },
             
             // เมนูเส้น (Noodle)
-            { id: 10, name: "มาม่าผัดกะเพราหอยลาย", price: 50, icon: "🍜", category: "noodle", reqMeat: true },
-            { id: 1, name: "กะเพราวุ้นเส้น", price: 55, icon: "🍝", category: "noodle", reqMeat: true },
+            { id: 10, name: "มาม่าผัดกะเพราหอยลาย", price: 50, icon: "🍜", category: "noodle", reqMeat: true, kcal: 450 },
+            { id: 1, name: "กะเพราวุ้นเส้น", price: 55, icon: "🍝", category: "noodle", reqMeat: true, kcal: 400 },
 
             // กระเทียม (Garlic)
-            { id: 7, name: "หมูสับกระเทียม", price: 50, icon: "🧄", category: "garlic", reqMeat: false },
-            { id: 8, name: "สันคอกระเทียม", price: 50, icon: "🍖", category: "garlic", reqMeat: false },
-            { id: 9, name: "หมูเด้งกระเทียม", price: 50, icon: "🍘", category: "garlic", reqMeat: false },
+            { id: 7, name: "หมูสับกระเทียม", price: 50, icon: "🧄", category: "garlic", reqMeat: false, kcal: 500 },
+            { id: 8, name: "สันคอกระเทียม", price: 50, icon: "🍖", category: "garlic", reqMeat: false, kcal: 580 },
+            { id: 9, name: "หมูเด้งกระเทียม", price: 50, icon: "🍘", category: "garlic", reqMeat: false, kcal: 530 },
 
             // อื่นๆ (Others/Eggs)
-            { id: 11, name: "ข้าวไข่ข้นน้ำพริกเผา", price: 40, icon: "🌶️", category: "others", reqMeat: false, desc: "ไข่ 2 ฟอง" },
-            { id: 12, name: "ข้าวไข่ข้น", price: 40, icon: "🍚", category: "others", reqMeat: false, desc: "ไข่ 2 ฟอง" },
-            { id: 13, name: "ข้าวไข่เจียวพริกสด", price: 50, icon: "🥘", category: "others", reqMeat: false },
-            { id: 14, name: "ข้าวไข่ดาว 3 ฟอง", price: 50, icon: "🍳", category: "others", reqMeat: false },
-            { id: 15, name: "หน่อไม้ผัดไข่", price: 50, icon: "🎋", category: "others", reqMeat: true },
+            { id: 11, name: "ข้าวไข่ข้นน้ำพริกเผา", price: 40, icon: "🌶️", category: "others", reqMeat: false, desc: "ไข่ 2 ฟอง", kcal: 450 },
+            { id: 12, name: "ข้าวไข่ข้น", price: 40, icon: "🍚", category: "others", reqMeat: false, desc: "ไข่ 2 ฟอง", kcal: 380 },
+            { id: 13, name: "ข้าวไข่เจียวพริกสด", price: 50, icon: "🥘", category: "others", reqMeat: false, kcal: 420 },
+            { id: 14, name: "ข้าวไข่ดาว 3 ฟอง", price: 50, icon: "🍳", category: "others", reqMeat: false, kcal: 480 },
+            { id: 15, name: "หน่อไม้ผัดไข่", price: 50, icon: "🎋", category: "others", reqMeat: true, kcal: 300 },
         ];
 
         // DATA PROMOTIONS
@@ -679,6 +692,9 @@
                 return;
             }
 
+            // [SOUND] Play bell sound
+            soundBell.play();
+
             let msg = `🔥 ออเดอร์จาก: คุณ ${name}\n========================\n`;
             let subTotal = 0;
             
@@ -709,13 +725,26 @@
             msg += `========================\n`;
             msg += `ขอบคุณที่อุดหนุนร้านเล็กๆ ของเรานะครับ`;
 
-            window.location.href = `https://line.me/R/msg/text/?${encodeURIComponent(msg)}`;
+            // [SOUND] Delay 800ms before redirecting so sound can play
+            setTimeout(() => {
+                window.location.href = `https://line.me/R/msg/text/?${encodeURIComponent(msg)}`;
+            }, 800);
         }
 
         // --- Other Functions ---
         const modalOverlay = document.getElementById('modal-overlay');
         const modalContent = document.getElementById('modal-content');
         const addonIds = ['special', 'kaikhon', 'kaidao', 'kaijiao', 'kaitom', 'kaiyiewma'];
+
+        // [UPDATED] Calorie Map for Addons
+        const addonCalories = {
+            'special': 80,    // พิเศษ
+            'kaikhon': 150,   // ไข่ข้น
+            'kaidao': 120,    // ไข่ดาว
+            'kaijiao': 200,   // ไข่เจียว
+            'kaitom': 75,     // ไข่ต้ม
+            'kaiyiewma': 100  // ไข่เยี่ยวม้า
+        };
 
         function openModal(item) {
             currentItem = item;
@@ -727,7 +756,9 @@
             const meatSec = document.getElementById('modal-meat-section');
             if(item.reqMeat) meatSec.classList.remove('hidden');
             else meatSec.classList.add('hidden');
-            updateModalPrice();
+            
+            updateModalPrice(); // Initial calculation with 0 addons
+            
             modalOverlay.classList.remove('hidden');
             setTimeout(() => {
                 modalOverlay.classList.remove('opacity-0');
@@ -744,17 +775,48 @@
             }, 300);
         }
 
+        // [UPDATED] Function: Calculate both Price and Calories
         function updateModalPrice() {
             if (!currentItem) return;
-            let total = currentItem.price;
+            
+            // 1. Calculate Price
+            let totalPrice = currentItem.price;
             addonIds.forEach(id => {
-                if(document.getElementById(`modal-opt-${id}`).checked) total += 10;
+                if(document.getElementById(`modal-opt-${id}`).checked) totalPrice += 10;
             });
+
+            // 2. Calculate Calories
+            let totalKcal = currentItem.kcal || 0; 
+            addonIds.forEach(id => {
+                if(document.getElementById(`modal-opt-${id}`).checked) {
+                    totalKcal += (addonCalories[id] || 0);
+                }
+            });
+
+            // 3. Update Price UI
             const priceEl = document.getElementById('modal-price');
-            priceEl.innerText = total;
+            priceEl.innerText = totalPrice;
             priceEl.classList.remove('price-bump');
             void priceEl.offsetWidth;
             priceEl.classList.add('price-bump');
+
+            // 4. Update Calorie UI with Animation
+            const kcalEl = document.getElementById('modal-kcal');
+            animateValue(kcalEl, parseInt(kcalEl.innerText) || 0, totalKcal, 300);
+        }
+
+        // [NEW] Helper for number animation
+        function animateValue(obj, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
         }
 
         addonIds.forEach(id => document.getElementById(`modal-opt-${id}`).addEventListener('change', updateModalPrice));
@@ -793,6 +855,10 @@
                 note: document.getElementById('modal-note').value.trim()
             };
             cart.push(orderItem);
+
+            // [SOUND] Play Pop Sound
+            soundPop.currentTime = 0; // Reset sound if played quickly
+            soundPop.play();
             
             renderCart();
             closeModal();
