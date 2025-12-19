@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kaprao52 - Final V5.1 (Sound & Remove Code)</title>
+    <title>Kaprao52 - Final V5.2 (UX Upgrade)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,8 +16,8 @@
                         brand: {
                             purple: '#7C77D6', 
                             yellow: '#FFD755', 
-                            bg: '#F5F7FB',     
-                            text: '#2D3436',   
+                            bg: '#F5F7FB',      
+                            text: '#2D3436',    
                         }
                     },
                     fontFamily: {
@@ -82,7 +82,6 @@
 </head>
 <body class="pb-32 font-sans select-none">
 
-    <!-- Top Bar -->
     <div class="px-6 pt-8 pb-4 bg-transparent">
         <div class="flex items-start gap-3">
             <div class="w-12 h-12 rounded-full bg-yellow-200 overflow-hidden border-2 border-white shadow-sm flex-shrink-0 flex items-center justify-center">
@@ -100,7 +99,6 @@
 
     <div class="max-w-md mx-auto px-5">
         
-        <!-- Hero Card -->
         <div id="hero-banner" class="w-full bg-brand-purple rounded-4xl p-6 relative overflow-hidden shadow-xl shadow-indigo-200 mb-8 fade-in-up mt-2">
             <div class="absolute -right-10 -top-10 w-40 h-40 bg-white opacity-10 rounded-full blur-2xl"></div>
             <div class="absolute bottom-0 right-10 w-20 h-20 bg-yellow-300 opacity-20 rounded-full blur-xl"></div>
@@ -118,7 +116,6 @@
             </div>
         </div>
 
-        <!-- Category Tabs -->
         <div class="mb-3 flex items-center justify-between">
             <h3 class="font-bold text-gray-800 text-lg">หมวดหมู่</h3>
             <div class="flex gap-2">
@@ -127,7 +124,7 @@
             </div>
         </div>
         
-        <div id="tabs-container" class="overflow-x-auto hide-scroll pb-4 -mx-5 px-5 flex gap-3 snap-x scroll-smooth">
+        <div id="tabs-container" class="sticky top-0 z-30 bg-[#F5F7FB] pt-2 pb-4 -mx-5 px-5 flex gap-3 snap-x scroll-smooth overflow-x-auto hide-scroll transition-all">
             <button onclick="switchCategory('kaprao')" id="tab-kaprao" class="snap-start category-pill-active min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all">
                 <span class="text-xl">🌶️</span>
                 <span class="text-xs">เมนูกะเพรา</span>
@@ -150,22 +147,19 @@
             </button>
         </div>
 
-        <!-- Menu List -->
         <div class="mb-4 mt-2">
             <h3 id="section-title" class="font-bold text-gray-800 text-lg">รายการแนะนำ</h3>
         </div>
 
         <div id="menu-grid" class="flex flex-col gap-4"></div>
 
-        <!-- DEVELOPER CREDIT -->
         <div class="text-center mt-12 mb-20 opacity-50">
             <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ</p>
-            <p class="text-[10px] font-medium text-gray-400 mt-1">VERSION 5.0.0 (19/12/2025)</p>
+            <p class="text-[10px] font-medium text-gray-400 mt-1">VERSION 5.2.0 (19/12/2025)</p>
         </div>
 
     </div>
 
-    <!-- Mini Cart Bar -->
     <div id="mini-cart-bar" class="fixed bottom-6 left-5 right-5 z-40 hidden fade-in-up">
         <div onclick="openCheckout()" class="bg-gray-900 text-white p-4 rounded-full shadow-2xl shadow-gray-400/50 flex justify-between items-center cursor-pointer active:scale-95 transition-transform">
             <div class="flex items-center gap-3 pl-2">
@@ -182,7 +176,6 @@
         </div>
     </div>
 
-    <!-- Checkout Sheet -->
     <div id="checkout-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 hidden transition-opacity opacity-0" onclick="closeCheckout()"></div>
     
     <div id="checkout-sheet" class="fixed bottom-0 left-0 right-0 bg-white rounded-t-[2.5rem] z-50 transform translate-y-full transition-transform duration-300 shadow-2xl max-w-md mx-auto h-[80vh] flex flex-col touch-pan-y">
@@ -204,13 +197,11 @@
                 <input type="text" id="user-name" placeholder="ชื่อผู้สั่ง..." class="bg-transparent w-full text-sm outline-none text-gray-700">
             </div>
             
-            <!-- Code Input Section -->
             <div class="bg-white rounded-xl p-2 pl-4 flex items-center border border-gray-200 shadow-sm justify-between transition-colors" id="code-input-container">
                 <div class="flex items-center gap-2 w-full">
                     <i class="fas fa-ticket-alt text-gray-400" id="code-icon"></i>
                     <input type="text" id="discount-code" placeholder="โค้ดส่วนลด" class="bg-transparent w-full text-sm outline-none text-gray-700 uppercase transition-colors">
                 </div>
-                <!-- ปุ่มนี้จะถูกเปลี่ยนฟังก์ชันโดย JS -->
                 <button onclick="applyDiscount()" id="btn-apply-code" class="bg-gray-800 hover:bg-gray-700 text-white text-xs px-4 py-2 rounded-lg transition-colors font-bold whitespace-nowrap">ใช้โค้ด</button>
             </div>
             <p id="discount-msg" class="text-xs h-4 pl-2 font-medium"></p>
@@ -220,14 +211,13 @@
                 <span id="sheet-grand-total" class="text-2xl font-bold text-brand-purple">0 ฿</span>
             </div>
 
-            <button onclick="submitOrderToLine()" class="w-full bg-brand-yellow text-gray-900 font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-transform flex justify-center items-center gap-2">
+            <button onclick="submitOrderToLine()" id="btn-submit-order" class="w-full bg-brand-yellow text-gray-900 font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-transform flex justify-center items-center gap-2">
                 <span>ยืนยันการสั่ง</span>
                 <i class="fas fa-paper-plane"></i>
             </button>
         </div>
     </div>
 
-    <!-- Menu Modal -->
     <div id="modal-overlay" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-50 hidden transition-opacity opacity-0" onclick="closeModal()"></div>
     
     <div id="modal-content" class="fixed bottom-0 left-0 right-0 bg-white rounded-t-[2.5rem] z-50 transform translate-y-full transition-transform duration-300 shadow-2xl max-w-md mx-auto h-[85vh] flex flex-col touch-pan-y">
@@ -297,7 +287,6 @@
         </div>
     </div>
 
-    <!-- Toast -->
     <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 transition-all duration-300 opacity-0 -translate-y-10 z-[60] pointer-events-none">
         <i class="fas fa-info-circle text-brand-yellow"></i>
         <span class="font-medium text-sm" id="toast-msg">Notification</span>
@@ -309,6 +298,11 @@
         const sfxOrder = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
         sfxPop.volume = 0.5;
         sfxOrder.volume = 0.6;
+
+        // --- UPDATED: HAPTIC FEEDBACK ---
+        function triggerHaptic() {
+            if (navigator.vibrate) navigator.vibrate(10); 
+        }
 
         // DATA
         const menuItems = [
@@ -339,7 +333,7 @@
             'kaikhon': 150,   
             'kaidao': 120,    
             'kaijiao': 200,   
-            'kaitom': 75,     
+            'kaitom': 75,      
             'kaiyiewma': 100  
         };
 
@@ -397,6 +391,7 @@
         }
 
         function switchCategory(cat) {
+            triggerHaptic(); // Haptic Added
             activeCategory = cat;
             ['kaprao', 'garlic', 'noodle', 'others', 'promotion'].forEach(c => {
                 const btn = document.getElementById(`tab-${c}`);
@@ -481,6 +476,7 @@
         }
 
         function openModal(item) {
+            triggerHaptic(); // Haptic Added
             currentItem = item;
             document.getElementById('modal-title').innerText = item.name;
             document.getElementById('modal-icon').innerText = item.icon;
@@ -569,9 +565,10 @@
                 note: document.getElementById('modal-note').value.trim()
             });
 
-            // Play Pop Sound
+            // Play Pop Sound & Haptic
             sfxPop.currentTime = 0;
             sfxPop.play();
+            triggerHaptic(); // Haptic Added
 
             closeModal();
             updateMiniCart();
@@ -579,6 +576,7 @@
         }
 
         function openCheckout() {
+            triggerHaptic(); // Haptic Added
             renderCheckoutList();
             // Re-apply if code exists
             if(document.getElementById('discount-code').value.trim() !== '' && discountValue > 0) {
@@ -740,12 +738,21 @@
             document.getElementById('sheet-grand-total').innerText = final + " ฿";
         }
 
+        // --- UPDATED: LOADING STATE IN SUBMIT ---
         function submitOrderToLine() {
             const name = document.getElementById('user-name').value.trim();
             if (!name) return showToast('กรุณาใส่ชื่อผู้สั่ง');
             
-            // Play Bell Sound
+            // 1. Get Button & Change State
+            const btn = document.getElementById('btn-submit-order');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> กำลังส่งไลน์...`;
+            btn.classList.add('opacity-75');
+            
+            // 2. Play Bell Sound & Haptic
             sfxOrder.play();
+            triggerHaptic(); // Haptic Added
 
             let total = cart.reduce((sum, i) => sum + i.price, 0);
             let final = Math.max(0, total - discountValue);
@@ -769,10 +776,18 @@
 
             setTimeout(() => {
                 window.location.href = `https://line.me/R/msg/text/?${encodeURIComponent(msg)}`;
+                
+                // 3. Reset Button State (เผื่อคนกด Back กลับมา)
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('opacity-75');
+                }, 1000);
             }, 800);
         }
 
         function randomMenu() {
+            triggerHaptic(); // Haptic Added
             const dice = document.getElementById('dice-icon');
             dice.classList.add('fa-spin');
             setTimeout(() => {
