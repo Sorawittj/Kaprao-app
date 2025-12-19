@@ -8,7 +8,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
     
-    <title>Kaprao52 - V5.7</title> <script src="https://cdn.tailwindcss.com"></script>
+    <title>Kaprao52 - V6.1 Clean & Clear</title> <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -91,50 +91,66 @@
             opacity: 0.1;
         }
 
-        /* --- GRAND WAVE ANIMATION FOR KAPRAO52 --- */
-        @keyframes waveBounce {
-            0%, 100% { 
-                transform: translateY(0); 
-                filter: drop-shadow(0 2px 2px rgba(124, 119, 214, 0.3));
-            }
-            50% { 
-                transform: translateY(-8px) scale(1.1); 
-                filter: drop-shadow(0 8px 6px rgba(124, 119, 214, 0.2));
-            }
-        }
-
+        /* --- CLEAN TITLE STYLES (แก้ไขใหม่ อ่านง่าย) --- */
         .grand-title {
             display: flex;
             align-items: baseline;
-        }
-
-        .bouncy-letter {
-            display: inline-block;
             font-weight: 900;
             font-size: 2.25rem;
             line-height: 1;
-            background: linear-gradient(135deg, #7C77D6 20%, #FF6B6B 80%); 
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            animation: waveBounce 2s ease-in-out infinite;
+            color: #2D3436; /* สีเข้ม อ่านง่าย */
+            letter-spacing: -1px;
         }
 
-        .bouncy-letter.highlight {
-            background: linear-gradient(135deg, #FFD755 20%, #FFA000 80%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+        .title-highlight {
+            color: #FFD755; /* สีเหลืองทองสำหรับเลข 52 */
+            text-shadow: 1px 1px 0px rgba(0,0,0,0.1); /* เงาบางๆ ให้ดูมีมิติ */
+            margin-left: 2px;
         }
 
-        .bouncy-letter:nth-child(1) { animation-delay: 0.0s; }
-        .bouncy-letter:nth-child(2) { animation-delay: 0.1s; }
-        .bouncy-letter:nth-child(3) { animation-delay: 0.2s; }
-        .bouncy-letter:nth-child(4) { animation-delay: 0.3s; }
-        .bouncy-letter:nth-child(5) { animation-delay: 0.4s; }
-        .bouncy-letter:nth-child(6) { animation-delay: 0.5s; }
-        .bouncy-letter:nth-child(7) { animation-delay: 0.6s; }
-        .bouncy-letter:nth-child(8) { animation-delay: 0.7s; }
+        /* --- LUCKY WHEEL STYLES --- */
+        #wheel-container {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto 20px auto;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
+        }
+        #wheel-canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            transition: transform 8s cubic-bezier(0.1, 0.99, 0.1, 0.99); /* หมุน 8 วินาที */
+        }
+        .wheel-pointer {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0; 
+            height: 0; 
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 35px solid #FFD755; /* สีเหลือง Brand */
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
+            z-index: 20;
+        }
+        .wheel-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 50%;
+            z-index: 10;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
     </style>
 </head>
 <body class="pb-32 font-sans select-none relative overflow-x-hidden">
@@ -161,21 +177,14 @@
     <div class="px-6 pt-8 pb-4 bg-transparent">
         <div class="flex items-start justify-between">
             <div class="flex items-start gap-3">
-                <div class="w-12 h-12 rounded-full bg-yellow-200 overflow-hidden border-2 border-white shadow-sm flex-shrink-0 flex items-center justify-center">
-                     <i class="fas fa-user text-yellow-600 text-xl"></i>
+                <div class="w-12 h-12 rounded-full bg-yellow-100 overflow-hidden border-2 border-white shadow-sm flex-shrink-0 flex items-center justify-center p-2">
+                     <img src="https://cdn-icons-png.flaticon.com/512/3170/3170733.png" alt="Rice Icon" class="w-full h-full object-contain opacity-80">
                 </div>
                 <div class="flex flex-col justify-center">
                     <p class="text-xs text-gray-400 font-medium mb-1">สวัสดี ลูกค้าคนพิเศษ ✨</p>
                     
                     <h1 class="grand-title leading-none tracking-tight mb-2 relative z-10 pt-1">
-                        <span class="bouncy-letter">K</span>
-                        <span class="bouncy-letter">A</span>
-                        <span class="bouncy-letter">P</span>
-                        <span class="bouncy-letter">R</span>
-                        <span class="bouncy-letter">A</span>
-                        <span class="bouncy-letter">O</span>
-                        <span class="bouncy-letter highlight">5</span>
-                        <span class="bouncy-letter highlight">2</span>
+                        KAPRAO<span class="title-highlight">52</span>
                     </h1>
 
                 </div>
@@ -250,7 +259,7 @@
         <div id="menu-grid" class="flex flex-col gap-4"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V5.7</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V6.1</p>
         </div>
 
     </div>
@@ -471,13 +480,113 @@
             { code: "MANU", title: "ส่วนลดแฟนแมนยู 🔴", desc: "สั่งครบ 100.- ลด 5 บาท", minOrder: 100, type: "discount", value: 5, color: "bg-red-600", icon: "⚽" }
         ];
 
+        // --- LUCKY WHEEL LOGIC (RIGGED) ---
+        let wheelSpinning = false;
+        let wheelRotation = 0;
+        
+        const wheelSegments = [
+            { text: "ลด 5 บาท", color: "#FFFFFF", type: "discount_5" },
+            { text: "ไม่ได้รางวัล", color: "#F3F4F6", type: "none" },
+            { text: "กินฟรี 40บ.", color: "#FFD755", type: "free_40" },
+            { text: "ลองใหม่", color: "#FFFFFF", type: "none" }, // Index 3: เป้าหมายที่ล็อค
+            { text: "ฟรีไข่ดาว", color: "#F3F4F6", type: "free_egg" },
+            { text: "ลด 10 บาท", color: "#FFD755", type: "discount_10" }
+        ];
+
+        function drawWheel() {
+            const canvas = document.getElementById('wheel-canvas');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const size = canvas.width;
+            const center = size / 2;
+            const sliceAngle = (2 * Math.PI) / wheelSegments.length;
+
+            wheelSegments.forEach((seg, i) => {
+                const startAngle = i * sliceAngle - (Math.PI / 2); 
+                const endAngle = startAngle + sliceAngle;
+
+                ctx.beginPath();
+                ctx.moveTo(center, center);
+                ctx.arc(center, center, center, startAngle, endAngle);
+                ctx.fillStyle = seg.color;
+                ctx.fill();
+                ctx.strokeStyle = "#E5E7EB";
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                ctx.save();
+                ctx.translate(center, center);
+                ctx.rotate(startAngle + sliceAngle / 2);
+                ctx.textAlign = "right";
+                ctx.fillStyle = "#2D3436";
+                ctx.font = "bold 14px Kanit";
+                ctx.fillText(seg.text, center - 20, 5);
+                ctx.restore();
+            });
+        }
+
+        function spinWheel() {
+            if (wheelSpinning) return;
+            wheelSpinning = true;
+            triggerHaptic();
+            sfxPop.play();
+
+            const box = document.getElementById('wheel-canvas');
+            
+            // --- RIGGED LOGIC (ล็อคผล) ---
+            const fullSpins = 360 * 8; // หมุน 8 รอบ
+            const targetDegree = 150;  // องศาเป้าหมาย "ลองใหม่"
+            const randomVariance = Math.floor(Math.random() * 40) - 20; 
+            const currentRot = wheelRotation;
+            const nextRotation = (Math.ceil(currentRot / 360) * 360) + fullSpins + targetDegree + randomVariance;
+            
+            wheelRotation = nextRotation;
+            box.style.transform = `rotate(${wheelRotation}deg)`;
+
+            // รอ 8 วินาที
+            setTimeout(() => {
+                wheelSpinning = false;
+                calculateWinner(wheelRotation % 360);
+            }, 8000); 
+        }
+
+        function calculateWinner(finalDegree) {
+            const sliceDeg = 360 / wheelSegments.length;
+            const normalizedDeg = (360 - finalDegree) % 360; 
+            const index = Math.floor(normalizedDeg / sliceDeg);
+            const winner = wheelSegments[index];
+
+            handleReward(winner);
+        }
+
+        function handleReward(reward) {
+            if (reward.type === 'free_40') {
+                const freeMenus = menuItems.filter(m => m.price === 40);
+                if (freeMenus.length > 0) {
+                    const luckyMenu = freeMenus[Math.floor(Math.random() * freeMenus.length)];
+                    sfxOrder.play(); 
+                    confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } }); 
+                    const prizeItem = { ...luckyMenu, price: 0, name: `🎁 ฟรี! ${luckyMenu.name}` };
+                    openModal(prizeItem);
+                    showToast(`ยินดีด้วย! คุณได้รับ ${luckyMenu.name} ฟรี!`);
+                }
+            } else if (reward.type === 'none') {
+                // *** เคสที่จะเกิดขึ้น 100% ***
+                showToast("เกือบได้แล้วเชียว! ลองใหม่อีกทีนะ");
+            } else if (reward.type === 'free_egg') {
+                showToast("ยินดีด้วย! แคปจอนี้เพื่อรับไข่ดาวฟรี");
+            } else {
+                showToast(`ยินดีด้วย! คุณได้ ${reward.text}`);
+            }
+        }
+
         const addonCalories = {
-            'special': 80,    
-            'kaikhon': 150,   
-            'kaidao': 120,    
-            'kaijiao': 200,   
+            'special': 80,     
+            'kaikhon': 150,    
+            'kaidao': 120,     
+            'kaijiao': 200,    
             'kaitom': 75,      
-            'kaiyiewma': 100  
+            'kaiyiewma': 100   
         };
 
         let cart = [];
@@ -594,6 +703,8 @@
         function renderPromotions() {
             const grid = document.getElementById('menu-grid');
             grid.innerHTML = '';
+
+            // 1. SHOW PROMOTIONS FIRST (คูปองขึ้นก่อน)
             promotions.forEach((promo, index) => {
                 const el = document.createElement('div');
                 el.className = "menu-card-style p-0 flex overflow-hidden cursor-pointer shadow-sm border border-gray-100 fade-in-up mb-2";
@@ -616,6 +727,28 @@
                 `;
                 grid.appendChild(el);
             });
+
+            // 2. SHOW WHEEL SECOND (วงล้ออยู่ด้านล่าง)
+            const wheelDiv = document.createElement('div');
+            wheelDiv.className = "w-full bg-white rounded-[1.5rem] p-6 mt-4 mb-6 shadow-sm border border-gray-100 flex flex-col items-center fade-in-up";
+            wheelDiv.innerHTML = `
+                <h3 class="font-bold text-gray-800 text-lg mb-1">วงล้อลุ้นกินฟรี! 🎡</h3>
+                <p class="text-xs text-gray-400 mb-4">ลุ้นรับเมนูราคา 40 บาท ฟรีทันที</p>
+                
+                <div id="wheel-container">
+                    <div class="wheel-pointer"></div>
+                    <canvas id="wheel-canvas" width="300" height="300"></canvas>
+                    <div class="wheel-center text-2xl">😋</div>
+                </div>
+
+                <button onclick="spinWheel()" class="bg-brand-purple text-white px-8 py-3 rounded-full font-bold shadow-lg shadow-indigo-200 active:scale-95 transition-transform hover:bg-indigo-500">
+                    หมุนเลย!
+                </button>
+            `;
+            grid.appendChild(wheelDiv);
+
+            // สั่งวาดวงล้อทันที
+            setTimeout(drawWheel, 100);
         }
 
         function openModal(item) {
