@@ -8,7 +8,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
     
-    <title>Kaprao52 - V9.2</title> 
+    <title>Kaprao52 - V9.3</title> 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -417,7 +417,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V9.2</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V9.3</p>
         </div>
 
     </div>
@@ -646,7 +646,7 @@
             });
         }
 
-        const CURRENT_VERSION = '9.2';
+        const CURRENT_VERSION = '9.3';
         window.addEventListener('load', () => {
             const savedVer = localStorage.getItem('kaprao_ver');
             if(savedVer !== CURRENT_VERSION) {
@@ -1196,9 +1196,11 @@
                 // Check if ticket is from "yesterday" or older to simulate waiting for drawing
                 // For DEMO: We check immediately if it's pending
                 
-                // --- FIXED LOGIC: DON'T CHECK TODAY'S TICKET ---
-                const todayStr = new Date().toLocaleDateString('th-TH');
-                if (t.date === todayStr) return; // Skip checking if ticket is from today
+                // --- FIXED LOGIC: STRICT TIMESTAMP CHECK FOR 'TODAY' ---
+                const tDate = new Date(t.timestamp);
+                const now = new Date();
+                // Compare Year, Month, Day strictly
+                if(tDate.setHours(0,0,0,0) === now.setHours(0,0,0,0)) return; // Skip if it is TODAY
                 
                 if (t.number === simulatedWinningNum) {
                     t.status = 'won';
@@ -1248,12 +1250,22 @@
                     </div>`;
             } else {
                 lottoHistory.forEach(t => {
+                    // --- FORCE PENDING VISUAL IF TODAY ---
+                    const tDate = new Date(t.timestamp);
+                    const now = new Date();
+                    let displayStatus = t.status;
+                    // If strictly today, FORCE 'pending' status for display (fixes old bad data)
+                    if(tDate.setHours(0,0,0,0) === now.setHours(0,0,0,0)) {
+                        displayStatus = 'pending';
+                    }
+
                     let statusHtml = '';
                     let statusClass = '';
-                    if(t.status === 'pending') {
+                    
+                    if(displayStatus === 'pending') {
                         statusHtml = '<span class="text-green-600 font-bold"><i class="fas fa-clock"></i> รอออกรางวัล</span>';
                         statusClass = 'border-l-4 border-green-500 bg-green-50';
-                    } else if(t.status === 'won') {
+                    } else if(displayStatus === 'won') {
                         statusHtml = '<span class="text-yellow-600 font-bold"><i class="fas fa-trophy"></i> ถูกรางวัล!</span>';
                         statusClass = 'border-l-4 border-yellow-500 bg-yellow-50';
                     } else {
@@ -1274,7 +1286,7 @@
                         </div>
                         <div class="text-right">
                              <div class="text-xs mb-1">${statusHtml}</div>
-                             ${t.status === 'won' ? '<button class="text-[10px] bg-yellow-500 text-white font-bold px-2 py-1 rounded shadow-sm">แคปจอรับสิทธิ์</button>' : ''}
+                             ${displayStatus === 'won' ? '<button class="text-[10px] bg-yellow-500 text-white font-bold px-2 py-1 rounded shadow-sm">แคปจอรับสิทธิ์</button>' : ''}
                         </div>
                     `;
                     list.appendChild(item);
