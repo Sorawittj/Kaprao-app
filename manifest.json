@@ -1,0 +1,16 @@
+{
+    "name": "Kaprao52",
+    "short_name": "Kaprao52",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#F5F7FB",
+    "theme_color": "#7C77D6",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "https://cdn-icons-png.flaticon.com/512/3448/3448609.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
