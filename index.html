@@ -8,7 +8,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
     
-    <title>Kaprao52 - V8.4 </title> 
+    <title>Kaprao52 - V8.7)</title> 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -366,6 +366,10 @@
                 <span class="text-xl">🍳</span>
                 <span class="text-xs">เมนูไข่/อื่นๆ</span>
             </button>
+            <button onclick="switchCategory('dessert')" id="tab-dessert" class="snap-start category-pill-inactive min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all">
+                <span class="text-xl">🍨</span>
+                <span class="text-xs">ของหวาน</span>
+            </button>
             <button onclick="switchCategory('promotion')" id="tab-promotion" class="snap-start category-pill-inactive min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all border-dashed border-red-300 text-red-500">
                 <span class="text-xl">🧧</span>
                 <span class="text-xs font-bold">ส่วนลด</span>
@@ -376,10 +380,18 @@
             <h3 id="section-title" class="font-bold text-gray-800 text-lg">รายการแนะนำ</h3>
         </div>
 
+        <div id="dessert-msg" class="hidden mb-6 fade-in-up">
+            <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4 flex flex-col items-center justify-center text-center">
+                <div class="text-3xl mb-2">🍨 ✨</div>
+                <h4 class="font-bold text-brand-purple text-sm">รอพบกับเมนูใหม่ๆ เร็วๆ นี้</h4>
+                <p class="text-xs text-gray-500 mt-1">กำลังคัดสรรความอร่อยมาให้ลูกค้าทุกท่าน</p>
+            </div>
+        </div>
+
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V8.4</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V8.7</p>
         </div>
 
     </div>
@@ -577,11 +589,11 @@
         }
 
         // --- NEW FEATURE: UPDATE NOTIFICATION ---
-        const CURRENT_VERSION = '8.4';
+        const CURRENT_VERSION = '8.7';
         window.addEventListener('load', () => {
             const savedVer = localStorage.getItem('kaprao_ver');
             if(savedVer !== CURRENT_VERSION) {
-                setTimeout(() => showToast("🎉 อัปเดตใหม่! มีสะสมแต้ม + เพิ่มจำนวนได้แล้ว"), 1500);
+                setTimeout(() => showToast("🎉 อัปเดตใหม่! ปรับรายการของหวาน 🍧"), 1500);
                 localStorage.setItem('kaprao_ver', CURRENT_VERSION);
             }
         });
@@ -627,7 +639,7 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // DATA
+        // DATA - Added Dessert Items
         const menuItems = [
             { id: 2, name: "กะเพราหน่อไม้", price: 55, icon: "🎍", category: "kaprao", reqMeat: true, kcal: 350 },
             { id: 3, name: "กะเพราหมูสับ", price: 50, icon: "🐷", category: "kaprao", reqMeat: false, kcal: 520 },
@@ -644,6 +656,9 @@
             { id: 13, name: "ข้าวไข่เจียวพริกสด", price: 50, icon: "🥘", category: "others", reqMeat: false, kcal: 420 },
             { id: 14, name: "ข้าวไข่ดาว 3 ฟอง", price: 50, icon: "🍳", category: "others", reqMeat: false, kcal: 480 },
             { id: 15, name: "หน่อไม้ผัดไข่", price: 50, icon: "🎋", category: "others", reqMeat: true, kcal: 300 },
+            // Dessert Items (Updated)
+            { id: 20, name: "เฉาก๊วยนมสด", price: 30, icon: "🧊", category: "dessert", reqMeat: false, kcal: 150 },
+            { id: 21, name: "กล้วยเชื่อม", price: 25, icon: "🍌", category: "dessert", reqMeat: false, kcal: 220 },
         ];
 
         const promotions = [
@@ -776,6 +791,7 @@
             document.getElementById('tabs-container').scrollBy({ left: amount, behavior: 'smooth' });
         }
 
+        // Updated switchCategory to include dessert logic
         function switchCategory(cat) {
             if(activeCategory === cat) return;
             
@@ -783,12 +799,14 @@
             
             // 1. Start Exit Animation
             const grid = document.getElementById('menu-grid');
+            const msg = document.getElementById('dessert-msg');
             grid.classList.add('page-out');
+            if(!msg.classList.contains('hidden')) msg.classList.add('page-out');
             
             // 2. Wait, then Change Data & Style
             setTimeout(() => {
                 activeCategory = cat;
-                ['kaprao', 'garlic', 'noodle', 'others', 'promotion'].forEach(c => {
+                ['kaprao', 'garlic', 'noodle', 'others', 'dessert', 'promotion'].forEach(c => {
                     const btn = document.getElementById(`tab-${c}`);
                     if (c === cat) {
                         btn.className = "snap-start category-pill-active min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all transform scale-105";
@@ -797,14 +815,27 @@
                         if(c === 'promotion') btn.classList.add('border-dashed', 'border-red-300', 'text-red-400');
                     }
                 });
+                
+                // Logic for Banner & Title
+                const banner = document.getElementById('hero-banner');
+                const title = document.getElementById('section-title');
+                
+                // Reset States
+                msg.classList.add('hidden');
+                msg.classList.remove('page-out');
+                banner.classList.remove('hidden');
 
                 if (cat === 'promotion') {
-                    document.getElementById('section-title').innerText = "คูปอง & โปรโมชั่น";
-                    document.getElementById('hero-banner').classList.add('hidden');
+                    title.innerText = "คูปอง & โปรโมชั่น";
+                    banner.classList.add('hidden');
                     renderPromotions();
+                } else if (cat === 'dessert') {
+                    title.innerText = "เมนูของหวาน";
+                    banner.classList.add('hidden'); // Hide random button for dessert
+                    msg.classList.remove('hidden'); // Show coming soon msg
+                    renderMenu();
                 } else {
-                    document.getElementById('section-title').innerText = "รายการแนะนำ";
-                    document.getElementById('hero-banner').classList.remove('hidden');
+                    title.innerText = "รายการแนะนำ";
                     renderMenu();
                 }
 
@@ -823,13 +854,44 @@
             grid.innerHTML = '';
             const filteredItems = menuItems.filter(i => i.category === activeCategory);
             
+            if(filteredItems.length === 0) {
+                 grid.innerHTML = `<div class="text-center text-gray-400 mt-10">กำลังอัปเดตเมนูครับ...</div>`;
+                 return;
+            }
+
             filteredItems.forEach((item, index) => {
+                const isDessert = item.category === 'dessert';
                 const el = document.createElement('div');
                 el.style.animationDelay = `${index * 0.05}s`;
-                el.className = "menu-card-style p-4 flex items-center justify-between cursor-pointer shadow-sm border border-gray-100 fade-in-up group";
-                el.onclick = () => openModal(item);
+                
+                // Remove cursor-pointer if dessert (to show it's not clickable for order)
+                el.className = `menu-card-style p-4 flex items-center justify-between shadow-sm border border-gray-100 fade-in-up group ${isDessert ? '' : 'cursor-pointer'}`;
+                
+                // Click Logic
+                el.onclick = () => {
+                    if(isDessert) {
+                        showToast('⏳ เมนูนี้จะพร้อมขายเร็วๆ นี้ครับ');
+                        triggerHaptic();
+                    } else {
+                        openModal(item);
+                    }
+                };
+
+                // Logic for Button: Add vs Soon
+                const actionButton = isDessert 
+                    ? `<span class="text-[10px] font-bold text-white bg-gray-400 px-2 py-1 rounded-full">เร็วๆ นี้</span>` 
+                    : `<div class="w-8 h-8 rounded-full bg-brand-yellow text-gray-800 flex items-center justify-center shadow-md"><i class="fas fa-plus text-xs"></i></div>`;
+                
+                // Logic for Price: Fade if dessert
+                const priceDisplay = isDessert
+                    ? `<span class="font-bold text-gray-300 text-lg line-through decoration-transparent">${item.price}</span>`
+                    : `<span class="font-bold text-gray-700 text-lg">${item.price}</span>`;
+                
+                // Gray out content if dessert
+                const contentStyle = isDessert ? 'opacity-60 grayscale-[50%]' : '';
+
                 el.innerHTML = `
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-4 ${contentStyle}">
                         <div class="w-16 h-16 rounded-2xl bg-indigo-50 text-3xl flex items-center justify-center shadow-inner group-hover:bg-indigo-100 transition-colors relative">
                             ${item.icon}
                         </div>
@@ -842,10 +904,8 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
-                        <span class="font-bold text-gray-700 text-lg">${item.price}</span>
-                        <div class="w-8 h-8 rounded-full bg-brand-yellow text-gray-800 flex items-center justify-center shadow-md">
-                            <i class="fas fa-plus text-xs"></i>
-                        </div>
+                        ${priceDisplay}
+                        ${actionButton}
                     </div>
                 `;
                 grid.appendChild(el);
@@ -1481,12 +1541,12 @@
                 
                 if(suggestItem) {
                     setTimeout(() => {
-                         const btn = document.createElement('button');
-                         btn.className = "self-center mt-2 bg-brand-yellow px-4 py-2 rounded-full text-xs font-bold shadow-md hover:bg-white transition-colors scale-in";
-                         btn.innerText = `สั่ง ${suggestItem.name} เลย!`;
-                         btn.onclick = () => { toggleAIChef(); openModal(suggestItem); };
-                         body.appendChild(btn);
-                         body.scrollTop = body.scrollHeight;
+                          const btn = document.createElement('button');
+                          btn.className = "self-center mt-2 bg-brand-yellow px-4 py-2 rounded-full text-xs font-bold shadow-md hover:bg-white transition-colors scale-in";
+                          btn.innerText = `สั่ง ${suggestItem.name} เลย!`;
+                          btn.onclick = () => { toggleAIChef(); openModal(suggestItem); };
+                          body.appendChild(btn);
+                          body.scrollTop = body.scrollHeight;
                     }, 500);
                 }
             }, 1200);
