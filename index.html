@@ -771,6 +771,28 @@
         }
         function spinWheel() {
             if (wheelSpinning) return;
+
+            // --- ADDED LIMIT LOGIC ---
+            const today = new Date().toLocaleDateString('th-TH'); // วันที่ปัจจุบัน
+            const lastDate = localStorage.getItem('kaprao_spin_date');
+            let count = parseInt(localStorage.getItem('kaprao_spin_count') || '0');
+
+            // ถ้านั่นคนละวัน ให้รีเซ็ตใหม่
+            if (lastDate !== today) {
+                count = 0;
+                localStorage.setItem('kaprao_spin_date', today);
+            }
+
+            // ถ้าเกิน 3 ครั้ง ให้แจ้งเตือนและหยุดทำงาน
+            if (count >= 3) {
+                showToast("⛔ ครบโควตา 3 ครั้งต่อวันแล้ว พรุ่งนี้มาใหม่นะ!");
+                return; 
+            }
+
+            // บันทึกจำนวนครั้งใหม่
+            localStorage.setItem('kaprao_spin_count', count + 1);
+            // -------------------------
+
             wheelSpinning = true;
             triggerHaptic();
             sfxPop.play();
@@ -949,7 +971,7 @@
             wheelDiv.className = "w-full bg-white rounded-[1.5rem] p-6 mt-4 mb-6 shadow-sm border border-gray-100 flex flex-col items-center fade-in-up";
             wheelDiv.innerHTML = `
                 <h3 class="font-bold text-gray-800 text-lg mb-1">วงล้อลุ้นกินฟรี! 🎡</h3>
-                <p class="text-xs text-gray-400 mb-4">ลุ้นรับเมนูราคา 40 บาท ฟรีทันที</p>
+                <p class="text-xs text-gray-400 mb-4">ลุ้นรับเมนูราคา 40 บาท ฟรีทันที (3 ครั้ง/วัน)</p>
                 <div id="wheel-container">
                     <div class="wheel-pointer"></div>
                     <canvas id="wheel-canvas" width="300" height="300"></canvas>
@@ -1593,12 +1615,12 @@
                 
                 if(suggestItem) {
                     setTimeout(() => {
-                          const btn = document.createElement('button');
-                          btn.className = "self-center mt-2 bg-brand-yellow px-4 py-2 rounded-full text-xs font-bold shadow-md hover:bg-white transition-colors scale-in";
-                          btn.innerText = `สั่ง ${suggestItem.name} เลย!`;
-                          btn.onclick = () => { toggleAIChef(); openModal(suggestItem); };
-                          body.appendChild(btn);
-                          body.scrollTop = body.scrollHeight;
+                           const btn = document.createElement('button');
+                           btn.className = "self-center mt-2 bg-brand-yellow px-4 py-2 rounded-full text-xs font-bold shadow-md hover:bg-white transition-colors scale-in";
+                           btn.innerText = `สั่ง ${suggestItem.name} เลย!`;
+                           btn.onclick = () => { toggleAIChef(); openModal(suggestItem); };
+                           body.appendChild(btn);
+                           body.scrollTop = body.scrollHeight;
                     }, 500);
                 }
             }, 1200);
