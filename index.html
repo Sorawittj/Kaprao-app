@@ -8,7 +8,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
     
-    <title>Kaprao52 - V8.0 </title> 
+    <title>Kaprao52 - V8.1</title> 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -356,7 +356,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V8.0</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V8.1</p>
         </div>
 
     </div>
@@ -390,9 +390,6 @@
                 <div class="flex gap-2">
                     <input type="text" id="ai-input" placeholder="พิมพ์ความรู้สึก..." class="flex-1 bg-gray-100 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-purple">
                     <button onclick="aiSendCustom()" class="w-10 h-10 bg-brand-purple text-white rounded-xl flex items-center justify-center shadow-lg active:scale-95"><i class="fas fa-paper-plane text-xs"></i></button>
-                </div>
-                <div class="mt-2 text-center">
-                    <button onclick="requestMotionPermission()" class="text-[10px] text-gray-400 underline">เปิดใช้งานฟีเจอร์เขย่าเพื่อลบ (iOS)</button>
                 </div>
             </div>
         </div>
@@ -449,7 +446,6 @@
             <div class="flex justify-between items-end mb-2 px-2">
                 <div class="flex flex-col">
                     <span class="text-gray-500 text-sm">ยอดสุทธิ</span>
-                    <span class="text-[10px] text-gray-400 font-light flex items-center gap-1"><i class="fas fa-mobile-alt"></i> เขย่าเพื่อลบตะกร้า</span>
                 </div>
                 <span id="sheet-grand-total" class="text-2xl font-bold text-brand-purple">0 ฿</span>
             </div>
@@ -541,10 +537,8 @@
         // --- SOUNDS ---
         const sfxPop = new Audio('https://www.soundjay.com/buttons/sounds/button-3.mp3');
         const sfxOrder = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
-        const sfxTrash = new Audio('https://www.soundjay.com/misc/sounds/crumple-paper-1.mp3'); // Sound for shake clear
         sfxPop.volume = 0.5;
         sfxOrder.volume = 0.6;
-        sfxTrash.volume = 0.8;
 
         function triggerHaptic() {
             if (navigator.vibrate) navigator.vibrate(10); 
@@ -1311,72 +1305,6 @@
                 aiSuggest(txt);
                 input.value = '';
             }
-        }
-        
-        // --- FEATURE 4: SHAKE TO CLEAR (ShakeDetector) ---
-        class ShakeDetector {
-            constructor(threshold = 15, timeout = 1000) {
-                this.threshold = threshold;
-                this.timeout = timeout;
-                this.lastTime = 0;
-                this.lastX = 0;
-                this.lastY = 0;
-                this.lastZ = 0;
-                this.enabled = false;
-            }
-            
-            start() {
-                if (typeof DeviceMotionEvent.requestPermission === 'function') {
-                    // iOS 13+ requires permission
-                    DeviceMotionEvent.requestPermission()
-                        .then(response => {
-                            if (response === 'granted') {
-                                window.addEventListener('devicemotion', this.handleMotion.bind(this));
-                                this.enabled = true;
-                                showToast('เปิดใช้งาน Shake to Clear แล้ว! 📳');
-                            }
-                        })
-                        .catch(console.error);
-                } else {
-                    // Non-iOS or older devices
-                    window.addEventListener('devicemotion', this.handleMotion.bind(this));
-                    this.enabled = true;
-                }
-            }
-
-            handleMotion(e) {
-                if(cart.length === 0) return; // Nothing to clear
-                
-                let current = e.accelerationIncludingGravity;
-                let curTime = new Date().getTime();
-
-                if ((curTime - this.lastTime) > 100) {
-                    let diffTime = (curTime - this.lastTime);
-                    this.lastTime = curTime;
-                    
-                    let speed = Math.abs(current.x + current.y + current.z - this.lastX - this.lastY - this.lastZ) / diffTime * 10000;
-
-                    if (speed > this.threshold * 50) { // Multiplier for sensitivity
-                        // Shake Detected
-                        if(navigator.vibrate) navigator.vibrate([50, 50, 50]);
-                        sfxTrash.play();
-                        cart = [];
-                        saveToLS();
-                        updateMiniCart();
-                        closeCheckout();
-                        showToast('เขย่าจนตะกร้าปลิวแล้ว! 🗑️');
-                    }
-
-                    this.lastX = current.x;
-                    this.lastY = current.y;
-                    this.lastZ = current.z;
-                }
-            }
-        }
-
-        const shaker = new ShakeDetector();
-        function requestMotionPermission() {
-            shaker.start();
         }
 
         document.getElementById('user-name').addEventListener('input', saveToLS);
