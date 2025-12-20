@@ -8,7 +8,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
     
-    <title>Kaprao52 - V8.2</title> 
+    <title>Kaprao52 - V8.3</title> 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -132,6 +132,15 @@
         .typing-dot:nth-child(2) { animation-delay: -0.16s; }
         @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
 
+        /* Draggable AI Button */
+        #ai-wrapper {
+            position: fixed;
+            bottom: 6rem; /* 24 */
+            right: 1.25rem; /* 5 */
+            z-index: 80;
+            touch-action: none; /* Prevent scroll while dragging */
+        }
+
         /* Parallax Background Pattern */
         #parallax-bg {
             background-image: radial-gradient(#7C77D6 1px, transparent 1px);
@@ -242,9 +251,14 @@
     <div id="parallax-bg" class="fixed top-0 left-0 w-full h-[120vh] z-[-1] pointer-events-none transition-transform duration-75 ease-out"></div>
     <div id="bubbles-container" class="fixed inset-0 overflow-hidden pointer-events-none z-[-1]"></div>
 
-    <button onclick="toggleAIChef()" class="fixed bottom-24 right-5 z-[80] w-14 h-14 bg-white rounded-full shadow-xl flex items-center justify-center border-2 border-brand-purple animate-bounce-slow active:scale-90 transition-transform">
-        <span class="text-2xl">👩‍🍳</span>
-    </button>
+    <div id="ai-wrapper">
+        <button onclick="hideAIButton(event)" class="absolute -top-1 -right-1 z-[82] w-5 h-5 bg-gray-400 text-white rounded-full flex items-center justify-center text-[10px] shadow-sm border border-white active:scale-90">
+            <i class="fas fa-times"></i>
+        </button>
+        <button id="ai-trigger-btn" onclick="toggleAIChef()" class="w-14 h-14 bg-white rounded-full shadow-xl flex items-center justify-center border-2 border-brand-purple animate-bounce-slow active:scale-90 transition-transform">
+            <span class="text-2xl">👩‍🍳</span>
+        </button>
+    </div>
 
     <div id="welcome-modal" class="fixed inset-0 z-[100] bg-gray-900/80 backdrop-blur-sm flex items-center justify-center p-6 fade-in-up">
         <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full text-center shadow-2xl relative overflow-hidden">
@@ -356,7 +370,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V8.2</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V8.3</p>
         </div>
 
     </div>
@@ -421,7 +435,8 @@
         <div class="px-6 pb-4 border-b border-gray-100 flex justify-between items-center">
             <h2 class="text-xl font-bold text-gray-800">สรุปออเดอร์</h2>
             <div class="flex gap-2">
-                 <button onclick="generateOrderCard()" class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-500 active:scale-90 transition-transform"><i class="fas fa-camera text-xs"></i></button>
+                <button onclick="clearCart()" class="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center text-red-500 active:scale-90 transition-transform"><i class="fas fa-trash text-xs"></i></button>
+                <button onclick="generateOrderCard()" class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-500 active:scale-90 transition-transform"><i class="fas fa-camera text-xs"></i></button>
                 <button onclick="closeCheckout()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500"><i class="fas fa-times text-sm"></i></button>
             </div>
         </div>
@@ -537,8 +552,10 @@
         // --- SOUNDS ---
         const sfxPop = new Audio('https://www.soundjay.com/buttons/sounds/button-3.mp3');
         const sfxOrder = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
+        const sfxTrash = new Audio('https://www.soundjay.com/misc/sounds/crumple-paper-1.mp3'); 
         sfxPop.volume = 0.5;
         sfxOrder.volume = 0.6;
+        sfxTrash.volume = 0.8;
 
         function triggerHaptic() {
             if (navigator.vibrate) navigator.vibrate(10); 
@@ -979,6 +996,20 @@
             updateMiniCart();
             if(cart.length === 0) closeCheckout();
         }
+        
+        // --- NEW FEATURE: CLEAR CART ---
+        function clearCart() {
+            if(cart.length === 0) return;
+            if(!confirm('คุณต้องการล้างตะกร้าทั้งหมดใช่ไหม?')) return;
+            
+            sfxTrash.play();
+            cart = [];
+            saveToLS();
+            removeDiscount();
+            updateMiniCart();
+            closeCheckout();
+            showToast('ล้างตะกร้าเรียบร้อย 🗑️');
+        }
 
         function applyDiscount() {
             const code = document.getElementById('discount-code').value.trim().toUpperCase();
@@ -1237,6 +1268,9 @@
 
         // --- FEATURE 3: AI CHEF LOGIC ---
         function toggleAIChef() {
+            const wrapper = document.getElementById('ai-wrapper');
+            if(wrapper.style.display === 'none') return; // If hidden, do nothing
+            
             const modal = document.getElementById('ai-modal');
             const isOpen = !modal.classList.contains('hidden');
             if(isOpen) {
@@ -1246,6 +1280,83 @@
                 modal.classList.remove('hidden');
                 setTimeout(() => modal.classList.remove('opacity-0'), 10);
             }
+        }
+
+        // Draggable Logic for AI Button
+        function initDraggableAI() {
+            const aiBtn = document.getElementById('ai-wrapper');
+            const trigger = document.getElementById('ai-trigger-btn');
+            
+            let isDragging = false;
+            let startX, startY, initialLeft, initialTop;
+            
+            // Mouse/Touch Start
+            function dragStart(e) {
+                if (e.target.closest('button[onclick*="hideAIButton"]')) return; // Don't drag if clicking close
+
+                const clientX = e.clientX || e.touches[0].clientX;
+                const clientY = e.clientY || e.touches[0].clientY;
+                
+                initialLeft = aiBtn.offsetLeft;
+                initialTop = aiBtn.offsetTop;
+                startX = clientX;
+                startY = clientY;
+                isDragging = true;
+                
+                // Switch from bottom/right to top/left positioning for dragging
+                aiBtn.style.bottom = 'auto';
+                aiBtn.style.right = 'auto';
+                aiBtn.style.left = initialLeft + 'px';
+                aiBtn.style.top = initialTop + 'px';
+                
+                trigger.classList.remove('animate-bounce-slow'); // Stop bouncing when dragging
+            }
+            
+            // Mouse/Touch Move
+            function dragMove(e) {
+                if (!isDragging) return;
+                e.preventDefault(); // Prevent scrolling
+                
+                const clientX = e.clientX || e.touches[0].clientX;
+                const clientY = e.clientY || e.touches[0].clientY;
+                
+                const deltaX = clientX - startX;
+                const deltaY = clientY - startY;
+                
+                let newLeft = initialLeft + deltaX;
+                let newTop = initialTop + deltaY;
+                
+                // Boundary checks
+                const maxX = window.innerWidth - aiBtn.offsetWidth;
+                const maxY = window.innerHeight - aiBtn.offsetHeight;
+                
+                newLeft = Math.max(0, Math.min(newLeft, maxX));
+                newTop = Math.max(0, Math.min(newTop, maxY));
+                
+                aiBtn.style.left = newLeft + 'px';
+                aiBtn.style.top = newTop + 'px';
+            }
+            
+            // Mouse/Touch End
+            function dragEnd() {
+                isDragging = false;
+                // Optional: Snap to edge? For now, leave where dropped.
+            }
+            
+            aiBtn.addEventListener('mousedown', dragStart);
+            aiBtn.addEventListener('touchstart', dragStart, {passive: false});
+            
+            window.addEventListener('mousemove', dragMove);
+            window.addEventListener('touchmove', dragMove, {passive: false});
+            
+            window.addEventListener('mouseup', dragEnd);
+            window.addEventListener('touchend', dragEnd);
+        }
+        initDraggableAI();
+
+        function hideAIButton(e) {
+            e.stopPropagation(); // Prevent opening modal
+            document.getElementById('ai-wrapper').style.display = 'none';
         }
         
         function aiAppendMsg(text, isUser = false) {
