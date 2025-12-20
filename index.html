@@ -8,7 +8,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
     
-    <title>Kaprao52 - V8.3</title> 
+    <title>Kaprao52 - V8.4 </title> 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -123,15 +123,6 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* AI Chat Bubble */
-        .typing-dot {
-            width: 6px; height: 6px; background: #ccc; border-radius: 50%;
-            animation: typing 1.4s infinite ease-in-out both;
-        }
-        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
-        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
-        @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
-
         /* Draggable AI Button */
         #ai-wrapper {
             position: fixed;
@@ -238,6 +229,10 @@
             font-family: 'Kanit', sans-serif;
             color: #2D3436;
         }
+
+        /* --- ACHIEVEMENT BAR --- */
+        .xp-bar-bg { background-color: #E5E7EB; border-radius: 9999px; overflow: hidden; height: 8px; }
+        .xp-bar-fill { background: linear-gradient(90deg, #FFD755, #f59e0b); height: 100%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
     </style>
 </head>
 <body class="pb-32 font-sans select-none relative overflow-x-hidden">
@@ -286,26 +281,40 @@
             </div>
         </div>
 
-        <div class="flex items-start justify-between">
+        <div class="flex items-start justify-between mb-4">
             <div class="flex items-start gap-3">
                 <div class="w-12 h-12 rounded-full bg-yellow-100 overflow-hidden border-2 border-white shadow-sm flex-shrink-0 flex items-center justify-center p-2">
                      <img src="https://cdn-icons-png.flaticon.com/512/3170/3170733.png" alt="Rice Icon" class="w-full h-full object-contain opacity-80">
                 </div>
                 <div class="flex flex-col justify-center">
                     <p class="text-xs text-gray-400 font-medium mb-1">สวัสดี ลูกค้าคนพิเศษ ✨</p>
-                    
                     <h1 class="grand-title leading-none tracking-tight mb-2 relative z-10 pt-1">
                         KAPRAO<span class="title-highlight">52</span>
                     </h1>
                 </div>
             </div>
-            
             <button id="pwa-install-btn" onclick="installApp()" class="hidden bg-gray-900 text-white rounded-full px-4 py-2 text-xs font-bold shadow-lg active:scale-95 transition-all flex items-center gap-2">
                 <i class="fas fa-download"></i>
                 <span>App</span>
             </button>
         </div>
-        <p class="text-[11px] text-gray-500 font-light mt-1 ml-[3.75rem]">ถ้าคุณชอบกินกะเพรา เราคือเพื่อนกัน ❤️</p>
+
+        <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 mb-1 flex items-center gap-3 fade-in-up" style="animation-delay: 0.1s;">
+            <div id="badge-icon" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-xl shadow-inner transition-colors duration-500">
+                🔒
+            </div>
+            <div class="flex-1">
+                <div class="flex justify-between items-end mb-1">
+                    <span id="level-title" class="text-xs font-bold text-gray-700">มือใหม่หัดกิน</span>
+                    <span id="level-count" class="text-[10px] text-gray-400">0/10 ครั้ง</span>
+                </div>
+                <div class="xp-bar-bg">
+                    <div id="level-fill" class="xp-bar-fill" style="width: 0%;"></div>
+                </div>
+            </div>
+        </div>
+        <p class="text-[10px] text-gray-400 text-right mb-4">สั่งครบ 10 ครั้ง รับส่วนลดพิเศษ! 🎁</p>
+
     </div>
 
     <div class="max-w-md mx-auto px-5 relative z-10">
@@ -370,7 +379,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V8.3</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V8.4</p>
         </div>
 
     </div>
@@ -500,6 +509,12 @@
                 </div>
             </div>
 
+            <div class="flex items-center justify-center gap-6 mb-6">
+                <button onclick="adjustQty(-1)" class="w-10 h-10 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold shadow-sm active:scale-90 transition-transform text-lg">-</button>
+                <span id="modal-qty" class="text-2xl font-bold text-gray-800 w-8 text-center">1</span>
+                <button onclick="adjustQty(1)" class="w-10 h-10 rounded-full bg-brand-yellow text-gray-800 flex items-center justify-center font-bold shadow-md active:scale-90 transition-transform text-lg">+</button>
+            </div>
+
             <div id="modal-meat-section" class="mb-6 hidden">
                 <h4 class="font-bold text-gray-800 mb-3 text-sm">เลือกเนื้อสัตว์</h4>
                 <div class="flex gap-2 overflow-x-auto pb-2 hide-scroll">
@@ -560,6 +575,16 @@
         function triggerHaptic() {
             if (navigator.vibrate) navigator.vibrate(10); 
         }
+
+        // --- NEW FEATURE: UPDATE NOTIFICATION ---
+        const CURRENT_VERSION = '8.4';
+        window.addEventListener('load', () => {
+            const savedVer = localStorage.getItem('kaprao_ver');
+            if(savedVer !== CURRENT_VERSION) {
+                setTimeout(() => showToast("🎉 อัปเดตใหม่! มีสะสมแต้ม + เพิ่มจำนวนได้แล้ว"), 1500);
+                localStorage.setItem('kaprao_ver', CURRENT_VERSION);
+            }
+        });
 
         // --- WELCOME POPUP ---
         function closeWelcome() {
@@ -630,6 +655,10 @@
         let currentItem = null;
         let activeCategory = 'kaprao';
         let discountValue = 0;
+        let modalQty = 1;
+        
+        // Gamification Stats
+        let userStats = JSON.parse(localStorage.getItem('kaprao_stats')) || { orders: 0 };
         
         const addonIds = ['special', 'kaikhon', 'kaidao', 'kaijiao', 'kaitom', 'kaiyiewma'];
         const addonCalories = { 'special': 80, 'kaikhon': 150, 'kaidao': 120, 'kaijiao': 200, 'kaitom': 75, 'kaiyiewma': 100 };
@@ -649,7 +678,35 @@
                  updateMiniCart();
                  renderCheckoutList();
              }
+             updateLevelUI();
         });
+
+        // --- NEW FEATURE: ACHIEVEMENT UI ---
+        function updateLevelUI() {
+            const count = userStats.orders;
+            const bar = document.getElementById('level-fill');
+            const txt = document.getElementById('level-count');
+            const title = document.getElementById('level-title');
+            const icon = document.getElementById('badge-icon');
+            
+            let percent = (count % 10) * 10;
+            if(count > 0 && count % 10 === 0) percent = 100;
+            
+            bar.style.width = `${percent}%`;
+            txt.innerText = `${count}/10 ครั้ง`;
+            
+            if(count >= 10) {
+                icon.innerText = '🏅';
+                icon.style.backgroundColor = '#FFD755';
+                title.innerText = "เทพเจ้ากะเพรา";
+                title.style.color = '#d97706';
+            } else if(count >= 5) {
+                icon.innerText = '😎';
+                title.innerText = "ลูกค้าประจำ";
+            } else {
+                icon.innerText = '🔒';
+            }
+        }
 
         // --- WHEEL ---
         let wheelSpinning = false;
@@ -841,6 +898,8 @@
             triggerHaptic();
             
             currentItem = item;
+            modalQty = 1; // Reset qty
+            document.getElementById('modal-qty').innerText = modalQty;
             document.getElementById('modal-title').innerText = item.name;
             document.getElementById('modal-icon').innerText = item.icon;
             document.getElementById('modal-note').value = '';
@@ -874,6 +933,15 @@
             }, 300);
         }
 
+        // --- NEW FEATURE: QUANTITY LOGIC ---
+        function adjustQty(n) {
+            modalQty += n;
+            if(modalQty < 1) modalQty = 1;
+            document.getElementById('modal-qty').innerText = modalQty;
+            triggerHaptic();
+            updateModalPrice();
+        }
+
         function updateModalPrice() {
             if (!currentItem) return;
             let total = currentItem.price;
@@ -884,6 +952,10 @@
                     totalKcal += (addonCalories[id] || 0); 
                 }
             });
+            // Apply Quantity
+            total = total * modalQty;
+            totalKcal = totalKcal * modalQty;
+
             const priceEl = document.getElementById('modal-price');
             priceEl.innerText = total;
             priceEl.classList.remove('price-pop');
@@ -911,19 +983,24 @@
                     addPrice += 10;
                 }
             });
-            cart.push({
-                id: Date.now(),
-                name: currentItem.name,
-                price: currentItem.price + addPrice,
-                meat: meat,
-                addons: addons,
-                note: document.getElementById('modal-note').value.trim()
-            });
+            
+            // Loop for Quantity
+            for(let i=0; i<modalQty; i++){
+                cart.push({
+                    id: Date.now() + i, // Unique ID for each item
+                    name: currentItem.name,
+                    price: currentItem.price + addPrice,
+                    meat: meat,
+                    addons: addons,
+                    note: document.getElementById('modal-note').value.trim()
+                });
+            }
+
             sfxPop.currentTime = 0; sfxPop.play(); triggerHaptic();
             closeModal();
             updateMiniCart();
             saveToLS();
-            showToast('เพิ่มลงตะกร้าแล้ว!');
+            showToast(`เพิ่ม ${modalQty} รายการแล้ว!`);
         }
 
         function openCheckout() {
@@ -1150,6 +1227,11 @@
             sfxOrder.play(); triggerHaptic();
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#FFD755', '#7C77D6', '#FFFFFF'] });
 
+            // UPDATE ACHIEVEMENT
+            userStats.orders++;
+            localStorage.setItem('kaprao_stats', JSON.stringify(userStats));
+            updateLevelUI();
+
             let subtotal = cart.reduce((sum, i) => sum + i.price, 0);
             let netTotal = Math.max(0, subtotal - discountValue);
             
@@ -1160,6 +1242,7 @@
             let msg = `🔥 ออเดอร์ใหม่!\n`;
             msg += `📅 ${now}\n`;
             msg += `👤 คุณ ${name}\n`;
+            msg += `🏅 สั่งครั้งที่: ${userStats.orders}\n`;
             msg += `------------------------\n`;
             
             cart.forEach((i, index) => {
