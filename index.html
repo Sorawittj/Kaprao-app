@@ -8,7 +8,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
     
-    <title>Kaprao52 - V7.4</title> 
+    <title>Kaprao52 - V8.0 </title> 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -23,7 +23,7 @@
                         brand: {
                             purple: '#7C77D6', 
                             yellow: '#FFD755', 
-                            bg: '#F5F7FB',      
+                            bg: '#F5F7FB',       
                             text: '#2D3436',    
                         }
                     },
@@ -33,6 +33,9 @@
                     },
                     borderRadius: {
                         '4xl': '2.5rem',
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce 3s infinite',
                     }
                 }
             }
@@ -40,13 +43,23 @@
     </script>
 
     <style>
-        body { background-color: #F5F7FB; color: #2D3436; -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; }
+        body { background-color: #F5F7FB; color: #2D3436; -webkit-tap-highlight-color: transparent; overscroll-behavior-y: contain; }
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
         
-        .fade-in-up { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        /* Transition Animations */
+        .fade-in-up { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
+        .scale-in { animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes scaleIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+
+        /* Page Transition Effect */
+        .page-out { animation: pageOut 0.2s ease-in forwards; }
+        .page-in { animation: pageIn 0.3s ease-out forwards; }
+        @keyframes pageOut { to { opacity: 0; transform: translateY(-10px) scale(0.95); } }
+        @keyframes pageIn { from { opacity: 0; transform: translateY(10px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
         .price-pop { animation: pricePop 0.3s ease-out; }
         @keyframes pricePop { 50% { transform: scale(1.2); } }
 
@@ -85,6 +98,39 @@
             background-color: #f0fdf4 !important;
             color: #15803d !important;
         }
+
+        /* Pull to Refresh Spinner */
+        #ptr-spinner {
+            position: fixed;
+            top: -60px;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            pointer-events: none;
+            transition: transform 0.2s;
+        }
+        .spinner-icon {
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(124, 119, 214, 0.3);
+            border-top-color: #7C77D6;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* AI Chat Bubble */
+        .typing-dot {
+            width: 6px; height: 6px; background: #ccc; border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out both;
+        }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
 
         /* Parallax Background Pattern */
         #parallax-bg {
@@ -187,8 +233,18 @@
 </head>
 <body class="pb-32 font-sans select-none relative overflow-x-hidden">
 
+    <div id="ptr-spinner">
+        <div class="bg-white p-2 rounded-full shadow-lg">
+            <div class="spinner-icon"></div>
+        </div>
+    </div>
+
     <div id="parallax-bg" class="fixed top-0 left-0 w-full h-[120vh] z-[-1] pointer-events-none transition-transform duration-75 ease-out"></div>
     <div id="bubbles-container" class="fixed inset-0 overflow-hidden pointer-events-none z-[-1]"></div>
+
+    <button onclick="toggleAIChef()" class="fixed bottom-24 right-5 z-[80] w-14 h-14 bg-white rounded-full shadow-xl flex items-center justify-center border-2 border-brand-purple animate-bounce-slow active:scale-90 transition-transform">
+        <span class="text-2xl">🤖</span>
+    </button>
 
     <div id="welcome-modal" class="fixed inset-0 z-[100] bg-gray-900/80 backdrop-blur-sm flex items-center justify-center p-6 fade-in-up">
         <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full text-center shadow-2xl relative overflow-hidden">
@@ -207,7 +263,7 @@
         </div>
     </div>
 
-    <div class="px-6 pt-6 pb-2 bg-transparent">
+    <div class="px-6 pt-6 pb-2 bg-transparent relative z-10">
         
         <div class="flex justify-end mb-4">
             <div class="bg-white/60 backdrop-blur-md p-2 px-3 rounded-full border border-white/50 shadow-sm inline-flex items-center gap-2">
@@ -238,7 +294,7 @@
         <p class="text-[11px] text-gray-500 font-light mt-1 ml-[3.75rem]">ถ้าคุณชอบกินกะเพรา เราคือเพื่อนกัน ❤️</p>
     </div>
 
-    <div class="max-w-md mx-auto px-5">
+    <div class="max-w-md mx-auto px-5 relative z-10">
         
         <div id="hero-banner" onclick="randomMenu()" class="w-full bg-gradient-to-r from-[#7C77D6] to-[#8B86E6] rounded-[1.5rem] p-3 pr-4 relative overflow-hidden shadow-lg shadow-indigo-100 mb-6 fade-in-up mt-2 flex items-center justify-between group cursor-pointer active:scale-98 transition-all duration-200">
             <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-white opacity-10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-500"></div>
@@ -297,12 +353,49 @@
             <h3 id="section-title" class="font-bold text-gray-800 text-lg">รายการแนะนำ</h3>
         </div>
 
-        <div id="menu-grid" class="flex flex-col gap-4"></div>
+        <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V7.4</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V8.0</p>
         </div>
 
+    </div>
+
+    <div id="ai-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[90] hidden transition-opacity opacity-0 flex items-center justify-center p-4">
+        <div class="bg-white rounded-[2rem] w-full max-w-sm overflow-hidden shadow-2xl relative">
+            <div class="bg-brand-purple p-4 flex justify-between items-center text-white">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">🤖</span>
+                    <div>
+                        <h3 class="font-bold text-sm">AI Chef Assistant</h3>
+                        <p class="text-[10px] opacity-80">บอกอารมณ์ของคุณมาสิครับ</p>
+                    </div>
+                </div>
+                <button onclick="toggleAIChef()" class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div id="ai-chat-body" class="p-4 h-[300px] overflow-y-auto bg-gray-50 flex flex-col gap-3">
+                <div class="self-start bg-white p-3 rounded-2xl rounded-tl-none border border-gray-100 shadow-sm max-w-[80%] text-sm text-gray-600">
+                    สวัสดีครับ! วันนี้รู้สึกยังไง หรืออยากทานอะไรเป็นพิเศษไหม? บอกผมได้เลย
+                </div>
+            </div>
+
+            <div class="p-4 bg-white border-t border-gray-100">
+                <div class="flex gap-2 mb-3 overflow-x-auto pb-1 hide-scroll">
+                    <button onclick="aiSuggest('หิวมาก')" class="px-3 py-1 bg-gray-100 rounded-full text-xs text-gray-600 whitespace-nowrap hover:bg-brand-yellow hover:text-gray-800 transition-colors">😫 หิวมาก</button>
+                    <button onclick="aiSuggest('เศร้า')" class="px-3 py-1 bg-gray-100 rounded-full text-xs text-gray-600 whitespace-nowrap hover:bg-brand-yellow hover:text-gray-800 transition-colors">😢 เศร้า</button>
+                    <button onclick="aiSuggest('ลดความอ้วน')" class="px-3 py-1 bg-gray-100 rounded-full text-xs text-gray-600 whitespace-nowrap hover:bg-brand-yellow hover:text-gray-800 transition-colors">🥗 ลดความอ้วน</button>
+                    <button onclick="aiSuggest('แฮงค์')" class="px-3 py-1 bg-gray-100 rounded-full text-xs text-gray-600 whitespace-nowrap hover:bg-brand-yellow hover:text-gray-800 transition-colors">🥴 แฮงค์</button>
+                </div>
+                <div class="flex gap-2">
+                    <input type="text" id="ai-input" placeholder="พิมพ์ความรู้สึก..." class="flex-1 bg-gray-100 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-purple">
+                    <button onclick="aiSendCustom()" class="w-10 h-10 bg-brand-purple text-white rounded-xl flex items-center justify-center shadow-lg active:scale-95"><i class="fas fa-paper-plane text-xs"></i></button>
+                </div>
+                <div class="mt-2 text-center">
+                    <button onclick="requestMotionPermission()" class="text-[10px] text-gray-400 underline">เปิดใช้งานฟีเจอร์เขย่าเพื่อลบ (iOS)</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="mini-cart-bar" class="fixed bottom-6 left-5 right-5 z-40 hidden fade-in-up">
@@ -354,7 +447,10 @@
             <p id="discount-msg" class="text-xs h-4 pl-2 font-medium"></p>
 
             <div class="flex justify-between items-end mb-2 px-2">
-                <span class="text-gray-500 text-sm">ยอดสุทธิ</span>
+                <div class="flex flex-col">
+                    <span class="text-gray-500 text-sm">ยอดสุทธิ</span>
+                    <span class="text-[10px] text-gray-400 font-light flex items-center gap-1"><i class="fas fa-mobile-alt"></i> เขย่าเพื่อลบตะกร้า</span>
+                </div>
                 <span id="sheet-grand-total" class="text-2xl font-bold text-brand-purple">0 ฿</span>
             </div>
 
@@ -439,14 +535,16 @@
     </div>
 
     <div id="receipt-capture">
-        </div>
+    </div>
 
     <script>
         // --- SOUNDS ---
         const sfxPop = new Audio('https://www.soundjay.com/buttons/sounds/button-3.mp3');
         const sfxOrder = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
+        const sfxTrash = new Audio('https://www.soundjay.com/misc/sounds/crumple-paper-1.mp3'); // Sound for shake clear
         sfxPop.volume = 0.5;
         sfxOrder.volume = 0.6;
+        sfxTrash.volume = 0.8;
 
         function triggerHaptic() {
             if (navigator.vibrate) navigator.vibrate(10); 
@@ -605,33 +703,51 @@
             else showToast(`ยินดีด้วย! คุณได้ ${reward.text}`);
         }
 
-        // --- CORE FUNCTIONS ---
+        // --- CORE FUNCTIONS & FEATURE 2: PAGE TRANSITION ---
         function scrollTabs(amount) {
             document.getElementById('tabs-container').scrollBy({ left: amount, behavior: 'smooth' });
         }
 
         function switchCategory(cat) {
+            if(activeCategory === cat) return;
+            
             triggerHaptic();
-            activeCategory = cat;
-            ['kaprao', 'garlic', 'noodle', 'others', 'promotion'].forEach(c => {
-                const btn = document.getElementById(`tab-${c}`);
-                if (c === cat) {
-                    btn.className = "snap-start category-pill-active min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all transform scale-105";
-                } else {
-                    btn.className = "snap-start category-pill-inactive min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all";
-                    if(c === 'promotion') btn.classList.add('border-dashed', 'border-red-300', 'text-red-400');
-                }
-            });
+            
+            // 1. Start Exit Animation
+            const grid = document.getElementById('menu-grid');
+            grid.classList.add('page-out');
+            
+            // 2. Wait, then Change Data & Style
+            setTimeout(() => {
+                activeCategory = cat;
+                ['kaprao', 'garlic', 'noodle', 'others', 'promotion'].forEach(c => {
+                    const btn = document.getElementById(`tab-${c}`);
+                    if (c === cat) {
+                        btn.className = "snap-start category-pill-active min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all transform scale-105";
+                    } else {
+                        btn.className = "snap-start category-pill-inactive min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all";
+                        if(c === 'promotion') btn.classList.add('border-dashed', 'border-red-300', 'text-red-400');
+                    }
+                });
 
-            if (cat === 'promotion') {
-                document.getElementById('section-title').innerText = "คูปอง & โปรโมชั่น";
-                document.getElementById('hero-banner').classList.add('hidden');
-                renderPromotions();
-            } else {
-                document.getElementById('section-title').innerText = "รายการแนะนำ";
-                document.getElementById('hero-banner').classList.remove('hidden');
-                renderMenu();
-            }
+                if (cat === 'promotion') {
+                    document.getElementById('section-title').innerText = "คูปอง & โปรโมชั่น";
+                    document.getElementById('hero-banner').classList.add('hidden');
+                    renderPromotions();
+                } else {
+                    document.getElementById('section-title').innerText = "รายการแนะนำ";
+                    document.getElementById('hero-banner').classList.remove('hidden');
+                    renderMenu();
+                }
+
+                // 3. End Exit, Start Enter Animation
+                grid.classList.remove('page-out');
+                grid.classList.add('page-in');
+                
+                // Cleanup class
+                setTimeout(() => grid.classList.remove('page-in'), 300);
+                
+            }, 200); // Match CSS animation time
         }
 
         function renderMenu() {
@@ -1092,6 +1208,176 @@
         }
         enableSwipeToClose(document.getElementById('modal-content'), document.getElementById('modal-scroll-area'), closeModal);
         enableSwipeToClose(document.getElementById('checkout-sheet'), document.getElementById('cart-list-container'), closeCheckout);
+
+        // --- FEATURE 1: PULL TO REFRESH ---
+        let ptrStartY = 0;
+        let ptrDistance = 0;
+        const ptrSpinner = document.getElementById('ptr-spinner');
+        
+        window.addEventListener('touchstart', e => {
+            if (window.scrollY === 0) ptrStartY = e.touches[0].clientY;
+        }, {passive: true});
+        
+        window.addEventListener('touchmove', e => {
+            if (ptrStartY === 0) return;
+            const currentY = e.touches[0].clientY;
+            ptrDistance = currentY - ptrStartY;
+            if (ptrDistance > 0 && window.scrollY === 0) {
+                if (ptrDistance > 120) ptrDistance = 120; // Cap at 120px
+                ptrSpinner.style.transform = `translateY(${ptrDistance}px) rotate(${ptrDistance * 2}deg)`;
+            }
+        }, {passive: true});
+        
+        window.addEventListener('touchend', e => {
+            if (ptrDistance > 80) {
+                // Trigger Refresh
+                ptrSpinner.style.transform = `translateY(80px)`;
+                ptrSpinner.querySelector('.spinner-icon').style.borderTopColor = '#22c55e'; // Green success
+                setTimeout(() => window.location.reload(), 500);
+            } else {
+                ptrSpinner.style.transform = `translateY(0px)`;
+            }
+            ptrStartY = 0;
+            ptrDistance = 0;
+        });
+
+        // --- FEATURE 3: AI CHEF LOGIC ---
+        function toggleAIChef() {
+            const modal = document.getElementById('ai-modal');
+            const isOpen = !modal.classList.contains('hidden');
+            if(isOpen) {
+                modal.classList.add('opacity-0');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            } else {
+                modal.classList.remove('hidden');
+                setTimeout(() => modal.classList.remove('opacity-0'), 10);
+            }
+        }
+        
+        function aiAppendMsg(text, isUser = false) {
+            const body = document.getElementById('ai-chat-body');
+            const div = document.createElement('div');
+            div.className = isUser 
+                ? "self-end bg-brand-purple text-white p-3 rounded-2xl rounded-tr-none shadow-sm max-w-[80%] text-sm scale-in"
+                : "self-start bg-white p-3 rounded-2xl rounded-tl-none border border-gray-100 shadow-sm max-w-[80%] text-sm text-gray-600 scale-in";
+            div.innerText = text;
+            body.appendChild(div);
+            body.scrollTop = body.scrollHeight;
+        }
+
+        function aiSuggest(mood) {
+            aiAppendMsg(mood, true);
+            
+            // Show Typing
+            const body = document.getElementById('ai-chat-body');
+            const typing = document.createElement('div');
+            typing.id = 'ai-typing';
+            typing.className = "self-start bg-white p-4 rounded-2xl rounded-tl-none border border-gray-100 shadow-sm flex gap-1";
+            typing.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+            body.appendChild(typing);
+            body.scrollTop = body.scrollHeight;
+
+            // Logic (Mock AI)
+            setTimeout(() => {
+                document.getElementById('ai-typing').remove();
+                let reply = "";
+                let suggestItem = null;
+
+                if(mood.includes('หิว')) { reply = "หิวมากต้องจัดหนัก! กะเพราสันคอพิเศษไข่ดาวไปเลยครับ"; suggestItem = menuItems.find(i=>i.name.includes('สันคอ')); }
+                else if(mood.includes('เศร้า')) { reply = "วันเศร้าๆ ต้องกินของอร่อยเยียวยาใจ ไข่ข้นนุ่มๆ ช่วยได้นะ"; suggestItem = menuItems.find(i=>i.name.includes('ไข่ข้น')); }
+                else if(mood.includes('อ้วน')) { reply = "คุมน้ำหนักหรอ? งั้นกะเพราหมูสับไม่ใส่น้ำมัน ไข่ต้มมั้ยครับ"; suggestItem = menuItems.find(i=>i.name.includes('หมูสับ')); }
+                else if(mood.includes('แฮงค์')) { reply = "ซดน้ำร้อนๆ ให้ตาสว่าง ต้องมาม่าผัดกะเพราแซ่บๆ!"; suggestItem = menuItems.find(i=>i.name.includes('มาม่า')); }
+                else { reply = "อารมณ์นี้... ผมแนะนำเมนูนี้เลย รับรองเด็ด!"; suggestItem = menuItems[Math.floor(Math.random() * menuItems.length)]; }
+
+                aiAppendMsg(reply);
+                
+                if(suggestItem) {
+                    setTimeout(() => {
+                         const btn = document.createElement('button');
+                         btn.className = "self-center mt-2 bg-brand-yellow px-4 py-2 rounded-full text-xs font-bold shadow-md hover:bg-white transition-colors scale-in";
+                         btn.innerText = `สั่ง ${suggestItem.name} เลย!`;
+                         btn.onclick = () => { toggleAIChef(); openModal(suggestItem); };
+                         body.appendChild(btn);
+                         body.scrollTop = body.scrollHeight;
+                    }, 500);
+                }
+            }, 1200);
+        }
+        
+        function aiSendCustom() {
+            const input = document.getElementById('ai-input');
+            const txt = input.value.trim();
+            if(txt) {
+                aiSuggest(txt);
+                input.value = '';
+            }
+        }
+        
+        // --- FEATURE 4: SHAKE TO CLEAR (ShakeDetector) ---
+        class ShakeDetector {
+            constructor(threshold = 15, timeout = 1000) {
+                this.threshold = threshold;
+                this.timeout = timeout;
+                this.lastTime = 0;
+                this.lastX = 0;
+                this.lastY = 0;
+                this.lastZ = 0;
+                this.enabled = false;
+            }
+            
+            start() {
+                if (typeof DeviceMotionEvent.requestPermission === 'function') {
+                    // iOS 13+ requires permission
+                    DeviceMotionEvent.requestPermission()
+                        .then(response => {
+                            if (response === 'granted') {
+                                window.addEventListener('devicemotion', this.handleMotion.bind(this));
+                                this.enabled = true;
+                                showToast('เปิดใช้งาน Shake to Clear แล้ว! 📳');
+                            }
+                        })
+                        .catch(console.error);
+                } else {
+                    // Non-iOS or older devices
+                    window.addEventListener('devicemotion', this.handleMotion.bind(this));
+                    this.enabled = true;
+                }
+            }
+
+            handleMotion(e) {
+                if(cart.length === 0) return; // Nothing to clear
+                
+                let current = e.accelerationIncludingGravity;
+                let curTime = new Date().getTime();
+
+                if ((curTime - this.lastTime) > 100) {
+                    let diffTime = (curTime - this.lastTime);
+                    this.lastTime = curTime;
+                    
+                    let speed = Math.abs(current.x + current.y + current.z - this.lastX - this.lastY - this.lastZ) / diffTime * 10000;
+
+                    if (speed > this.threshold * 50) { // Multiplier for sensitivity
+                        // Shake Detected
+                        if(navigator.vibrate) navigator.vibrate([50, 50, 50]);
+                        sfxTrash.play();
+                        cart = [];
+                        saveToLS();
+                        updateMiniCart();
+                        closeCheckout();
+                        showToast('เขย่าจนตะกร้าปลิวแล้ว! 🗑️');
+                    }
+
+                    this.lastX = current.x;
+                    this.lastY = current.y;
+                    this.lastZ = current.z;
+                }
+            }
+        }
+
+        const shaker = new ShakeDetector();
+        function requestMotionPermission() {
+            shaker.start();
+        }
 
         document.getElementById('user-name').addEventListener('input', saveToLS);
         renderMenu();
