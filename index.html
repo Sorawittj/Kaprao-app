@@ -8,7 +8,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
     
-    <title>Kaprao52 - V8.7</title> 
+    <title>Kaprao52 - V9.00</title> 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -257,18 +257,25 @@
 
     <div id="welcome-modal" class="fixed inset-0 z-[100] bg-gray-900/80 backdrop-blur-sm flex items-center justify-center p-6 fade-in-up">
         <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full text-center shadow-2xl relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-2 bg-brand-yellow"></div>
-            <div class="w-20 h-20 bg-brand-purple/10 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl">
-                👋
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-yellow-200 rounded-full opacity-50 blur-2xl"></div>
+            <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-purple-200 rounded-full opacity-50 blur-2xl"></div>
+            
+            <div class="relative z-10">
+                <div class="w-24 h-24 bg-gradient-to-br from-yellow-300 to-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4 text-5xl shadow-lg border-4 border-white animate-bounce-slow">
+                    🎟️
+                </div>
+                <h2 class="text-2xl font-black text-gray-800 mb-2">ลุ้นกินฟรีทุกงวด!</h2>
+                <p class="text-gray-600 mb-6 leading-relaxed text-sm">
+                    <span class="font-bold text-brand-purple text-base">ใบเสร็จมีค่า อย่าทิ้ง!</span><br>
+                    ลุ้นเป็นเศรษฐี (น้อยๆ) ไปด้วยกัน<br>
+                    เลขท้าย Order ID ตรงกับ<br>
+                    <span class="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded font-bold">เลขท้าย 2 ตัว หวยรัฐบาล</span><br>
+                    รับสิทธิ์กินฟรีมื้อหน้าทันที! 🎁
+                </p>
+                <button onclick="closeWelcome()" class="w-full bg-gradient-to-r from-brand-purple to-indigo-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-200 active:scale-95 transition-transform text-lg border-2 border-transparent hover:border-yellow-300">
+                    สั่งเลย! ลุ้นเลขเด็ด 🎰
+                </button>
             </div>
-            <h2 class="text-2xl font-extrabold text-gray-800 mb-2">ยินดีต้อนรับ</h2>
-            <p class="text-gray-500 mb-8 leading-relaxed">
-                ข้าวกะเพราทำสดทุกออเดอร์<br>
-                <span class="text-brand-purple font-medium">เลือกเมนูได้ทันที</span>
-            </p>
-            <button onclick="closeWelcome()" class="w-full bg-brand-purple text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-200 active:scale-95 transition-transform text-lg">
-                สั่งเลย! 🍛
-            </button>
         </div>
     </div>
 
@@ -391,7 +398,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V8.7</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V8.9</p>
         </div>
 
     </div>
@@ -589,11 +596,11 @@
         }
 
         // --- NEW FEATURE: UPDATE NOTIFICATION ---
-        const CURRENT_VERSION = '8.7';
+        const CURRENT_VERSION = '8.9';
         window.addEventListener('load', () => {
             const savedVer = localStorage.getItem('kaprao_ver');
             if(savedVer !== CURRENT_VERSION) {
-                setTimeout(() => showToast("🎉 อัปเดตใหม่! ปรับรายการของหวาน 🍧"), 1500);
+                // setTimeout(() => showToast("🎉 อัปเดตใหม่! ลุ้นหวยท้ายใบเสร็จ 🎟️"), 1500); // Popup บอกไปแล้ว
                 localStorage.setItem('kaprao_ver', CURRENT_VERSION);
             }
         });
@@ -1062,11 +1069,48 @@
             saveToLS();
             showToast(`เพิ่ม ${modalQty} รายการแล้ว!`);
         }
+        
+        // --- LOTTERY FEATURE ---
+        let currentOrderId = "";
+
+        function generateOrderId() {
+            const now = Date.now().toString(); 
+            const randomPart = Math.floor(Math.random() * 100).toString().padStart(2, '0'); // Random 00-99
+            const timePart = now.slice(-2); // Last 2 digits of timestamp
+            // ID Format: KP-{Time}{Random} (Last 2 digits will be random)
+            currentOrderId = `KP-${timePart}${randomPart}`;
+            return currentOrderId;
+        }
 
         function openCheckout() {
             triggerHaptic();
             renderCheckoutList();
             if(document.getElementById('discount-code').value.trim() !== '' && discountValue > 0) applyDiscount();
+            
+            // GEN LOTTERY NUMBER UI
+            if(cart.length > 0) {
+                 const lottoId = generateOrderId();
+                 const listContainer = document.getElementById('cart-list-container');
+                 const lottoBanner = document.createElement('div');
+                 lottoBanner.className = "bg-gradient-to-r from-brand-purple to-indigo-600 text-white p-4 rounded-xl mb-4 flex justify-between items-center shadow-md relative overflow-hidden";
+                 lottoBanner.innerHTML = `
+                    <div class="absolute -right-4 -top-4 bg-white opacity-10 w-20 h-20 rounded-full"></div>
+                    <div class="flex flex-col z-10">
+                        <span class="text-[10px] opacity-90 uppercase tracking-wider">Order ID ของคุณ</span>
+                        <div class="flex items-baseline gap-1">
+                            <span class="font-bold text-xl">${lottoId.slice(0, -2)}</span>
+                            <span class="font-black text-3xl text-brand-yellow drop-shadow-md">${lottoId.slice(-2)}</span>
+                        </div>
+                    </div>
+                    <div class="z-10 text-right">
+                        <div class="text-2xl">🎟️</div>
+                        <span class="text-[10px] font-bold">ลุ้นหวยงวดนี้!</span>
+                    </div>
+                 `;
+                 // Insert at top
+                 listContainer.insertBefore(lottoBanner, listContainer.firstChild);
+            }
+            
             const overlay = document.getElementById('checkout-overlay');
             const sheet = document.getElementById('checkout-sheet');
             sheet.style.transform = '';
@@ -1198,9 +1242,16 @@
 
             // Construct HTML exactly like Line message but formatted for Image
             let html = `
-                <div class="text-center mb-4">
+                <div class="text-center mb-4 relative">
                     <h2 class="text-xl font-black text-brand-purple tracking-tight">KAPRAO52</h2>
                     <p class="text-xs text-gray-400">ORDER SUMMARY</p>
+                    
+                    <div class="mt-2 border-2 border-brand-yellow rounded-lg p-2 bg-yellow-50 inline-block">
+                         <p class="text-[10px] text-gray-500 uppercase">Lucky Order ID</p>
+                         <p class="font-black text-2xl text-gray-800 tracking-widest">
+                            ${currentOrderId.slice(0,-2)}<span class="text-red-500">${currentOrderId.slice(-2)}</span>
+                         </p>
+                    </div>
                 </div>
                 <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-100">
                     <div>
@@ -1267,7 +1318,7 @@
                 backgroundColor: "#ffffff"
             }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = `Order-${Date.now()}.png`;
+                link.download = `Order-${currentOrderId}.png`;
                 link.href = canvas.toDataURL();
                 link.click();
                 showToast('บันทึกใบสั่งซื้อแล้ว 📸');
@@ -1298,8 +1349,9 @@
             // Collect Data
             const now = new Date().toLocaleString('th-TH');
             
-            // Build Message
-            let msg = `🔥 ออเดอร์ใหม่!\n`;
+            // Build Message with Lotto ID
+            let msg = `🔥 ออเดอร์ใหม่! [${currentOrderId}]\n`;
+            msg += `🎟️ เลขลุ้นหวย: ${currentOrderId.slice(-2)}\n`;
             msg += `📅 ${now}\n`;
             msg += `👤 คุณ ${name}\n`;
             msg += `🏅 สั่งครั้งที่: ${userStats.orders}\n`;
