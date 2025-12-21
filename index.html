@@ -258,9 +258,9 @@
             position: fixed;
             top: -9999px;
             left: -9999px;
-            width: 380px; 
+            width: 400px; /* Fixed width for consistent image */
             background: #FFFFFF;
-            padding: 25px;
+            padding: 0; /* Let inner content handle padding */
             border-radius: 0;
             font-family: 'Kanit', sans-serif;
             color: #2D3436;
@@ -462,7 +462,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V9.6</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V9.7</p>
         </div>
 
     </div>
@@ -661,6 +661,63 @@
     </div>
 
     <div id="receipt-capture">
+        <div class="bg-white p-6 relative">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-brand-yellow rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
+                    <span class="text-3xl">🧑‍🍳</span>
+                </div>
+                <h2 class="text-2xl font-black text-gray-800 tracking-wider">KAPRAO52</h2>
+                <p class="text-[10px] text-gray-400 tracking-widest uppercase mt-1">Authentic Thai Street Food</p>
+                <div class="mt-4 inline-block px-4 py-1 bg-gray-100 rounded-full border border-gray-200">
+                    <p class="text-xs font-bold text-gray-600">RECEIPT / ใบเสร็จรับเงิน</p>
+                </div>
+            </div>
+
+            <div class="border-t-2 border-dashed border-gray-200 my-4"></div>
+
+            <div class="flex justify-between items-center mb-1">
+                <span class="text-xs text-gray-400">Order ID</span>
+                <span class="font-bold text-gray-800 tracking-wide receipt-id">KP-XX99</span>
+            </div>
+            <div class="flex justify-between items-center mb-1">
+                <span class="text-xs text-gray-400">Date</span>
+                <span class="font-medium text-xs text-gray-600 receipt-date">01/01/2024 12:00</span>
+            </div>
+            <div class="flex justify-between items-center mb-4">
+                <span class="text-xs text-gray-400">Customer</span>
+                <span class="font-bold text-sm text-gray-800 receipt-name">Customer</span>
+            </div>
+
+            <div class="bg-gray-50 rounded-lg p-3 mb-4 space-y-2 receipt-items">
+                </div>
+
+            <div class="space-y-1">
+                <div class="flex justify-between text-xs text-gray-500">
+                    <span>Subtotal</span>
+                    <span class="receipt-subtotal">0.-</span>
+                </div>
+                <div class="flex justify-between text-xs text-green-600">
+                    <span>Discount</span>
+                    <span class="receipt-discount">-0.-</span>
+                </div>
+                <div class="flex justify-between items-end mt-2 pt-2 border-t border-gray-200">
+                    <span class="font-bold text-gray-800">TOTAL</span>
+                    <span class="font-black text-3xl text-brand-purple receipt-total">0.-</span>
+                </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t-2 border-dotted border-gray-200 text-center">
+                <div class="flex justify-center gap-1 text-2xl text-gray-300 mb-2">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                </div>
+                <p class="text-[10px] text-gray-400">THANK YOU FOR YOUR ORDER</p>
+                <div class="mt-4 flex justify-center opacity-50">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg" class="w-16 h-16 mix-blend-multiply">
+                </div>
+            </div>
+            
+            <div class="absolute bottom-0 left-0 right-0 h-4 bg-white" style="background: linear-gradient(45deg, transparent 33.333%, #ffffff 33.333%, #ffffff 66.667%, transparent 66.667%), linear-gradient(-45deg, transparent 33.333%, #ffffff 33.333%, #ffffff 66.667%, transparent 66.667%); background-size: 20px 40px; transform: translateY(10px);"></div>
+        </div>
     </div>
 
     <script>
@@ -677,7 +734,7 @@
             if (navigator.vibrate) navigator.vibrate(10); 
         }
 
-        // --- NEW FEATURE: GLOBAL LOADER ---
+        // --- GLOBAL LOADER ---
         function showGlobalLoader(text = "กำลังโหลด...") {
             const loader = document.getElementById('global-loader');
             const txt = document.getElementById('loader-text');
@@ -690,7 +747,7 @@
             loader.classList.add('loader-hidden');
         }
 
-        // --- NEW FEATURE: NOTIFICATION PERMISSION ---
+        // --- NOTIFICATION ---
         function requestNotifPermission() {
             if (!("Notification" in window)) {
                 showToast("Browser นี้ไม่รองรับการแจ้งเตือน");
@@ -704,7 +761,7 @@
             });
         }
 
-        const CURRENT_VERSION = '9.6';
+        const CURRENT_VERSION = '9.7';
         window.addEventListener('load', () => {
             const savedVer = localStorage.getItem('kaprao_ver');
             if(savedVer !== CURRENT_VERSION) {
@@ -753,7 +810,7 @@
         }
         createBubbles();
 
-        // --- CLOCK (No Weather) ---
+        // --- CLOCK ---
         function updateClock() {
             const now = new Date();
             document.getElementById('live-clock').innerText = now.toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'});
@@ -761,7 +818,7 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // DATA - Added Dessert Items
+        // DATA
         const menuItems = [
             { id: 2, name: "กะเพราหน่อไม้", price: 55, icon: "🎍", category: "kaprao", reqMeat: true, kcal: 350 },
             { id: 3, name: "กะเพราหมูสับ", price: 50, icon: "🐷", category: "kaprao", reqMeat: false, kcal: 520 },
@@ -778,7 +835,6 @@
             { id: 13, name: "ข้าวไข่เจียวพริกสด", price: 50, icon: "🥘", category: "others", reqMeat: false, kcal: 420 },
             { id: 14, name: "ข้าวไข่ดาว 3 ฟอง", price: 50, icon: "🍳", category: "others", reqMeat: false, kcal: 480 },
             { id: 15, name: "หน่อไม้ผัดไข่", price: 50, icon: "🎋", category: "others", reqMeat: true, kcal: 300 },
-            // Dessert Items (Updated)
             { id: 20, name: "เฉาก๊วยนมสด", price: 30, icon: "🧊", category: "dessert", reqMeat: false, kcal: 150 },
             { id: 21, name: "กล้วยเชื่อม", price: 25, icon: "🍌", category: "dessert", reqMeat: false, kcal: 220 },
         ];
@@ -787,28 +843,23 @@
             { code: "MANU", title: "ส่วนลดแฟนแมนยู 🔴", desc: "สั่งครบ 100.- ลด 5 บาท", minOrder: 100, type: "discount", value: 5, color: "bg-red-600", icon: "⚽" }
         ];
 
-        // --- STATE MANAGEMENT (LS) ---
+        // --- STATE MANAGEMENT ---
         let cart = [];
         let currentItem = null;
         let activeCategory = 'kaprao';
         let discountValue = 0;
         let modalQty = 1;
-        
-        // Gamification Stats
         let userStats = JSON.parse(localStorage.getItem('kaprao_stats')) || { orders: 0 };
-        // Lottery History State
         let lottoHistory = JSON.parse(localStorage.getItem('kaprao_lotto_history')) || [];
         
         const addonIds = ['special', 'kaikhon', 'kaidao', 'kaijiao', 'kaitom', 'kaiyiewma'];
         const addonCalories = { 'special': 80, 'kaikhon': 150, 'kaidao': 120, 'kaijiao': 200, 'kaitom': 75, 'kaiyiewma': 100 };
 
-        // Save State
         function saveToLS() {
             const userState = { cart: cart, name: document.getElementById('user-name').value };
             localStorage.setItem('kaprao52_user', JSON.stringify(userState));
         }
 
-        // Load User
         window.addEventListener('load', () => {
              const u = JSON.parse(localStorage.getItem('kaprao52_user'));
              if(u){
@@ -820,7 +871,7 @@
              updateLevelUI();
         });
 
-        // --- NEW FEATURE: ACHIEVEMENT UI ---
+        // --- ACHIEVEMENT UI ---
         function updateLevelUI() {
             const count = userStats.orders;
             const bar = document.getElementById('level-fill');
@@ -888,27 +939,21 @@
         }
         function spinWheel() {
             if (wheelSpinning) return;
-
-            // --- ADDED LIMIT LOGIC ---
-            const today = new Date().toLocaleDateString('th-TH'); // วันที่ปัจจุบัน
+            const today = new Date().toLocaleDateString('th-TH');
             const lastDate = localStorage.getItem('kaprao_spin_date');
             let count = parseInt(localStorage.getItem('kaprao_spin_count') || '0');
 
-            // ถ้านั่นคนละวัน ให้รีเซ็ตใหม่
             if (lastDate !== today) {
                 count = 0;
                 localStorage.setItem('kaprao_spin_date', today);
             }
 
-            // ถ้าเกิน 3 ครั้ง ให้แจ้งเตือนและหยุดทำงาน
             if (count >= 3) {
                 showToast("⛔ ครบโควตา 3 ครั้งต่อวันแล้ว พรุ่งนี้มาใหม่นะ!");
                 return; 
             }
 
-            // บันทึกจำนวนครั้งใหม่
             localStorage.setItem('kaprao_spin_count', count + 1);
-            // -------------------------
 
             wheelSpinning = true;
             triggerHaptic();
@@ -932,24 +977,19 @@
             else showToast(`ยินดีด้วย! คุณได้ ${reward.text}`);
         }
 
-        // --- CORE FUNCTIONS & FEATURE 2: PAGE TRANSITION ---
+        // --- CORE FUNCTIONS ---
         function scrollTabs(amount) {
             document.getElementById('tabs-container').scrollBy({ left: amount, behavior: 'smooth' });
         }
 
-        // Updated switchCategory to include dessert logic
         function switchCategory(cat) {
             if(activeCategory === cat) return;
-            
             triggerHaptic();
-            
-            // 1. Start Exit Animation
             const grid = document.getElementById('menu-grid');
             const msg = document.getElementById('dessert-msg');
             grid.classList.add('page-out');
             if(!msg.classList.contains('hidden')) msg.classList.add('page-out');
             
-            // 2. Wait, then Change Data & Style
             setTimeout(() => {
                 activeCategory = cat;
                 ['kaprao', 'garlic', 'noodle', 'others', 'dessert', 'promotion'].forEach(c => {
@@ -962,11 +1002,9 @@
                     }
                 });
                 
-                // Logic for Banner & Title
                 const banner = document.getElementById('hero-banner');
                 const title = document.getElementById('section-title');
                 
-                // Reset States
                 msg.classList.add('hidden');
                 msg.classList.remove('page-out');
                 banner.classList.remove('hidden');
@@ -977,22 +1015,18 @@
                     renderPromotions();
                 } else if (cat === 'dessert') {
                     title.innerText = "เมนูของหวาน";
-                    banner.classList.add('hidden'); // Hide random button for dessert
-                    msg.classList.remove('hidden'); // Show coming soon msg
+                    banner.classList.add('hidden'); 
+                    msg.classList.remove('hidden'); 
                     renderMenu();
                 } else {
                     title.innerText = "รายการแนะนำ";
                     renderMenu();
                 }
 
-                // 3. End Exit, Start Enter Animation
                 grid.classList.remove('page-out');
                 grid.classList.add('page-in');
-                
-                // Cleanup class
                 setTimeout(() => grid.classList.remove('page-in'), 300);
-                
-            }, 200); // Match CSS animation time
+            }, 200);
         }
 
         function renderMenu() {
@@ -1010,10 +1044,8 @@
                 const el = document.createElement('div');
                 el.style.animationDelay = `${index * 0.05}s`;
                 
-                // Remove cursor-pointer if dessert (to show it's not clickable for order)
                 el.className = `menu-card-style p-4 flex items-center justify-between shadow-sm border border-gray-100 fade-in-up group ${isDessert ? '' : 'cursor-pointer'}`;
                 
-                // Click Logic
                 el.onclick = () => {
                     if(isDessert) {
                         showToast('⏳ เมนูนี้จะพร้อมขายเร็วๆ นี้ครับ');
@@ -1023,17 +1055,14 @@
                     }
                 };
 
-                // Logic for Button: Add vs Soon
                 const actionButton = isDessert 
                     ? `<span class="text-[10px] font-bold text-white bg-gray-400 px-2 py-1 rounded-full">เร็วๆ นี้</span>` 
                     : `<div class="w-8 h-8 rounded-full bg-brand-yellow text-gray-800 flex items-center justify-center shadow-md"><i class="fas fa-plus text-xs"></i></div>`;
                 
-                // Logic for Price: Fade if dessert
                 const priceDisplay = isDessert
                     ? `<span class="font-bold text-gray-300 text-lg line-through decoration-transparent">${item.price}</span>`
                     : `<span class="font-bold text-gray-700 text-lg">${item.price}</span>`;
                 
-                // Gray out content if dessert
                 const contentStyle = isDessert ? 'opacity-60 grayscale-[50%]' : '';
 
                 el.innerHTML = `
@@ -1102,20 +1131,16 @@
 
         function openModal(item) {
             triggerHaptic();
-            
             currentItem = item;
-            modalQty = 1; // Reset qty
+            modalQty = 1; 
             document.getElementById('modal-qty').innerText = modalQty;
             document.getElementById('modal-title').innerText = item.name;
             document.getElementById('modal-icon').innerText = item.icon;
             document.getElementById('modal-note').value = '';
-            
             document.querySelectorAll('input[name="modal-meat"]').forEach(el => el.checked = false);
             addonIds.forEach(id => document.getElementById(`modal-opt-${id}`).checked = false);
-            
             const meatSec = document.getElementById('modal-meat-section');
             if(item.reqMeat) meatSec.classList.remove('hidden'); else meatSec.classList.add('hidden');
-            
             updateModalPrice();
             const overlay = document.getElementById('modal-overlay');
             const content = document.getElementById('modal-content');
@@ -1139,7 +1164,6 @@
             }, 300);
         }
 
-        // --- NEW FEATURE: QUANTITY LOGIC ---
         function adjustQty(n) {
             modalQty += n;
             if(modalQty < 1) modalQty = 1;
@@ -1158,10 +1182,8 @@
                     totalKcal += (addonCalories[id] || 0); 
                 }
             });
-            // Apply Quantity
             total = total * modalQty;
             totalKcal = totalKcal * modalQty;
-
             const priceEl = document.getElementById('modal-price');
             priceEl.innerText = total;
             priceEl.classList.remove('price-pop');
@@ -1189,11 +1211,9 @@
                     addPrice += 10;
                 }
             });
-            
-            // Loop for Quantity
             for(let i=0; i<modalQty; i++){
                 cart.push({
-                    id: Date.now() + i, // Unique ID for each item
+                    id: Date.now() + i,
                     name: currentItem.name,
                     price: currentItem.price + addPrice,
                     meat: meat,
@@ -1201,7 +1221,6 @@
                     note: document.getElementById('modal-note').value.trim()
                 });
             }
-
             sfxPop.currentTime = 0; sfxPop.play(); triggerHaptic();
             closeModal();
             updateMiniCart();
@@ -1209,84 +1228,53 @@
             showToast(`เพิ่ม ${modalQty} รายการแล้ว!`);
         }
         
-        // --- LOTTERY UTILS ---
-        
-        // คำนวณวันหวยออกถัดไป (1 หรือ 16)
         function getNextDrawDate() {
             const today = new Date();
             const day = today.getDate();
             const month = today.getMonth();
             const year = today.getFullYear();
-
             let drawDate = new Date();
-
-            if (day <= 1) {
-                // งวดวันที่ 1 เดือนนี้
-                drawDate = new Date(year, month, 1);
-            } else if (day <= 16) {
-                // งวดวันที่ 16 เดือนนี้
-                drawDate = new Date(year, month, 16);
-            } else {
-                // งวดวันที่ 1 เดือนหน้า
-                drawDate = new Date(year, month + 1, 1);
-            }
+            if (day <= 1) drawDate = new Date(year, month, 1);
+            else if (day <= 16) drawDate = new Date(year, month, 16);
+            else drawDate = new Date(year, month + 1, 1);
             return drawDate;
         }
 
-        // --- ส่วนที่แก้ไข: ล็อคผลรางวัล (Hardcode Logic) ---
-        
-        // 1. ตารางผลรางวัลที่กำหนดเอง (ADMIN SETTING)
         const OFFICIAL_RESULTS = {
-             "16/12/2566": "52", // ตัวอย่าง
+             "16/12/2566": "52",
              "30/12/2566": "99",
              "17/1/2567": "00",
              "1/11/2566": "52",
              "16/11/2566": "99"
-             // เพิ่มงวดต่อไปที่นี่...
         };
 
-        // 2. ฟังก์ชันดึงเลขรางวัล (แก้ใหม่ ตัด Random ออก)
         function getWinningNumberForDate(dateStr) {
-            // เช็คว่ามีเลขที่ล็อคไว้สำหรับวันที่นี้ไหม
-            if (OFFICIAL_RESULTS[dateStr]) {
-                console.log(`[LOTTO] งวดวันที่ ${dateStr} ล็อคเลขไว้ที่: ${OFFICIAL_RESULTS[dateStr]}`);
-                return OFFICIAL_RESULTS[dateStr];
-            }
-
-            // ถ้าไม่มีเลขระบุไว้ (เช่น ลืมใส่ หรือยังไม่ออก) 
-            console.log(`[LOTTO] งวดวันที่ ${dateStr} ยังไม่มีการระบุเลขรางวัล`);
+            if (OFFICIAL_RESULTS[dateStr]) return OFFICIAL_RESULTS[dateStr];
             return "NotSet"; 
         }
 
-        // --- LOTTERY FEATURE ---
         let currentOrderId = "";
-
         function generateOrderId() {
             const now = Date.now().toString(); 
-            const randomPart = Math.floor(Math.random() * 100).toString().padStart(2, '0'); // Random 00-99
-            const timePart = now.slice(-2); // Last 2 digits of timestamp
-            // ID Format: KP-{Time}{Random} (Last 2 digits will be random)
+            const randomPart = Math.floor(Math.random() * 100).toString().padStart(2, '0');
+            const timePart = now.slice(-2);
             currentOrderId = `KP-${timePart}${randomPart}`;
             return currentOrderId;
         }
 
-        // --- NEW: SAVE TICKET TO HISTORY (UPDATED) ---
         function saveTicketToHistory(orderId, totalPrice) {
             const today = new Date();
             const drawDateObj = getNextDrawDate();
-            
-            // แปลงวันที่หวยออกเป็น string สวยๆ เช่น "1/10/2566"
             const drawDateStr = drawDateObj.toLocaleDateString('th-TH');
-
             const ticket = {
                 id: orderId,
                 number: orderId.slice(-2),
-                date: today.toLocaleDateString('th-TH'), // วันที่ซื้อ
-                drawDate: drawDateStr,                   // วันที่หวยออก (สำคัญ!)
-                drawDateTimestamp: drawDateObj.getTime(), // เก็บ timestamp ไว้เทียบเวลา
+                date: today.toLocaleDateString('th-TH'),
+                drawDate: drawDateStr,
+                drawDateTimestamp: drawDateObj.getTime(),
                 timestamp: Date.now(),
                 price: totalPrice,
-                status: 'pending', // pending, won, lost
+                status: 'pending',
                 checkedDate: null
             };
             lottoHistory.unshift(ticket);
@@ -1294,42 +1282,22 @@
             updateTicketBadge();
         }
 
-        // --- NEW: AUTO CHECK LOTTERY (FIXED LOGIC) ---
         function autoCheckLottery() {
             const pendingTickets = lottoHistory.filter(t => t.status === 'pending');
             if(pendingTickets.length === 0) return;
-
             const now = new Date();
-            // set เวลาเป็นเที่ยงคืนเพื่อเปรียบเทียบแค่วันที่
             now.setHours(0, 0, 0, 0); 
-
             let winCount = 0;
             let updated = false;
-
             pendingTickets.forEach(t => {
-                // ตรวจสอบว่าตั๋วนี้มีข้อมูล drawDateTimestamp หรือไม่ (รองรับตั๋วเวอร์ชั่นเก่า)
                 let targetDate;
-                if (t.drawDateTimestamp) {
-                    targetDate = t.drawDateTimestamp;
-                } else {
-                    // ถ้าเป็นตั๋วเก่า ไม่มีวันหวยออก ให้ถือว่าตรวจได้เลย (หรือจะข้ามไปก็ได้)
-                    targetDate = 0; 
-                }
-
-                // กฏ: ถ้า "วันนี้" ยังไม่ถึง "วันหวยออก" ให้ข้ามไป (ยังคงสถานะ Pending)
-                if (now.getTime() < targetDate) {
-                    return; // ยังไม่ถึงเวลา จบการทำงานรอบนี้
-                }
-
-                // --- ถึงเวลาตรวจผลรางวัล ---
-                
-                // ดึงเลขรางวัลที่ล็อคไว้ของงวดนั้นๆ
+                if (t.drawDateTimestamp) targetDate = t.drawDateTimestamp;
+                else targetDate = 0; 
+                if (now.getTime() < targetDate) return;
                 const winningNum = getWinningNumberForDate(t.drawDate || new Date().toLocaleDateString('th-TH'));
-
                 if (t.number === winningNum) {
                     t.status = 'won';
                     winCount++;
-                    // Notification
                     if (Notification.permission === "granted") {
                         new Notification("เศรษฐีใหม่มาแล้ว! 🤑", { 
                             body: `งวด ${t.drawDate}: Order ${t.id} ถูกรางวัลกินฟรี!`, 
@@ -1337,16 +1305,13 @@
                         });
                     }
                 } else if (winningNum !== "NotSet") {
-                    // ถ้ามีเลขรางวัลออกแล้ว แต่ไม่ตรง ให้ปรับเป็นแพ้ (lost)
                     t.status = 'lost';
                 }
-                
                 if (winningNum !== "NotSet") {
                     t.checkedDate = new Date().toLocaleDateString('th-TH');
                     updated = true;
                 }
             });
-
             if (updated) {
                 localStorage.setItem('kaprao_lotto_history', JSON.stringify(lottoHistory));
                 if(winCount > 0) {
@@ -1364,12 +1329,10 @@
             if(pending > 0) dot.classList.remove('hidden'); else dot.classList.add('hidden');
         }
 
-        // --- NEW: MY TICKETS MODAL LOGIC (UPDATED UI) ---
         function openMyTickets() {
             triggerHaptic();
             const list = document.getElementById('tickets-list');
             list.innerHTML = '';
-            
             if(lottoHistory.length === 0) {
                 list.innerHTML = `
                     <div class="text-center text-gray-400 mt-10">
@@ -1380,8 +1343,6 @@
                 lottoHistory.forEach(t => {
                     let statusHtml = '';
                     let statusClass = '';
-                    
-                    // แสดงผลตามสถานะจริง
                     if(t.status === 'pending') {
                         statusHtml = `<span class="text-brand-purple font-bold"><i class="far fa-clock"></i> รอลุ้นงวด ${t.drawDate || 'เร็วๆนี้'}</span>`;
                         statusClass = 'border-l-4 border-brand-purple bg-indigo-50';
@@ -1392,7 +1353,6 @@
                         statusHtml = '<span class="text-gray-400 font-bold"><i class="fas fa-times-circle"></i> ไม่ถูกรางวัล</span>';
                         statusClass = 'border-l-4 border-gray-300 bg-gray-50 opacity-70 grayscale';
                     }
-
                     const item = document.createElement('div');
                     item.className = `ticket-stub p-4 rounded-lg shadow-sm border border-gray-200 mb-3 flex justify-between items-center relative overflow-hidden ${statusClass}`;
                     item.innerHTML = `
@@ -1412,7 +1372,6 @@
                     list.appendChild(item);
                 });
             }
-
             const overlay = document.getElementById('tickets-modal-overlay');
             const sheet = document.getElementById('tickets-sheet');
             sheet.style.transform = '';
@@ -1433,15 +1392,11 @@
                 sheet.style.transform = '';
             }, 300);
         }
-        
-        // --- EXISTING FUNCTIONS CONTINUED ---
 
         function openCheckout() {
             triggerHaptic();
             renderCheckoutList();
             if(document.getElementById('discount-code').value.trim() !== '' && discountValue > 0) applyDiscount();
-            
-            // GEN LOTTERY NUMBER UI
             if(cart.length > 0) {
                  const lottoId = generateOrderId();
                  const listContainer = document.getElementById('cart-list-container');
@@ -1461,10 +1416,8 @@
                         <span class="text-[10px] font-bold">ลุ้นหวยงวดนี้!</span>
                     </div>
                  `;
-                 // Insert at top
                  listContainer.insertBefore(lottoBanner, listContainer.firstChild);
             }
-            
             const overlay = document.getElementById('checkout-overlay');
             const sheet = document.getElementById('checkout-sheet');
             sheet.style.transform = '';
@@ -1532,11 +1485,9 @@
             if(cart.length === 0) closeCheckout();
         }
         
-        // --- NEW FEATURE: CLEAR CART ---
         function clearCart() {
             if(cart.length === 0) return;
             if(!confirm('คุณต้องการล้างตะกร้าทั้งหมดใช่ไหม?')) return;
-            
             sfxTrash.play();
             cart = [];
             saveToLS();
@@ -1551,11 +1502,9 @@
             let total = cart.reduce((sum, i) => sum + i.price, 0);
             const msg = document.getElementById('discount-msg');
             const promo = promotions.find(p => p.code === code);
-            
             discountValue = 0;
             const inputContainer = document.getElementById('code-input-container');
             const btn = document.getElementById('btn-apply-code');
-
             if (promo && total >= promo.minOrder) {
                 discountValue = promo.value;
                 msg.innerHTML = `<span class="text-green-600"><i class="fas fa-check-circle"></i> ใช้โค้ดลด ${promo.value} บาท</span>`;
@@ -1585,166 +1534,98 @@
             document.getElementById('sheet-grand-total').innerText = final + " ฿";
         }
 
-        // --- ORDER CARD GENERATOR ---
+        // --- NEW: PREMIUM RECEIPT GENERATOR ---
         function generateOrderCard() {
-            // NEW: SHOW LOADER
             showGlobalLoader("กำลังพิมพ์ใบเสร็จ...");
-
-            const div = document.getElementById('receipt-capture');
             const name = document.getElementById('user-name').value || 'ลูกค้า';
             const now = new Date().toLocaleString('th-TH');
-            
             let subtotal = cart.reduce((sum, i) => sum + i.price, 0);
             let netTotal = Math.max(0, subtotal - discountValue);
 
-            // Construct HTML exactly like Line message but formatted for Image
-            let html = `
-                <div class="text-center mb-4 relative">
-                    <h2 class="text-xl font-black text-brand-purple tracking-tight">KAPRAO52</h2>
-                    <p class="text-xs text-gray-400">ORDER SUMMARY</p>
-                    
-                    <div class="mt-2 border-2 border-brand-yellow rounded-lg p-2 bg-yellow-50 inline-block">
-                         <p class="text-[10px] text-gray-500 uppercase">Lucky Order ID</p>
-                         <p class="font-black text-2xl text-gray-800 tracking-widest">
-                            ${currentOrderId.slice(0,-2)}<span class="text-red-500">${currentOrderId.slice(-2)}</span>
-                         </p>
-                    </div>
-                </div>
-                <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-100">
-                    <div>
-                        <p class="text-xs text-gray-400">Customer</p>
-                        <p class="font-bold text-sm text-gray-800">${name}</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-xs text-gray-400">Date</p>
-                        <p class="font-bold text-[10px] text-gray-800">${now}</p>
-                    </div>
-                </div>
-                <div class="space-y-3 mb-6">
-            `;
+            // Populate Receipt Data
+            document.querySelector('.receipt-id').innerText = currentOrderId || 'KP-XXXX';
+            document.querySelector('.receipt-date').innerText = now;
+            document.querySelector('.receipt-name').innerText = name;
+            document.querySelector('.receipt-subtotal').innerText = subtotal + '.-';
+            document.querySelector('.receipt-discount').innerText = '-' + discountValue + '.-';
+            document.querySelector('.receipt-total').innerText = netTotal + '.-';
 
+            const itemsContainer = document.querySelector('.receipt-items');
+            itemsContainer.innerHTML = '';
             cart.forEach((i, index) => {
-                let detail = `<span class="font-bold">${i.name}</span>`;
-                if(i.meat) detail += ` <span class="text-xs text-orange-500">(${i.meat})</span>`;
-                
-                let extras = [];
-                if(i.addons.length) extras.push(...i.addons);
-                if(i.note) extras.push(`📝 ${i.note}`);
-                
-                html += `
-                    <div class="flex justify-between items-start text-sm">
-                        <div class="flex gap-2">
-                            <span class="text-gray-400 font-bold w-4">${index + 1}.</span>
-                            <div class="flex flex-col">
-                                <span class="text-gray-800 leading-tight">${detail}</span>
-                                ${extras.length ? `<span class="text-[10px] text-gray-500 mt-0.5">+ ${extras.join(', ')}</span>` : ''}
-                            </div>
-                        </div>
-                        <span class="font-bold text-gray-700 whitespace-nowrap">${i.price}.-</span>
+                let detail = `${i.name}`;
+                if(i.meat) detail += ` (${i.meat})`;
+                if(i.addons.length) detail += ` +${i.addons.join(',')}`;
+                const row = document.createElement('div');
+                row.className = "flex justify-between text-xs";
+                row.innerHTML = `
+                    <div class="flex gap-1 text-gray-700">
+                        <span class="w-4">${index+1}.</span>
+                        <span>${detail}</span>
                     </div>
+                    <span class="font-bold text-gray-800">${i.price}.-</span>
                 `;
+                itemsContainer.appendChild(row);
             });
 
-            html += `</div><div class="border-t border-dashed border-gray-300 pt-4 space-y-1">`;
-            
-            if (discountValue > 0) {
-                html += `
-                    <div class="flex justify-between text-xs text-gray-500">
-                        <span>ยอดรวม</span>
-                        <span>${subtotal}.-</span>
-                    </div>
-                    <div class="flex justify-between text-xs text-green-600">
-                        <span>ส่วนลด</span>
-                        <span>-${discountValue}.-</span>
-                    </div>
-                `;
-            }
-
-            html += `
-                <div class="flex justify-between items-end mt-2">
-                    <span class="font-bold text-gray-800">ยอดสุทธิ</span>
-                    <span class="font-black text-2xl text-brand-purple leading-none">${netTotal}.-</span>
-                </div>
-            </div>`;
-
-            div.innerHTML = html;
-
+            // Capture
+            const div = document.getElementById('receipt-capture');
             html2canvas(div, { 
-                scale: 2, // High resolution
+                scale: 2, 
                 useCORS: true, 
-                backgroundColor: "#ffffff"
+                backgroundColor: null // Transparent for nice edges
             }).then(canvas => {
-                // NEW: HIDE LOADER
                 hideGlobalLoader();
-
                 const link = document.createElement('a');
-                link.download = `Order-${currentOrderId}.png`;
+                link.download = `Receipt-${currentOrderId || 'Order'}.png`;
                 link.href = canvas.toDataURL();
                 link.click();
-                showToast('บันทึกใบสั่งซื้อแล้ว 📸');
+                showToast('บันทึกใบเสร็จแล้ว 📸');
             }).catch(() => {
                 hideGlobalLoader();
                 showToast('เกิดข้อผิดพลาดในการบันทึกภาพ');
             });
         }
 
-        // --- SUBMIT ---
         function submitOrderToLine() {
             const name = document.getElementById('user-name').value.trim();
             if (!name) return showToast('กรุณาใส่ชื่อผู้สั่ง');
-            
-            // NEW: SHOW LOADER
             showGlobalLoader("กำลังส่งออเดอร์...");
-            
             sfxOrder.play(); triggerHaptic();
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#FFD755', '#7C77D6', '#FFFFFF'] });
-
-            // UPDATE ACHIEVEMENT
             userStats.orders++;
             localStorage.setItem('kaprao_stats', JSON.stringify(userStats));
             updateLevelUI();
-
             let subtotal = cart.reduce((sum, i) => sum + i.price, 0);
             let netTotal = Math.max(0, subtotal - discountValue);
-            
-            // Collect Data
             const now = new Date().toLocaleString('th-TH');
-            
-            // Build Message with Lotto ID
             let msg = `🔥 ออเดอร์ใหม่! [${currentOrderId}]\n`;
             msg += `🎟️ เลขลุ้นหวย: ${currentOrderId.slice(-2)}\n`;
             msg += `📅 ${now}\n`;
             msg += `👤 คุณ ${name}\n`;
             msg += `🏅 สั่งครั้งที่: ${userStats.orders}\n`;
             msg += `------------------------\n`;
-            
             cart.forEach((i, index) => {
                 let detail = `${i.name} ${i.meat ? '('+i.meat+')' : ''}`;
                 if(i.addons.length) detail += ` +${i.addons.join('+')}`;
                 if(i.note) detail += ` [${i.note}]`;
                 msg += `${index + 1}. ${detail} (${i.price}.-)\n`;
             });
-
             msg += `------------------------\n`;
-            
             if (discountValue > 0) {
                 msg += `💵 ยอดรวม: ${subtotal} บาท\n`;
                 msg += `🏷️ ส่วนลด: -${discountValue} บาท\n`;
             }
             msg += `💰 ยอดสุทธิ: ${netTotal} บาท\n`;
-            
-            // SAVE TO LOTTERY HISTORY
             saveTicketToHistory(currentOrderId, netTotal);
-
             setTimeout(() => {
                 window.location.href = `https://line.me/R/msg/text/?${encodeURIComponent(msg)}`;
-                cart = []; // Clear Cart
+                cart = []; 
                 saveToLS();
                 updateMiniCart();
                 closeCheckout();
-                
                 setTimeout(() => {
-                    hideGlobalLoader(); // Hide loader after redirect
+                    hideGlobalLoader(); 
                 }, 1000);
             }, 800);
         }
@@ -1768,7 +1649,6 @@
             setTimeout(() => t.classList.add('opacity-0', '-translate-y-10'), 2000);
         }
 
-        // SWIPE LOGIC
         function enableSwipeToClose(el, scrollEl, closeCallback) {
             let startY = 0;
             let currentY = 0;
@@ -1793,7 +1673,6 @@
         enableSwipeToClose(document.getElementById('checkout-sheet'), document.getElementById('cart-list-container'), closeCheckout);
         enableSwipeToClose(document.getElementById('tickets-sheet'), document.getElementById('tickets-list'), closeMyTickets);
 
-        // --- FEATURE 1: PULL TO REFRESH ---
         let ptrStartY = 0;
         let ptrDistance = 0;
         const ptrSpinner = document.getElementById('ptr-spinner');
@@ -1814,9 +1693,8 @@
         
         window.addEventListener('touchend', e => {
             if (ptrDistance > 80) {
-                // Trigger Refresh
                 ptrSpinner.style.transform = `translateY(80px)`;
-                ptrSpinner.querySelector('.spinner-icon').style.borderTopColor = '#22c55e'; // Green success
+                ptrSpinner.querySelector('.spinner-icon').style.borderTopColor = '#22c55e';
                 setTimeout(() => window.location.reload(), 500);
             } else {
                 ptrSpinner.style.transform = `translateY(0px)`;
@@ -1825,11 +1703,9 @@
             ptrDistance = 0;
         });
 
-        // --- FEATURE 3: AI CHEF LOGIC ---
         function toggleAIChef() {
             const wrapper = document.getElementById('ai-wrapper');
-            if(wrapper.style.display === 'none') return; // If hidden, do nothing
-            
+            if(wrapper.style.display === 'none') return;
             const modal = document.getElementById('ai-modal');
             const isOpen = !modal.classList.contains('hidden');
             if(isOpen) {
@@ -1841,80 +1717,60 @@
             }
         }
 
-        // Draggable Logic for AI Button
         function initDraggableAI() {
             const aiBtn = document.getElementById('ai-wrapper');
             const trigger = document.getElementById('ai-trigger-btn');
-            
             let isDragging = false;
             let startX, startY, initialLeft, initialTop;
             
-            // Mouse/Touch Start
             function dragStart(e) {
-                if (e.target.closest('button[onclick*="hideAIButton"]')) return; // Don't drag if clicking close
-
+                if (e.target.closest('button[onclick*="hideAIButton"]')) return;
                 const clientX = e.clientX || e.touches[0].clientX;
                 const clientY = e.clientY || e.touches[0].clientY;
-                
                 initialLeft = aiBtn.offsetLeft;
                 initialTop = aiBtn.offsetTop;
                 startX = clientX;
                 startY = clientY;
                 isDragging = true;
-                
-                // Switch from bottom/right to top/left positioning for dragging
                 aiBtn.style.bottom = 'auto';
                 aiBtn.style.right = 'auto';
                 aiBtn.style.left = initialLeft + 'px';
                 aiBtn.style.top = initialTop + 'px';
-                
-                trigger.classList.remove('animate-bounce-slow'); // Stop bouncing when dragging
+                trigger.classList.remove('animate-bounce-slow');
             }
             
-            // Mouse/Touch Move
             function dragMove(e) {
                 if (!isDragging) return;
-                e.preventDefault(); // Prevent scrolling
-                
+                e.preventDefault();
                 const clientX = e.clientX || e.touches[0].clientX;
                 const clientY = e.clientY || e.touches[0].clientY;
-                
                 const deltaX = clientX - startX;
                 const deltaY = clientY - startY;
-                
                 let newLeft = initialLeft + deltaX;
                 let newTop = initialTop + deltaY;
-                
-                // Boundary checks
                 const maxX = window.innerWidth - aiBtn.offsetWidth;
                 const maxY = window.innerHeight - aiBtn.offsetHeight;
-                
                 newLeft = Math.max(0, Math.min(newLeft, maxX));
                 newTop = Math.max(0, Math.min(newTop, maxY));
-                
                 aiBtn.style.left = newLeft + 'px';
                 aiBtn.style.top = newTop + 'px';
             }
             
-            // Mouse/Touch End
             function dragEnd() {
                 isDragging = false;
-                // Optional: Snap to edge? For now, leave where dropped.
             }
             
             aiBtn.addEventListener('mousedown', dragStart);
             aiBtn.addEventListener('touchstart', dragStart, {passive: false});
-            
             window.addEventListener('mousemove', dragMove);
             window.addEventListener('touchmove', dragMove, {passive: false});
-            
             window.addEventListener('mouseup', dragEnd);
             window.addEventListener('touchend', dragEnd);
         }
         initDraggableAI();
 
         function hideAIButton(e) {
-            e.stopPropagation(); // Prevent opening modal
+            e.stopPropagation();
             document.getElementById('ai-wrapper').style.display = 'none';
         }
         
@@ -1931,8 +1787,6 @@
 
         function aiSuggest(mood) {
             aiAppendMsg(mood, true);
-            
-            // Show Typing
             const body = document.getElementById('ai-chat-body');
             const typing = document.createElement('div');
             typing.id = 'ai-typing';
@@ -1941,20 +1795,16 @@
             body.appendChild(typing);
             body.scrollTop = body.scrollHeight;
 
-            // Logic (Mock AI)
             setTimeout(() => {
                 document.getElementById('ai-typing').remove();
                 let reply = "";
                 let suggestItem = null;
-
                 if(mood.includes('หิว')) { reply = "หิวมากต้องจัดหนัก! กะเพราสันคอพิเศษไข่ดาวไปเลยครับ"; suggestItem = menuItems.find(i=>i.name.includes('สันคอ')); }
                 else if(mood.includes('เศร้า')) { reply = "วันเศร้าๆ ต้องกินของอร่อยเยียวยาใจ ไข่ข้นนุ่มๆ ช่วยได้นะ"; suggestItem = menuItems.find(i=>i.name.includes('ไข่ข้น')); }
                 else if(mood.includes('อ้วน')) { reply = "คุมน้ำหนักหรอ? งั้นกะเพราหมูสับไม่ใส่น้ำมัน ไข่ต้มมั้ยครับ"; suggestItem = menuItems.find(i=>i.name.includes('หมูสับ')); }
                 else if(mood.includes('แฮงค์')) { reply = "ซดน้ำร้อนๆ ให้ตาสว่าง ต้องมาม่าผัดกะเพราแซ่บๆ!"; suggestItem = menuItems.find(i=>i.name.includes('มาม่า')); }
                 else { reply = "อารมณ์นี้... ผมแนะนำเมนูนี้เลย รับรองเด็ด!"; suggestItem = menuItems[Math.floor(Math.random() * menuItems.length)]; }
-
                 aiAppendMsg(reply);
-                
                 if(suggestItem) {
                     setTimeout(() => {
                             const btn = document.createElement('button');
