@@ -1170,22 +1170,32 @@
             return drawDate;
         }
 
-        // สุ่มเลขรางวัลสำหรับงวดนั้นๆ (ถ้าสุ่มแล้วจะจำไว้ใน LocalStorage ไม่ให้เปลี่ยน)
+        // --- ส่วนที่แก้ไข: ล็อคผลรางวัล (Hardcode Logic) ---
+        
+        // 1. ตารางผลรางวัลที่กำหนดเอง (ADMIN SETTING)
+        // ใส่เลขที่ต้องการให้ออกรางวัลตรงนี้ Format: "วัน/เดือน/ปีพ.ศ.": "เลขท้าย2ตัว"
+        // ต้องตรงกับที่ระบบแสดงในตั๋วเป๊ะๆ (เช่น 1/11/2566 ไม่ใช่ 01/11/2566 ขึ้นอยู่กับ Browser แต่ส่วนใหญ่เป็น d/m/yyyy)
+        const OFFICIAL_RESULTS = {
+             "16/12/2566": "52", // ตัวอย่าง
+             "30/12/2566": "99",
+             "17/1/2567": "00",
+             "1/11/2566": "52",
+             "16/11/2566": "99"
+             // เพิ่มงวดต่อไปที่นี่...
+        };
+
+        // 2. ฟังก์ชันดึงเลขรางวัล (แก้ใหม่ ตัด Random ออก)
         function getWinningNumberForDate(dateStr) {
-            let savedResults = JSON.parse(localStorage.getItem('kaprao_lotto_results')) || {};
-            
-            // ถ้ามีเลขของงวดนั้นแล้ว ให้ใช้เลขเดิม
-            if (savedResults[dateStr]) {
-                return savedResults[dateStr];
+            // เช็คว่ามีเลขที่ล็อคไว้สำหรับวันที่นี้ไหม
+            if (OFFICIAL_RESULTS[dateStr]) {
+                console.log(`[LOTTO] งวดวันที่ ${dateStr} ล็อคเลขไว้ที่: ${OFFICIAL_RESULTS[dateStr]}`);
+                return OFFICIAL_RESULTS[dateStr];
             }
 
-            // ถ้ายังไม่มี ให้สุ่มใหม่ (00-99)
-            const randomNum = Math.floor(Math.random() * 100).toString().padStart(2, '0');
-            savedResults[dateStr] = randomNum;
-            localStorage.setItem('kaprao_lotto_results', JSON.stringify(savedResults));
-            
-            console.log(`งวดวันที่ ${dateStr} ออกเลข: ${randomNum}`);
-            return randomNum;
+            // ถ้าไม่มีเลขระบุไว้ (เช่น ลืมใส่ หรือยังไม่ออก) 
+            // ให้คืนค่า "PENDING" หรือค่าที่ไม่มีทางถูก เพื่อไม่ให้ใครถูกมั่ว
+            console.log(`[LOTTO] งวดวันที่ ${dateStr} ยังไม่มีการระบุเลขรางวัล`);
+            return "NotSet"; 
         }
 
         // --- LOTTERY FEATURE ---
@@ -1266,11 +1276,16 @@
                             icon: 'https://cdn-icons-png.flaticon.com/512/3170/3170733.png' 
                         });
                     }
-                } else {
+                } else if (winningNum !== "NotSet") {
+                    // ถ้ามีเลขรางวัลออกแล้ว แต่ไม่ตรง ให้ปรับเป็นแพ้ (lost)
                     t.status = 'lost';
                 }
-                t.checkedDate = new Date().toLocaleDateString('th-TH');
-                updated = true;
+                // ถ้า winningNum เป็น "NotSet" แปลว่าแอดมินยังไม่ได้ใส่เลข ก็จะยังค้างสถานะ Pending ไว้
+                
+                if (winningNum !== "NotSet") {
+                    t.checkedDate = new Date().toLocaleDateString('th-TH');
+                    updated = true;
+                }
             });
 
             if (updated) {
@@ -1877,12 +1892,12 @@
                 
                 if(suggestItem) {
                     setTimeout(() => {
-                           const btn = document.createElement('button');
-                           btn.className = "self-center mt-2 bg-brand-yellow px-4 py-2 rounded-full text-xs font-bold shadow-md hover:bg-white transition-colors scale-in";
-                           btn.innerText = `สั่ง ${suggestItem.name} เลย!`;
-                           btn.onclick = () => { toggleAIChef(); openModal(suggestItem); };
-                           body.appendChild(btn);
-                           body.scrollTop = body.scrollHeight;
+                            const btn = document.createElement('button');
+                            btn.className = "self-center mt-2 bg-brand-yellow px-4 py-2 rounded-full text-xs font-bold shadow-md hover:bg-white transition-colors scale-in";
+                            btn.innerText = `สั่ง ${suggestItem.name} เลย!`;
+                            btn.onclick = () => { toggleAIChef(); openModal(suggestItem); };
+                            body.appendChild(btn);
+                            body.scrollTop = body.scrollHeight;
                     }, 500);
                 }
             }, 1200);
