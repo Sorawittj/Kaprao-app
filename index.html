@@ -8,7 +8,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
     
-    <title>Kaprao52 - V9.3</title> 
+    <title>Kaprao52 - APP</title> 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -1146,6 +1146,48 @@
             showToast(`เพิ่ม ${modalQty} รายการแล้ว!`);
         }
         
+        // --- LOTTERY UTILS ---
+        
+        // คำนวณวันหวยออกถัดไป (1 หรือ 16)
+        function getNextDrawDate() {
+            const today = new Date();
+            const day = today.getDate();
+            const month = today.getMonth();
+            const year = today.getFullYear();
+
+            let drawDate = new Date();
+
+            if (day <= 1) {
+                // งวดวันที่ 1 เดือนนี้
+                drawDate = new Date(year, month, 1);
+            } else if (day <= 16) {
+                // งวดวันที่ 16 เดือนนี้
+                drawDate = new Date(year, month, 16);
+            } else {
+                // งวดวันที่ 1 เดือนหน้า
+                drawDate = new Date(year, month + 1, 1);
+            }
+            return drawDate;
+        }
+
+        // สุ่มเลขรางวัลสำหรับงวดนั้นๆ (ถ้าสุ่มแล้วจะจำไว้ใน LocalStorage ไม่ให้เปลี่ยน)
+        function getWinningNumberForDate(dateStr) {
+            let savedResults = JSON.parse(localStorage.getItem('kaprao_lotto_results')) || {};
+            
+            // ถ้ามีเลขของงวดนั้นแล้ว ให้ใช้เลขเดิม
+            if (savedResults[dateStr]) {
+                return savedResults[dateStr];
+            }
+
+            // ถ้ายังไม่มี ให้สุ่มใหม่ (00-99)
+            const randomNum = Math.floor(Math.random() * 100).toString().padStart(2, '0');
+            savedResults[dateStr] = randomNum;
+            localStorage.setItem('kaprao_lotto_results', JSON.stringify(savedResults));
+            
+            console.log(`งวดวันที่ ${dateStr} ออกเลข: ${randomNum}`);
+            return randomNum;
+        }
+
         // --- LOTTERY FEATURE ---
         let currentOrderId = "";
 
@@ -1158,13 +1200,20 @@
             return currentOrderId;
         }
 
-        // --- NEW: SAVE TICKET TO HISTORY ---
+        // --- NEW: SAVE TICKET TO HISTORY (UPDATED) ---
         function saveTicketToHistory(orderId, totalPrice) {
             const today = new Date();
+            const drawDateObj = getNextDrawDate();
+            
+            // แปลงวันที่หวยออกเป็น string สวยๆ เช่น "1/10/2566"
+            const drawDateStr = drawDateObj.toLocaleDateString('th-TH');
+
             const ticket = {
                 id: orderId,
                 number: orderId.slice(-2),
-                date: today.toLocaleDateString('th-TH'),
+                date: today.toLocaleDateString('th-TH'), // วันที่ซื้อ
+                drawDate: drawDateStr,                   // วันที่หวยออก (สำคัญ!)
+                drawDateTimestamp: drawDateObj.getTime(), // เก็บ timestamp ไว้เทียบเวลา
                 timestamp: Date.now(),
                 price: totalPrice,
                 status: 'pending', // pending, won, lost
@@ -1175,40 +1224,45 @@
             updateTicketBadge();
         }
 
-        // --- NEW: AUTO CHECK LOTTERY (SIMULATION) ---
+        // --- NEW: AUTO CHECK LOTTERY (FIXED LOGIC) ---
         function autoCheckLottery() {
-            // Filter tickets that are 'pending' and older than 1 minute (for demo purposes) or normally check by date
-            // Note: In real app, you would fetch API here.
-            // SIMULATION: We pretend the "Winning Number" is random each time we open app if there are pending tickets.
-            
             const pendingTickets = lottoHistory.filter(t => t.status === 'pending');
             if(pendingTickets.length === 0) return;
 
-            // Simulate Fetching Winning Number
-            // For Demo: We'll just generate a random number
-            const simulatedWinningNum = Math.floor(Math.random() * 100).toString().padStart(2, '0');
-            console.log("Simulated Winning Num:", simulatedWinningNum);
+            const now = new Date();
+            // set เวลาเป็นเที่ยงคืนเพื่อเปรียบเทียบแค่วันที่
+            now.setHours(0, 0, 0, 0); 
 
             let winCount = 0;
             let updated = false;
 
             pendingTickets.forEach(t => {
-                // Check if ticket is from "yesterday" or older to simulate waiting for drawing
-                // For DEMO: We check immediately if it's pending
+                // ตรวจสอบว่าตั๋วนี้มีข้อมูล drawDateTimestamp หรือไม่ (รองรับตั๋วเวอร์ชั่นเก่า)
+                let targetDate;
+                if (t.drawDateTimestamp) {
+                    targetDate = t.drawDateTimestamp;
+                } else {
+                    // ถ้าเป็นตั๋วเก่า ไม่มีวันหวยออก ให้ถือว่าตรวจได้เลย (หรือจะข้ามไปก็ได้)
+                    targetDate = 0; 
+                }
+
+                // กฏ: ถ้า "วันนี้" ยังไม่ถึง "วันหวยออก" ให้ข้ามไป (ยังคงสถานะ Pending)
+                if (now.getTime() < targetDate) {
+                    return; // ยังไม่ถึงเวลา จบการทำงานรอบนี้
+                }
+
+                // --- ถึงเวลาตรวจผลรางวัล ---
                 
-                // --- FIXED LOGIC: STRICT TIMESTAMP CHECK FOR 'TODAY' ---
-                const tDate = new Date(t.timestamp);
-                const now = new Date();
-                // Compare Year, Month, Day strictly
-                if(tDate.setHours(0,0,0,0) === now.setHours(0,0,0,0)) return; // Skip if it is TODAY
-                
-                if (t.number === simulatedWinningNum) {
+                // ดึงเลขรางวัลที่ล็อคไว้ของงวดนั้นๆ
+                const winningNum = getWinningNumberForDate(t.drawDate || new Date().toLocaleDateString('th-TH'));
+
+                if (t.number === winningNum) {
                     t.status = 'won';
                     winCount++;
                     // Notification
                     if (Notification.permission === "granted") {
-                        new Notification("ยินดีด้วย! 🤑", { 
-                            body: `Order ID ${t.id} ถูกรางวัลกินฟรี!`, 
+                        new Notification("เศรษฐีใหม่มาแล้ว! 🤑", { 
+                            body: `งวด ${t.drawDate}: Order ${t.id} ถูกรางวัลกินฟรี!`, 
                             icon: 'https://cdn-icons-png.flaticon.com/512/3170/3170733.png' 
                         });
                     }
@@ -1224,7 +1278,7 @@
                 if(winCount > 0) {
                     sfxWin.play();
                     confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
-                    showToast(`🎉 คุณถูกรางวัล ${winCount} ใบ!`);
+                    showToast(`🎉 ยินดีด้วย! คุณถูกรางวัล ${winCount} ใบ!`);
                 }
                 updateTicketBadge();
             }
@@ -1236,7 +1290,7 @@
             if(pending > 0) dot.classList.remove('hidden'); else dot.classList.add('hidden');
         }
 
-        // --- NEW: MY TICKETS MODAL LOGIC ---
+        // --- NEW: MY TICKETS MODAL LOGIC (UPDATED UI) ---
         function openMyTickets() {
             triggerHaptic();
             const list = document.getElementById('tickets-list');
@@ -1250,27 +1304,19 @@
                     </div>`;
             } else {
                 lottoHistory.forEach(t => {
-                    // --- FORCE PENDING VISUAL IF TODAY ---
-                    const tDate = new Date(t.timestamp);
-                    const now = new Date();
-                    let displayStatus = t.status;
-                    // If strictly today, FORCE 'pending' status for display (fixes old bad data)
-                    if(tDate.setHours(0,0,0,0) === now.setHours(0,0,0,0)) {
-                        displayStatus = 'pending';
-                    }
-
                     let statusHtml = '';
                     let statusClass = '';
                     
-                    if(displayStatus === 'pending') {
-                        statusHtml = '<span class="text-green-600 font-bold"><i class="fas fa-clock"></i> รอออกรางวัล</span>';
-                        statusClass = 'border-l-4 border-green-500 bg-green-50';
-                    } else if(displayStatus === 'won') {
+                    // แสดงผลตามสถานะจริง
+                    if(t.status === 'pending') {
+                        statusHtml = `<span class="text-brand-purple font-bold"><i class="far fa-clock"></i> รอลุ้นงวด ${t.drawDate || 'เร็วๆนี้'}</span>`;
+                        statusClass = 'border-l-4 border-brand-purple bg-indigo-50';
+                    } else if(t.status === 'won') {
                         statusHtml = '<span class="text-yellow-600 font-bold"><i class="fas fa-trophy"></i> ถูกรางวัล!</span>';
                         statusClass = 'border-l-4 border-yellow-500 bg-yellow-50';
                     } else {
-                        statusHtml = '<span class="text-red-500 font-bold"><i class="fas fa-times-circle"></i> ไม่ถูกรางวัล</span>';
-                        statusClass = 'border-l-4 border-red-500 bg-red-50 opacity-80';
+                        statusHtml = '<span class="text-gray-400 font-bold"><i class="fas fa-times-circle"></i> ไม่ถูกรางวัล</span>';
+                        statusClass = 'border-l-4 border-gray-300 bg-gray-50 opacity-70 grayscale';
                     }
 
                     const item = document.createElement('div');
@@ -1282,11 +1328,11 @@
                                 <span class="text-xs text-gray-600">เลขลุ้น:</span>
                                 <span class="text-2xl font-black text-brand-purple tracking-widest">${t.number}</span>
                             </div>
-                            <div class="text-[10px] text-gray-400 mt-1">${t.date}</div>
+                            <div class="text-[10px] text-gray-400 mt-1">ซื้อเมื่อ: ${t.date}</div>
                         </div>
-                        <div class="text-right">
-                             <div class="text-xs mb-1">${statusHtml}</div>
-                             ${displayStatus === 'won' ? '<button class="text-[10px] bg-yellow-500 text-white font-bold px-2 py-1 rounded shadow-sm">แคปจอรับสิทธิ์</button>' : ''}
+                        <div class="text-right flex flex-col items-end">
+                             <div class="text-xs mb-1 bg-white/80 px-2 py-1 rounded-full shadow-sm whitespace-nowrap">${statusHtml}</div>
+                             ${t.status === 'won' ? '<button class="text-[10px] bg-yellow-500 text-white font-bold px-2 py-1 rounded shadow-sm mt-1 animate-pulse">แคปจอรับสิทธิ์</button>' : ''}
                         </div>
                     `;
                     list.appendChild(item);
