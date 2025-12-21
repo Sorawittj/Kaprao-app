@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#7C77D6">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="manifest" href="manifest.json">
@@ -47,6 +47,15 @@
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
         
+        /* แก้ไข 3: CSS Variables สำหรับ Safe Area */
+        :root {
+            --sat: env(safe-area-inset-top);
+            --sab: env(safe-area-inset-bottom);
+        }
+        .safe-area-pt { padding-top: var(--sat); }
+        .safe-area-pb { padding-bottom: var(--sab); }
+        .safe-area-pb-plus { padding-bottom: calc(1rem + var(--sab)); } /* เผื่อพื้นที่ปุ่ม */
+
         /* Transition Animations */
         .fade-in-up { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -126,10 +135,10 @@
         /* Draggable AI Button */
         #ai-wrapper {
             position: fixed;
-            bottom: 6rem; /* 24 */
-            right: 1.25rem; /* 5 */
+            bottom: calc(6rem + env(safe-area-inset-bottom)); /* Adjust for safe area */
+            right: 1.25rem; 
             z-index: 80;
-            touch-action: none; /* Prevent scroll while dragging */
+            touch-action: none; 
         }
 
         /* Parallax Background Pattern */
@@ -222,7 +231,7 @@
             position: fixed;
             top: -9999px;
             left: -9999px;
-            width: 380px; /* Slightly wider for Order Card style */
+            width: 380px; 
             background: #FFFFFF;
             padding: 25px;
             border-radius: 0;
@@ -242,7 +251,7 @@
         }
     </style>
 </head>
-<body class="pb-32 font-sans select-none relative overflow-x-hidden">
+<body class="pb-32 font-sans select-none relative overflow-x-hidden safe-area-pt">
 
     <div id="ptr-spinner">
         <div class="bg-white p-2 rounded-full shadow-lg">
@@ -370,8 +379,8 @@
         <div class="mb-3 flex items-center justify-between">
             <h3 class="font-bold text-gray-800 text-lg">หมวดหมู่</h3>
             <div class="flex gap-2">
-                <button onclick="scrollTabs(-100)" class="nav-btn w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:text-brand-purple active:scale-90 transition-all"><i class="fas fa-chevron-left text-xs"></i></button>
-                <button onclick="scrollTabs(100)" class="nav-btn w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:text-brand-purple active:scale-90 transition-all"><i class="fas fa-chevron-right text-xs"></i></button>
+                <button onclick="scrollTabs(-100)" class="nav-btn w-11 h-11 rounded-full flex items-center justify-center text-gray-500 hover:text-brand-purple active:scale-90 transition-all"><i class="fas fa-chevron-left text-xs"></i></button>
+                <button onclick="scrollTabs(100)" class="nav-btn w-11 h-11 rounded-full flex items-center justify-center text-gray-500 hover:text-brand-purple active:scale-90 transition-all"><i class="fas fa-chevron-right text-xs"></i></button>
             </div>
         </div>
         
@@ -417,19 +426,19 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V9.3</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V9.4</p>
         </div>
 
     </div>
     
     <div id="tickets-modal-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[110] hidden transition-opacity opacity-0" onclick="closeMyTickets()"></div>
-    <div id="tickets-sheet" class="fixed bottom-0 left-0 right-0 bg-[#F5F7FB] rounded-t-[2.5rem] z-[111] transform translate-y-full transition-transform duration-300 shadow-2xl max-w-md mx-auto h-[70vh] flex flex-col">
+    <div id="tickets-sheet" class="fixed bottom-0 left-0 right-0 bg-[#F5F7FB] rounded-t-[2.5rem] z-[111] transform translate-y-full transition-transform duration-300 shadow-2xl max-w-md mx-auto h-[70vh] flex flex-col safe-area-pb">
         <div class="w-full flex justify-center pt-4 pb-2">
              <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
         </div>
         <div class="px-6 py-2 border-b border-gray-200 flex justify-between items-center bg-white rounded-t-[2.5rem]">
             <h2 class="text-xl font-bold text-gray-800">🎫 ตั๋วหวยของฉัน</h2>
-            <button onclick="closeMyTickets()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500"><i class="fas fa-times text-sm"></i></button>
+            <button onclick="closeMyTickets()" class="w-11 h-11 rounded-full bg-gray-100 flex items-center justify-center text-gray-500"><i class="fas fa-times text-sm"></i></button>
         </div>
         <div id="tickets-list" class="flex-1 overflow-y-auto p-4 space-y-3 hide-scroll">
             <div class="text-center text-gray-400 mt-10">
@@ -449,7 +458,7 @@
                         <p class="text-[10px] opacity-80">บอกอารมณ์ของคุณมาสิครับ</p>
                     </div>
                 </div>
-                <button onclick="toggleAIChef()" class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30"><i class="fas fa-times"></i></button>
+                <button onclick="toggleAIChef()" class="w-11 h-11 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30"><i class="fas fa-times"></i></button>
             </div>
             
             <div id="ai-chat-body" class="p-4 h-[300px] overflow-y-auto bg-gray-50 flex flex-col gap-3">
@@ -466,14 +475,14 @@
                     <button onclick="aiSuggest('แฮงค์')" class="px-3 py-1 bg-gray-100 rounded-full text-xs text-gray-600 whitespace-nowrap hover:bg-brand-yellow hover:text-gray-800 transition-colors">🥴 แฮงค์</button>
                 </div>
                 <div class="flex gap-2">
-                    <input type="text" id="ai-input" placeholder="พิมพ์ความรู้สึก..." class="flex-1 bg-gray-100 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-purple">
-                    <button onclick="aiSendCustom()" class="w-10 h-10 bg-brand-purple text-white rounded-xl flex items-center justify-center shadow-lg active:scale-95"><i class="fas fa-paper-plane text-xs"></i></button>
+                    <input type="text" id="ai-input" placeholder="พิมพ์ความรู้สึก..." class="flex-1 bg-gray-100 rounded-xl px-4 py-2 text-base outline-none focus:ring-2 focus:ring-brand-purple">
+                    <button onclick="aiSendCustom()" class="w-11 h-11 bg-brand-purple text-white rounded-xl flex items-center justify-center shadow-lg active:scale-95"><i class="fas fa-paper-plane text-xs"></i></button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="mini-cart-bar" class="fixed bottom-6 left-5 right-5 z-40 hidden fade-in-up">
+    <div id="mini-cart-bar" class="fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom))] left-5 right-5 z-40 hidden fade-in-up">
         <div onclick="openCheckout()" class="bg-gray-900 text-white p-4 rounded-full shadow-2xl shadow-gray-400/50 flex justify-between items-center cursor-pointer active:scale-95 transition-transform">
             <div class="flex items-center gap-3 pl-2">
                 <div class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center border border-gray-700 text-brand-yellow font-bold" id="mini-count">0</div>
@@ -490,7 +499,7 @@
     </div>
 
     <div id="checkout-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 hidden transition-opacity opacity-0" onclick="closeCheckout()"></div>
-    <div id="checkout-sheet" class="fixed bottom-0 left-0 right-0 bg-white rounded-t-[2.5rem] z-50 transform translate-y-full transition-transform duration-300 shadow-2xl max-w-md mx-auto h-[85vh] flex flex-col touch-pan-y">
+    <div id="checkout-sheet" class="fixed bottom-0 left-0 right-0 bg-white rounded-t-[2.5rem] z-50 transform translate-y-full transition-transform duration-300 shadow-2xl max-w-md mx-auto h-[85vh] flex flex-col touch-pan-y safe-area-pb">
         
         <div id="checkout-drag-handle" class="w-full flex justify-center pt-4 pb-2 cursor-grab active:cursor-grabbing z-50 bg-white rounded-t-[2.5rem]">
             <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
@@ -499,9 +508,9 @@
         <div class="px-6 pb-4 border-b border-gray-100 flex justify-between items-center">
             <h2 class="text-xl font-bold text-gray-800">สรุปออเดอร์</h2>
             <div class="flex gap-2">
-                <button onclick="clearCart()" class="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center text-red-500 active:scale-90 transition-transform"><i class="fas fa-trash text-xs"></i></button>
-                <button onclick="generateOrderCard()" class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-500 active:scale-90 transition-transform"><i class="fas fa-camera text-xs"></i></button>
-                <button onclick="closeCheckout()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500"><i class="fas fa-times text-sm"></i></button>
+                <button onclick="clearCart()" class="w-11 h-11 rounded-full bg-red-50 flex items-center justify-center text-red-500 active:scale-90 transition-transform"><i class="fas fa-trash text-xs"></i></button>
+                <button onclick="generateOrderCard()" class="w-11 h-11 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-500 active:scale-90 transition-transform"><i class="fas fa-camera text-xs"></i></button>
+                <button onclick="closeCheckout()" class="w-11 h-11 rounded-full bg-gray-100 flex items-center justify-center text-gray-500"><i class="fas fa-times text-sm"></i></button>
             </div>
         </div>
         
@@ -510,13 +519,13 @@
         <div class="p-6 bg-gray-50 rounded-t-[2rem] space-y-3">
             <div class="bg-white rounded-xl p-3 flex items-center border border-gray-200 shadow-sm gap-2">
                 <i class="fas fa-user text-gray-400 ml-1"></i>
-                <input type="text" id="user-name" placeholder="ชื่อผู้สั่ง..." class="bg-transparent w-full text-sm outline-none text-gray-700">
+                <input type="text" id="user-name" placeholder="ชื่อผู้สั่ง..." class="bg-transparent w-full text-base outline-none text-gray-700">
             </div>
             
             <div class="bg-white rounded-xl p-2 pl-4 flex items-center border border-gray-200 shadow-sm justify-between transition-colors" id="code-input-container">
                 <div class="flex items-center gap-2 w-full">
                     <i class="fas fa-ticket-alt text-gray-400" id="code-icon"></i>
-                    <input type="text" id="discount-code" placeholder="โค้ดส่วนลด" class="bg-transparent w-full text-sm outline-none text-gray-700 uppercase transition-colors">
+                    <input type="text" id="discount-code" placeholder="โค้ดส่วนลด" class="bg-transparent w-full text-base outline-none text-gray-700 uppercase transition-colors">
                 </div>
                 <button onclick="applyDiscount()" id="btn-apply-code" class="bg-gray-800 hover:bg-gray-700 text-white text-xs px-4 py-2 rounded-lg transition-colors font-bold whitespace-nowrap">ใช้โค้ด</button>
             </div>
@@ -537,13 +546,13 @@
     </div>
 
     <div id="modal-overlay" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-50 hidden transition-opacity opacity-0" onclick="closeModal()"></div>
-    <div id="modal-content" class="fixed bottom-0 left-0 right-0 bg-white rounded-t-[2.5rem] z-50 transform translate-y-full transition-transform duration-300 shadow-2xl max-w-md mx-auto h-[85vh] flex flex-col touch-pan-y">
+    <div id="modal-content" class="fixed bottom-0 left-0 right-0 bg-white rounded-t-[2.5rem] z-50 transform translate-y-full transition-transform duration-300 shadow-2xl max-w-md mx-auto h-[85vh] flex flex-col touch-pan-y safe-area-pb">
         
         <div id="modal-drag-handle" class="w-full flex justify-center pt-4 pb-2 cursor-grab active:cursor-grabbing z-50 bg-white rounded-t-[2.5rem]">
             <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
         </div>
 
-        <button onclick="closeModal()" class="absolute top-4 right-4 z-50 bg-gray-900 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform border-2 border-white">
+        <button onclick="closeModal()" class="absolute top-4 right-4 z-50 bg-gray-900 text-white w-11 h-11 rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform border-2 border-white">
             <i class="fas fa-times text-sm"></i>
         </button>
 
@@ -565,9 +574,9 @@
             </div>
 
             <div class="flex items-center justify-center gap-6 mb-6">
-                <button onclick="adjustQty(-1)" class="w-10 h-10 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold shadow-sm active:scale-90 transition-transform text-lg">-</button>
+                <button onclick="adjustQty(-1)" class="w-12 h-12 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold shadow-sm active:scale-90 transition-transform text-lg">-</button>
                 <span id="modal-qty" class="text-2xl font-bold text-gray-800 w-8 text-center">1</span>
-                <button onclick="adjustQty(1)" class="w-10 h-10 rounded-full bg-brand-yellow text-gray-800 flex items-center justify-center font-bold shadow-md active:scale-90 transition-transform text-lg">+</button>
+                <button onclick="adjustQty(1)" class="w-12 h-12 rounded-full bg-brand-yellow text-gray-800 flex items-center justify-center font-bold shadow-md active:scale-90 transition-transform text-lg">+</button>
             </div>
 
             <div id="modal-meat-section" class="mb-6 hidden">
@@ -598,11 +607,11 @@
             
             <div class="mb-4">
                 <h4 class="font-bold text-gray-800 mb-2 text-sm">Note</h4>
-                <textarea id="modal-note" rows="2" class="w-full bg-gray-50 border-none rounded-2xl p-4 text-sm focus:ring-2 focus:ring-brand-purple resize-none" placeholder="เช่น ไม่เผ็ด, ข้าวน้อย..."></textarea>
+                <textarea id="modal-note" rows="2" class="w-full bg-gray-50 border-none rounded-2xl p-4 text-base focus:ring-2 focus:ring-brand-purple resize-none" placeholder="เช่น ไม่เผ็ด, ข้าวน้อย..."></textarea>
             </div>
         </div>
 
-        <div class="absolute bottom-0 left-0 right-0 p-5 bg-white border-t border-gray-100 rounded-t-[2rem]">
+        <div class="absolute bottom-0 left-0 right-0 p-5 bg-white border-t border-gray-100 rounded-t-[2rem] safe-area-pb-plus">
             <button onclick="addToCart()" class="w-full bg-brand-purple text-white font-bold text-lg py-4 rounded-full shadow-lg shadow-indigo-200 active:scale-95 transition-transform flex justify-center items-center gap-2">
                 <span>ใส่ตะกร้า</span>
                 <i class="fas fa-plus bg-white/20 rounded-full w-6 h-6 flex items-center justify-center text-xs"></i>
@@ -646,7 +655,7 @@
             });
         }
 
-        const CURRENT_VERSION = '9.3';
+        const CURRENT_VERSION = '9.4';
         window.addEventListener('load', () => {
             const savedVer = localStorage.getItem('kaprao_ver');
             if(savedVer !== CURRENT_VERSION) {
@@ -1173,8 +1182,6 @@
         // --- ส่วนที่แก้ไข: ล็อคผลรางวัล (Hardcode Logic) ---
         
         // 1. ตารางผลรางวัลที่กำหนดเอง (ADMIN SETTING)
-        // ใส่เลขที่ต้องการให้ออกรางวัลตรงนี้ Format: "วัน/เดือน/ปีพ.ศ.": "เลขท้าย2ตัว"
-        // ต้องตรงกับที่ระบบแสดงในตั๋วเป๊ะๆ (เช่น 1/11/2566 ไม่ใช่ 01/11/2566 ขึ้นอยู่กับ Browser แต่ส่วนใหญ่เป็น d/m/yyyy)
         const OFFICIAL_RESULTS = {
              "16/12/2566": "52", // ตัวอย่าง
              "30/12/2566": "99",
@@ -1193,7 +1200,6 @@
             }
 
             // ถ้าไม่มีเลขระบุไว้ (เช่น ลืมใส่ หรือยังไม่ออก) 
-            // ให้คืนค่า "PENDING" หรือค่าที่ไม่มีทางถูก เพื่อไม่ให้ใครถูกมั่ว
             console.log(`[LOTTO] งวดวันที่ ${dateStr} ยังไม่มีการระบุเลขรางวัล`);
             return "NotSet"; 
         }
@@ -1280,7 +1286,6 @@
                     // ถ้ามีเลขรางวัลออกแล้ว แต่ไม่ตรง ให้ปรับเป็นแพ้ (lost)
                     t.status = 'lost';
                 }
-                // ถ้า winningNum เป็น "NotSet" แปลว่าแอดมินยังไม่ได้ใส่เลข ก็จะยังค้างสถานะ Pending ไว้
                 
                 if (winningNum !== "NotSet") {
                     t.checkedDate = new Date().toLocaleDateString('th-TH');
@@ -1455,7 +1460,7 @@
                     </div>
                     <div class="flex flex-col items-end gap-2">
                         <span class="font-bold text-gray-700">${item.price}.-</span>
-                        <button onclick="removeFromCart(${item.id})" class="text-xs text-red-400 bg-red-50 w-6 h-6 rounded flex items-center justify-center"><i class="fas fa-trash"></i></button>
+                        <button onclick="removeFromCart(${item.id})" class="text-xs text-red-400 bg-red-50 w-9 h-9 rounded flex items-center justify-center border border-red-100"><i class="fas fa-trash"></i></button>
                     </div>
                 `;
                 container.appendChild(el);
