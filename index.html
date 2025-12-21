@@ -11,7 +11,7 @@
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
     <link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
     
-    <title>Kaprao52 - APP</title> 
+    <title>Kaprao52 - Avatar Home</title> 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -74,7 +74,7 @@
         .price-pop { animation: pricePop 0.3s ease-out; }
         @keyframes pricePop { 50% { transform: scale(1.2); } }
 
-        /* ✨ FEATURE 1: SHAKE ANIMATION */
+        /* SHAKE ANIMATION */
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             20% { transform: translateX(-5px); }
@@ -84,7 +84,7 @@
         }
         .animate-shake {
             animation: shake 0.4s ease-in-out;
-            border-color: #ef4444 !important; /* Red border on error */
+            border-color: #ef4444 !important; 
         }
 
         .category-pill-active {
@@ -296,6 +296,38 @@
         .ticket-stub:active {
             transform: scale(0.98);
         }
+
+        /* --- AVATAR STYLES --- */
+        .avatar-option {
+            font-size: 2rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            position: relative;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #f3f4f6;
+        }
+        .avatar-option:hover { transform: scale(1.1); background: #e5e7eb; }
+        .avatar-selected { background: #FFD755 !important; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        
+        .chef-hat-overlay {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 30px;
+            background-image: url('https://cdn-icons-png.flaticon.com/512/1830/1830839.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            pointer-events: none;
+            z-index: 10;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
+        }
     </style>
 </head>
 <body class="pb-32 font-sans select-none relative overflow-x-hidden safe-area-pt">
@@ -356,6 +388,27 @@
         </div>
     </div>
 
+    <div id="avatar-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[120] hidden transition-opacity opacity-0 flex items-center justify-center p-6">
+        <div class="bg-white rounded-[2rem] p-6 max-w-xs w-full shadow-2xl scale-in">
+            <h3 class="text-lg font-bold text-center mb-4 text-gray-800">เลือกตัวละครของคุณ 🐾</h3>
+            
+            <div class="grid grid-cols-4 gap-3 mb-6" id="avatar-grid">
+                </div>
+
+            <div class="flex items-center justify-between bg-gray-50 p-3 rounded-xl mb-6">
+                <span class="text-sm font-bold text-gray-700">ใส่หมวกเชฟ 👨‍🍳</span>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="hat-toggle" class="sr-only peer" onchange="toggleHat()">
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-purple"></div>
+                </label>
+            </div>
+
+            <button onclick="closeAvatarModal()" class="w-full bg-brand-yellow text-gray-900 font-bold py-3 rounded-xl shadow-lg active:scale-95 transition-all">
+                ตกลง
+            </button>
+        </div>
+    </div>
+
     <div class="px-6 pt-6 pb-2 bg-transparent relative z-10">
         
         <div class="flex justify-end mb-4">
@@ -367,9 +420,14 @@
 
         <div class="flex items-start justify-between mb-4">
             <div class="flex items-start gap-3">
-                <div class="w-12 h-12 rounded-full bg-yellow-100 overflow-hidden border-2 border-white shadow-sm flex-shrink-0 flex items-center justify-center p-2">
-                     <img src="https://cdn-icons-png.flaticon.com/512/3170/3170733.png" alt="Rice Icon" class="w-full h-full object-contain opacity-80">
+                
+                <div id="header-avatar-btn" onclick="openAvatarModal()" class="w-12 h-12 rounded-full bg-yellow-100 border-2 border-white shadow-sm flex items-center justify-center text-2xl cursor-pointer relative active:scale-90 transition-transform">
+                     🐶
+                     <div class="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm border border-gray-100">
+                        <i class="fas fa-pen text-[8px] text-gray-400"></i>
+                     </div>
                 </div>
+
                 <div class="flex flex-col justify-center">
                     <p class="text-xs text-gray-400 font-medium mb-1">สวัสดี ลูกค้าคนพิเศษ ✨</p>
                     <h1 class="grand-title leading-none tracking-tight mb-2 relative z-10 pt-1">
@@ -485,7 +543,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V10.2</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V10.4</p>
         </div>
 
     </div>
@@ -691,8 +749,10 @@
     <div id="receipt-capture">
         <div class="bg-white p-6 relative">
             <div class="text-center mb-6">
-                <div class="w-16 h-16 bg-brand-yellow rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
-                    <span class="text-3xl">🧑‍🍳</span>
+                <div class="w-16 h-16 bg-brand-yellow rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm relative">
+                    <div id="receipt-avatar-display" class="text-4xl flex items-center justify-center w-full h-full rounded-full">
+                        🧑‍🍳
+                    </div>
                 </div>
                 <h2 class="text-2xl font-black text-gray-800 tracking-wider">KAPRAO52</h2>
                 <p class="text-[10px] text-gray-400 tracking-widest uppercase mt-1">Authentic Thai Street Food</p>
@@ -789,7 +849,7 @@
             });
         }
 
-        const CURRENT_VERSION = '10.2';
+        const CURRENT_VERSION = '10.4';
         window.addEventListener('load', () => {
             const savedVer = localStorage.getItem('kaprao_ver');
             if(savedVer !== CURRENT_VERSION) {
@@ -797,12 +857,85 @@
             }
             setTimeout(autoCheckLottery, 1000);
             updateTicketBadge();
-            updateStreak(); // Check streak on load
+            updateStreak(); 
+            loadAvatar(); // Load Avatar
         });
 
         setTimeout(() => {
             hideGlobalLoader();
         }, 4000);
+
+        // --- AVATAR LOGIC ---
+        let userAvatar = { animal: '🐶', hat: false };
+        const avatarOptions = ['🐶', '🐱', '🐷', '🦒', '🦁', '🐼', '🐰', '🐨', '🐯', '🐮', '🐸', '🐔'];
+
+        function openAvatarModal() {
+            const grid = document.getElementById('avatar-grid');
+            grid.innerHTML = '';
+            avatarOptions.forEach(emoji => {
+                const el = document.createElement('div');
+                el.className = `avatar-option ${userAvatar.animal === emoji ? 'avatar-selected' : ''}`;
+                el.innerText = emoji;
+                el.onclick = () => selectAvatar(emoji);
+                grid.appendChild(el);
+            });
+            document.getElementById('hat-toggle').checked = userAvatar.hat;
+            
+            const modal = document.getElementById('avatar-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+        }
+
+        function closeAvatarModal() {
+            const modal = document.getElementById('avatar-modal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+            saveToLS();
+            updateAvatarDisplay();
+        }
+
+        function selectAvatar(emoji) {
+            userAvatar.animal = emoji;
+            // Redraw grid to show selection
+            const options = document.querySelectorAll('.avatar-option');
+            options.forEach(opt => {
+                if (opt.innerText === emoji) opt.classList.add('avatar-selected');
+                else opt.classList.remove('avatar-selected');
+            });
+            triggerHaptic();
+        }
+
+        function toggleHat() {
+            userAvatar.hat = document.getElementById('hat-toggle').checked;
+        }
+
+        function updateAvatarDisplay() {
+            // Updated to new Header ID
+            const btn = document.getElementById('header-avatar-btn');
+            // Keep the edit icon
+            const editIcon = btn.querySelector('.absolute'); 
+            
+            btn.innerHTML = userAvatar.animal;
+            btn.appendChild(editIcon); // Add edit icon back
+
+            // Clear existing hat
+            const existingHat = btn.querySelector('.chef-hat-overlay');
+            if (existingHat) existingHat.remove();
+
+            if (userAvatar.hat) {
+                const hat = document.createElement('div');
+                hat.className = 'chef-hat-overlay';
+                btn.appendChild(hat);
+            }
+        }
+
+        function loadAvatar() {
+            const saved = JSON.parse(localStorage.getItem('kaprao52_user'));
+            if (saved && saved.avatar) {
+                userAvatar = saved.avatar;
+            }
+            updateAvatarDisplay();
+        }
 
         // --- WELCOME POPUP ---
         function closeWelcome() {
@@ -883,7 +1016,11 @@
         const addonCalories = { 'special': 80, 'kaikhon': 150, 'kaidao': 120, 'kaijiao': 200, 'kaitom': 75, 'kaiyiewma': 100 };
 
         function saveToLS() {
-            const userState = { cart: cart, name: document.getElementById('user-name').value };
+            const userState = { 
+                cart: cart, 
+                name: document.getElementById('user-name').value,
+                avatar: userAvatar 
+            };
             localStorage.setItem('kaprao52_user', JSON.stringify(userState));
         }
 
@@ -1092,7 +1229,7 @@
                 
                 const contentStyle = isDessert ? 'opacity-60 grayscale-[50%]' : '';
 
-                // ✨ FEATURE 2: GRADIENT BORDERS
+                // GRADIENT BORDERS
                 el.innerHTML = `
                     <div class="flex items-center gap-4 ${contentStyle}">
                         <div class="p-[2px] rounded-2xl bg-gradient-to-br from-brand-yellow to-brand-purple shadow-sm">
@@ -1234,7 +1371,7 @@
             if (currentItem.reqMeat) {
                 const r = document.querySelector('input[name="modal-meat"]:checked');
                 
-                // ✨ FEATURE 1: SHAKE ANIMATION
+                // SHAKE ANIMATION
                 if(!r) {
                     const meatContainer = document.getElementById('meat-options-container');
                     meatContainer.classList.remove('animate-shake');
@@ -1648,6 +1785,19 @@
             document.querySelector('.receipt-subtotal').innerText = subtotal + '.-';
             document.querySelector('.receipt-discount').innerText = '-' + discountValue + '.-';
             document.querySelector('.receipt-total').innerText = netTotal + '.-';
+
+            // SHOW AVATAR ON RECEIPT
+            const receiptAvatar = document.getElementById('receipt-avatar-display');
+            receiptAvatar.innerHTML = userAvatar.animal;
+            // Clear hat in receipt
+            const existingHat = receiptAvatar.querySelector('.chef-hat-overlay');
+            if (existingHat) existingHat.remove();
+            
+            if (userAvatar.hat) {
+                const hat = document.createElement('div');
+                hat.className = 'chef-hat-overlay';
+                receiptAvatar.appendChild(hat);
+            }
 
             const itemsContainer = document.querySelector('.receipt-items');
             itemsContainer.innerHTML = '';
