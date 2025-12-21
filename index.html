@@ -4,13 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#7C77D6">
-    
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Kaprao52">
+    <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
     
-<link rel="manifest" href="manifest.json">    
     <title>Kaprao52 - V9.3</title> 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -27,7 +24,7 @@
                             purple: '#7C77D6', 
                             yellow: '#FFD755', 
                             bg: '#F5F7FB',       
-                            text: '#2D3436',     
+                            text: '#2D3436',    
                         }
                     },
                     fontFamily: {
@@ -243,73 +240,9 @@
             background-position: 0 0, 0 0;
             background-size: 100% 100%;
         }
-
-        /* --- PWA INSTALL BANNER --- */
-        #pwa-install-banner {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            z-index: 200;
-            padding: 1rem;
-            border-top-left-radius: 1.5rem;
-            border-top-right-radius: 1.5rem;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
-            transform: translateY(100%);
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        #pwa-install-banner.show {
-            transform: translateY(0);
-        }
-        
-        /* --- OFFLINE BANNER --- */
-        #offline-banner {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: #ef4444;
-            color: white;
-            text-align: center;
-            padding: 4px;
-            font-size: 10px;
-            font-weight: bold;
-            z-index: 1000;
-            transform: translateY(-100%);
-            transition: transform 0.3s;
-        }
-        #offline-banner.show { transform: translateY(0); }
     </style>
 </head>
 <body class="pb-32 font-sans select-none relative overflow-x-hidden">
-
-    <div id="offline-banner"><i class="fas fa-wifi-slash"></i> คุณกำลังใช้งานแบบ Offline</div>
-
-    <div id="update-banner" class="fixed top-4 left-4 right-4 bg-gray-900 text-white p-3 rounded-xl shadow-xl z-[1001] hidden flex items-center justify-between fade-in-up">
-        <div class="flex items-center gap-2">
-            <span class="text-brand-yellow text-xl">🚀</span>
-            <div class="flex flex-col">
-                <span class="text-xs font-bold">มีเวอร์ชันใหม่!</span>
-                <span class="text-[10px] text-gray-400">อัปเดตเพื่อฟีเจอร์ที่ดีขึ้น</span>
-            </div>
-        </div>
-        <button onclick="window.location.reload()" class="bg-brand-purple px-3 py-1 rounded-lg text-xs font-bold">รีโหลด</button>
-    </div>
-
-    <div id="pwa-install-banner" class="flex items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-            <img src="https://cdn-icons-png.flaticon.com/512/3448/3448609.png" class="w-12 h-12 rounded-xl shadow-sm border border-gray-100">
-            <div>
-                <h4 class="font-bold text-gray-800 text-sm">ติดตั้ง Kaprao52</h4>
-                <p class="text-xs text-gray-500">เพื่อประสบการณ์ที่ลื่นไหลกว่า</p>
-            </div>
-        </div>
-        <div class="flex gap-2">
-            <button onclick="dismissInstall()" class="text-gray-400 text-xs px-2">ไว้ก่อน</button>
-            <button onclick="triggerPwaInstall()" class="bg-brand-purple text-white px-4 py-2 rounded-full text-xs font-bold shadow-lg">ติดตั้ง</button>
-        </div>
-    </div>
 
     <div id="ptr-spinner">
         <div class="bg-white p-2 rounded-full shadow-lg">
@@ -360,10 +293,7 @@
 
     <div class="px-6 pt-6 pb-2 bg-transparent relative z-10">
         
-        <div class="flex justify-end mb-4 gap-2">
-            <button id="header-install-btn" onclick="triggerPwaInstall()" class="hidden bg-gray-900 text-white rounded-full px-3 py-1 text-[10px] font-bold shadow-sm active:scale-95 transition-all flex items-center gap-1">
-                <i class="fas fa-download"></i> App
-            </button>
+        <div class="flex justify-end mb-4">
             <div class="bg-white/60 backdrop-blur-md p-2 px-3 rounded-full border border-white/50 shadow-sm inline-flex items-center gap-2">
                 <i class="far fa-clock text-brand-purple"></i>
                 <span id="live-clock" class="text-xs font-bold text-gray-700 tracking-wide">00:00:00</span>
@@ -382,6 +312,10 @@
                     </h1>
                 </div>
             </div>
+            <button id="pwa-install-btn" onclick="installApp()" class="hidden bg-gray-900 text-white rounded-full px-4 py-2 text-xs font-bold shadow-lg active:scale-95 transition-all flex items-center gap-2">
+                <i class="fas fa-download"></i>
+                <span>App</span>
+            </button>
         </div>
 
         <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 mb-1 flex items-center gap-3 fade-in-up" style="animation-delay: 0.1s;">
@@ -685,82 +619,6 @@
     </div>
 
     <script>
-        // --- PWA LOGIC START ---
-        
-        // 1. Service Worker Registration
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(registration => {
-                        console.log('SW Registered:', registration.scope);
-                        // Check for updates
-                        registration.onupdatefound = () => {
-                            const newWorker = registration.installing;
-                            newWorker.onstatechange = () => {
-                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                    // New version available
-                                    document.getElementById('update-banner').classList.remove('hidden');
-                                }
-                            };
-                        };
-                    })
-                    .catch(err => console.log('SW Registration Failed:', err));
-            });
-            
-            // Listen for controller change (reload for new version)
-            navigator.serviceWorker.addEventListener('controllerchange', () => {
-                window.location.reload();
-            });
-        }
-
-        // 2. Install Prompt Logic
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            // Show install banner
-            document.getElementById('pwa-install-banner').classList.add('show');
-            // Also show top button for desktop
-            document.getElementById('header-install-btn').classList.remove('hidden');
-        });
-
-        function triggerPwaInstall() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted the PWA prompt');
-                        dismissInstall();
-                    }
-                    deferredPrompt = null;
-                });
-            }
-        }
-
-        function dismissInstall() {
-            document.getElementById('pwa-install-banner').classList.remove('show');
-        }
-
-        // 3. Offline/Online Detection
-        function updateOnlineStatus() {
-            const banner = document.getElementById('offline-banner');
-            if (navigator.onLine) {
-                banner.classList.remove('show');
-                banner.style.backgroundColor = '#22c55e';
-                banner.innerHTML = '<i class="fas fa-wifi"></i> เชื่อมต่อแล้ว';
-                banner.classList.add('show');
-                setTimeout(() => banner.classList.remove('show'), 2000);
-            } else {
-                banner.style.backgroundColor = '#ef4444';
-                banner.innerHTML = '<i class="fas fa-wifi-slash"></i> คุณกำลังใช้งานแบบ Offline';
-                banner.classList.add('show');
-            }
-        }
-        window.addEventListener('online', updateOnlineStatus);
-        window.addEventListener('offline', updateOnlineStatus);
-        
-        // --- PWA LOGIC END ---
-
         // --- SOUNDS ---
         const sfxPop = new Audio('https://www.soundjay.com/buttons/sounds/button-3.mp3');
         const sfxOrder = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
@@ -783,10 +641,6 @@
             Notification.requestPermission().then(permission => {
                 if (permission === "granted") {
                     showToast("เปิดแจ้งเตือนแล้ว! 🔔");
-                    new Notification("Kaprao52", {
-                        body: "ยินดีต้อนรับสู่ Kaprao52 แบบ App!",
-                        icon: "https://cdn-icons-png.flaticon.com/512/3448/3448609.png"
-                    });
                     triggerHaptic();
                 }
             });
