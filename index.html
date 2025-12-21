@@ -47,14 +47,13 @@
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* แก้ไข 3: CSS Variables สำหรับ Safe Area */
         :root {
             --sat: env(safe-area-inset-top);
             --sab: env(safe-area-inset-bottom);
         }
         .safe-area-pt { padding-top: var(--sat); }
         .safe-area-pb { padding-bottom: var(--sab); }
-        .safe-area-pb-plus { padding-bottom: calc(1rem + var(--sab)); } /* เผื่อพื้นที่ปุ่ม */
+        .safe-area-pb-plus { padding-bottom: calc(1rem + var(--sab)); }
 
         /* Transition Animations */
         .fade-in-up { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
@@ -132,10 +131,38 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* --- GLOBAL LOADER STYLES --- */
+        #global-loader {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background-color: #F5F7FB;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.4s ease, visibility 0.4s;
+        }
+        .loader-hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .cooking-pan {
+            font-size: 4rem;
+            animation: panFlip 1.5s infinite ease-in-out;
+            transform-origin: center bottom;
+        }
+        @keyframes panFlip {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
+        }
+
         /* Draggable AI Button */
         #ai-wrapper {
             position: fixed;
-            bottom: calc(6rem + env(safe-area-inset-bottom)); /* Adjust for safe area */
+            bottom: calc(6rem + env(safe-area-inset-bottom));
             right: 1.25rem; 
             z-index: 80;
             touch-action: none; 
@@ -252,6 +279,15 @@
     </style>
 </head>
 <body class="pb-32 font-sans select-none relative overflow-x-hidden safe-area-pt">
+
+    <div id="global-loader">
+        <div class="relative mb-4">
+            <div class="absolute inset-0 bg-yellow-200 rounded-full blur-xl opacity-50 animate-pulse"></div>
+            <div class="cooking-pan relative z-10">🍳</div>
+        </div>
+        <h2 class="text-xl font-bold text-gray-800 tracking-wider">KAPRAO<span class="text-brand-yellow">52</span></h2>
+        <p id="loader-text" class="text-xs text-gray-400 mt-2 font-medium">กำลังเตรียมร้าน...</p>
+    </div>
 
     <div id="ptr-spinner">
         <div class="bg-white p-2 rounded-full shadow-lg">
@@ -426,7 +462,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V9.4</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V9.5</p>
         </div>
 
     </div>
@@ -641,6 +677,19 @@
             if (navigator.vibrate) navigator.vibrate(10); 
         }
 
+        // --- NEW FEATURE: GLOBAL LOADER ---
+        function showGlobalLoader(text = "กำลังโหลด...") {
+            const loader = document.getElementById('global-loader');
+            const txt = document.getElementById('loader-text');
+            txt.innerText = text;
+            loader.classList.remove('loader-hidden');
+        }
+
+        function hideGlobalLoader() {
+            const loader = document.getElementById('global-loader');
+            loader.classList.add('loader-hidden');
+        }
+
         // --- NEW FEATURE: NOTIFICATION PERMISSION ---
         function requestNotifPermission() {
             if (!("Notification" in window)) {
@@ -655,7 +704,7 @@
             });
         }
 
-        const CURRENT_VERSION = '9.4';
+        const CURRENT_VERSION = '9.5';
         window.addEventListener('load', () => {
             const savedVer = localStorage.getItem('kaprao_ver');
             if(savedVer !== CURRENT_VERSION) {
@@ -664,6 +713,11 @@
             // AUTO CHECK LOTTERY ON LOAD
             setTimeout(autoCheckLottery, 1000);
             updateTicketBadge();
+
+            // Hide Splash Screen
+            setTimeout(() => {
+                hideGlobalLoader();
+            }, 800);
         });
 
         // --- WELCOME POPUP ---
@@ -1533,6 +1587,9 @@
 
         // --- ORDER CARD GENERATOR ---
         function generateOrderCard() {
+            // NEW: SHOW LOADER
+            showGlobalLoader("กำลังพิมพ์ใบเสร็จ...");
+
             const div = document.getElementById('receipt-capture');
             const name = document.getElementById('user-name').value || 'ลูกค้า';
             const now = new Date().toLocaleString('th-TH');
@@ -1617,11 +1674,17 @@
                 useCORS: true, 
                 backgroundColor: "#ffffff"
             }).then(canvas => {
+                // NEW: HIDE LOADER
+                hideGlobalLoader();
+
                 const link = document.createElement('a');
                 link.download = `Order-${currentOrderId}.png`;
                 link.href = canvas.toDataURL();
                 link.click();
                 showToast('บันทึกใบสั่งซื้อแล้ว 📸');
+            }).catch(() => {
+                hideGlobalLoader();
+                showToast('เกิดข้อผิดพลาดในการบันทึกภาพ');
             });
         }
 
@@ -1630,10 +1693,8 @@
             const name = document.getElementById('user-name').value.trim();
             if (!name) return showToast('กรุณาใส่ชื่อผู้สั่ง');
             
-            const btn = document.getElementById('btn-submit-order');
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> กำลังส่งไลน์...`;
+            // NEW: SHOW LOADER
+            showGlobalLoader("กำลังส่งออเดอร์...");
             
             sfxOrder.play(); triggerHaptic();
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#FFD755', '#7C77D6', '#FFFFFF'] });
@@ -1683,8 +1744,7 @@
                 closeCheckout();
                 
                 setTimeout(() => {
-                    btn.disabled = false;
-                    btn.innerHTML = originalText;
+                    hideGlobalLoader(); // Hide loader after redirect
                 }, 1000);
             }, 800);
         }
