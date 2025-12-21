@@ -278,6 +278,10 @@
             background-image: radial-gradient(circle at 0 50%, transparent 8px, #FFFFFF 8.5px), radial-gradient(circle at 100% 50%, transparent 8px, #FFFFFF 8.5px);
             background-position: 0 0, 0 0;
             background-size: 100% 100%;
+            transition: transform 0.1s ease;
+        }
+        .ticket-stub:active {
+            transform: scale(0.98);
         }
     </style>
 </head>
@@ -465,7 +469,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V9.9</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V10.1</p>
         </div>
 
     </div>
@@ -769,7 +773,7 @@
             });
         }
 
-        const CURRENT_VERSION = '9.9';
+        const CURRENT_VERSION = '10.1';
         window.addEventListener('load', () => {
             const savedVer = localStorage.getItem('kaprao_ver');
             if(savedVer !== CURRENT_VERSION) {
@@ -1274,6 +1278,8 @@
             const today = new Date();
             const drawDateObj = getNextDrawDate();
             const drawDateStr = drawDateObj.toLocaleDateString('th-TH');
+            const name = document.getElementById('user-name').value || 'ลูกค้า';
+            
             const ticket = {
                 id: orderId,
                 number: orderId.slice(-2),
@@ -1283,7 +1289,9 @@
                 timestamp: Date.now(),
                 price: totalPrice,
                 status: 'pending',
-                checkedDate: null
+                checkedDate: null,
+                items: JSON.parse(JSON.stringify(cart)), // Save items snapshot
+                customerName: name // Save customer name
             };
             lottoHistory.unshift(ticket);
             localStorage.setItem('kaprao_lotto_history', JSON.stringify(lottoHistory));
@@ -1348,7 +1356,7 @@
                         <p class="text-sm">ยังไม่มีประวัติการสั่งซื้อ</p>
                     </div>`;
             } else {
-                lottoHistory.forEach(t => {
+                lottoHistory.forEach((t, index) => {
                     let statusHtml = '';
                     let statusClass = '';
                     if(t.status === 'pending') {
@@ -1362,7 +1370,9 @@
                         statusClass = 'border-l-4 border-gray-300 bg-gray-50 opacity-70 grayscale';
                     }
                     const item = document.createElement('div');
-                    item.className = `ticket-stub p-4 rounded-lg shadow-sm border border-gray-200 mb-3 flex justify-between items-center relative overflow-hidden ${statusClass}`;
+                    // Add onclick to reprint
+                    item.onclick = () => reprintReceipt(index);
+                    item.className = `ticket-stub p-4 rounded-lg shadow-sm border border-gray-200 mb-3 flex justify-between items-center relative overflow-hidden cursor-pointer active:scale-95 transition-transform ${statusClass}`;
                     item.innerHTML = `
                         <div>
                             <div class="text-[10px] text-gray-400">Order ID: ${t.id}</div>
@@ -1371,6 +1381,7 @@
                                 <span class="text-2xl font-black text-brand-purple tracking-widest">${t.number}</span>
                             </div>
                             <div class="text-[10px] text-gray-400 mt-1">ซื้อเมื่อ: ${t.date}</div>
+                            <div class="text-[10px] text-indigo-500 font-bold mt-2"><i class="fas fa-print"></i> กดเพื่อพิมพ์ใบเสร็จ</div>
                         </div>
                         <div class="text-right flex flex-col items-end">
                              <div class="text-xs mb-1 bg-white/80 px-2 py-1 rounded-full shadow-sm whitespace-nowrap">${statusHtml}</div>
@@ -1593,6 +1604,72 @@
                 hideGlobalLoader();
                 showToast('เกิดข้อผิดพลาดในการบันทึกภาพ');
             });
+        }
+
+        // --- NEW: REPRINT RECEIPT FROM HISTORY ---
+        function reprintReceipt(ticketIndex) {
+            triggerHaptic();
+            const ticket = lottoHistory[ticketIndex];
+            
+            // Validation for old data
+            if (!ticket.items || ticket.items.length === 0) {
+                showToast("ไม่พบข้อมูลรายการอาหารของบิลเก่า 😢");
+                return;
+            }
+
+            showGlobalLoader("กำลังดึงข้อมูลใบเสร็จ...");
+            
+            // Populate Data from History
+            const name = ticket.customerName || 'ลูกค้า';
+            const subtotal = ticket.items.reduce((sum, i) => sum + i.price, 0);
+            // Note: discount is not stored in history in this version, assume net = total
+            const netTotal = ticket.price; 
+            const discount = subtotal - netTotal; // Calculate back if possible
+
+            document.querySelector('.receipt-id').innerText = ticket.id;
+            document.querySelector('.receipt-date').innerText = new Date(ticket.timestamp).toLocaleString('th-TH');
+            document.querySelector('.receipt-name').innerText = name;
+            document.querySelector('.receipt-subtotal').innerText = subtotal + '.-';
+            document.querySelector('.receipt-discount').innerText = '-' + discount + '.-';
+            document.querySelector('.receipt-total').innerText = netTotal + '.-';
+
+            const itemsContainer = document.querySelector('.receipt-items');
+            itemsContainer.innerHTML = '';
+            ticket.items.forEach((i, index) => {
+                let detail = `${i.name}`;
+                if(i.meat) detail += ` (${i.meat})`;
+                if(i.addons.length) detail += ` +${i.addons.join(',')}`;
+                const row = document.createElement('div');
+                row.className = "flex justify-between text-xs";
+                row.innerHTML = `
+                    <div class="flex gap-1 text-gray-700">
+                        <span class="w-4">${index+1}.</span>
+                        <span>${detail}</span>
+                    </div>
+                    <span class="font-bold text-gray-800">${i.price}.-</span>
+                `;
+                itemsContainer.appendChild(row);
+            });
+
+            // Delay slightly for rendering then Capture
+            setTimeout(() => {
+                const div = document.getElementById('receipt-capture');
+                html2canvas(div, { 
+                    scale: 2, 
+                    useCORS: true, 
+                    backgroundColor: null 
+                }).then(canvas => {
+                    hideGlobalLoader();
+                    const link = document.createElement('a');
+                    link.download = `Reprint-${ticket.id}.png`;
+                    link.href = canvas.toDataURL();
+                    link.click();
+                    showToast('บันทึกใบเสร็จย้อนหลังแล้ว 📸');
+                }).catch(() => {
+                    hideGlobalLoader();
+                    showToast('เกิดข้อผิดพลาดในการบันทึกภาพ');
+                });
+            }, 500);
         }
 
         function submitOrderToLine() {
