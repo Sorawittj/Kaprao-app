@@ -34,7 +34,7 @@
                         brand: {
                             purple: '#7C77D6', 
                             yellow: '#FFD755', 
-                            bg: '#F5F7FB',       
+                            bg: '#F5F7FB',        
                             text: '#2D3436',    
                         }
                     },
@@ -54,7 +54,8 @@
     </script>
 
     <style>
-        body { background-color: #F5F7FB; color: #2D3436; -webkit-tap-highlight-color: transparent; overscroll-behavior-y: contain; }
+        /* แก้ไข: เปลี่ยน contain เป็น none เพื่อป้องกัน iOS เด้ง */
+        body { background-color: #F5F7FB; color: #2D3436; -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; }
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
         
@@ -130,30 +131,6 @@
             background-color: #f0fdf4 !important;
             color: #15803d !important;
         }
-
-        /* Pull to Refresh Spinner */
-        #ptr-spinner {
-            position: fixed;
-            top: -60px;
-            left: 0;
-            width: 100%;
-            height: 60px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
-            pointer-events: none;
-            transition: transform 0.2s;
-        }
-        .spinner-icon {
-            width: 30px;
-            height: 30px;
-            border: 3px solid rgba(124, 119, 214, 0.3);
-            border-top-color: #7C77D6;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
 
         /* --- GLOBAL LOADER STYLES --- */
         #global-loader {
@@ -349,12 +326,6 @@
         <p id="loader-text" class="text-xs text-gray-400 mt-2 font-medium">กำลังเตรียมร้าน...</p>
     </div>
 
-    <div id="ptr-spinner">
-        <div class="bg-white p-2 rounded-full shadow-lg">
-            <div class="spinner-icon"></div>
-        </div>
-    </div>
-
     <div id="parallax-bg" class="fixed top-0 left-0 w-full h-[120vh] z-[-1] pointer-events-none transition-transform duration-75 ease-out"></div>
     <div id="bubbles-container" class="fixed inset-0 overflow-hidden pointer-events-none z-[-1]"></div>
 
@@ -385,7 +356,7 @@
                     รับสิทธิ์กินฟรีมื้อหน้าทันที! 🎁
                 </p>
                 <div class="flex flex-col gap-3">
-                     <button onclick="requestNotifPermission()" class="w-full bg-white text-brand-purple font-bold py-3 rounded-xl shadow-sm border border-brand-purple active:scale-95 active:bg-purple-50 transition-all text-sm">
+                      <button onclick="requestNotifPermission()" class="w-full bg-white text-brand-purple font-bold py-3 rounded-xl shadow-sm border border-brand-purple active:scale-95 active:bg-purple-50 transition-all text-sm">
                         <i class="fas fa-bell mr-2"></i> เปิดแจ้งเตือนผลหวย
                     </button>
                     <button onclick="closeWelcome()" class="w-full bg-gradient-to-r from-brand-purple to-indigo-600 text-white font-bold py-4 rounded-xl shadow-xl shadow-indigo-300/50 active:scale-95 transition-all text-lg border-2 border-transparent hover:border-yellow-300">
@@ -785,7 +756,7 @@
             </div>
 
             <div class="bg-gray-50 rounded-lg p-3 mb-4 space-y-2 receipt-items">
-                </div>
+            </div>
 
             <div class="space-y-1">
                 <div class="flex justify-between text-xs text-gray-500">
@@ -2003,35 +1974,7 @@
         enableSwipeToClose(document.getElementById('checkout-sheet'), document.getElementById('cart-list-container'), closeCheckout);
         enableSwipeToClose(document.getElementById('tickets-sheet'), document.getElementById('tickets-list'), closeMyTickets);
 
-        let ptrStartY = 0;
-        let ptrDistance = 0;
-        const ptrSpinner = document.getElementById('ptr-spinner');
-        
-        window.addEventListener('touchstart', e => {
-            if (window.scrollY === 0) ptrStartY = e.touches[0].clientY;
-        }, {passive: true});
-        
-        window.addEventListener('touchmove', e => {
-            if (ptrStartY === 0) return;
-            const currentY = e.touches[0].clientY;
-            ptrDistance = currentY - ptrStartY;
-            if (ptrDistance > 0 && window.scrollY === 0) {
-                if (ptrDistance > 120) ptrDistance = 120; // Cap at 120px
-                ptrSpinner.style.transform = `translateY(${ptrDistance}px) rotate(${ptrDistance * 2}deg)`;
-            }
-        }, {passive: true});
-        
-        window.addEventListener('touchend', e => {
-            if (ptrDistance > 80) {
-                ptrSpinner.style.transform = `translateY(80px)`;
-                ptrSpinner.querySelector('.spinner-icon').style.borderTopColor = '#22c55e';
-                setTimeout(() => window.location.reload(), 500);
-            } else {
-                ptrSpinner.style.transform = `translateY(0px)`;
-            }
-            ptrStartY = 0;
-            ptrDistance = 0;
-        });
+        // --- DELETED: PULL TO REFRESH LOGIC WAS HERE ---
 
         function toggleAIChef() {
             const wrapper = document.getElementById('ai-wrapper');
