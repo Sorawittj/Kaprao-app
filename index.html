@@ -35,7 +35,7 @@
                             purple: '#7C77D6', 
                             yellow: '#FFD755', 
                             bg: '#F5F7FB',        
-                            text: '#2D3436',    
+                            text: '#2D3436',     
                         }
                     },
                     fontFamily: {
@@ -158,15 +158,6 @@
             0%, 100% { transform: rotate(0deg); }
             25% { transform: rotate(-10deg); }
             75% { transform: rotate(10deg); }
-        }
-
-        /* Draggable AI Button */
-        #ai-wrapper {
-            position: fixed;
-            bottom: calc(6rem + env(safe-area-inset-bottom));
-            right: 1.25rem; 
-            z-index: 80;
-            touch-action: none; 
         }
 
         /* Parallax Background Pattern */
@@ -300,19 +291,19 @@
         .avatar-selected { background: #FFD755 !important; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         
         .chef-hat-overlay {
-            position: absolute;
-            top: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 30px;
-            height: 30px;
+            width: 40px;
+            height: 40px;
             background-image: url('https://cdn-icons-png.flaticon.com/512/1830/1830839.png');
             background-size: contain;
             background-repeat: no-repeat;
             pointer-events: none;
-            z-index: 10;
             filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
         }
+
+        /* New Level Badges */
+        .badge-newbie { background: linear-gradient(135deg, #fefce8, #fff7ed); color: #d97706; border: 2px solid #fde68a; }
+        .badge-regular { background: linear-gradient(135deg, #dbeafe, #60a5fa); color: #1e40af; border: 2px solid #93c5fd; }
+        .badge-god { background: linear-gradient(135deg, #fef3c7, #f59e0b); color: #78350f; border: 2px solid #fcd34d; box-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
     </style>
 </head>
 <body class="pb-32 font-sans select-none relative overflow-x-hidden safe-area-pt">
@@ -328,15 +319,6 @@
 
     <div id="parallax-bg" class="fixed top-0 left-0 w-full h-[120vh] z-[-1] pointer-events-none transition-transform duration-75 ease-out"></div>
     <div id="bubbles-container" class="fixed inset-0 overflow-hidden pointer-events-none z-[-1]"></div>
-
-    <div id="ai-wrapper">
-        <button onclick="hideAIButton(event)" class="absolute -top-1 -right-1 z-[82] w-5 h-5 bg-gray-400 text-white rounded-full flex items-center justify-center text-[10px] shadow-sm border border-white active:scale-90 active:bg-gray-500 transition-colors">
-            <i class="fas fa-times"></i>
-        </button>
-        <button id="ai-trigger-btn" onclick="toggleAIChef()" class="w-14 h-14 bg-white rounded-full shadow-xl flex items-center justify-center border-2 border-brand-purple animate-bounce-slow active:scale-90 active:bg-purple-50 transition-all">
-            <span class="text-2xl">👩‍🍳</span>
-        </button>
-    </div>
 
     <div id="welcome-modal" class="fixed inset-0 z-[100] bg-gray-900/80 backdrop-blur-sm flex items-center justify-center p-6 fade-in-up">
         <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full text-center shadow-2xl relative overflow-hidden">
@@ -390,46 +372,35 @@
 
     <div class="px-6 pt-6 pb-2 bg-transparent relative z-10">
         
-        <div class="flex justify-end mb-4">
-            <div class="bg-white/60 backdrop-blur-md p-2 px-3 rounded-full border border-white/50 shadow-sm inline-flex items-center gap-2">
-                <i class="far fa-clock text-brand-purple"></i>
-                <span id="live-clock" class="text-xs font-bold text-gray-700 tracking-wide">00:00:00</span>
-            </div>
-        </div>
-
-        <div class="flex items-start justify-between mb-4">
-            <div class="flex items-start gap-3">
-                
-                <div id="header-avatar-btn" onclick="openAvatarModal()" class="w-12 h-12 rounded-full bg-yellow-100 border-2 border-white shadow-sm flex items-center justify-center text-2xl cursor-pointer relative active:scale-90 transition-transform">
-                     🐶
-                     <div class="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm border border-gray-100">
-                        <i class="fas fa-pen text-[8px] text-gray-400"></i>
-                     </div>
-                </div>
-
-                <div class="flex flex-col justify-center">
-                    <p class="text-xs text-gray-400 font-medium mb-1">อย่าทำงานหนัก จนลืมกินกะเพรา🤤</p>
-                    <h1 class="grand-title leading-none tracking-tight mb-2 relative z-10 pt-1">
-                        KAPRAO<span class="title-highlight">52</span>
-                    </h1>
-                    <div id="streak-display" class="hidden mt-1 inline-flex items-center gap-1 bg-gradient-to-r from-orange-400 to-red-500 text-white text-[10px] px-2 py-0.5 rounded-full w-max shadow-sm animate-pulse">
-                        <i class="fas fa-fire"></i> <span id="streak-text">สั่งติดกัน 0 วัน</span>
-                    </div>
+        <div class="flex justify-between items-start mb-6">
+            <div class="flex flex-col justify-center">
+                <p class="text-xs text-gray-400 font-medium mb-1">สวัสดีครับ, วันนี้กินอะไรดี?</p>
+                <h1 class="grand-title leading-none tracking-tight mb-2 relative z-10 pt-1">
+                    KAPRAO<span class="title-highlight">52</span>
+                </h1>
+                <div id="streak-display" class="hidden mt-1 inline-flex items-center gap-1 bg-gradient-to-r from-orange-400 to-red-500 text-white text-[10px] px-2 py-0.5 rounded-full w-max shadow-sm animate-pulse">
+                    <i class="fas fa-fire"></i> <span id="streak-text">สั่งติดกัน 0 วัน</span>
                 </div>
             </div>
-            <button id="pwa-install-btn" onclick="installApp()" class="hidden bg-gray-900 text-white rounded-full px-4 py-2 text-xs font-bold shadow-lg active:scale-95 transition-all flex items-center gap-2">
-                <i class="fas fa-download"></i>
-                <span>App</span>
-            </button>
+
+            <div id="header-avatar-btn" onclick="openAvatarModal()" class="w-20 h-20 rounded-full bg-white border-4 border-white shadow-lg flex items-center justify-center relative cursor-pointer active:scale-90 transition-transform">
+                  <span id="avatar-emoji" class="text-4xl z-10 relative mt-1">🐶</span>
+                  
+                  <div id="avatar-hat-container" class="absolute top-[-20px] left-1/2 -translate-x-1/2 z-20"></div>
+
+                  <div class="absolute bottom-0 right-0 bg-brand-purple rounded-full w-6 h-6 flex items-center justify-center shadow-md border-2 border-white z-30">
+                     <i class="fas fa-pen text-[10px] text-white"></i>
+                  </div>
+            </div>
         </div>
 
         <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 mb-1 flex items-center gap-3 fade-in-up" style="animation-delay: 0.1s;">
-            <div id="badge-icon" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-xl shadow-inner transition-colors duration-500">
-                🔒
+            <div id="badge-icon" class="w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-inner transition-all duration-500 border-2 border-gray-100">
+                🐣
             </div>
             <div class="flex-1">
                 <div class="flex justify-between items-end mb-1">
-                    <span id="level-title" class="text-xs font-bold text-gray-700">มือใหม่หัดกิน</span>
+                    <span id="level-title" class="text-sm font-bold text-gray-700">มือใหม่หัดกิน</span>
                     <span id="level-count" class="text-[10px] text-gray-400">0/10 ครั้ง</span>
                 </div>
                 <div class="xp-bar-bg">
@@ -450,30 +421,12 @@
 
     <div class="max-w-md mx-auto px-5 relative z-10">
         
-        <div id="hero-banner" onclick="randomMenu()" class="w-full bg-gradient-to-r from-[#7C77D6] to-[#8B86E6] rounded-[1.5rem] p-3 pr-4 relative overflow-hidden shadow-lg shadow-indigo-100 mb-6 fade-in-up mt-2 flex items-center justify-between group cursor-pointer active:scale-98 transition-all duration-200">
-            <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-white opacity-10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-500"></div>
-            <div class="absolute -left-4 -top-4 w-20 h-20 bg-brand-yellow opacity-10 rounded-full blur-lg"></div>
-            
-            <div class="relative z-10 flex items-center gap-3">
-                <div class="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-xl shadow-inner border border-white/10">
-                    🎲
-                </div>
-                <div class="flex flex-col justify-center">
-                    <h3 class="text-sm font-bold text-white leading-tight">สุ่มเมนูเลยมั้ย?</h3>
-                    <p class="text-indigo-100 text-[10px] opacity-90 font-light">คิดไม่ออกเดี๋ยวเลือกให้</p>
-                </div>
-            </div>
-
-            <div class="relative z-10">
-                <div class="bg-brand-yellow text-gray-900 px-3 py-1.5 rounded-full text-xs font-bold shadow-md flex items-center gap-2 group-hover:bg-white group-hover:text-brand-purple active:bg-[#e5c04d] transition-colors">
-                    <span>กดเลย</span>
-                    <i id="dice-icon" class="fas fa-play text-[10px]"></i>
-                </div>
-            </div>
-        </div>
-
         <div class="mb-3 flex items-center justify-between">
-            <h3 class="font-bold text-gray-800 text-lg">หมวดหมู่</h3>
+            <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2">หมวดหมู่ 
+                <button onclick="randomMenu()" class="bg-brand-purple text-white px-3 py-1 rounded-full text-xs font-bold shadow-md hover:bg-indigo-600 active:scale-95 transition-all flex items-center gap-1 ml-2">
+                    <i id="dice-icon" class="fas fa-dice"></i> สุ่มเมนู
+                </button>
+            </h3>
             <div class="flex gap-2">
                 <button onclick="scrollTabs(-100)" class="nav-btn w-11 h-11 rounded-full flex items-center justify-center text-gray-500 hover:text-brand-purple active:scale-90 active:bg-gray-100 transition-all"><i class="fas fa-chevron-left text-xs"></i></button>
                 <button onclick="scrollTabs(100)" class="nav-btn w-11 h-11 rounded-full flex items-center justify-center text-gray-500 hover:text-brand-purple active:scale-90 active:bg-gray-100 transition-all"><i class="fas fa-chevron-right text-xs"></i></button>
@@ -522,7 +475,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V10.7</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V11.5</p>
         </div>
 
     </div>
@@ -540,40 +493,6 @@
             <div class="text-center text-gray-400 mt-10">
                 <div class="text-4xl mb-2 opacity-30">🎟️</div>
                 <p class="text-sm">ยังไม่มีประวัติการสั่งซื้อ</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="ai-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[90] hidden transition-opacity opacity-0 flex items-center justify-center p-4">
-        <div class="bg-white rounded-[2rem] w-full max-w-sm overflow-hidden shadow-2xl relative">
-            <div class="bg-brand-purple p-4 flex justify-between items-center text-white">
-                <div class="flex items-center gap-2">
-                    <span class="text-2xl">👩‍🍳</span>
-                    <div>
-                        <h3 class="font-bold text-sm">KAPRAO52 AI</h3>
-                        <p class="text-[10px] opacity-80">บอกอารมณ์ของคุณมาสิครับ</p>
-                    </div>
-                </div>
-                <button onclick="toggleAIChef()" class="w-11 h-11 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 active:bg-white/50 transition-all"><i class="fas fa-times"></i></button>
-            </div>
-            
-            <div id="ai-chat-body" class="p-4 h-[300px] overflow-y-auto bg-gray-50 flex flex-col gap-3">
-                <div class="self-start bg-white p-3 rounded-2xl rounded-tl-none border border-gray-100 shadow-sm max-w-[80%] text-sm text-gray-600">
-                    สวัสดีครับ! วันนี้รู้สึกยังไง หรืออยากทานอะไรเป็นพิเศษไหม? บอกผมได้เลย
-                </div>
-            </div>
-
-            <div class="p-4 bg-white border-t border-gray-100">
-                <div class="flex gap-2 mb-3 overflow-x-auto pb-1 hide-scroll">
-                    <button onclick="aiSuggest('หิวมาก')" class="px-3 py-1 bg-gray-100 rounded-full text-xs text-gray-600 whitespace-nowrap hover:bg-brand-yellow hover:text-gray-800 active:bg-[#e5c04d] transition-colors">😫 หิวมาก</button>
-                    <button onclick="aiSuggest('เศร้า')" class="px-3 py-1 bg-gray-100 rounded-full text-xs text-gray-600 whitespace-nowrap hover:bg-brand-yellow hover:text-gray-800 active:bg-[#e5c04d] transition-colors">😢 เศร้า</button>
-                    <button onclick="aiSuggest('ลดความอ้วน')" class="px-3 py-1 bg-gray-100 rounded-full text-xs text-gray-600 whitespace-nowrap hover:bg-brand-yellow hover:text-gray-800 active:bg-[#e5c04d] transition-colors">🥗 ลดความอ้วน</button>
-                    <button onclick="aiSuggest('แฮงค์')" class="px-3 py-1 bg-gray-100 rounded-full text-xs text-gray-600 whitespace-nowrap hover:bg-brand-yellow hover:text-gray-800 active:bg-[#e5c04d] transition-colors">🥴 แฮงค์</button>
-                </div>
-                <div class="flex gap-2">
-                    <input type="text" id="ai-input" placeholder="พิมพ์ความรู้สึก..." class="flex-1 bg-gray-100 rounded-xl px-4 py-2 text-base outline-none focus:ring-2 focus:ring-brand-purple">
-                    <button onclick="aiSendCustom()" class="w-11 h-11 bg-brand-purple text-white rounded-xl flex items-center justify-center shadow-lg active:scale-95 active:bg-indigo-600 transition-all"><i class="fas fa-paper-plane text-xs"></i></button>
-                </div>
             </div>
         </div>
     </div>
@@ -877,22 +796,16 @@
         }
 
         function updateAvatarDisplay() {
-            // Updated to new Header ID
-            const btn = document.getElementById('header-avatar-btn');
-            // Keep the edit icon
-            const editIcon = btn.querySelector('.absolute'); 
+            // FIXED: Clearly separate elements to prevent duplication
+            document.getElementById('avatar-emoji').innerText = userAvatar.animal;
             
-            btn.innerHTML = userAvatar.animal;
-            btn.appendChild(editIcon); // Add edit icon back
-
-            // Clear existing hat
-            const existingHat = btn.querySelector('.chef-hat-overlay');
-            if (existingHat) existingHat.remove();
+            const hatContainer = document.getElementById('avatar-hat-container');
+            hatContainer.innerHTML = ''; // Clear old hat first
 
             if (userAvatar.hat) {
                 const hat = document.createElement('div');
                 hat.className = 'chef-hat-overlay';
-                btn.appendChild(hat);
+                hatContainer.appendChild(hat);
             }
         }
 
@@ -936,14 +849,6 @@
             }
         }
         createBubbles();
-
-        // --- CLOCK ---
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('live-clock').innerText = now.toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'});
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
 
         // DATA
         const menuItems = [
@@ -993,7 +898,7 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '10.7';
+        const CURRENT_VERSION = '11.5';
 
         // ป้องกัน XSS (ลูกค้าใส่ชื่อแปลกๆ)
         function escapeHtml(text) {
@@ -1060,7 +965,7 @@
             renderCheckoutList();
         });
 
-        // --- ACHIEVEMENT UI ---
+        // --- ACHIEVEMENT UI ENHANCED (NEW ICONS) ---
         function updateLevelUI() {
             const count = userStats.orders;
             const bar = document.getElementById('level-fill');
@@ -1074,16 +979,24 @@
             bar.style.width = `${percent}%`;
             txt.innerText = `${count}/10 ครั้ง`;
             
+            // Clear old classes
+            icon.className = "w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-inner transition-all duration-500 border-2";
+
             if(count >= 10) {
-                icon.innerText = '🏅';
-                icon.style.backgroundColor = '#FFD755';
+                icon.innerText = '👑';
+                icon.classList.add('badge-god');
                 title.innerText = "เทพเจ้ากะเพรา";
                 title.style.color = '#d97706';
             } else if(count >= 5) {
                 icon.innerText = '😎';
+                icon.classList.add('badge-regular');
                 title.innerText = "ลูกค้าประจำ";
+                title.style.color = '#1e40af';
             } else {
-                icon.innerText = '🔒';
+                icon.innerText = '🐣';
+                icon.classList.add('badge-newbie');
+                title.innerText = "มือใหม่หัดกิน";
+                title.style.color = '#d97706';
             }
         }
 
@@ -1191,20 +1104,16 @@
                     }
                 });
                 
-                const banner = document.getElementById('hero-banner');
                 const title = document.getElementById('section-title');
                 
                 msg.classList.add('hidden');
                 msg.classList.remove('page-out');
-                banner.classList.remove('hidden');
 
                 if (cat === 'promotion') {
                     title.innerText = "คูปอง & โปรโมชั่น";
-                    banner.classList.add('hidden');
                     renderPromotions();
                 } else if (cat === 'dessert') {
                     title.innerText = "เมนูของหวาน";
-                    banner.classList.add('hidden'); 
                     msg.classList.remove('hidden'); 
                     renderMenu();
                 } else {
@@ -2035,132 +1944,6 @@
         enableSwipeToClose(document.getElementById('modal-content'), document.getElementById('modal-scroll-area'), closeModal);
         enableSwipeToClose(document.getElementById('checkout-sheet'), document.getElementById('cart-list-container'), closeCheckout);
         enableSwipeToClose(document.getElementById('tickets-sheet'), document.getElementById('tickets-list'), closeMyTickets);
-
-        // --- DELETED: PULL TO REFRESH LOGIC WAS HERE ---
-
-        function toggleAIChef() {
-            const wrapper = document.getElementById('ai-wrapper');
-            if(wrapper.style.display === 'none') return;
-            const modal = document.getElementById('ai-modal');
-            const isOpen = !modal.classList.contains('hidden');
-            if(isOpen) {
-                modal.classList.add('opacity-0');
-                setTimeout(() => modal.classList.add('hidden'), 300);
-            } else {
-                modal.classList.remove('hidden');
-                setTimeout(() => modal.classList.remove('opacity-0'), 10);
-            }
-        }
-
-        function initDraggableAI() {
-            const aiBtn = document.getElementById('ai-wrapper');
-            const trigger = document.getElementById('ai-trigger-btn');
-            let isDragging = false;
-            let startX, startY, initialLeft, initialTop;
-            
-            function dragStart(e) {
-                if (e.target.closest('button[onclick*="hideAIButton"]')) return;
-                const clientX = e.clientX || e.touches[0].clientX;
-                const clientY = e.clientY || e.touches[0].clientY;
-                initialLeft = aiBtn.offsetLeft;
-                initialTop = aiBtn.offsetTop;
-                startX = clientX;
-                startY = clientY;
-                isDragging = true;
-                aiBtn.style.bottom = 'auto';
-                aiBtn.style.right = 'auto';
-                aiBtn.style.left = initialLeft + 'px';
-                aiBtn.style.top = initialTop + 'px';
-                trigger.classList.remove('animate-bounce-slow');
-            }
-            
-            function dragMove(e) {
-                if (!isDragging) return;
-                e.preventDefault();
-                const clientX = e.clientX || e.touches[0].clientX;
-                const clientY = e.clientY || e.touches[0].clientY;
-                const deltaX = clientX - startX;
-                const deltaY = clientY - startY;
-                let newLeft = initialLeft + deltaX;
-                let newTop = initialTop + deltaY;
-                const maxX = window.innerWidth - aiBtn.offsetWidth;
-                const maxY = window.innerHeight - aiBtn.offsetHeight;
-                newLeft = Math.max(0, Math.min(newLeft, maxX));
-                newTop = Math.max(0, Math.min(newTop, maxY));
-                aiBtn.style.left = newLeft + 'px';
-                aiBtn.style.top = newTop + 'px';
-            }
-            
-            function dragEnd() {
-                isDragging = false;
-            }
-            
-            aiBtn.addEventListener('mousedown', dragStart);
-            aiBtn.addEventListener('touchstart', dragStart, {passive: false});
-            window.addEventListener('mousemove', dragMove);
-            window.addEventListener('touchmove', dragMove, {passive: false});
-            window.addEventListener('mouseup', dragEnd);
-            window.addEventListener('touchend', dragEnd);
-        }
-        initDraggableAI();
-
-        function hideAIButton(e) {
-            e.stopPropagation();
-            document.getElementById('ai-wrapper').style.display = 'none';
-        }
-        
-        function aiAppendMsg(text, isUser = false) {
-            const body = document.getElementById('ai-chat-body');
-            const div = document.createElement('div');
-            div.className = isUser 
-                ? "self-end bg-brand-purple text-white p-3 rounded-2xl rounded-tr-none shadow-sm max-w-[80%] text-sm scale-in"
-                : "self-start bg-white p-3 rounded-2xl rounded-tl-none border border-gray-100 shadow-sm max-w-[80%] text-sm text-gray-600 scale-in";
-            div.innerText = text;
-            body.appendChild(div);
-            body.scrollTop = body.scrollHeight;
-        }
-
-        function aiSuggest(mood) {
-            aiAppendMsg(mood, true);
-            const body = document.getElementById('ai-chat-body');
-            const typing = document.createElement('div');
-            typing.id = 'ai-typing';
-            typing.className = "self-start bg-white p-4 rounded-2xl rounded-tl-none border border-gray-100 shadow-sm flex gap-1";
-            typing.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
-            body.appendChild(typing);
-            body.scrollTop = body.scrollHeight;
-
-            setTimeout(() => {
-                document.getElementById('ai-typing').remove();
-                let reply = "";
-                let suggestItem = null;
-                if(mood.includes('หิว')) { reply = "หิวมากต้องจัดหนัก! กะเพราสันคอพิเศษไข่ดาวไปเลยครับ"; suggestItem = menuItems.find(i=>i.name.includes('สันคอ')); }
-                else if(mood.includes('เศร้า')) { reply = "วันเศร้าๆ ต้องกินของอร่อยเยียวยาใจ ไข่ข้นนุ่มๆ ช่วยได้นะ"; suggestItem = menuItems.find(i=>i.name.includes('ไข่ข้น')); }
-                else if(mood.includes('อ้วน')) { reply = "คุมน้ำหนักหรอ? งั้นกะเพราหมูสับไม่ใส่น้ำมัน ไข่ต้มมั้ยครับ"; suggestItem = menuItems.find(i=>i.name.includes('หมูสับ')); }
-                else if(mood.includes('แฮงค์')) { reply = "ซดน้ำร้อนๆ ให้ตาสว่าง ต้องมาม่าผัดกะเพราแซ่บๆ!"; suggestItem = menuItems.find(i=>i.name.includes('มาม่า')); }
-                else { reply = "อารมณ์นี้... ผมแนะนำเมนูนี้เลย รับรองเด็ด!"; suggestItem = menuItems[Math.floor(Math.random() * menuItems.length)]; }
-                aiAppendMsg(reply);
-                if(suggestItem) {
-                    setTimeout(() => {
-                            const btn = document.createElement('button');
-                            btn.className = "self-center mt-2 bg-brand-yellow px-4 py-2 rounded-full text-xs font-bold shadow-md hover:bg-white transition-colors scale-in";
-                            btn.innerText = `สั่ง ${suggestItem.name} เลย!`;
-                            btn.onclick = () => { toggleAIChef(); openModal(suggestItem); };
-                            body.appendChild(btn);
-                            body.scrollTop = body.scrollHeight;
-                    }, 500);
-                }
-            }, 1200);
-        }
-        
-        function aiSendCustom() {
-            const input = document.getElementById('ai-input');
-            const txt = input.value.trim();
-            if(txt) {
-                aiSuggest(txt);
-                input.value = '';
-            }
-        }
 
         document.getElementById('user-name').addEventListener('input', saveToLS);
         renderMenu();
