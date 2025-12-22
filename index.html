@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-4FR74WPRNY"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -947,6 +951,40 @@
             };
             localStorage.setItem(KEYS.USER, JSON.stringify(userState));
         }
+        
+        // --- SYSTEM: AUTO UPDATE CHECKER ---
+        async function checkForUpdate() {
+            try {
+                // ยิงไปที่ Server เพื่อขอไฟล์ index.html (ใส่ timestamp เพื่อไม่ให้ติด Cache)
+                const response = await fetch(window.location.href + '?t=' + new Date().getTime());
+                const text = await response.text();
+                
+                // หาคำว่า CURRENT_VERSION ในไฟล์บน Server
+                const serverVerMatch = text.match(/const CURRENT_VERSION = '([\d.]+)';/);
+                
+                if (serverVerMatch && serverVerMatch[1]) {
+                    const serverVer = serverVerMatch[1];
+                    
+                    // ถ้าเวอร์ชั่นไม่ตรงกัน (Server ใหม่กว่า)
+                    if (serverVer !== CURRENT_VERSION) {
+                        console.log(`New version found: ${serverVer} (Current: ${CURRENT_VERSION})`);
+                        
+                        // เคลียร์ Cache ของ Browser ทิ้งให้หมด
+                        if ('caches' in window) {
+                            try {
+                                const names = await caches.keys();
+                                await Promise.all(names.map(name => caches.delete(name)));
+                            } catch(e) {}
+                        }
+                        
+                        // บังคับโหลดหน้าใหม่จาก Server
+                        window.location.reload(true);
+                    }
+                }
+            } catch (err) {
+                console.log("Check update failed (Offline?)", err);
+            }
+        }
 
         window.addEventListener('load', () => {
             const savedVer = localStorage.getItem(KEYS.VERSION);
@@ -963,6 +1001,16 @@
             updateLevelUI();
             updateMiniCart();
             renderCheckoutList();
+            
+            // เรียกใช้ระบบเช็กอัปเดต (รอ 2 วินาทีหลังจากโหลดเสร็จค่อยเช็ก)
+            setTimeout(checkForUpdate, 2000);
+            
+            // เช็กทุกครั้งที่ลูกค้ากลับเข้ามาหน้าแอป (เช่น สลับแอพไปไลน์แล้วกลับมา)
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') {
+                    checkForUpdate();
+                }
+            });
         });
 
         // --- ACHIEVEMENT UI ENHANCED (NEW ICONS) ---
