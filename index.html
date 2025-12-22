@@ -308,6 +308,52 @@
         .badge-newbie { background: linear-gradient(135deg, #fefce8, #fff7ed); color: #d97706; border: 2px solid #fde68a; }
         .badge-regular { background: linear-gradient(135deg, #dbeafe, #60a5fa); color: #1e40af; border: 2px solid #93c5fd; }
         .badge-god { background: linear-gradient(135deg, #fef3c7, #f59e0b); color: #78350f; border: 2px solid #fcd34d; box-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
+
+        /* --- PET PLAYGROUND STYLES --- */
+        #pet-playground {
+            position: fixed;
+            bottom: calc(4.5rem + env(safe-area-inset-bottom)); /* Sit above tickets/cart bar */
+            left: 0;
+            width: 100%;
+            height: 80px;
+            z-index: 5; /* Low index, behind cart modal */
+            pointer-events: none; /* Let clicks pass through empty space */
+            overflow: hidden;
+        }
+        
+        #active-pet-container {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: auto; /* Enable clicking on the pet */
+            cursor: pointer;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), left 2s ease-in-out;
+        }
+
+        .pet-bounce { animation: petBounce 2s infinite ease-in-out; }
+        @keyframes petBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        
+        .pet-walk-left { transform: scaleX(-1); animation: petWalk 0.5s infinite steps(2); }
+        .pet-walk-right { transform: scaleX(1); animation: petWalk 0.5s infinite steps(2); }
+        @keyframes petWalk { 0% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+
+        .pet-heart {
+            position: absolute;
+            font-size: 20px;
+            color: #ff4757;
+            animation: floatHeart 1s ease-out forwards;
+            pointer-events: none;
+        }
+        @keyframes floatHeart {
+            0% { transform: translateY(0) scale(0.5); opacity: 0; }
+            50% { opacity: 1; transform: translateY(-20px) scale(1.2); }
+            100% { transform: translateY(-40px) scale(1); opacity: 0; }
+        }
     </style>
 </head>
 <body class="pb-32 font-sans select-none relative overflow-x-hidden safe-area-pt">
@@ -323,6 +369,16 @@
 
     <div id="parallax-bg" class="fixed top-0 left-0 w-full h-[120vh] z-[-1] pointer-events-none transition-transform duration-75 ease-out"></div>
     <div id="bubbles-container" class="fixed inset-0 overflow-hidden pointer-events-none z-[-1]"></div>
+
+    <div id="pet-playground">
+        <div id="active-pet-container" onclick="petInteract()">
+            <div id="pet-body" class="text-4xl relative select-none">
+                🐶
+                <div id="pet-hat" class="absolute -top-4 left-1/2 -translate-x-1/2 w-6 h-6 bg-contain bg-no-repeat pointer-events-none hidden" style="background-image: url('https://cdn-icons-png.flaticon.com/512/1830/1830839.png');"></div>
+            </div>
+            <div class="absolute -bottom-1 w-10 h-2 bg-black/10 rounded-full blur-sm"></div>
+        </div>
+    </div>
 
     <div id="welcome-modal" class="fixed inset-0 z-[100] bg-gray-900/80 backdrop-blur-sm flex items-center justify-center p-6 fade-in-up">
         <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full text-center shadow-2xl relative overflow-hidden">
@@ -479,7 +535,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V11.5</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V12.0</p>
         </div>
 
     </div>
@@ -782,6 +838,7 @@
             setTimeout(() => modal.classList.add('hidden'), 300);
             saveToLS();
             updateAvatarDisplay();
+            initPetSystem(); // Update Pet when closed
         }
 
         function selectAvatar(emoji) {
@@ -902,7 +959,7 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '11.5';
+        const CURRENT_VERSION = '12.0';
 
         // ป้องกัน XSS (ลูกค้าใส่ชื่อแปลกๆ)
         function escapeHtml(text) {
@@ -1001,6 +1058,7 @@
             updateLevelUI();
             updateMiniCart();
             renderCheckoutList();
+            initPetSystem(); // START PET
             
             // เรียกใช้ระบบเช็กอัปเดต (รอ 2 วินาทีหลังจากโหลดเสร็จค่อยเช็ก)
             setTimeout(checkForUpdate, 2000);
@@ -1046,6 +1104,98 @@
                 title.innerText = "มือใหม่หัดกิน";
                 title.style.color = '#d97706';
             }
+        }
+
+        // --- PET SYSTEM LOGIC ---
+        function initPetSystem() {
+            const petBody = document.getElementById('pet-body');
+            const petHat = document.getElementById('pet-hat');
+            
+            // Set Emoji
+            const emojiText = petBody.childNodes[0]; // First text node
+            if(emojiText) emojiText.textContent = userAvatar.animal;
+            else petBody.innerHTML = userAvatar.animal;
+
+            // Set Hat
+            if(userAvatar.hat) petHat.classList.remove('hidden');
+            else petHat.classList.add('hidden');
+
+            // Set Growth Scale
+            // Logic: Base scale 1. Each order adds 0.05. Max scale 1.5.
+            const scale = Math.min(1.5, 1 + (userStats.orders * 0.05));
+            petBody.style.transform = `scale(${scale})`;
+
+            // Start Wandering
+            petWander();
+        }
+
+        function petWander() {
+            const container = document.getElementById('active-pet-container');
+            const petBody = document.getElementById('pet-body');
+            
+            // Random Behavior Loop
+            setInterval(() => {
+                const action = Math.random();
+                const screenWidth = window.innerWidth;
+                
+                if (action < 0.4) {
+                    // IDLE: Bounce
+                    petBody.className = "text-4xl relative select-none pet-bounce";
+                } else if (action < 0.7) {
+                    // WALK RIGHT
+                    const currentLeft = container.offsetLeft;
+                    if (currentLeft < screenWidth - 80) {
+                        petBody.className = "text-4xl relative select-none pet-walk-right";
+                        container.style.left = (currentLeft + 60) + 'px';
+                    } else {
+                        // Turn back
+                        petBody.className = "text-4xl relative select-none pet-walk-left";
+                        container.style.left = (currentLeft - 60) + 'px';
+                    }
+                } else {
+                    // WALK LEFT
+                    const currentLeft = container.offsetLeft;
+                    if (currentLeft > 20) {
+                        petBody.className = "text-4xl relative select-none pet-walk-left";
+                        container.style.left = (currentLeft - 60) + 'px';
+                    } else {
+                        // Turn back
+                        petBody.className = "text-4xl relative select-none pet-walk-right";
+                        container.style.left = (currentLeft + 60) + 'px';
+                    }
+                }
+            }, 3000); // Change action every 3 seconds
+        }
+
+        function petInteract() {
+            triggerHaptic();
+            const petBody = document.getElementById('pet-body');
+            petBody.classList.remove('pet-bounce', 'pet-walk-left', 'pet-walk-right');
+            void petBody.offsetWidth; // Reset animation
+            petBody.classList.add('pet-bounce'); // Jump!
+            
+            // Create Heart
+            const container = document.getElementById('active-pet-container');
+            const heart = document.createElement('div');
+            heart.innerText = "❤️";
+            heart.className = "pet-heart";
+            container.appendChild(heart);
+            setTimeout(() => heart.remove(), 1000);
+        }
+
+        function feedPet() {
+            const petBody = document.getElementById('pet-body');
+            // Flash effect
+            petBody.style.transition = 'transform 0.2s';
+            const currentScale = Math.min(1.5, 1 + ((userStats.orders + 1) * 0.05)); // +1 for visual feedback
+            petBody.style.transform = `scale(${currentScale + 0.2})`; // Puff up
+            setTimeout(() => {
+                petBody.style.transform = `scale(${currentScale})`; // Settle at new size
+                // Show many hearts
+                for(let i=0; i<3; i++) {
+                    setTimeout(petInteract, i * 200);
+                }
+            }, 200);
         }
 
         // --- WHEEL ---
@@ -1898,6 +2048,9 @@
             sfxOrder.play(); triggerHaptic();
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#FFD755', '#7C77D6', '#FFFFFF'] });
             
+            // FEED PET AND GROW
+            feedPet();
+
             // Record Streak
             recordOrderForStreak();
 
