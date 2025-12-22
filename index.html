@@ -277,22 +277,29 @@
             transform: scale(0.98);
         }
 
-        /* --- AVATAR STYLES --- */
+        /* --- AVATAR STYLES (Verified 3D) --- */
         .avatar-option {
-            font-size: 2rem;
+            width: 65px;
+            height: 65px;
             cursor: pointer;
             transition: transform 0.2s;
             position: relative;
-            width: 50px;
-            height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            background: #f3f4f6;
+            background: #ffffff;
+            padding: 5px;
+            border: 2px solid #f3f4f6;
         }
-        .avatar-option:hover { transform: scale(1.1); background: #e5e7eb; }
-        .avatar-selected { background: #FFD755 !important; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .avatar-option img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+        }
+        .avatar-option:hover { transform: scale(1.1); border-color: #e5e7eb; }
+        .avatar-selected { background: #fffbeb !important; border: 2px solid #FFD755; box-shadow: 0 4px 6px rgba(255, 215, 85, 0.4); }
         
         .chef-hat-overlay {
             width: 40px;
@@ -315,7 +322,7 @@
             bottom: calc(4.5rem + env(safe-area-inset-bottom)); /* Sit above tickets/cart bar */
             left: 0;
             width: 100%;
-            height: 80px;
+            height: 100px;
             z-index: 5; /* Low index, behind cart modal */
             pointer-events: none; /* Let clicks pass through empty space */
             overflow: hidden;
@@ -325,8 +332,8 @@
             position: absolute;
             bottom: 0;
             left: 50%;
-            width: 60px;
-            height: 60px;
+            width: 80px;
+            height: 80px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -335,24 +342,32 @@
             transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), left 2s ease-in-out;
         }
 
+        #pet-body-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
+        }
+
         .pet-bounce { animation: petBounce 2s infinite ease-in-out; }
-        @keyframes petBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        @keyframes petBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
         
         .pet-walk-left { transform: scaleX(-1); animation: petWalk 0.5s infinite steps(2); }
         .pet-walk-right { transform: scaleX(1); animation: petWalk 0.5s infinite steps(2); }
-        @keyframes petWalk { 0% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+        @keyframes petWalk { 0% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 
         .pet-heart {
             position: absolute;
-            font-size: 20px;
+            font-size: 24px;
             color: #ff4757;
             animation: floatHeart 1s ease-out forwards;
             pointer-events: none;
+            z-index: 20;
         }
         @keyframes floatHeart {
             0% { transform: translateY(0) scale(0.5); opacity: 0; }
-            50% { opacity: 1; transform: translateY(-20px) scale(1.2); }
-            100% { transform: translateY(-40px) scale(1); opacity: 0; }
+            50% { opacity: 1; transform: translateY(-30px) scale(1.2); }
+            100% { transform: translateY(-60px) scale(1); opacity: 0; }
         }
     </style>
 </head>
@@ -372,11 +387,11 @@
 
     <div id="pet-playground">
         <div id="active-pet-container" onclick="petInteract()">
-            <div id="pet-body" class="text-4xl relative select-none">
-                🐶
-                <div id="pet-hat" class="absolute -top-4 left-1/2 -translate-x-1/2 w-6 h-6 bg-contain bg-no-repeat pointer-events-none hidden" style="background-image: url('https://cdn-icons-png.flaticon.com/512/1830/1830839.png');"></div>
+            <div id="pet-body" class="w-full h-full relative select-none">
+                <img id="pet-body-img" src="" alt="Pet">
+                <div id="pet-hat" class="absolute -top-6 left-1/2 -translate-x-1/2 w-8 h-8 bg-contain bg-no-repeat pointer-events-none hidden" style="background-image: url('https://cdn-icons-png.flaticon.com/512/1830/1830839.png');"></div>
             </div>
-            <div class="absolute -bottom-1 w-10 h-2 bg-black/10 rounded-full blur-sm"></div>
+            <div class="absolute -bottom-1 w-12 h-3 bg-black/10 rounded-full blur-md"></div>
         </div>
     </div>
 
@@ -410,11 +425,16 @@
     </div>
 
     <div id="avatar-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[120] hidden transition-opacity opacity-0 flex items-center justify-center p-6">
-        <div class="bg-white rounded-[2rem] p-6 max-w-xs w-full shadow-2xl scale-in">
-            <h3 class="text-lg font-bold text-center mb-4 text-gray-800">เลือกตัวละครของคุณ 🐾</h3>
+        <div class="bg-white rounded-[2rem] p-6 max-w-sm w-full shadow-2xl scale-in">
+            <h3 class="text-xl font-bold text-center mb-4 text-gray-800">เลือกเพื่อนซี้ของคุณ 🐾</h3>
             
-            <div class="grid grid-cols-4 gap-3 mb-6" id="avatar-grid">
+            <div class="grid grid-cols-4 gap-4 mb-6" id="avatar-grid">
                 </div>
+
+            <div class="mb-6">
+                 <label class="text-sm font-bold text-gray-700 mb-2 block pl-1">ตั้งชื่อน้อง 💬</label>
+                 <input type="text" id="pet-name-input" maxlength="12" placeholder="เช่น เจ้าตูบ" class="w-full bg-gray-50 border-2 border-gray-100 rounded-xl p-3 text-center font-bold text-brand-purple focus:border-brand-yellow outline-none transition-all">
+            </div>
 
             <div class="flex items-center justify-between bg-gray-50 p-3 rounded-xl mb-6">
                 <span class="text-sm font-bold text-gray-700">ใส่หมวกเชฟ 👨‍🍳</span>
@@ -443,14 +463,17 @@
                 </div>
             </div>
 
-            <div id="header-avatar-btn" onclick="openAvatarModal()" class="w-20 h-20 rounded-full bg-white border-4 border-white shadow-lg flex items-center justify-center relative cursor-pointer active:scale-90 transition-transform">
-                  <span id="avatar-emoji" class="text-4xl z-10 relative mt-1">🐶</span>
-                  
-                  <div id="avatar-hat-container" class="absolute top-[-20px] left-1/2 -translate-x-1/2 z-20"></div>
+            <div class="flex flex-col items-center">
+                 <div id="header-avatar-btn" onclick="openAvatarModal()" class="w-24 h-24 rounded-full bg-white border-4 border-white shadow-xl flex items-center justify-center relative cursor-pointer active:scale-90 transition-transform">
+                      <img id="avatar-img" src="" class="w-20 h-20 z-10 relative object-contain filter drop-shadow-md">
+                      
+                      <div id="avatar-hat-container" class="absolute top-[-25px] left-1/2 -translate-x-1/2 z-20"></div>
 
-                  <div class="absolute bottom-0 right-0 bg-brand-purple rounded-full w-6 h-6 flex items-center justify-center shadow-md border-2 border-white z-30">
-                     <i class="fas fa-pen text-[10px] text-white"></i>
-                  </div>
+                      <div class="absolute bottom-0 right-0 bg-brand-purple rounded-full w-7 h-7 flex items-center justify-center shadow-md border-2 border-white z-30">
+                         <i class="fas fa-pen text-xs text-white"></i>
+                      </div>
+                </div>
+                <p id="avatar-name-display" class="text-xs font-round font-bold text-brand-purple mt-3 tracking-wide bg-white/90 backdrop-blur-sm px-4 py-1 rounded-full shadow-md animate-bounce-slow border border-purple-100">น้องฝึกหัด</p>
             </div>
         </div>
 
@@ -535,7 +558,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V12.0</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V15.0</p>
         </div>
 
     </div>
@@ -707,10 +730,9 @@
     <div id="receipt-capture">
         <div class="bg-white p-6 relative">
             <div class="text-center mb-6">
-                <div class="w-16 h-16 bg-brand-yellow rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm relative">
-                    <div id="receipt-avatar-display" class="text-4xl flex items-center justify-center w-full h-full rounded-full">
-                        🧑‍🍳
-                    </div>
+                <div class="w-16 h-16 bg-brand-yellow rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm relative overflow-hidden">
+                    <img id="receipt-avatar-img" src="" class="w-full h-full object-contain z-10 relative">
+                    <div id="receipt-hat" class="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-8 bg-contain bg-no-repeat pointer-events-none hidden z-20" style="background-image: url('https://cdn-icons-png.flaticon.com/512/1830/1830839.png');"></div>
                 </div>
                 <h2 class="text-2xl font-black text-gray-800 tracking-wider">KAPRAO52</h2>
                 <p class="text-[10px] text-gray-400 tracking-widest uppercase mt-1">Authentic Thai Street Food</p>
@@ -811,21 +833,38 @@
             hideGlobalLoader();
         }, 4000);
 
-        // --- AVATAR LOGIC ---
-        let userAvatar = { animal: '🐶', hat: false };
-        const avatarOptions = ['🐶', '🐱', '🐷', '🦒', '🦁', '🐼', '🐰', '🐨', '🐯', '🐮', '🐸', '🐔'];
+        // --- AVATAR LOGIC (UPDATED for V15.0 - THE REAL FIX) ---
+        // Using High-Quality 3D Microsoft Fluent Emojis via Reliable CDN
+        const avatarOptions = [
+            'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Dog%20face/3D/dog_face_3d.png', // Dog
+            'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Cat%20face/3D/cat_face_3d.png', // Cat
+            'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Tiger%20face/3D/tiger_face_3d.png', // Tiger
+            'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Lion/3D/lion_3d.png', // Lion
+            'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Monkey%20face/3D/monkey_face_3d.png', // Monkey
+            'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Elephant/3D/elephant_3d.png', // Elephant
+            'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Pig%20face/3D/pig_face_3d.png', // Pig
+            'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Chicken/3D/chicken_3d.png', // Chicken
+            'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Panda/3D/panda_3d.png', // Panda
+            'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Frog/3D/frog_3d.png', // Frog
+            'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Giraffe/3D/giraffe_3d.png'  // Giraffe
+        ];
+        
+        // Default state includes name now
+        let userAvatar = { image: avatarOptions[0], hat: false, name: 'น้องฝึกหัด' };
 
         function openAvatarModal() {
             const grid = document.getElementById('avatar-grid');
             grid.innerHTML = '';
-            avatarOptions.forEach(emoji => {
+            avatarOptions.forEach(imgSrc => {
                 const el = document.createElement('div');
-                el.className = `avatar-option ${userAvatar.animal === emoji ? 'avatar-selected' : ''}`;
-                el.innerText = emoji;
-                el.onclick = () => selectAvatar(emoji);
+                el.className = `avatar-option ${userAvatar.image === imgSrc ? 'avatar-selected' : ''}`;
+                el.innerHTML = `<img src="${imgSrc}" alt="avatar">`;
+                el.onclick = () => selectAvatar(imgSrc);
                 grid.appendChild(el);
             });
             document.getElementById('hat-toggle').checked = userAvatar.hat;
+            // Load current name into input
+            document.getElementById('pet-name-input').value = userAvatar.name || '';
             
             const modal = document.getElementById('avatar-modal');
             modal.classList.remove('hidden');
@@ -836,17 +875,25 @@
             const modal = document.getElementById('avatar-modal');
             modal.classList.add('opacity-0');
             setTimeout(() => modal.classList.add('hidden'), 300);
+            
+            // Save Name
+            const nameInput = document.getElementById('pet-name-input').value.trim();
+            if(nameInput) {
+                userAvatar.name = escapeHtml(nameInput);
+            }
+
             saveToLS();
             updateAvatarDisplay();
-            initPetSystem(); // Update Pet when closed
+            initPetSystem(); // Update Pet playground
         }
 
-        function selectAvatar(emoji) {
-            userAvatar.animal = emoji;
+        function selectAvatar(imgSrc) {
+            userAvatar.image = imgSrc;
             // Redraw grid to show selection
             const options = document.querySelectorAll('.avatar-option');
             options.forEach(opt => {
-                if (opt.innerText === emoji) opt.classList.add('avatar-selected');
+                const img = opt.querySelector('img');
+                if (img && img.src === imgSrc) opt.classList.add('avatar-selected');
                 else opt.classList.remove('avatar-selected');
             });
             triggerHaptic();
@@ -857,9 +904,13 @@
         }
 
         function updateAvatarDisplay() {
-            // FIXED: Clearly separate elements to prevent duplication
-            document.getElementById('avatar-emoji').innerText = userAvatar.animal;
+            // Update Header Avatar Image
+            document.getElementById('avatar-img').src = userAvatar.image;
             
+            // Update Header Pet Name (with nice font)
+            const nameDisplay = document.getElementById('avatar-name-display');
+            nameDisplay.innerText = userAvatar.name || 'น้องฝึกหัด';
+
             const hatContainer = document.getElementById('avatar-hat-container');
             hatContainer.innerHTML = ''; // Clear old hat first
 
@@ -959,7 +1010,7 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '12.0';
+        const CURRENT_VERSION = '15.0';
 
         // ป้องกัน XSS (ลูกค้าใส่ชื่อแปลกๆ)
         function escapeHtml(text) {
@@ -978,7 +1029,8 @@
                 if (savedUser) {
                     const u = JSON.parse(savedUser);
                     cart = u.cart || [];
-                    userAvatar = u.avatar || { animal: '🐶', hat: false };
+                    // Migrate avatar data structure if needed, or use default
+                    userAvatar = u.avatar || { image: avatarOptions[0], hat: false, name: 'น้องฝึกหัด' };
                     if(u.name) document.getElementById('user-name').value = u.name;
                 }
 
@@ -1106,24 +1158,21 @@
             }
         }
 
-        // --- PET SYSTEM LOGIC ---
+        // --- PET SYSTEM LOGIC (UPDATED for V15.0) ---
         function initPetSystem() {
-            const petBody = document.getElementById('pet-body');
+            const petBodyImg = document.getElementById('pet-body-img');
             const petHat = document.getElementById('pet-hat');
             
-            // Set Emoji
-            const emojiText = petBody.childNodes[0]; // First text node
-            if(emojiText) emojiText.textContent = userAvatar.animal;
-            else petBody.innerHTML = userAvatar.animal;
+            // Set Image URL instead of emoji
+            petBodyImg.src = userAvatar.image;
 
             // Set Hat
             if(userAvatar.hat) petHat.classList.remove('hidden');
             else petHat.classList.add('hidden');
 
             // Set Growth Scale
-            // Logic: Base scale 1. Each order adds 0.05. Max scale 1.5.
             const scale = Math.min(1.5, 1 + (userStats.orders * 0.05));
-            petBody.style.transform = `scale(${scale})`;
+            document.getElementById('pet-body').style.transform = `scale(${scale})`;
 
             // Start Wandering
             petWander();
@@ -1140,27 +1189,27 @@
                 
                 if (action < 0.4) {
                     // IDLE: Bounce
-                    petBody.className = "text-4xl relative select-none pet-bounce";
+                    petBody.className = "w-full h-full relative select-none pet-bounce";
                 } else if (action < 0.7) {
                     // WALK RIGHT
                     const currentLeft = container.offsetLeft;
                     if (currentLeft < screenWidth - 80) {
-                        petBody.className = "text-4xl relative select-none pet-walk-right";
+                        petBody.className = "w-full h-full relative select-none pet-walk-right";
                         container.style.left = (currentLeft + 60) + 'px';
                     } else {
                         // Turn back
-                        petBody.className = "text-4xl relative select-none pet-walk-left";
+                        petBody.className = "w-full h-full relative select-none pet-walk-left";
                         container.style.left = (currentLeft - 60) + 'px';
                     }
                 } else {
                     // WALK LEFT
                     const currentLeft = container.offsetLeft;
                     if (currentLeft > 20) {
-                        petBody.className = "text-4xl relative select-none pet-walk-left";
+                        petBody.className = "w-full h-full relative select-none pet-walk-left";
                         container.style.left = (currentLeft - 60) + 'px';
                     } else {
                         // Turn back
-                        petBody.className = "text-4xl relative select-none pet-walk-right";
+                        petBody.className = "w-full h-full relative select-none pet-walk-right";
                         container.style.left = (currentLeft + 60) + 'px';
                     }
                 }
@@ -1923,17 +1972,13 @@
             document.querySelector('.receipt-total').innerText = netTotal + '.-';
 
             // SHOW AVATAR ON RECEIPT
-            const receiptAvatar = document.getElementById('receipt-avatar-display');
-            receiptAvatar.innerHTML = userAvatar.animal;
-            // Clear hat in receipt
-            const existingHat = receiptAvatar.querySelector('.chef-hat-overlay');
-            if (existingHat) existingHat.remove();
+            const receiptAvatar = document.getElementById('receipt-avatar-img');
+            receiptAvatar.src = userAvatar.image;
             
-            if (userAvatar.hat) {
-                const hat = document.createElement('div');
-                hat.className = 'chef-hat-overlay';
-                receiptAvatar.appendChild(hat);
-            }
+            // Show hat in receipt
+            const receiptHat = document.getElementById('receipt-hat');
+            if (userAvatar.hat) receiptHat.classList.remove('hidden');
+            else receiptHat.classList.add('hidden');
 
             const itemsContainer = document.querySelector('.receipt-items');
             itemsContainer.innerHTML = '';
