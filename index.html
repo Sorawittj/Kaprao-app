@@ -54,7 +54,7 @@
     </script>
 
     <style>
-        /* แก้ไข: เปลี่ยน contain เป็น none เพื่อป้องกัน iOS เด้ง */
+        /* แก้ไขจุดที่ 1: เปลี่ยน contain เป็น none เพื่อป้องกัน iOS เด้งและรีเฟรชเอง */
         body { background-color: #F5F7FB; color: #2D3436; -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; }
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
@@ -522,7 +522,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V10.4</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V10.5</p>
         </div>
 
     </div>
@@ -828,18 +828,6 @@
             });
         }
 
-        const CURRENT_VERSION = '10.4';
-        window.addEventListener('load', () => {
-            const savedVer = localStorage.getItem('kaprao_ver');
-            if(savedVer !== CURRENT_VERSION) {
-                localStorage.setItem('kaprao_ver', CURRENT_VERSION);
-            }
-            setTimeout(autoCheckLottery, 1000);
-            updateTicketBadge();
-            updateStreak(); 
-            loadAvatar(); // Load Avatar
-        });
-
         setTimeout(() => {
             hideGlobalLoader();
         }, 4000);
@@ -988,30 +976,86 @@
         let activeCategory = 'kaprao';
         let discountValue = 0;
         let modalQty = 1;
-        let userStats = JSON.parse(localStorage.getItem('kaprao_stats')) || { orders: 0 };
-        let lottoHistory = JSON.parse(localStorage.getItem('kaprao_lotto_history')) || [];
+        let userStats = { orders: 0 }; // Default Value
+        let lottoHistory = []; // Default Value
         
         const addonIds = ['special', 'kaikhon', 'kaidao', 'kaijiao', 'kaitom', 'kaiyiewma'];
         const addonCalories = { 'special': 80, 'kaikhon': 150, 'kaidao': 120, 'kaijiao': 200, 'kaitom': 75, 'kaiyiewma': 100 };
 
+        // ----------------------------------------------------
+        // ส่วนจัดการข้อมูลลูกค้า (แก้ไขจุดที่ 3: ระบบเซฟปลอดภัย)
+        // ----------------------------------------------------
+        
+        // 1. กำหนดชื่อกุญแจให้คงที่ (ห้ามเปลี่ยนค่าในนี้)
+        const KEYS = {
+            USER: 'kaprao52_user',
+            HISTORY: 'kaprao_lotto_history',
+            STATS: 'kaprao_stats',
+            VERSION: 'kaprao_ver'
+        };
+
+        const CURRENT_VERSION = '10.5';
+
+        // ฟังก์ชันโหลดข้อมูลแบบปลอดภัย (Safe Load)
+        function loadUserDataSafe() {
+            try {
+                // โหลดข้อมูลผู้ใช้ (ตะกร้า, ชื่อ, อวตาร)
+                const savedUser = localStorage.getItem(KEYS.USER);
+                if (savedUser) {
+                    const u = JSON.parse(savedUser);
+                    cart = u.cart || [];
+                    userAvatar = u.avatar || { animal: '🐶', hat: false };
+                    if(u.name) document.getElementById('user-name').value = u.name;
+                }
+
+                // โหลดประวัติหวย
+                const savedHistory = localStorage.getItem(KEYS.HISTORY);
+                if (savedHistory) {
+                    lottoHistory = JSON.parse(savedHistory) || [];
+                }
+
+                // โหลดสถิติ
+                const savedStats = localStorage.getItem(KEYS.STATS);
+                if (savedStats) {
+                    userStats = JSON.parse(savedStats) || { orders: 0 };
+                }
+
+                console.log("โหลดข้อมูลลูกค้าเรียบร้อย ไม่หายแน่นอน!");
+
+            } catch (error) {
+                console.error("เกิดข้อผิดพลาดในการโหลดข้อมูล:", error);
+                showToast("พบปัญหาข้อมูลเล็กน้อย ระบบกำลังกู้คืน...");
+            }
+        }
+
+        // ฟังก์ชันเซฟ (ใช้ Key เดิม)
         function saveToLS() {
             const userState = { 
                 cart: cart, 
                 name: document.getElementById('user-name').value,
                 avatar: userAvatar 
             };
-            localStorage.setItem('kaprao52_user', JSON.stringify(userState));
+            localStorage.setItem(KEYS.USER, JSON.stringify(userState));
         }
 
+        // เริ่มต้นระบบ
         window.addEventListener('load', () => {
-             const u = JSON.parse(localStorage.getItem('kaprao52_user'));
-             if(u){
-                 cart = u.cart || [];
-                 if(u.name) document.getElementById('user-name').value = u.name;
-                 updateMiniCart();
-                 renderCheckoutList();
-             }
-             updateLevelUI();
+            const savedVer = localStorage.getItem(KEYS.VERSION);
+            if(savedVer !== CURRENT_VERSION) {
+                localStorage.setItem(KEYS.VERSION, CURRENT_VERSION);
+            }
+
+            // เรียกใช้ฟังก์ชันโหลดข้อมูลใหม่
+            loadUserDataSafe();
+
+            // อัปเดตหน้าจอ
+            setTimeout(autoCheckLottery, 1000);
+            updateTicketBadge();
+            updateStreak(); 
+            updateAvatarDisplay();
+            updateLevelUI();
+            updateMiniCart();
+            renderCheckoutList();
         });
 
         // --- ACHIEVEMENT UI ---
@@ -1491,7 +1535,7 @@
                 customerName: name 
             };
             lottoHistory.unshift(ticket);
-            localStorage.setItem('kaprao_lotto_history', JSON.stringify(lottoHistory));
+            localStorage.setItem(KEYS.HISTORY, JSON.stringify(lottoHistory));
             updateTicketBadge();
         }
 
@@ -1526,7 +1570,7 @@
                 }
             });
             if (updated) {
-                localStorage.setItem('kaprao_lotto_history', JSON.stringify(lottoHistory));
+                localStorage.setItem(KEYS.HISTORY, JSON.stringify(lottoHistory));
                 if(winCount > 0) {
                     sfxWin.play();
                     confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
@@ -1895,7 +1939,7 @@
             recordOrderForStreak();
 
             userStats.orders++;
-            localStorage.setItem('kaprao_stats', JSON.stringify(userStats));
+            localStorage.setItem(KEYS.STATS, JSON.stringify(userStats));
             updateLevelUI();
             let subtotal = cart.reduce((sum, i) => sum + i.price, 0);
             let netTotal = Math.max(0, subtotal - discountValue);
