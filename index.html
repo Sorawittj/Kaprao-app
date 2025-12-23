@@ -39,7 +39,7 @@
                             purple: '#7C77D6', 
                             yellow: '#FFD755', 
                             bg: '#F5F7FB',        
-                            text: '#2D3436',     
+                            text: '#2D3436',      
                         }
                     },
                     fontFamily: {
@@ -793,6 +793,10 @@
     </div>
 
     <script>
+        // --- GOOGLE SHEET CONFIG ---
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw0RU3dBQQkuGOVicVGnVIgGKOWidVvFZ3iRk0RUpeQbZGZ88VNfxlT2dnMRbeyhy8/exec'; 
+        // ---------------------------
+
         // --- SOUNDS ---
         const sfxPop = new Audio('https://www.soundjay.com/buttons/sounds/button-3.mp3');
         const sfxOrder = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
@@ -2111,10 +2115,13 @@
             }, 500);
         }
 
-        function submitOrderToLine() {
+        // --- UPDATED: SEND TO GOOGLE SHEET & LINE ---
+        async function submitOrderToLine() {
             const name = document.getElementById('user-name').value.trim();
             if (!name) return showToast('กรุณาใส่ชื่อผู้สั่ง');
-            showGlobalLoader("กำลังส่งออเดอร์...");
+
+            // 1. Show Loading
+            showGlobalLoader("กำลังบันทึกและส่งออเดอร์...");
             sfxOrder.play(); triggerHaptic();
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#FFD755', '#7C77D6', '#FFFFFF'] });
             
@@ -2128,10 +2135,43 @@
             localStorage.setItem(KEYS.STATS, JSON.stringify(userStats));
             updateLevelUI();
             
-            // Re-calculate Total Freshly (Safety Check)
+            // Calculate Totals
             let subtotal = cart.reduce((sum, i) => sum + i.price, 0);
             let netTotal = Math.max(0, subtotal - discountValue);
             
+            // 2. Prepare Data for Google Sheet
+            const allNotes = cart.filter(i => i.note).map(i => i.note).join(", ");
+            const sheetData = {
+                orderId: currentOrderId,
+                name: name,
+                items: cart,
+                totalPrice: subtotal,
+                discount: discountValue,
+                netTotal: netTotal,
+                allNotes: allNotes
+            };
+
+            // 3. Send to Google Sheet (using fetch with no-cors to avoid simple CORS issues)
+            if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
+                try {
+                    await fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors', // สำคัญมากสำหรับการส่งจากหน้าเว็บธรรมดา
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(sheetData)
+                    });
+                    console.log("Order sent to Sheet successfully");
+                } catch (err) {
+                    console.error("Error sending to sheet:", err);
+                    // ไม่ต้อง alert user เพราะเรายังจะส่งไป LINE ต่อ
+                }
+            } else {
+                console.warn("ยังไม่ได้ใส่ลิงก์ Google Script");
+            }
+
+            // 4. Generate LINE Message
             const now = new Date().toLocaleString('th-TH');
             let msg = `🔥 ออเดอร์ใหม่! [${currentOrderId}]\n`;
             msg += `🎟️ เลขลุ้นหวย: ${currentOrderId.slice(-2)}\n`;
@@ -2161,6 +2201,7 @@
                  return;
             }
 
+            // 5. Redirect to LINE
             setTimeout(() => {
                 window.location.href = `https://line.me/R/msg/text/?${encodedMsg}`;
                 cart = []; 
