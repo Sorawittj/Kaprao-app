@@ -39,7 +39,7 @@
                             purple: '#7C77D6', 
                             yellow: '#FFD755', 
                             bg: '#F5F7FB',        
-                            text: '#2D3436',      
+                            text: '#2D3436',       
                         }
                     },
                     fontFamily: {
@@ -470,7 +470,7 @@
                       <div id="avatar-hat-container" class="absolute top-[-25px] left-1/2 -translate-x-1/2 z-20"></div>
 
                       <div class="absolute bottom-0 right-0 bg-brand-purple rounded-full w-7 h-7 flex items-center justify-center shadow-md border-2 border-white z-30">
-                         <i class="fas fa-pen text-xs text-white"></i>
+                          <i class="fas fa-pen text-xs text-white"></i>
                       </div>
                 </div>
                 <p id="avatar-name-display" class="text-xs font-round font-bold text-brand-purple mt-3 tracking-wide bg-white/90 backdrop-blur-sm px-4 py-1 rounded-full shadow-md animate-bounce-slow border border-purple-100">น้องฝึกหัด</p>
@@ -2157,7 +2157,7 @@
             }, 500);
         }
 
-        // --- UPDATED: SEND TO GOOGLE SHEET & LINE ---
+        // --- UPDATED: SEND TO GOOGLE SHEET & LINE OA DIRECTLY ---
         async function submitOrderToLine() {
             const name = document.getElementById('user-name').value.trim();
             if (!name) return showToast('กรุณาใส่ชื่อผู้สั่ง');
@@ -2165,12 +2165,10 @@
             // 1. Show Loading
             showGlobalLoader("กำลังบันทึกและส่งออเดอร์...");
             sfxOrder.play(); triggerHaptic();
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#FFD755', '#7C77D6', '#FFFFFF'] });
+            // ลดจำนวน confetti เล็กน้อยเพื่อประสิทธิภาพ
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#FFD755', '#7C77D6', '#FFFFFF'] });
             
-            // FEED PET AND GROW
             feedPet();
-
-            // Record Streak
             recordOrderForStreak();
 
             userStats.orders++;
@@ -2193,24 +2191,14 @@
                 allNotes: allNotes
             };
 
-            // 3. Send to Google Sheet (using fetch with no-cors to avoid simple CORS issues)
+            // 3. Send to Google Sheet (Fire and Forget - ไม่รอผลลัพธ์เพื่อความเร็วในการเด้งไลน์)
             if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
-                try {
-                    await fetch(GOOGLE_SCRIPT_URL, {
-                        method: 'POST',
-                        mode: 'no-cors', // สำคัญมากสำหรับการส่งจากหน้าเว็บธรรมดา
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(sheetData)
-                    });
-                    console.log("Order sent to Sheet successfully");
-                } catch (err) {
-                    console.error("Error sending to sheet:", err);
-                    // ไม่ต้อง alert user เพราะเรายังจะส่งไป LINE ต่อ
-                }
-            } else {
-                console.warn("ยังไม่ได้ใส่ลิงก์ Google Script");
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(sheetData)
+                }).catch(err => console.error("Sheet Error:", err));
             }
 
             // 4. Generate LINE Message
@@ -2233,27 +2221,28 @@
                 msg += `🏷️ ส่วนลด: -${discountValue} บาท\n`;
             }
             msg += `💰 ยอดสุทธิ: ${netTotal} บาท\n`;
+            
             saveTicketToHistory(currentOrderId, netTotal);
             
-            // Check URL Limit
+            // Encode Message
             const encodedMsg = encodeURIComponent(msg);
-            if(encodedMsg.length > 1800) {
-                 hideGlobalLoader();
-                 alert("⚠️ รายการอาหารเยอะเกินไป ระบบ LINE ไม่รองรับ \nกรุณาแบ่งสั่งเป็น 2 บิลนะครับ");
-                 return;
-            }
 
-            // 5. Redirect to LINE
+            // 5. Redirect Logic (แก้ไขใหม่)
+            // ใช้ URL Scheme แบบเข้ารหัส @ เป็น %40 เพื่อความชัวร์
+            const lineOAId = "%40772ysswn"; // @772ysswn encoded
+            const targetUrl = `https://line.me/R/oaMessage/${lineOAId}/?${encodedMsg}`;
+
+            // *สำคัญ* ลดเวลาหน่วงเหลือแค่นิดเดียวเพื่อให้ Browser ไม่บล็อกการเด้ง
             setTimeout(() => {
-                window.location.href = `https://line.me/R/msg/text/?${encodedMsg}`;
                 cart = []; 
                 saveToLS();
                 updateMiniCart();
                 closeCheckout();
-                setTimeout(() => {
-                    hideGlobalLoader(); 
-                }, 1000);
-            }, 800);
+                hideGlobalLoader();
+                
+                // สั่งเด้งทันที
+                window.location.href = targetUrl;
+            }, 100); // รอแค่ 0.1 วินาที (จากเดิม 0.8)
         }
 
         function randomMenu() {
