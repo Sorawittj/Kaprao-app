@@ -529,6 +529,10 @@
                 <span class="text-xl">🍜</span>
                 <span class="text-xs">เมนูเส้น</span>
             </button>
+            <button onclick="switchCategory('soup')" id="tab-soup" class="snap-start category-pill-inactive min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all">
+                <span class="text-xl">🍲</span>
+                <span class="text-xs">เมนูแกง/ต้ม</span>
+            </button>
             <button onclick="switchCategory('others')" id="tab-others" class="snap-start category-pill-inactive min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all">
                 <span class="text-xl">🍳</span>
                 <span class="text-xs">เมนูไข่/อื่นๆ</span>
@@ -558,7 +562,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V15.0</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V15.2</p>
         </div>
 
     </div>
@@ -969,16 +973,25 @@
             { id: 4, name: "กะเพราหมูเด้ง", price: 50, icon: "🥓", category: "kaprao", reqMeat: false, kcal: 550 },
             { id: 5, name: "กะเพราสันคอ", price: 50, icon: "🥩", category: "kaprao", reqMeat: false, kcal: 600 },
             { id: 6, name: "กะเพราไข่เยี่ยวม้า", price: 60, icon: "⚫", category: "kaprao", reqMeat: false, kcal: 650 },
+            { id: 102, name: "กะเพรากุ้ง", price: 60, icon: "🦐", category: "kaprao", reqMeat: false, kcal: 450, isNew: true },
+            
             { id: 10, name: "มาม่าผัดกะเพรา", price: 50, icon: "🍜", category: "noodle", reqMeat: true, kcal: 450 },
             { id: 1, name: "กะเพราวุ้นเส้น", price: 55, icon: "🍝", category: "noodle", reqMeat: true, kcal: 400 },
+            
             { id: 7, name: "หมูสับกระเทียม", price: 50, icon: "🧄", category: "garlic", reqMeat: false, kcal: 500 },
             { id: 8, name: "สันคอกระเทียม", price: 50, icon: "🍖", category: "garlic", reqMeat: false, kcal: 580 },
             { id: 9, name: "หมูเด้งกระเทียม", price: 50, icon: "🍘", category: "garlic", reqMeat: false, kcal: 530 },
+            { id: 103, name: "กุ้งกระเทียม", price: 60, icon: "🍤", category: "garlic", reqMeat: false, kcal: 480, isNew: true },
+
+            { id: 101, name: "ต้มจืดไข่น้ำ (ไข่เจียว)", price: 40, icon: "🥘", category: "soup", reqMeat: false, kcal: 350, isNew: true },
+
             { id: 11, name: "ข้าวไข่ข้นพริกเผา", price: 40, icon: "🌶️", category: "others", reqMeat: false, desc: "ไข่ 2 ฟอง", kcal: 450 },
             { id: 12, name: "ข้าวไข่ข้น", price: 40, icon: "🍚", category: "others", reqMeat: false, desc: "ไข่ 2 ฟอง", kcal: 380 },
             { id: 13, name: "ข้าวไข่เจียวพริกสด", price: 50, icon: "🥘", category: "others", reqMeat: false, kcal: 420 },
             { id: 14, name: "ข้าวไข่ดาว 3 ฟอง", price: 50, icon: "🍳", category: "others", reqMeat: false, kcal: 480 },
             { id: 15, name: "หน่อไม้ผัดไข่", price: 50, icon: "🎋", category: "others", reqMeat: true, kcal: 300 },
+            { id: 104, name: "ข้าวไข่ข้นกุ้ง", price: 60, icon: "🍳", category: "others", reqMeat: false, kcal: 550, isNew: true },
+
             { id: 20, name: "เฉาก๊วยนมสด", price: 30, icon: "🧊", category: "dessert", reqMeat: false, kcal: 150 },
             { id: 21, name: "กล้วยเชื่อม", price: 25, icon: "🍌", category: "dessert", reqMeat: false, kcal: 220 },
         ];
@@ -1010,7 +1023,7 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '15.0';
+        const CURRENT_VERSION = '15.2';
 
         // ป้องกัน XSS (ลูกค้าใส่ชื่อแปลกๆ)
         function escapeHtml(text) {
@@ -1341,7 +1354,7 @@
             
             setTimeout(() => {
                 activeCategory = cat;
-                ['kaprao', 'garlic', 'noodle', 'others', 'dessert', 'promotion'].forEach(c => {
+                ['kaprao', 'garlic', 'noodle', 'soup', 'others', 'dessert', 'promotion'].forEach(c => {
                     const btn = document.getElementById(`tab-${c}`);
                     if (c === cat) {
                         btn.className = "snap-start category-pill-active min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all transform scale-105";
@@ -1362,6 +1375,9 @@
                 } else if (cat === 'dessert') {
                     title.innerText = "เมนูของหวาน";
                     msg.classList.remove('hidden'); 
+                    renderMenu();
+                } else if (cat === 'soup') {
+                    title.innerText = "เมนูแกง/ต้ม";
                     renderMenu();
                 } else {
                     title.innerText = "รายการแนะนำ";
@@ -1410,10 +1426,16 @@
                 
                 const contentStyle = isDessert ? 'opacity-60 grayscale-[50%]' : '';
 
+                // NEW BADGE LOGIC
+                const newBadge = item.isNew 
+                    ? `<span class="absolute -top-2 -right-2 bg-red-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full border-2 border-white shadow-sm z-10 animate-pulse">NEW!</span>` 
+                    : '';
+
                 // GRADIENT BORDERS
                 el.innerHTML = `
                     <div class="flex items-center gap-4 ${contentStyle}">
-                        <div class="p-[2px] rounded-2xl bg-gradient-to-br from-brand-yellow to-brand-purple shadow-sm">
+                        <div class="relative p-[2px] rounded-2xl bg-gradient-to-br from-brand-yellow to-brand-purple shadow-sm">
+                            ${newBadge}
                             <div class="w-16 h-16 rounded-2xl bg-white flex items-center justify-center text-3xl">
                                 ${item.icon}
                             </div>
