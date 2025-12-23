@@ -797,6 +797,25 @@
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw0RU3dBQQkuGOVicVGnVIgGKOWidVvFZ3iRk0RUpeQbZGZ88VNfxlT2dnMRbeyhy8/exec'; 
         // ---------------------------
 
+        // --- BACK BUTTON HANDLER (UX FIX) ---
+        let currentOpenModal = null;
+
+        function pushModalState(modalId) {
+            currentOpenModal = modalId;
+            window.history.pushState({ modal: modalId }, null, "");
+        }
+
+        window.addEventListener('popstate', function(event) {
+            if (currentOpenModal) {
+                if (currentOpenModal === 'menu') closeModal(true);
+                else if (currentOpenModal === 'checkout') closeCheckout(true);
+                else if (currentOpenModal === 'tickets') closeMyTickets(true);
+                else if (currentOpenModal === 'avatar') closeAvatarModal(true);
+                
+                currentOpenModal = null;
+            }
+        });
+
         // --- SOUNDS ---
         const sfxPop = new Audio('https://www.soundjay.com/buttons/sounds/button-3.mp3');
         const sfxOrder = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
@@ -861,6 +880,8 @@
         let userAvatar = { image: avatarOptions[0], hat: false, name: 'น้องฝึกหัด' };
 
         function openAvatarModal() {
+            pushModalState('avatar'); // Added History
+
             const grid = document.getElementById('avatar-grid');
             grid.innerHTML = '';
             avatarOptions.forEach(imgSrc => {
@@ -879,7 +900,9 @@
             setTimeout(() => modal.classList.remove('opacity-0'), 10);
         }
 
-        function closeAvatarModal() {
+        function closeAvatarModal(isBackNav = false) {
+            if (!isBackNav && currentOpenModal === 'avatar') { history.back(); return; }
+
             const modal = document.getElementById('avatar-modal');
             modal.classList.add('opacity-0');
             setTimeout(() => modal.classList.add('hidden'), 300);
@@ -893,6 +916,7 @@
             saveToLS();
             updateAvatarDisplay();
             initPetSystem(); // Update Pet playground
+            currentOpenModal = null;
         }
 
         function selectAvatar(imgSrc) {
@@ -1507,6 +1531,8 @@
         }
 
         function openModal(item) {
+            pushModalState('menu'); // Added History
+            
             triggerHaptic();
             currentItem = item;
             modalQty = 1; 
@@ -1533,7 +1559,12 @@
             }, 10);
         }
 
-        function closeModal() {
+        function closeModal(isBackNav = false) {
+            if (!isBackNav && currentOpenModal === 'menu') { 
+                history.back(); // ถ้ากดปุ่ม X บนจอ ให้สั่ง Back เพื่อเคลียร์ History
+                return; 
+            }
+
             const overlay = document.getElementById('modal-overlay');
             const content = document.getElementById('modal-content');
             overlay.classList.add('opacity-0');
@@ -1543,6 +1574,7 @@
                 currentItem = null;
                 content.style.transform = '';
             }, 300);
+            currentOpenModal = null;
         }
 
         function adjustQty(n) {
@@ -1778,6 +1810,8 @@
         }
 
         function openMyTickets() {
+            pushModalState('tickets'); // Added History
+
             triggerHaptic();
             const list = document.getElementById('tickets-list');
             list.innerHTML = '';
@@ -1832,7 +1866,9 @@
             }, 10);
         }
 
-        function closeMyTickets() {
+        function closeMyTickets(isBackNav = false) {
+            if (!isBackNav && currentOpenModal === 'tickets') { history.back(); return; }
+
             const overlay = document.getElementById('tickets-modal-overlay');
             const sheet = document.getElementById('tickets-sheet');
             overlay.classList.add('opacity-0');
@@ -1841,9 +1877,12 @@
                 overlay.classList.add('hidden');
                 sheet.style.transform = '';
             }, 300);
+            currentOpenModal = null;
         }
 
         function openCheckout() {
+            pushModalState('checkout'); // Added History
+
             triggerHaptic();
             renderCheckoutList();
             if(document.getElementById('discount-code').value.trim() !== '' && discountValue > 0) applyDiscount();
@@ -1878,7 +1917,9 @@
             }, 10);
         }
 
-        function closeCheckout() {
+        function closeCheckout(isBackNav = false) {
+            if (!isBackNav && currentOpenModal === 'checkout') { history.back(); return; }
+
             const overlay = document.getElementById('checkout-overlay');
             const sheet = document.getElementById('checkout-sheet');
             overlay.classList.add('opacity-0');
@@ -1887,6 +1928,7 @@
                 overlay.classList.add('hidden');
                 sheet.style.transform = '';
             }, 300);
+            currentOpenModal = null;
         }
 
         function updateMiniCart() {
