@@ -562,7 +562,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V16.3.0</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V16.4.0</p>
         </div>
 
     </div>
@@ -649,7 +649,7 @@
                 <span>ยืนยันการสั่ง</span>
                 <i class="fas fa-paper-plane"></i>
             </button>
-        </div>
+            <div class="h-10"></div> </div>
     </div>
 
     <div id="modal-overlay" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-50 hidden transition-opacity opacity-0" onclick="closeModal()"></div>
@@ -1084,7 +1084,7 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '16.3.0'; // UPDATED VERSION
+        const CURRENT_VERSION = '16.4.0'; // UPDATED VERSION
 
         // ป้องกัน XSS (ลูกค้าใส่ชื่อแปลกๆ)
         function escapeHtml(text) {
@@ -1445,6 +1445,9 @@
                     renderMenu();
                 }
 
+                // FIX: SCROLL TO TOP OF SECTION
+                document.getElementById('section-title').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
                 grid.classList.remove('page-out');
                 grid.classList.add('page-in');
                 setTimeout(() => grid.classList.remove('page-in'), 300);
@@ -1463,13 +1466,22 @@
 
             filteredItems.forEach((item, index) => {
                 const isDessert = item.category === 'dessert';
+                const isSoldOut = item.soldOut || false; // Support Sold Out
+                
                 const el = document.createElement('div');
                 el.style.animationDelay = `${index * 0.05}s`;
                 
-                el.className = `menu-card-style p-4 flex items-center justify-between shadow-sm border border-gray-100 fade-in-up group ${isDessert ? '' : 'cursor-pointer'}`;
+                // Add grayscale if sold out
+                const grayscaleClass = isSoldOut ? 'grayscale opacity-70' : '';
+                const pointerClass = (isDessert || isSoldOut) ? '' : 'cursor-pointer';
+
+                el.className = `menu-card-style p-4 flex items-center justify-between shadow-sm border border-gray-100 fade-in-up group ${pointerClass} ${grayscaleClass}`;
                 
                 el.onclick = () => {
-                    if(isDessert) {
+                    if (isSoldOut) {
+                        showToast('⛔ เมนูนี้หมดชั่วคราวครับ');
+                        triggerHaptic();
+                    } else if (isDessert) {
                         showToast('⏳ เมนูนี้จะพร้อมขายเร็วๆ นี้ครับ');
                         triggerHaptic();
                     } else {
@@ -1477,18 +1489,23 @@
                     }
                 };
 
-                const actionButton = isDessert 
-                    ? `<span class="text-[10px] font-bold text-white bg-gray-400 px-2 py-1 rounded-full">เร็วๆ นี้</span>` 
-                    : `<div class="w-8 h-8 rounded-full bg-brand-yellow text-gray-800 flex items-center justify-center shadow-md"><i class="fas fa-plus text-xs"></i></div>`;
+                let actionButton;
+                if (isSoldOut) {
+                    actionButton = `<span class="text-[10px] font-bold text-white bg-red-400 px-2 py-1 rounded-full">หมด</span>`;
+                } else if (isDessert) {
+                    actionButton = `<span class="text-[10px] font-bold text-white bg-gray-400 px-2 py-1 rounded-full">เร็วๆ นี้</span>`;
+                } else {
+                    actionButton = `<div class="w-8 h-8 rounded-full bg-brand-yellow text-gray-800 flex items-center justify-center shadow-md"><i class="fas fa-plus text-xs"></i></div>`;
+                }
                 
-                const priceDisplay = isDessert
+                const priceDisplay = (isDessert || isSoldOut)
                     ? `<span class="font-bold text-gray-300 text-lg line-through decoration-transparent">${item.price}</span>`
                     : `<span class="font-bold text-gray-700 text-lg">${item.price}</span>`;
                 
-                const contentStyle = isDessert ? 'opacity-60 grayscale-[50%]' : '';
+                const contentStyle = (isDessert || isSoldOut) ? 'opacity-60 grayscale-[50%]' : '';
 
                 // NEW BADGE LOGIC
-                const newBadge = item.isNew 
+                const newBadge = item.isNew && !isSoldOut
                     ? `<span class="absolute -top-2 -right-2 bg-red-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full border-2 border-white shadow-sm z-10 animate-pulse">NEW!</span>` 
                     : '';
 
