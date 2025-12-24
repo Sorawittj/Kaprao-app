@@ -562,7 +562,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V15.3</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V16.0.0</p>
         </div>
 
     </div>
@@ -1044,7 +1044,7 @@
         const addonCalories = { 'special': 80, 'kaikhon': 150, 'kaidao': 120, 'kaijiao': 200, 'kaitom': 75, 'kaiyiewma': 100 };
 
         // ----------------------------------------------------
-        // ส่วนจัดการข้อมูลลูกค้า
+        // ส่วนจัดการข้อมูลลูกค้า (ห้ามลบ Key เดิมเด็ดขาด)
         // ----------------------------------------------------
         
         const KEYS = {
@@ -1054,7 +1054,7 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '15.3';
+        const CURRENT_VERSION = '16.0.0'; // UPDATED VERSION
 
         // ป้องกัน XSS (ลูกค้าใส่ชื่อแปลกๆ)
         function escapeHtml(text) {
@@ -2158,6 +2158,7 @@
         }
 
         // --- UPDATED: SEND TO GOOGLE SHEET & LINE OA DIRECTLY ---
+        // VERSION 16.0.0 FIX: Added keepalive and faster redirect
         async function submitOrderToLine() {
             const name = document.getElementById('user-name').value.trim();
             if (!name) return showToast('กรุณาใส่ชื่อผู้สั่ง');
@@ -2191,13 +2192,14 @@
                 allNotes: allNotes
             };
 
-            // 3. Send to Google Sheet (Fire and Forget - ไม่รอผลลัพธ์เพื่อความเร็วในการเด้งไลน์)
+            // 3. Send to Google Sheet (Fire and Forget but with KEEPALIVE for safety)
             if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
                 fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(sheetData)
+                    body: JSON.stringify(sheetData),
+                    keepalive: true // <--- CRITICAL FIX: Ensures data is sent even if page closes
                 }).catch(err => console.error("Sheet Error:", err));
             }
 
@@ -2227,12 +2229,12 @@
             // Encode Message
             const encodedMsg = encodeURIComponent(msg);
 
-            // 5. Redirect Logic (แก้ไขใหม่)
-            // ใช้ URL Scheme แบบเข้ารหัส @ เป็น %40 เพื่อความชัวร์
-            const lineOAId = "%40772ysswn"; // @772ysswn encoded
+            // 5. Redirect Logic (Using standard OA URL Scheme)
+            const lineOAId = "@772ysswn"; // Correct ID format for scheme
             const targetUrl = `https://line.me/R/oaMessage/${lineOAId}/?${encodedMsg}`;
 
             // *สำคัญ* ลดเวลาหน่วงเหลือแค่นิดเดียวเพื่อให้ Browser ไม่บล็อกการเด้ง
+            // เนื่องจากเรามี keepalive แล้ว ไม่ต้องรอให้ fetch เสร็จ
             setTimeout(() => {
                 cart = []; 
                 saveToLS();
@@ -2242,7 +2244,7 @@
                 
                 // สั่งเด้งทันที
                 window.location.href = targetUrl;
-            }, 100); // รอแค่ 0.1 วินาที (จากเดิม 0.8)
+            }, 50); 
         }
 
         function randomMenu() {
