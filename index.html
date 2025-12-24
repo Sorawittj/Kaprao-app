@@ -562,7 +562,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V16.2.1</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V16.3.0</p>
         </div>
 
     </div>
@@ -1084,7 +1084,7 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '16.2.1'; // UPDATED VERSION
+        const CURRENT_VERSION = '16.3.0'; // UPDATED VERSION
 
         // ป้องกัน XSS (ลูกค้าใส่ชื่อแปลกๆ)
         function escapeHtml(text) {
@@ -2041,14 +2041,31 @@
             showToast('ล้างตะกร้าเรียบร้อย 🗑️');
         }
 
+        // --- UPDATED DISCOUNT LOGIC TO FIX "CANCEL" BUG ---
         function applyDiscount() {
             const code = document.getElementById('discount-code').value.trim().toUpperCase();
             let total = cart.reduce((sum, i) => sum + i.price, 0);
             const msg = document.getElementById('discount-msg');
-            const promo = promotions.find(p => p.code === code);
-            discountValue = 0;
             const inputContainer = document.getElementById('code-input-container');
             const btn = document.getElementById('btn-apply-code');
+            
+            // Reset Discount first
+            discountValue = 0;
+
+            // Case 1: Empty Code (Reset State)
+            if (code === '') {
+                msg.innerText = '';
+                inputContainer.className = "bg-white rounded-xl p-2 pl-4 flex items-center border border-gray-200 shadow-sm justify-between transition-colors";
+                btn.innerHTML = 'ใช้โค้ด';
+                btn.className = 'bg-gray-800 hover:bg-gray-700 text-white text-xs px-4 py-2 rounded-lg transition-colors font-bold whitespace-nowrap active:bg-gray-900';
+                btn.onclick = applyDiscount; // Important Fix: Restore click handler
+                updateTotalSummary();
+                return;
+            }
+
+            const promo = promotions.find(p => p.code === code);
+
+            // Case 2: Success
             if (promo && total >= promo.minOrder) {
                 discountValue = promo.value;
                 msg.innerHTML = `<span class="text-green-600"><i class="fas fa-check-circle"></i> ใช้โค้ดลด ${promo.value} บาท</span>`;
@@ -2056,11 +2073,14 @@
                 btn.innerHTML = '<i class="fas fa-times"></i> ยกเลิก';
                 btn.className = 'bg-red-500 hover:bg-red-600 text-white text-xs px-4 py-2 rounded-lg transition-colors font-bold whitespace-nowrap';
                 btn.onclick = removeDiscount;
-            } else {
+            } 
+            // Case 3: Error (Invalid code or Not enough total)
+            else {
                 msg.innerHTML = `<span class="text-red-400">${promo ? 'ต้องสั่งครบ '+promo.minOrder : 'ไม่พบโค้ด'}</span>`;
-                inputContainer.className = "bg-white rounded-xl p-2 pl-4 flex items-center border border-gray-200 shadow-sm justify-between transition-colors";
+                inputContainer.className = "bg-white rounded-xl p-2 pl-4 flex items-center border border-red-200 shadow-sm justify-between transition-colors"; 
                 btn.innerHTML = 'ใช้โค้ด';
-                btn.className = 'bg-gray-800 hover:bg-gray-700 text-white text-xs px-4 py-2 rounded-lg transition-colors font-bold whitespace-nowrap';
+                btn.className = 'bg-gray-800 hover:bg-gray-700 text-white text-xs px-4 py-2 rounded-lg transition-colors font-bold whitespace-nowrap active:bg-gray-900';
+                btn.onclick = applyDiscount; // Important Fix: Restore click handler
             }
             updateTotalSummary();
         }
