@@ -562,7 +562,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V16.1.0</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V16.2.1</p>
         </div>
 
     </div>
@@ -1027,8 +1027,38 @@
             { id: 21, name: "กล้วยเชื่อม", price: 25, icon: "🍌", category: "dessert", reqMeat: false, kcal: 220 },
         ];
 
+        // --- NEW PROMOTIONS LOGIC (REPLACED MAN U) ---
         const promotions = [
-            { code: "MANU", title: "ส่วนลดแฟนแมนยู 🔴", desc: "สั่งครบ 100.- ลด 5 บาท", minOrder: 100, type: "discount", value: 5, color: "bg-red-600", icon: "⚽" }
+            { 
+                code: "SAVE10", 
+                title: "Set อิ่มคุ้ม (Value) 🥉", 
+                desc: "ครบ 150.- ลด 10 บาท", 
+                minOrder: 150, 
+                type: "discount", 
+                value: 10, 
+                color: "bg-orange-400", 
+                icon: "🥡" 
+            },
+            { 
+                code: "SAVE25", 
+                title: "Set ยกแก๊ง (Gang) 🥈", 
+                desc: "ครบ 300.- ลด 25 บาท", 
+                minOrder: 300, 
+                type: "discount", 
+                value: 25, 
+                color: "bg-blue-500", 
+                icon: "🛵" 
+            },
+            { 
+                code: "SAVE50", 
+                title: "Set จัดเต็ม (Grand) 🥇", 
+                desc: "ครบ 500.- ลด 50 บาท", 
+                minOrder: 500, 
+                type: "discount", 
+                value: 50, 
+                color: "bg-brand-purple", 
+                icon: "🏢" 
+            }
         ];
 
         // --- STATE MANAGEMENT ---
@@ -1054,7 +1084,7 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '16.1.0'; // UPDATED VERSION
+        const CURRENT_VERSION = '16.2.1'; // UPDATED VERSION
 
         // ป้องกัน XSS (ลูกค้าใส่ชื่อแปลกๆ)
         function escapeHtml(text) {
