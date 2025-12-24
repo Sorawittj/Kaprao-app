@@ -562,7 +562,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V16.0.0</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V16.1.0</p>
         </div>
 
     </div>
@@ -1054,7 +1054,7 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '16.0.0'; // UPDATED VERSION
+        const CURRENT_VERSION = '16.1.0'; // UPDATED VERSION
 
         // ป้องกัน XSS (ลูกค้าใส่ชื่อแปลกๆ)
         function escapeHtml(text) {
@@ -1730,10 +1730,32 @@
         }
 
         let currentOrderId = "";
+        
+        // --- UPDATED: GENERATE ORDER ID (UNIQUE CHECK) ---
         function generateOrderId() {
-            const now = Date.now().toString(); 
-            const randomPart = Math.floor(Math.random() * 100).toString().padStart(2, '0');
-            const timePart = now.slice(-2);
+            const now = Date.now().toString();
+            const timePart = now.slice(-2); // เอาเวลาวินาทีมาเป็นส่วนหน้า
+
+            // 1. ดึงเลขที่ลูกค้ามีอยู่แล้ว (เฉพาะใบที่รอผล 'pending')
+            const myPendingNumbers = lottoHistory
+                .filter(t => t.status === 'pending')
+                .map(t => t.number);
+
+            let randomPart;
+            let isDuplicate = true;
+            let attempts = 0;
+
+            // 2. วนลูปสุ่มจนกว่าจะได้เลขที่ไม่ซ้ำ
+            while (isDuplicate && attempts < 500) {
+                randomPart = Math.floor(Math.random() * 100).toString().padStart(2, '0');
+
+                // ถ้าเลขนี้ยังไม่มีในรายการ หรือ ลูกค้ามีตั๋วครบ 100 เบอร์แล้ว (เลี่ยงไม่ได้) ให้หยุดวน
+                if (!myPendingNumbers.includes(randomPart) || myPendingNumbers.length >= 100) {
+                    isDuplicate = false;
+                }
+                attempts++;
+            }
+
             currentOrderId = `KP-${timePart}${randomPart}`;
             return currentOrderId;
         }
@@ -1887,7 +1909,7 @@
             renderCheckoutList();
             if(document.getElementById('discount-code').value.trim() !== '' && discountValue > 0) applyDiscount();
             if(cart.length > 0) {
-                 const lottoId = generateOrderId();
+                 const lottoId = generateOrderId(); // This now generates a UNIQUE ID
                  const listContainer = document.getElementById('cart-list-container');
                  const lottoBanner = document.createElement('div');
                  lottoBanner.className = "bg-gradient-to-r from-brand-purple to-indigo-600 text-white p-4 rounded-xl mb-4 flex justify-between items-center shadow-md relative overflow-hidden";
