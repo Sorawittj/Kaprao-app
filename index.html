@@ -24,7 +24,7 @@
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
     <link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
     
-    <title>Kaprao52 - Cloud</title> 
+    <title>Kaprao52 - Auto Sync</title> 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -401,7 +401,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V18.3.0 (Cloud Ready)</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V18.4.0 (Auto-Migration)</p>
         </div>
 
     </div>
@@ -661,7 +661,7 @@
         const MY_LIFF_ID = '2008781875-6whmY1cf'; 
         
         // --- GOOGLE SHEET CONFIG (UPDATED) ---
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyUyudTYmQXMpN5g6vHIacPmF1Uqxqv0WUGEdaxUscmCuUG53v6nPm-ItEfEGBp6I-K/exec'; 
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxKKzal49kCIjl6TgXfgeHzCBymMGZAQye1kYQhUp3rYL_WodN8bTmjpCl1HAY8oQjj/exec'; 
         // ---------------------------
 
         // --- BACK BUTTON HANDLER ---
@@ -941,7 +941,7 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '18.3.0'; 
+        const CURRENT_VERSION = '18.4.0'; 
 
         function escapeHtml(text) {
             if (!text) return text;
@@ -1039,35 +1039,55 @@
             }
         }
 
-        // --- SYNC DATA SYSTEM (เพิ่มใหม่) ---
+        // --- UPDATED: SYNC WITH AUTO-MIGRATION ---
         async function syncUserStatsFromServer(userId) {
             if(!userId) return;
             
-            // โชว์ว่ากำลังซิงค์ข้อมูล (Optional)
             const levelCount = document.getElementById('level-count');
-            if(levelCount) levelCount.innerText = "↻ กำลังซิงค์...";
+            if(levelCount) levelCount.innerText = "กำลังซิงค์...";
 
             try {
-                // ยิงไปถาม Google Sheet
+                // 1. ดึงข้อมูลจาก Server
                 const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getUserStats&userId=' + userId);
-                const data = await response.json();
+                const serverData = await response.json();
                 
-                console.log("Server Stats:", data);
+                console.log("Server Orders:", serverData.orders);
+                console.log("Local Orders:", userStats.orders);
 
-                // อัปเดตข้อมูลในเครื่องให้ตรงกับ Server
-                if(data && data.orders !== undefined) {
-                    userStats.orders = data.orders;
+                // 2. เช็คเงื่อนไข: ถ้า Server น้อยกว่า Local (แสดงว่าเพิ่ง Login ครั้งแรก หรือเปลี่ยนเครื่องมา)
+                // เราจะเอาส่วนต่าง (Local - Server) ส่งขึ้นไปเติมให้เท่ากัน
+                if (serverData.orders < userStats.orders) {
                     
-                    // บันทึกลงเครื่องเพื่อใช้ครั้งต่อไป
+                    const diff = userStats.orders - serverData.orders;
+                    console.log(`ตรวจพบประวัติเก่า ${diff} รายการ.. กำลังโอนย้ายไป Cloud`);
+
+                    // ส่งคำสั่ง Migrate ไปที่ doPost
+                    await fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'migrate_guest',
+                            userId: userId,
+                            count: diff
+                        })
+                    });
+
+                    // รอแป๊บนึง แล้วดึงข้อมูลใหม่อีกรอบ (Re-sync)
+                    setTimeout(() => syncUserStatsFromServer(userId), 1500);
+                    return; 
+                }
+
+                // 3. ถ้า Server มากกว่า หรือเท่ากัน ก็ใช้ค่าจาก Server ตามปกติ (กรณีเปลี่ยนเครื่องมา)
+                if(serverData && serverData.orders !== undefined) {
+                    userStats.orders = serverData.orders;
                     localStorage.setItem(KEYS.STATS, JSON.stringify(userStats));
-                    
-                    // อัปเดตหน้าจอทันที
                     updateLevelUI();
                 }
                 
             } catch (error) {
                 console.error("Sync Error:", error);
-                // ถ้าซิงค์ไม่ได้ (เช่น เน็ตหลุด) ก็ใช้ข้อมูลเดิมในเครื่องไปก่อน
+                // ถ้า Error ให้ใช้ค่าเดิมในเครื่องไปก่อน
                 updateLevelUI();
             }
         }
@@ -2163,18 +2183,6 @@
             const name = document.getElementById('user-name').value.trim();
             if (!name) return showToast('กรุณาใส่ชื่อผู้สั่ง');
 
-            // --- แก้ไขใหม่: ดึง UserID ให้ชัวร์ที่สุด ---
-            let finalUserId = userAvatar.userId; // 1. ลองดึงจากตัวแปร
-            
-            // 2. ถ้าไม่มี ลองดึงจาก LocalStorage
-            if (!finalUserId) {
-                try {
-                    const saved = JSON.parse(localStorage.getItem(KEYS.USER));
-                    if (saved && saved.userId) finalUserId = saved.userId;
-                } catch (e) {}
-            }
-            // ----------------------------------------
-
             isSubmitting = true;
             const btn = document.getElementById('btn-submit-order');
             const originalText = btn.innerHTML;
@@ -2205,7 +2213,7 @@
                     discount: discountValue,
                     netTotal: netTotal,
                     allNotes: allNotes,
-                    userId: finalUserId || "" // ส่งค่าที่หามาได้ (ถ้าไม่มีส่งค่าว่าง)
+                    userId: userAvatar.userId // Send User ID for tracking
                 };
 
                 if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
