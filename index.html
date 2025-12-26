@@ -58,12 +58,12 @@
     </script>
 
     <style>
-        /* Performance Fixes */
+        /* Base Styles */
         body { 
             color: #1F2937; 
             -webkit-tap-highlight-color: transparent; 
             overscroll-behavior-y: none; 
-            background: #f3f4f6; /* Solid background color for base */
+            background: #f3f4f6; 
         }
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
@@ -76,24 +76,35 @@
         .safe-area-pb { padding-bottom: var(--sab); }
         .safe-area-pb-plus { padding-bottom: calc(1rem + var(--sab)); }
 
-        /* --- OPTIMIZED NEO-STYLE --- */
-        
-        /* Static Mesh Background (No Animation = Fast) */
-        .bg-mesh-static {
+        /* --- BACKGROUND ANIMATION (Optimized) --- */
+        #bubbles-container {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100vh;
+            top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1;
-            background: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
-                        radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
-                        radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
-            background-color: #f3f4f6;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(251, 191, 36, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(167, 243, 208, 0.15) 0px, transparent 50%);
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .bubble {
+            position: absolute;
+            bottom: -100px;
+            background-color: rgba(251, 191, 36, 0.15); /* Yellow Tint */
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatUp linear infinite;
+            z-index: -1;
+        }
+        .bubble.purple {
+            background-color: rgba(139, 92, 246, 0.1); /* Purple Tint */
+        }
+        
+        @keyframes floatUp {
+            0% { transform: translateY(0) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-110vh) translateX(20px); opacity: 0; }
         }
 
-        /* Glass only for static overlays (Header/Modal) */
+        /* --- NEO-GLASS COMPONENTS --- */
         .glass-panel {
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(8px);
@@ -101,11 +112,10 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.5);
         }
         
-        /* FAST CARD (No Blur, Solid Color) */
         .fast-card {
             background: #FFFFFF;
             border: 1px solid #ffffff;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03); /* Softer Shadow */
             border-radius: 1.25rem;
             transition: transform 0.1s cubic-bezier(0.34, 1.56, 0.64, 1);
             position: relative;
@@ -116,7 +126,6 @@
             background: #fafafa;
         }
 
-        /* Modals still use heavy glass because they cover everything */
         .glass-heavy {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -221,7 +230,7 @@
 </head>
 <body class="pb-32 font-sans select-none relative overflow-x-hidden safe-area-pt">
 
-    <div class="bg-mesh-static"></div>
+    <div id="bubbles-container"></div>
 
     <div id="global-loader">
         <div class="relative mb-4">
@@ -392,7 +401,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V18.1.0</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V18.2.0</p>
         </div>
 
     </div>
@@ -823,8 +832,26 @@
             triggerHaptic();
         }
 
-        // --- BUBBLES NOT USED IN NEO GLASS BUT KEPT FOR STRUCTURE COMPAT ---
-        function createBubbles() { /* Placeholder */ }
+        // --- BUBBLES LOGIC (Optimized) ---
+        function createBubbles() {
+            const container = document.getElementById('bubbles-container');
+            const bubbleCount = 15; // Limit count for performance
+            
+            for(let i=0; i<bubbleCount; i++){
+                const b = document.createElement('div');
+                b.className = 'bubble';
+                if(i % 2 === 0) b.classList.add('purple'); // Alternate colors
+                
+                const size = Math.random() * 60 + 20; 
+                b.style.width = size + 'px';
+                b.style.height = size + 'px';
+                b.style.left = Math.random() * 100 + '%';
+                b.style.animationDelay = Math.random() * 15 + 's';
+                b.style.animationDuration = Math.random() * 10 + 15 + 's'; 
+                container.appendChild(b);
+            }
+        }
+        createBubbles();
 
         // DATA
         const menuItems = [
@@ -914,7 +941,7 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '18.1.0'; // Performance Fix
+        const CURRENT_VERSION = '18.2.0'; 
 
         function escapeHtml(text) {
             if (!text) return text;
