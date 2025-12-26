@@ -39,7 +39,7 @@
                             purple: '#7C77D6', 
                             yellow: '#FFD755', 
                             bg: '#F5F7FB',        
-                            text: '#2D3436',       
+                            text: '#2D3436',        
                         }
                     },
                     fontFamily: {
@@ -794,7 +794,7 @@
 
     <script>
         // --- GOOGLE SHEET CONFIG ---
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw0RU3dBQQkuGOVicVGnVIgGKOWidVvFZ3iRk0RUpeQbZGZ88VNfxlT2dnMRbeyhy8/exec'; 
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwl2ywRFbYjotbr-M_Gy22j0Miwri2T11GITvuWRfMg04zl1gCgofPb_1lPAyCxNujc/exec'; 
         // ---------------------------
 
         // --- BACK BUTTON HANDLER (UX FIX) ---
@@ -1178,6 +1178,9 @@
 
             loadUserDataSafe();
 
+            // เรียกฟังก์ชันดึงผลหวยจาก Google Sheet ทันทีที่โหลด
+            fetchLottoResults();
+
             setTimeout(autoCheckLottery, 1000);
             updateTicketBadge();
             updateStreak(); 
@@ -1213,7 +1216,7 @@
             txt.innerText = `${count}/10 ครั้ง`;
             
             // Clear old classes
-            icon.className = "w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-inner transition-all duration-500 border-2";
+            icon.className = "w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-inner transition-all duration-500 border-2 border-gray-100";
 
             if(count >= 10) {
                 icon.innerText = '👑';
@@ -1764,13 +1767,29 @@
             return drawDate;
         }
 
-        const OFFICIAL_RESULTS = {
-             "16/12/2566": "52",
-             "30/12/2566": "99",
-             "17/1/2567": "00",
-             "1/11/2566": "52",
-             "16/11/2566": "99"
-        };
+        // ตัวแปรเก็บผลหวย (เริ่มต้นว่างเปล่า)
+        let OFFICIAL_RESULTS = {};
+
+        // ฟังก์ชันดึงผลหวยจาก Google Sheet
+        async function fetchLottoResults() {
+            try {
+                // ยิงไปขอข้อมูล โดยส่ง action=getLotto
+                const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getLotto');
+                const data = await response.json();
+                
+                // อัปเดตตัวแปรผลรางวัล
+                OFFICIAL_RESULTS = data;
+                
+                console.log("อัปเดตผลหวยเรียบร้อย:", OFFICIAL_RESULTS);
+                
+                // พอได้ผลมาใหม่ ให้สั่งเช็ครางวัลของลูกค้าทันที (เผื่อมีใบที่ pending อยู่)
+                autoCheckLottery(); 
+                
+            } catch (error) {
+                console.error("ไม่สามารถดึงผลหวยได้:", error);
+                // กรณีดึงไม่ได้ อาจจะใช้ผลสำรอง หรือปล่อยว่างไว้
+            }
+        }
 
         function getWinningNumberForDate(dateStr) {
             if (OFFICIAL_RESULTS[dateStr]) return OFFICIAL_RESULTS[dateStr];
