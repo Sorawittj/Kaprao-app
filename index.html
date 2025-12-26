@@ -562,7 +562,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V16.5.0</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V16.5.5</p>
         </div>
 
     </div>
@@ -1085,7 +1085,7 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '16.5.0'; // UPDATED VERSION
+        const CURRENT_VERSION = '16.5.5'; // UPDATED VERSION
 
         // ป้องกัน XSS (ลูกค้าใส่ชื่อแปลกๆ)
         function escapeHtml(text) {
@@ -1096,6 +1096,22 @@
                 .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
+        }
+        
+        // --- NEW HELPER: Standardize Date to CE (DD/MM/YYYY) ---
+        function getStandardDate(dateObj) {
+            if(!dateObj) dateObj = new Date();
+            const d = dateObj.getDate().toString().padStart(2, '0');
+            const m = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+            const y = dateObj.getFullYear(); // Always gets CE (e.g., 2025)
+            return `${d}/${m}/${y}`;
+        }
+
+        function formatTime(dateObj) {
+            if(!dateObj) dateObj = new Date();
+            const h = dateObj.getHours().toString().padStart(2, '0');
+            const m = dateObj.getMinutes().toString().padStart(2, '0');
+            return `${h}:${m}`;
         }
 
         function loadUserDataSafe() {
@@ -1366,7 +1382,7 @@
         }
         function spinWheel() {
             if (wheelSpinning) return;
-            const today = new Date().toLocaleDateString('th-TH');
+            const today = getStandardDate(new Date()); // FIX: Use standard date
             const lastDate = localStorage.getItem('kaprao_spin_date');
             let count = parseInt(localStorage.getItem('kaprao_spin_count') || '0');
 
@@ -1830,13 +1846,17 @@
         function saveTicketToHistory(orderId, totalPrice) {
             const today = new Date();
             const drawDateObj = getNextDrawDate();
-            const drawDateStr = drawDateObj.toLocaleDateString('th-TH');
+            
+            // FIX: Use getStandardDate to force CE (DD/MM/YYYY)
+            const todayStr = getStandardDate(today);
+            const drawDateStr = getStandardDate(drawDateObj);
+
             const name = document.getElementById('user-name').value || 'ลูกค้า';
             
             const ticket = {
                 id: orderId,
                 number: orderId.slice(-2),
-                date: today.toLocaleDateString('th-TH'),
+                date: todayStr,
                 drawDate: drawDateStr,
                 drawDateTimestamp: drawDateObj.getTime(),
                 timestamp: Date.now(),
@@ -1866,7 +1886,9 @@
                 // ✅ แก้ไขเรียบร้อย: เปิดเช็คเวลาเพื่อไม่ให้ตรวจก่อนหวยออก
                 if (now.getTime() < targetDate) return; 
 
-                const winningNum = getWinningNumberForDate(t.drawDate || new Date().toLocaleDateString('th-TH'));
+                // FIX: Use standard date for fallback
+                const winningNum = getWinningNumberForDate(t.drawDate || getStandardDate(new Date()));
+                
                 if (t.number === winningNum) {
                     t.status = 'won';
                     winCount++;
@@ -1880,7 +1902,8 @@
                     t.status = 'lost';
                 }
                 if (winningNum !== "NotSet") {
-                    t.checkedDate = new Date().toLocaleDateString('th-TH');
+                    // FIX: Use standard date
+                    t.checkedDate = getStandardDate(new Date());
                     updated = true;
                 }
             });
@@ -2142,13 +2165,16 @@
         function generateOrderCard() {
             showGlobalLoader("กำลังพิมพ์ใบเสร็จ...");
             const name = document.getElementById('user-name').value || 'ลูกค้า';
-            const now = new Date().toLocaleString('th-TH');
+            
+            // FIX: Use standard date + time
+            const nowStr = `${getStandardDate(new Date())} ${formatTime(new Date())}`;
+
             let subtotal = cart.reduce((sum, i) => sum + i.price, 0);
             let netTotal = Math.max(0, subtotal - discountValue);
 
             // Populate Receipt Data
             document.querySelector('.receipt-id').innerText = currentOrderId || 'KP-XXXX';
-            document.querySelector('.receipt-date').innerText = now;
+            document.querySelector('.receipt-date').innerText = nowStr;
             document.querySelector('.receipt-name').innerText = escapeHtml(name);
             document.querySelector('.receipt-subtotal').innerText = subtotal + '.-';
             document.querySelector('.receipt-discount').innerText = '-' + discountValue + '.-';
@@ -2220,8 +2246,12 @@
             const netTotal = ticket.price; 
             const discount = subtotal - netTotal; 
 
+            // FIX: Use standard date + time
+            const tDate = new Date(ticket.timestamp);
+            const dateStr = `${getStandardDate(tDate)} ${formatTime(tDate)}`;
+
             document.querySelector('.receipt-id').innerText = ticket.id;
-            document.querySelector('.receipt-date').innerText = new Date(ticket.timestamp).toLocaleString('th-TH');
+            document.querySelector('.receipt-date').innerText = dateStr;
             document.querySelector('.receipt-name').innerText = escapeHtml(name);
             document.querySelector('.receipt-subtotal').innerText = subtotal + '.-';
             document.querySelector('.receipt-discount').innerText = '-' + discount + '.-';
@@ -2248,7 +2278,6 @@
             // Delay slightly for rendering then Capture
             setTimeout(() => {
                 const div = document.getElementById('receipt-capture');
-                const tDate = new Date(ticket.timestamp);
                 const filename = `Kaprao_Reprint_${tDate.toISOString().split('T')[0]}.png`;
 
                 html2canvas(div, { 
@@ -2316,10 +2345,12 @@
             }
 
             // 4. Generate LINE Message
-            const now = new Date().toLocaleString('th-TH');
+            // FIX: Use standard date + time
+            const nowStr = `${getStandardDate(new Date())} ${formatTime(new Date())}`;
+            
             let msg = `🔥 ออเดอร์ใหม่! [${currentOrderId}]\n`;
             msg += `🎟️ เลขลุ้นหวย: ${currentOrderId.slice(-2)}\n`;
-            msg += `📅 ${now}\n`;
+            msg += `📅 ${nowStr}\n`;
             msg += `👤 คุณ ${name}\n`;
             msg += `🏅 สั่งครั้งที่: ${userStats.orders}\n`;
             msg += `------------------------\n`;
