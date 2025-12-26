@@ -303,74 +303,11 @@
         .avatar-option:hover { transform: scale(1.1); border-color: #e5e7eb; }
         .avatar-selected { background: #fffbeb !important; border: 2px solid #FFD755; box-shadow: 0 4px 6px rgba(255, 215, 85, 0.4); }
         
-        .chef-hat-overlay {
-            width: 40px;
-            height: 40px;
-            background-image: url('https://cdn-icons-png.flaticon.com/512/1830/1830839.png');
-            background-size: contain;
-            background-repeat: no-repeat;
-            pointer-events: none;
-            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
-        }
-
         /* New Level Badges */
         .badge-newbie { background: linear-gradient(135deg, #fefce8, #fff7ed); color: #d97706; border: 2px solid #fde68a; }
         .badge-regular { background: linear-gradient(135deg, #dbeafe, #60a5fa); color: #1e40af; border: 2px solid #93c5fd; }
         .badge-god { background: linear-gradient(135deg, #fef3c7, #f59e0b); color: #78350f; border: 2px solid #fcd34d; box-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
 
-        /* --- PET PLAYGROUND STYLES --- */
-        #pet-playground {
-            position: fixed;
-            bottom: calc(4.5rem + env(safe-area-inset-bottom)); /* Sit above tickets/cart bar */
-            left: 0;
-            width: 100%;
-            height: 100px;
-            z-index: 5; /* Low index, behind cart modal */
-            pointer-events: none; /* Let clicks pass through empty space */
-            overflow: hidden;
-        }
-        
-        #active-pet-container {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            width: 80px;
-            height: 80px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            pointer-events: auto; /* Enable clicking on the pet */
-            cursor: pointer;
-            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), left 2s ease-in-out;
-        }
-
-        #pet-body-img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
-        }
-
-        .pet-bounce { animation: petBounce 2s infinite ease-in-out; }
-        @keyframes petBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-        
-        .pet-walk-left { transform: scaleX(-1); animation: petWalk 0.5s infinite steps(2); }
-        .pet-walk-right { transform: scaleX(1); animation: petWalk 0.5s infinite steps(2); }
-        @keyframes petWalk { 0% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-
-        .pet-heart {
-            position: absolute;
-            font-size: 24px;
-            color: #ff4757;
-            animation: floatHeart 1s ease-out forwards;
-            pointer-events: none;
-            z-index: 20;
-        }
-        @keyframes floatHeart {
-            0% { transform: translateY(0) scale(0.5); opacity: 0; }
-            50% { opacity: 1; transform: translateY(-30px) scale(1.2); }
-            100% { transform: translateY(-60px) scale(1); opacity: 0; }
-        }
     </style>
 </head>
 <body class="pb-32 font-sans select-none relative overflow-x-hidden safe-area-pt">
@@ -386,16 +323,6 @@
 
     <div id="parallax-bg" class="fixed top-0 left-0 w-full h-[120vh] z-[-1] pointer-events-none transition-transform duration-75 ease-out"></div>
     <div id="bubbles-container" class="fixed inset-0 overflow-hidden pointer-events-none z-[-1]"></div>
-
-    <div id="pet-playground">
-        <div id="active-pet-container" onclick="petInteract()">
-            <div id="pet-body" class="w-full h-full relative select-none">
-                <img id="pet-body-img" src="" alt="Pet">
-                <div id="pet-hat" class="absolute -top-6 left-1/2 -translate-x-1/2 w-8 h-8 bg-contain bg-no-repeat pointer-events-none hidden" style="background-image: url('https://cdn-icons-png.flaticon.com/512/1830/1830839.png');"></div>
-            </div>
-            <div class="absolute -bottom-1 w-12 h-3 bg-black/10 rounded-full blur-md"></div>
-        </div>
-    </div>
 
     <div id="welcome-modal" class="fixed inset-0 z-[100] bg-gray-900/80 backdrop-blur-sm flex items-center justify-center p-6 fade-in-up">
         <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full text-center shadow-2xl relative overflow-hidden">
@@ -428,22 +355,14 @@
 
     <div id="avatar-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[120] hidden transition-opacity opacity-0 flex items-center justify-center p-6">
         <div class="bg-white rounded-[2rem] p-6 max-w-sm w-full shadow-2xl scale-in">
-            <h3 class="text-xl font-bold text-center mb-4 text-gray-800">เลือกเพื่อนซี้ของคุณ 🐾</h3>
+            <h3 class="text-xl font-bold text-center mb-4 text-gray-800">เลือกรูปประจำตัว 👤</h3>
             
             <div class="grid grid-cols-4 gap-4 mb-6" id="avatar-grid">
-                </div>
-
-            <div class="mb-6">
-                 <label class="text-sm font-bold text-gray-700 mb-2 block pl-1">ตั้งชื่อน้อง 💬</label>
-                 <input type="text" id="pet-name-input" maxlength="12" placeholder="เช่น เจ้าตูบ" class="w-full bg-gray-50 border-2 border-gray-100 rounded-xl p-3 text-center font-bold text-brand-purple focus:border-brand-yellow outline-none transition-all">
             </div>
 
-            <div class="flex items-center justify-between bg-gray-50 p-3 rounded-xl mb-6">
-                <span class="text-sm font-bold text-gray-700">ใส่หมวกเชฟ 👨‍🍳</span>
-                <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" id="hat-toggle" class="sr-only peer" onchange="toggleHat()">
-                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-purple"></div>
-                </label>
+            <div class="mb-6">
+                 <label class="text-sm font-bold text-gray-700 mb-2 block pl-1">ชื่อเล่นของคุณ 💬</label>
+                 <input type="text" id="pet-name-input" maxlength="12" placeholder="เช่น พี่กะเพรา" class="w-full bg-gray-50 border-2 border-gray-100 rounded-xl p-3 text-center font-bold text-brand-purple focus:border-brand-yellow outline-none transition-all">
             </div>
 
             <button onclick="closeAvatarModal()" class="w-full bg-brand-yellow text-gray-900 font-bold py-3 rounded-xl shadow-lg active:scale-95 transition-all">
@@ -466,16 +385,14 @@
             </div>
 
             <div class="flex flex-col items-center">
-                 <div id="header-avatar-btn" onclick="openAvatarModal()" class="w-24 h-24 rounded-full bg-white border-4 border-white shadow-xl flex items-center justify-center relative cursor-pointer active:scale-90 transition-transform">
-                      <img id="avatar-img" src="" class="w-20 h-20 z-10 relative object-contain filter drop-shadow-md">
+                 <div id="header-avatar-btn" onclick="openAvatarModal()" class="w-24 h-24 rounded-full bg-white border-4 border-white shadow-xl flex items-center justify-center relative cursor-pointer active:scale-90 transition-transform overflow-hidden">
+                      <img id="avatar-img" src="" class="w-full h-full object-cover">
                       
-                      <div id="avatar-hat-container" class="absolute top-[-25px] left-1/2 -translate-x-1/2 z-20"></div>
-
-                      <div class="absolute bottom-0 right-0 bg-brand-purple rounded-full w-7 h-7 flex items-center justify-center shadow-md border-2 border-white z-30">
+                      <div class="absolute bottom-0 right-0 bg-brand-purple rounded-full w-7 h-7 flex items-center justify-center shadow-md border-2 border-white z-30" style="bottom: 5px; right: 5px;">
                           <i class="fas fa-pen text-xs text-white"></i>
                       </div>
                 </div>
-                <p id="avatar-name-display" class="text-xs font-round font-bold text-brand-purple mt-3 tracking-wide bg-white/90 backdrop-blur-sm px-4 py-1 rounded-full shadow-md animate-bounce-slow border border-purple-100">น้องฝึกหัด</p>
+                <p id="avatar-name-display" class="text-xs font-round font-bold text-brand-purple mt-3 tracking-wide bg-white/90 backdrop-blur-sm px-4 py-1 rounded-full shadow-md border border-purple-100">ลูกค้า</p>
             </div>
         </div>
 
@@ -564,7 +481,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V17.0.0 (LIFF)</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V17.1.1</p>
         </div>
 
     </div>
@@ -737,8 +654,7 @@
         <div class="bg-white p-6 relative">
             <div class="text-center mb-6">
                 <div class="w-16 h-16 bg-brand-yellow rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm relative overflow-hidden">
-                    <img id="receipt-avatar-img" src="" class="w-full h-full object-contain z-10 relative">
-                    <div id="receipt-hat" class="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-8 bg-contain bg-no-repeat pointer-events-none hidden z-20" style="background-image: url('https://cdn-icons-png.flaticon.com/512/1830/1830839.png');"></div>
+                    <img id="receipt-avatar-img" src="" class="w-full h-full object-cover">
                 </div>
                 <h2 class="text-2xl font-black text-gray-800 tracking-wider">KAPRAO52</h2>
                 <p class="text-[10px] text-gray-400 tracking-widest uppercase mt-1">Authentic Thai Street Food</p>
@@ -865,7 +781,7 @@
             hideGlobalLoader();
         }, 4000);
 
-        // --- AVATAR LOGIC (UPDATED for V15.0 - THE REAL FIX) ---
+        // --- AVATAR LOGIC (UPDATED for V17.1.1 - NAME INPUT RESTORED) ---
         // Using High-Quality 3D Microsoft Fluent Emojis via Reliable CDN
         const avatarOptions = [
             'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Dog%20face/3D/dog_face_3d.png', // Dog
@@ -896,10 +812,10 @@
                 el.onclick = () => selectAvatar(imgSrc);
                 grid.appendChild(el);
             });
-            document.getElementById('hat-toggle').checked = userAvatar.hat;
+            
             // Load current name into input
             document.getElementById('pet-name-input').value = userAvatar.name || '';
-            
+
             const modal = document.getElementById('avatar-modal');
             modal.classList.remove('hidden');
             setTimeout(() => modal.classList.remove('opacity-0'), 10);
@@ -916,11 +832,13 @@
             const nameInput = document.getElementById('pet-name-input').value.trim();
             if(nameInput) {
                 userAvatar.name = escapeHtml(nameInput);
+                // Sync with order name input if needed, or just display
+                const orderNameInput = document.getElementById('user-name');
+                if(orderNameInput) orderNameInput.value = userAvatar.name;
             }
 
             saveToLS();
             updateAvatarDisplay();
-            initPetSystem(); // Update Pet playground
             currentOpenModal = null;
         }
 
@@ -936,26 +854,13 @@
             triggerHaptic();
         }
 
-        function toggleHat() {
-            userAvatar.hat = document.getElementById('hat-toggle').checked;
-        }
-
         function updateAvatarDisplay() {
             // Update Header Avatar Image
             document.getElementById('avatar-img').src = userAvatar.image;
             
             // Update Header Pet Name (with nice font)
             const nameDisplay = document.getElementById('avatar-name-display');
-            nameDisplay.innerText = userAvatar.name || 'น้องฝึกหัด';
-
-            const hatContainer = document.getElementById('avatar-hat-container');
-            hatContainer.innerHTML = ''; // Clear old hat first
-
-            if (userAvatar.hat) {
-                const hat = document.createElement('div');
-                hat.className = 'chef-hat-overlay';
-                hatContainer.appendChild(hat);
-            }
+            nameDisplay.innerText = userAvatar.name || 'ลูกค้า';
         }
 
         function loadAvatar() {
@@ -1090,7 +995,7 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '17.0.0'; // UPDATED VERSION
+        const CURRENT_VERSION = '17.1.1'; // UPDATED VERSION
 
         // ป้องกัน XSS (ลูกค้าใส่ชื่อแปลกๆ)
         function escapeHtml(text) {
@@ -1208,7 +1113,6 @@
                     if(profile.pictureUrl) {
                         userAvatar.image = profile.pictureUrl;
                         updateAvatarDisplay();
-                        initPetSystem(); // รีเฟรชหน้า Pet ให้เป็นรูปเรา
                     }
                     
                     saveToLS(); // บันทึกทันที
@@ -1244,7 +1148,6 @@
             updateLevelUI();
             updateMiniCart();
             renderCheckoutList();
-            initPetSystem(); // START PET
             
             // เรียกใช้ระบบเช็กอัปเดต (รอ 2 วินาทีหลังจากโหลดเสร็จค่อยเช็ก)
             setTimeout(checkForUpdate, 2000);
@@ -1290,95 +1193,6 @@
                 title.innerText = "มือใหม่หัดกิน";
                 title.style.color = '#d97706';
             }
-        }
-
-        // --- PET SYSTEM LOGIC (UPDATED for V15.0) ---
-        function initPetSystem() {
-            const petBodyImg = document.getElementById('pet-body-img');
-            const petHat = document.getElementById('pet-hat');
-            
-            // Set Image URL instead of emoji
-            petBodyImg.src = userAvatar.image;
-
-            // Set Hat
-            if(userAvatar.hat) petHat.classList.remove('hidden');
-            else petHat.classList.add('hidden');
-
-            // Set Growth Scale
-            const scale = Math.min(1.5, 1 + (userStats.orders * 0.05));
-            document.getElementById('pet-body').style.transform = `scale(${scale})`;
-
-            // Start Wandering
-            petWander();
-        }
-
-        function petWander() {
-            const container = document.getElementById('active-pet-container');
-            const petBody = document.getElementById('pet-body');
-            
-            // Random Behavior Loop
-            setInterval(() => {
-                const action = Math.random();
-                const screenWidth = window.innerWidth;
-                
-                if (action < 0.4) {
-                    // IDLE: Bounce
-                    petBody.className = "w-full h-full relative select-none pet-bounce";
-                } else if (action < 0.7) {
-                    // WALK RIGHT
-                    const currentLeft = container.offsetLeft;
-                    if (currentLeft < screenWidth - 80) {
-                        petBody.className = "w-full h-full relative select-none pet-walk-right";
-                        container.style.left = (currentLeft + 60) + 'px';
-                    } else {
-                        // Turn back
-                        petBody.className = "w-full h-full relative select-none pet-walk-left";
-                        container.style.left = (currentLeft - 60) + 'px';
-                    }
-                } else {
-                    // WALK LEFT
-                    const currentLeft = container.offsetLeft;
-                    if (currentLeft > 20) {
-                        petBody.className = "w-full h-full relative select-none pet-walk-left";
-                        container.style.left = (currentLeft - 60) + 'px';
-                    } else {
-                        // Turn back
-                        petBody.className = "w-full h-full relative select-none pet-walk-right";
-                        container.style.left = (currentLeft + 60) + 'px';
-                    }
-                }
-            }, 3000); // Change action every 3 seconds
-        }
-
-        function petInteract() {
-            triggerHaptic();
-            const petBody = document.getElementById('pet-body');
-            petBody.classList.remove('pet-bounce', 'pet-walk-left', 'pet-walk-right');
-            void petBody.offsetWidth; // Reset animation
-            petBody.classList.add('pet-bounce'); // Jump!
-            
-            // Create Heart
-            const container = document.getElementById('active-pet-container');
-            const heart = document.createElement('div');
-            heart.innerText = "❤️";
-            heart.className = "pet-heart";
-            container.appendChild(heart);
-            setTimeout(() => heart.remove(), 1000);
-        }
-
-        function feedPet() {
-            const petBody = document.getElementById('pet-body');
-            // Flash effect
-            petBody.style.transition = 'transform 0.2s';
-            const currentScale = Math.min(1.5, 1 + ((userStats.orders + 1) * 0.05)); // +1 for visual feedback
-            petBody.style.transform = `scale(${currentScale + 0.2})`; // Puff up
-            setTimeout(() => {
-                petBody.style.transform = `scale(${currentScale})`; // Settle at new size
-                // Show many hearts
-                for(let i=0; i<3; i++) {
-                    setTimeout(petInteract, i * 200);
-                }
-            }, 200);
         }
 
         // --- WHEEL ---
@@ -2349,7 +2163,7 @@
             sfxOrder.play(); triggerHaptic();
             confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#FFD755', '#7C77D6', '#FFFFFF'] });
             
-            feedPet();
+            // feedPet() removed
             recordOrderForStreak();
 
             userStats.orders++;
@@ -2372,7 +2186,7 @@
                 allNotes: allNotes
             };
 
-            // 3. Send to Google Sheet (Fire and Forget but with KEEPALIVE)
+            // 3. Send to Google Sheet
             if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
                 fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
@@ -2407,35 +2221,45 @@
             
             saveTicketToHistory(currentOrderId, netTotal);
             
-            // 5. Send Message (Check if inside LIFF or External Browser)
+            // เตรียม URL สำหรับเด้งไปหน้าแชท (แผนสำรอง)
+            const encodedMsg = encodeURIComponent(msg);
+            const lineOAId = "@772ysswn"; // ID OA ของคุณ
+            const targetUrl = `https://line.me/R/oaMessage/${lineOAId}/?${encodedMsg}`;
+
+            // 5. Send Message Logic (Smart Fallback)
             if (liff.isInClient() && liff.isLoggedIn()) {
-                // --- CASE 1: Inside LINE App (LIFF) ---
+                // พยายามส่งแบบเนียนๆ ก่อน
                 try {
                     await liff.sendMessages([{
                         type: 'text',
                         text: msg
                     }]);
                     
-                    // Success! Close window
+                    // ถ้าสำเร็จ: ปิดหน้าต่าง LIFF
                     setTimeout(() => {
                         cart = []; 
                         saveToLS();
                         updateMiniCart();
                         closeCheckout();
                         hideGlobalLoader();
-                        liff.closeWindow(); // Close LIFF window automatically
+                        liff.closeWindow(); 
                     }, 1000);
 
                 } catch (err) {
-                    showToast("เกิดข้อผิดพลาดในการส่งข้อความ: " + err);
-                    hideGlobalLoader();
+                    console.error("Send Error:", err);
+                    // ⚠️ ถ้าส่งไม่ผ่าน (เช่น ลืมติ๊ก Permission หรือไม่ได้เปิดจาก Rich Menu)
+                    // ให้ใช้แผนสำรอง: เด้งไปหน้าแชทแทนทันที
+                    setTimeout(() => {
+                        cart = []; 
+                        saveToLS();
+                        updateMiniCart();
+                        closeCheckout();
+                        hideGlobalLoader();
+                        window.location.href = targetUrl; // เด้งไปเลย!
+                    }, 500); 
                 }
             } else {
-                // --- CASE 2: External Browser (Chrome/Safari) ---
-                const encodedMsg = encodeURIComponent(msg);
-                const lineOAId = "@772ysswn"; // OA ID
-                const targetUrl = `https://line.me/R/oaMessage/${lineOAId}/?${encodedMsg}`;
-
+                // ถ้าเปิดใน Chrome/Safari ให้เด้งไปหน้าแชทเลย
                 setTimeout(() => {
                     cart = []; 
                     saveToLS();
