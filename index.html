@@ -1863,11 +1863,8 @@
                 if (t.drawDateTimestamp) targetDate = t.drawDateTimestamp;
                 else targetDate = 0; 
                 
-                // 🔴 จุดที่ต้องแก้: ใส่ // ข้างหน้า เพื่อปิดการใช้งานบรรทัดนี้
-                // if (now.getTime() < targetDate) return; 
-                
-                // 🟢 แก้เป็นแบบนี้ครับ (หรือลบบรรทัดบนทิ้งไปเลยก็ได้)
-                // if (now.getTime() < targetDate) return; 
+                // ✅ แก้ไขเรียบร้อย: เปิดเช็คเวลาเพื่อไม่ให้ตรวจก่อนหวยออก
+                if (now.getTime() < targetDate) return; 
 
                 const winningNum = getWinningNumberForDate(t.drawDate || new Date().toLocaleDateString('th-TH'));
                 if (t.number === winningNum) {
