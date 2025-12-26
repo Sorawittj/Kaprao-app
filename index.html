@@ -24,7 +24,7 @@
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
     <link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
     
-    <title>Kaprao52 - APP</title> 
+    <title>Kaprao52 - Cloud</title> 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -401,7 +401,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V18.2.0 (Sync)</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V18.3.0 (Cloud Ready)</p>
         </div>
 
     </div>
@@ -660,8 +660,8 @@
         // --- LIFF CONFIGURATION ---
         const MY_LIFF_ID = '2008781875-6whmY1cf'; 
         
-        // --- GOOGLE SHEET CONFIG ---
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyo6T5VR4pp5NREYW1BK7NCA0e0TeTpJttanDMpM6Eem1LIDaAknZtlCex2PHN3es6N/exec'; 
+        // --- GOOGLE SHEET CONFIG (UPDATED) ---
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyUyudTYmQXMpN5g6vHIacPmF1Uqxqv0WUGEdaxUscmCuUG53v6nPm-ItEfEGBp6I-K/exec'; 
         // ---------------------------
 
         // --- BACK BUTTON HANDLER ---
@@ -756,7 +756,7 @@
             'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Giraffe/3D/giraffe_3d.png'  
         ];
         
-        let userAvatar = { image: avatarOptions[0], hat: false, name: 'น้องฝึกหัด' };
+        let userAvatar = { image: avatarOptions[0], hat: false, name: 'น้องฝึกหัด', userId: null };
 
         function openAvatarModal() {
             pushModalState('avatar'); 
@@ -941,7 +941,7 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '18.2.0'; 
+        const CURRENT_VERSION = '18.3.0'; 
 
         function escapeHtml(text) {
             if (!text) return text;
@@ -976,6 +976,11 @@
                     cart = u.cart || [];
                     userAvatar = u.avatar || { image: avatarOptions[0], hat: false, name: 'น้องฝึกหัด' };
                     if(u.name) document.getElementById('user-name').value = u.name;
+                    
+                    // Restore userId if available
+                    if (u.userId) {
+                        userAvatar.userId = u.userId;
+                    }
                 }
 
                 const savedHistory = localStorage.getItem(KEYS.HISTORY);
@@ -2158,6 +2163,18 @@
             const name = document.getElementById('user-name').value.trim();
             if (!name) return showToast('กรุณาใส่ชื่อผู้สั่ง');
 
+            // --- แก้ไขใหม่: ดึง UserID ให้ชัวร์ที่สุด ---
+            let finalUserId = userAvatar.userId; // 1. ลองดึงจากตัวแปร
+            
+            // 2. ถ้าไม่มี ลองดึงจาก LocalStorage
+            if (!finalUserId) {
+                try {
+                    const saved = JSON.parse(localStorage.getItem(KEYS.USER));
+                    if (saved && saved.userId) finalUserId = saved.userId;
+                } catch (e) {}
+            }
+            // ----------------------------------------
+
             isSubmitting = true;
             const btn = document.getElementById('btn-submit-order');
             const originalText = btn.innerHTML;
@@ -2188,7 +2205,7 @@
                     discount: discountValue,
                     netTotal: netTotal,
                     allNotes: allNotes,
-                    userId: userAvatar.userId // Send User ID for tracking
+                    userId: finalUserId || "" // ส่งค่าที่หามาได้ (ถ้าไม่มีส่งค่าว่าง)
                 };
 
                 if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
