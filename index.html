@@ -39,7 +39,7 @@
                     colors: {
                         brand: {
                             purple: '#7C77D6', 
-                            yellow: '#FFD755', 
+                            yellow: '#FFD755',
                             bg: '#F5F7FB',        
                             text: '#2D3436',        
                         }
@@ -1057,14 +1057,26 @@
             }
         }
 
+        // ----------------------------------------------------
+        //  UPDATED: SAVE TO LS (เพิ่มการบันทึก userId และกันข้อมูลหาย)
+        // ----------------------------------------------------
         function saveToLS() {
             // Sanitize Name ก่อนเซฟ
             let safeName = escapeHtml(document.getElementById('user-name').value);
+            
+            // ดึงข้อมูลเดิมออกมาก่อน เพื่อคงค่า userId ไว้ (ถ้ามี)
+            let oldData = {};
+            try {
+                oldData = JSON.parse(localStorage.getItem(KEYS.USER)) || {};
+            } catch (e) {}
+
             const userState = { 
+                ...oldData, // เก็บค่าเดิมไว้ก่อน (เช่น userId)
                 cart: cart, 
                 name: safeName,
-                avatar: userAvatar 
+                avatar: userAvatar
             };
+            
             localStorage.setItem(KEYS.USER, JSON.stringify(userState));
         }
         
@@ -1102,30 +1114,61 @@
             }
         }
 
-        // --- LIFF INITIALIZATION ---
+        // ----------------------------------------------------
+        //  UPDATED: INIT LIFF (Smart Merge Logic)
+        // ----------------------------------------------------
         async function initLIFF() {
             try {
                 await liff.init({ liffId: MY_LIFF_ID });
+                
                 if (liff.isLoggedIn()) {
                     const profile = await liff.getProfile();
                     
-                    // Hide Login Button
+                    // ซ่อนปุ่ม Login เพราะเข้าสู่ระบบแล้ว
                     const loginBtn = document.getElementById('line-login-btn');
                     if(loginBtn) loginBtn.classList.add('hidden');
 
-                    // 1. Auto-fill Name (ถ้ายังไม่มีชื่อ)
+                    // --- SMART MERGE LOGIC เริ่มตรงนี้ ---
+                    
+                    // 1. ตรวจสอบว่ามีข้อมูล Guest เดิมอยู่ไหม
+                    let savedUser = {};
+                    try {
+                        savedUser = JSON.parse(localStorage.getItem(KEYS.USER)) || {};
+                    } catch(e) {}
+
+                    // 2. บันทึก LINE User ID ลงไป (สำคัญมากสำหรับการระบุตัวตนในอนาคต)
+                    savedUser.userId = profile.userId;
+
+                    // 3. จัดการชื่อ (ถ้ายังไม่มีชื่อ ให้ใช้ชื่อ LINE)
                     const nameInput = document.getElementById('user-name');
-                    if(nameInput && (!nameInput.value || nameInput.value === '')) {
+                    if(nameInput && (!nameInput.value || nameInput.value.trim() === '')) {
                         nameInput.value = profile.displayName;
+                        savedUser.name = profile.displayName;
                     }
+
+                    // 4. จัดการรูปโปรไฟล์ (เฉพาะถ้ารูปยังเป็น default หรือไม่มีรูป ให้ใช้รูป LINE)
+                    // เช็คว่าเป็นรูปการ์ตูน default หรือไม่
+                    const isDefaultAvatar = avatarOptions.includes(userAvatar.image);
                     
-                    // 2. Auto-fill Avatar (ถ้ามีรูป)
-                    if(profile.pictureUrl) {
+                    if(profile.pictureUrl && (isDefaultAvatar || !userAvatar.image)) {
                         userAvatar.image = profile.pictureUrl;
-                        updateAvatarDisplay();
+                        userAvatar.name = profile.displayName; // อัปเดตชื่อใน Avatar ด้วย
+                        savedUser.avatar = userAvatar;
+                        updateAvatarDisplay(); // อัปเดตหน้าจอทันที
                     }
                     
-                    saveToLS(); // บันทึกทันที
+                    // 5. บันทึกข้อมูลที่ผสานแล้วกลับลงเครื่อง
+                    localStorage.setItem(KEYS.USER, JSON.stringify(savedUser));
+                    
+                    // ถ้าตะกร้าว่างเปล่า แต่ใน savedUser มีของ (เผื่อกรณีโหลดไม่ทัน) ให้โหลดกลับมา
+                    if (cart.length === 0 && savedUser.cart && savedUser.cart.length > 0) {
+                        cart = savedUser.cart;
+                        updateMiniCart();
+                        renderCheckoutList();
+                    }
+
+                    console.log("LIFF Login Sync Complete: History preserved.");
+
                 } else {
                     // ถ้ายังไม่ล็อกอิน และไม่ได้เปิดใน LINE (เช่นเปิดใน Chrome) ให้โชว์ปุ่ม
                     if (!liff.isInClient()) {
@@ -2055,7 +2098,7 @@
             // Show hat in receipt
             const receiptHat = document.getElementById('receipt-hat');
             if (userAvatar.hat) receiptHat.classList.remove('hidden');
-            else receiptHat.classList.add('hidden');
+            else if(receiptHat) receiptHat.classList.add('hidden');
 
             const itemsContainer = document.querySelector('.receipt-items');
             itemsContainer.innerHTML = '';
