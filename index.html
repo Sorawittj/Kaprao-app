@@ -401,7 +401,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V18.2.0</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V18.2.0 (Sync)</p>
         </div>
 
     </div>
@@ -661,7 +661,7 @@
         const MY_LIFF_ID = '2008781875-6whmY1cf'; 
         
         // --- GOOGLE SHEET CONFIG ---
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwl2ywRFbYjotbr-M_Gy22j0Miwri2T11GITvuWRfMg04zl1gCgofPb_1lPAyCxNujc/exec'; 
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyo6T5VR4pp5NREYW1BK7NCA0e0TeTpJttanDMpM6Eem1LIDaAknZtlCex2PHN3es6N/exec'; 
         // ---------------------------
 
         // --- BACK BUTTON HANDLER ---
@@ -1034,6 +1034,39 @@
             }
         }
 
+        // --- SYNC DATA SYSTEM (เพิ่มใหม่) ---
+        async function syncUserStatsFromServer(userId) {
+            if(!userId) return;
+            
+            // โชว์ว่ากำลังซิงค์ข้อมูล (Optional)
+            const levelCount = document.getElementById('level-count');
+            if(levelCount) levelCount.innerText = "↻ กำลังซิงค์...";
+
+            try {
+                // ยิงไปถาม Google Sheet
+                const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getUserStats&userId=' + userId);
+                const data = await response.json();
+                
+                console.log("Server Stats:", data);
+
+                // อัปเดตข้อมูลในเครื่องให้ตรงกับ Server
+                if(data && data.orders !== undefined) {
+                    userStats.orders = data.orders;
+                    
+                    // บันทึกลงเครื่องเพื่อใช้ครั้งต่อไป
+                    localStorage.setItem(KEYS.STATS, JSON.stringify(userStats));
+                    
+                    // อัปเดตหน้าจอทันที
+                    updateLevelUI();
+                }
+                
+            } catch (error) {
+                console.error("Sync Error:", error);
+                // ถ้าซิงค์ไม่ได้ (เช่น เน็ตหลุด) ก็ใช้ข้อมูลเดิมในเครื่องไปก่อน
+                updateLevelUI();
+            }
+        }
+
         // --- INIT LIFF ---
         async function initLIFF() {
             try {
@@ -1051,6 +1084,7 @@
                     } catch(e) {}
 
                     savedUser.userId = profile.userId;
+                    userAvatar.userId = profile.userId; // Store globally for submit order
 
                     const nameInput = document.getElementById('user-name');
                     if(nameInput && (!nameInput.value || nameInput.value.trim() === '')) {
@@ -1073,6 +1107,10 @@
                         updateMiniCart();
                         renderCheckoutList();
                     }
+
+                    // เพิ่มบรรทัดนี้!!! เพื่อซิงค์ยอดสั่งซื้อทุกครั้งที่เข้าแอพ
+                    syncUserStatsFromServer(profile.userId);
+
                 } else {
                     if (!liff.isInClient()) {
                         const loginBtn = document.getElementById('line-login-btn');
@@ -2149,7 +2187,8 @@
                     totalPrice: subtotal,
                     discount: discountValue,
                     netTotal: netTotal,
-                    allNotes: allNotes
+                    allNotes: allNotes,
+                    userId: userAvatar.userId // Send User ID for tracking
                 };
 
                 if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
