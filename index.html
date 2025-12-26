@@ -5,6 +5,8 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
 
+    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-4FR74WPRNY"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -562,7 +564,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V16.5.5</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V17.0.0 (LIFF)</p>
         </div>
 
     </div>
@@ -793,6 +795,9 @@
     </div>
 
     <script>
+        // --- LIFF CONFIGURATION ---
+        const MY_LIFF_ID = '2008781875-6whmY1cf'; // YOUR LIFF ID
+        
         // --- GOOGLE SHEET CONFIG ---
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwl2ywRFbYjotbr-M_Gy22j0Miwri2T11GITvuWRfMg04zl1gCgofPb_1lPAyCxNujc/exec'; 
         // ---------------------------
@@ -1085,7 +1090,7 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '16.5.5'; // UPDATED VERSION
+        const CURRENT_VERSION = '17.0.0'; // UPDATED VERSION
 
         // ป้องกัน XSS (ลูกค้าใส่ชื่อแปลกๆ)
         function escapeHtml(text) {
@@ -1186,6 +1191,38 @@
             }
         }
 
+        // --- LIFF INITIALIZATION ---
+        async function initLIFF() {
+            try {
+                await liff.init({ liffId: MY_LIFF_ID });
+                if (liff.isLoggedIn()) {
+                    const profile = await liff.getProfile();
+                    
+                    // 1. Auto-fill Name (ถ้ายังไม่มีชื่อ)
+                    const nameInput = document.getElementById('user-name');
+                    if(nameInput && (!nameInput.value || nameInput.value === '')) {
+                        nameInput.value = profile.displayName;
+                    }
+                    
+                    // 2. Auto-fill Avatar (ถ้ามีรูป)
+                    if(profile.pictureUrl) {
+                        userAvatar.image = profile.pictureUrl;
+                        updateAvatarDisplay();
+                        initPetSystem(); // รีเฟรชหน้า Pet ให้เป็นรูปเรา
+                    }
+                    
+                    saveToLS(); // บันทึกทันที
+                } else {
+                    // ถ้าเปิดใน LINE แล้วยังไม่ Login ให้ Login เลย
+                    if (liff.isInClient()) {
+                        liff.login();
+                    }
+                }
+            } catch (err) {
+                console.error("LIFF Error", err);
+            }
+        }
+
         window.addEventListener('load', () => {
             const savedVer = localStorage.getItem(KEYS.VERSION);
             if(savedVer !== CURRENT_VERSION) {
@@ -1196,6 +1233,9 @@
 
             // เรียกฟังก์ชันดึงผลหวยจาก Google Sheet ทันทีที่โหลด
             fetchLottoResults();
+
+            // เริ่มระบบ LIFF
+            initLIFF();
 
             setTimeout(autoCheckLottery, 1000);
             updateTicketBadge();
@@ -2298,8 +2338,8 @@
             }, 500);
         }
 
-        // --- UPDATED: SEND TO GOOGLE SHEET & LINE OA DIRECTLY ---
-        // VERSION 16.0.0 FIX: Added keepalive and faster redirect
+        // --- UPDATED: SEND TO GOOGLE SHEET & LINE OA DIRECTLY (LIFF SUPPORT) ---
+        // VERSION 17.0.0 LIFF EDITION
         async function submitOrderToLine() {
             const name = document.getElementById('user-name').value.trim();
             if (!name) return showToast('กรุณาใส่ชื่อผู้สั่ง');
@@ -2307,7 +2347,6 @@
             // 1. Show Loading
             showGlobalLoader("กำลังบันทึกและส่งออเดอร์...");
             sfxOrder.play(); triggerHaptic();
-            // ลดจำนวน confetti เล็กน้อยเพื่อประสิทธิภาพ
             confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#FFD755', '#7C77D6', '#FFFFFF'] });
             
             feedPet();
@@ -2333,19 +2372,18 @@
                 allNotes: allNotes
             };
 
-            // 3. Send to Google Sheet (Fire and Forget but with KEEPALIVE for safety)
+            // 3. Send to Google Sheet (Fire and Forget but with KEEPALIVE)
             if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
                 fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(sheetData),
-                    keepalive: true // <--- CRITICAL FIX: Ensures data is sent even if page closes
+                    keepalive: true 
                 }).catch(err => console.error("Sheet Error:", err));
             }
 
             // 4. Generate LINE Message
-            // FIX: Use standard date + time
             const nowStr = `${getStandardDate(new Date())} ${formatTime(new Date())}`;
             
             let msg = `🔥 ออเดอร์ใหม่! [${currentOrderId}]\n`;
@@ -2369,25 +2407,44 @@
             
             saveTicketToHistory(currentOrderId, netTotal);
             
-            // Encode Message
-            const encodedMsg = encodeURIComponent(msg);
+            // 5. Send Message (Check if inside LIFF or External Browser)
+            if (liff.isInClient() && liff.isLoggedIn()) {
+                // --- CASE 1: Inside LINE App (LIFF) ---
+                try {
+                    await liff.sendMessages([{
+                        type: 'text',
+                        text: msg
+                    }]);
+                    
+                    // Success! Close window
+                    setTimeout(() => {
+                        cart = []; 
+                        saveToLS();
+                        updateMiniCart();
+                        closeCheckout();
+                        hideGlobalLoader();
+                        liff.closeWindow(); // Close LIFF window automatically
+                    }, 1000);
 
-            // 5. Redirect Logic (Using standard OA URL Scheme)
-            const lineOAId = "@772ysswn"; // Correct ID format for scheme
-            const targetUrl = `https://line.me/R/oaMessage/${lineOAId}/?${encodedMsg}`;
+                } catch (err) {
+                    showToast("เกิดข้อผิดพลาดในการส่งข้อความ: " + err);
+                    hideGlobalLoader();
+                }
+            } else {
+                // --- CASE 2: External Browser (Chrome/Safari) ---
+                const encodedMsg = encodeURIComponent(msg);
+                const lineOAId = "@772ysswn"; // OA ID
+                const targetUrl = `https://line.me/R/oaMessage/${lineOAId}/?${encodedMsg}`;
 
-            // *สำคัญ* ลดเวลาหน่วงเหลือแค่นิดเดียวเพื่อให้ Browser ไม่บล็อกการเด้ง
-            // เนื่องจากเรามี keepalive แล้ว ไม่ต้องรอให้ fetch เสร็จ
-            setTimeout(() => {
-                cart = []; 
-                saveToLS();
-                updateMiniCart();
-                closeCheckout();
-                hideGlobalLoader();
-                
-                // สั่งเด้งทันที
-                window.location.href = targetUrl;
-            }, 50); 
+                setTimeout(() => {
+                    cart = []; 
+                    saveToLS();
+                    updateMiniCart();
+                    closeCheckout();
+                    hideGlobalLoader();
+                    window.location.href = targetUrl;
+                }, 50); 
+            }
         }
 
         function randomMenu() {
