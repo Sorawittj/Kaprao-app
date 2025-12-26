@@ -60,7 +60,7 @@
     </script>
 
     <style>
-        /* ล็อกหน้าจอไม่ให้เด้ง (iOS Fix) - สำคัญมากห้ามลบ */
+        /* iOS Fix: Prevent bounce and hide scrollbars */
         body { background-color: #F5F7FB; color: #2D3436; -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; }
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
@@ -995,7 +995,7 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '17.3.1'; // UPDATED VERSION
+        const CURRENT_VERSION = '17.4.0'; // UPDATED VERSION
 
         // ป้องกัน XSS (ลูกค้าใส่ชื่อแปลกๆ)
         function escapeHtml(text) {
@@ -2153,7 +2153,7 @@
         }
 
         // --- UPDATED: SEND TO GOOGLE SHEET & LINE OA DIRECTLY (LIFF SUPPORT) ---
-        // VERSION 17.3.1 LIFF EDITION + SMART FALLBACK (CLEAN FOOTER)
+        // VERSION 17.4.0 FORCE OA + SMART FALLBACK (CLEAN FOOTER)
         async function submitOrderToLine() {
             const name = document.getElementById('user-name').value.trim();
             if (!name) return showToast('กรุณาใส่ชื่อผู้สั่ง');
@@ -2229,36 +2229,18 @@
 
             // 5. Send Message Logic (Smart Fallback)
             if (liff.isInClient() && liff.isLoggedIn()) {
-                // พยายามส่งแบบเนียนๆ ก่อน
-                try {
-                    await liff.sendMessages([{
-                        type: 'text',
-                        text: msg
-                    }]);
-                    
-                    // ถ้าสำเร็จ: ปิดหน้าต่าง LIFF
-                    setTimeout(() => {
-                        cart = []; 
-                        saveToLS();
-                        updateMiniCart();
-                        closeCheckout();
-                        hideGlobalLoader();
-                        liff.closeWindow(); 
-                    }, 1000);
-
-                } catch (err) {
-                    console.error("Send Error:", err);
-                    // ⚠️ ถ้าส่งไม่ผ่าน (เช่น ลืมติ๊ก Permission หรือไม่ได้เปิดจาก Rich Menu)
-                    // ให้ใช้แผนสำรอง: เด้งไปหน้าแชทแทนทันที
-                    setTimeout(() => {
-                        cart = []; 
-                        saveToLS();
-                        updateMiniCart();
-                        closeCheckout();
-                        hideGlobalLoader();
-                        window.location.href = targetUrl; // เด้งไปเลย!
-                    }, 500); 
-                }
+                // ถ้าอยู่ใน LINE ให้เปิด Link นี้ (มันจะสลับไปหน้าแชท)
+                setTimeout(() => {
+                    cart = []; 
+                    saveToLS();
+                    updateMiniCart();
+                    closeCheckout();
+                    hideGlobalLoader();
+                    liff.openWindow({
+                        url: targetUrl,
+                        external: false
+                    });
+                }, 1000);
             } else {
                 // ถ้าเปิดใน Chrome/Safari ให้เด้งไปหน้าแชทเลย
                 setTimeout(() => {
