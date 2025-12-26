@@ -60,7 +60,7 @@
     </script>
 
     <style>
-        /* iOS Fix: Prevent bounce and hide scrollbars */
+        /* ล็อกหน้าจอไม่ให้เด้ง (iOS Fix) - สำคัญมากห้ามลบ */
         body { background-color: #F5F7FB; color: #2D3436; -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; }
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
@@ -375,7 +375,13 @@
         
         <div class="flex justify-between items-start mb-6">
             <div class="flex flex-col justify-center">
-                <p class="text-xs text-gray-400 font-medium mb-1">สวัสดีครับ, วันนี้กินอะไรดี?</p>
+                <div class="flex items-center gap-2 mb-1">
+                    <p class="text-xs text-gray-400 font-medium">สวัสดีครับ, วันนี้กินอะไรดี?</p>
+                    <button id="line-login-btn" onclick="liff.login()" class="hidden bg-[#06C755] hover:bg-[#05b34c] text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm transition-all flex items-center gap-1 active:scale-95">
+                        <i class="fab fa-line"></i> เข้าสู่ระบบ
+                    </button>
+                </div>
+                
                 <h1 class="grand-title leading-none tracking-tight mb-2 relative z-10 pt-1">
                     KAPRAO<span class="title-highlight">52</span>
                 </h1>
@@ -481,7 +487,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V17.4.0</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V17.5.0</p>
         </div>
 
     </div>
@@ -995,7 +1001,7 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '17.4.0'; // UPDATED VERSION
+        const CURRENT_VERSION = '17.5.0'; // UPDATED VERSION
 
         // ป้องกัน XSS (ลูกค้าใส่ชื่อแปลกๆ)
         function escapeHtml(text) {
@@ -1103,6 +1109,10 @@
                 if (liff.isLoggedIn()) {
                     const profile = await liff.getProfile();
                     
+                    // Hide Login Button
+                    const loginBtn = document.getElementById('line-login-btn');
+                    if(loginBtn) loginBtn.classList.add('hidden');
+
                     // 1. Auto-fill Name (ถ้ายังไม่มีชื่อ)
                     const nameInput = document.getElementById('user-name');
                     if(nameInput && (!nameInput.value || nameInput.value === '')) {
@@ -1117,8 +1127,12 @@
                     
                     saveToLS(); // บันทึกทันที
                 } else {
-                    // ถ้าเปิดใน LINE แล้วยังไม่ Login ให้ Login เลย
-                    if (liff.isInClient()) {
+                    // ถ้ายังไม่ล็อกอิน และไม่ได้เปิดใน LINE (เช่นเปิดใน Chrome) ให้โชว์ปุ่ม
+                    if (!liff.isInClient()) {
+                        const loginBtn = document.getElementById('line-login-btn');
+                        if(loginBtn) loginBtn.classList.remove('hidden');
+                    } else {
+                         // ถ้าเปิดใน LINE แล้วยังไม่ Login ให้ Login เลย (Auto Login)
                         liff.login();
                     }
                 }
@@ -2153,7 +2167,7 @@
         }
 
         // --- UPDATED: SEND TO GOOGLE SHEET & LINE OA DIRECTLY (LIFF SUPPORT) ---
-        // VERSION 17.4.0 FORCE OA + SMART FALLBACK (CLEAN FOOTER)
+        // VERSION 17.5.0 LIFF EDITION + SMART FALLBACK + LOGIN BUTTON
         async function submitOrderToLine() {
             const name = document.getElementById('user-name').value.trim();
             if (!name) return showToast('กรุณาใส่ชื่อผู้สั่ง');
@@ -2229,18 +2243,36 @@
 
             // 5. Send Message Logic (Smart Fallback)
             if (liff.isInClient() && liff.isLoggedIn()) {
-                // ถ้าอยู่ใน LINE ให้เปิด Link นี้ (มันจะสลับไปหน้าแชท)
-                setTimeout(() => {
-                    cart = []; 
-                    saveToLS();
-                    updateMiniCart();
-                    closeCheckout();
-                    hideGlobalLoader();
-                    liff.openWindow({
-                        url: targetUrl,
-                        external: false
-                    });
-                }, 1000);
+                // พยายามส่งแบบเนียนๆ ก่อน
+                try {
+                    await liff.sendMessages([{
+                        type: 'text',
+                        text: msg
+                    }]);
+                    
+                    // ถ้าสำเร็จ: ปิดหน้าต่าง LIFF
+                    setTimeout(() => {
+                        cart = []; 
+                        saveToLS();
+                        updateMiniCart();
+                        closeCheckout();
+                        hideGlobalLoader();
+                        liff.closeWindow(); 
+                    }, 1000);
+
+                } catch (err) {
+                    console.error("Send Error:", err);
+                    // ⚠️ ถ้าส่งไม่ผ่าน (เช่น ลืมติ๊ก Permission หรือไม่ได้เปิดจาก Rich Menu)
+                    // ให้ใช้แผนสำรอง: เด้งไปหน้าแชทแทนทันที
+                    setTimeout(() => {
+                        cart = []; 
+                        saveToLS();
+                        updateMiniCart();
+                        closeCheckout();
+                        hideGlobalLoader();
+                        window.location.href = targetUrl; // เด้งไปเลย!
+                    }, 500); 
+                }
             } else {
                 // ถ้าเปิดใน Chrome/Safari ให้เด้งไปหน้าแชทเลย
                 setTimeout(() => {
