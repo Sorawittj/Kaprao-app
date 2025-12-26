@@ -418,7 +418,7 @@
         </div>
 
         <div class="flex justify-between items-center mb-4 mt-2">
-            <p class="text-[10px] text-gray-400">สั่งครบ 10 ครั้ง รับส่วนลดพิเศษ! 🎁</p>
+            <p class="text-[10px] text-gray-400">สั่งครบ 10 ครั้ง รับรางวัลแทนใจ! 🎁</p>
             <button onclick="openMyTickets()" class="bg-white px-3 py-1.5 rounded-full border border-gray-100 shadow-sm flex items-center gap-2 text-xs font-bold text-gray-700 active:scale-95 active:bg-gray-50 transition-all">
                 <span>🎫 ตั๋วของฉัน</span>
                 <div id="unread-ticket-dot" class="w-2 h-2 bg-red-500 rounded-full hidden"></div>
@@ -487,7 +487,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V17.5.1</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V17.6.0</p>
         </div>
 
     </div>
@@ -575,6 +575,32 @@
                 <i class="fas fa-paper-plane"></i>
             </button>
             <div class="h-10"></div> </div>
+    </div>
+
+    <div id="reward-modal" class="fixed inset-0 z-[130] bg-gray-900/90 backdrop-blur-sm flex items-center justify-center p-6 hidden fade-in-up">
+        <div class="bg-gradient-to-b from-yellow-100 to-white rounded-[2rem] p-1 w-full max-w-sm shadow-2xl relative overflow-hidden">
+            <div class="absolute inset-0 z-0 opacity-20" style="background: repeating-conic-gradient(#FFD755 0 15deg, transparent 15deg 30deg);"></div>
+            
+            <div class="bg-white/90 backdrop-blur-sm rounded-[1.8rem] p-6 text-center relative z-10">
+                <div class="w-28 h-28 bg-gradient-to-br from-yellow-300 to-orange-400 rounded-full flex items-center justify-center mx-auto mb-4 text-6xl shadow-lg border-4 border-white animate-bounce-slow">
+                    👑
+                </div>
+                <h2 class="text-2xl font-black text-gray-800 mb-1">ยินดีด้วย!</h2>
+                <p class="text-brand-purple font-bold text-lg mb-4">คุณคือ "เทพเจ้ากะเพรา"</p>
+                
+                <div class="bg-orange-50 border border-orange-100 rounded-xl p-4 mb-6">
+                    <p class="text-sm text-gray-600 mb-2">สั่งครบ 10 ครั้งแล้ว รับรางวัลฟรี!</p>
+                    <div class="font-bold text-xl text-orange-600">🎁 สินค้า Moshi Moshi</div>
+                    <p class="text-[10px] text-gray-400 mt-1">(มูลค่าไม่เกิน 30.-)</p>
+                </div>
+
+                <p class="text-xs text-gray-500 mb-4">แคปหน้าจอนี้ไว้ยื่นให้พนักงานเพื่อรับรางวัล</p>
+
+                <button onclick="claimReward()" class="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-3 rounded-xl shadow-lg active:scale-95 transition-all text-lg">
+                    รับทราบ / แคปจอแล้ว 📸
+                </button>
+            </div>
+        </div>
     </div>
 
     <div id="modal-overlay" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-50 hidden transition-opacity opacity-0" onclick="closeModal()"></div>
@@ -787,7 +813,7 @@
             hideGlobalLoader();
         }, 4000);
 
-        // --- AVATAR LOGIC (UPDATED for V17.1.1 - NAME INPUT RESTORED) ---
+        // --- AVATAR LOGIC ---
         // Using High-Quality 3D Microsoft Fluent Emojis via Reliable CDN
         const avatarOptions = [
             'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Dog%20face/3D/dog_face_3d.png', // Dog
@@ -803,7 +829,6 @@
             'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Giraffe/3D/giraffe_3d.png'  // Giraffe
         ];
         
-        // Default state includes name now
         let userAvatar = { image: avatarOptions[0], hat: false, name: 'น้องฝึกหัด' };
 
         function openAvatarModal() {
@@ -1002,7 +1027,7 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '17.5.1'; // UPDATED VERSION
+        const CURRENT_VERSION = '17.6.0'; // UPDATED VERSION
 
         // ป้องกัน XSS (ลูกค้าใส่ชื่อแปลกๆ)
         function escapeHtml(text) {
@@ -2253,6 +2278,7 @@
                 userStats.orders++;
                 localStorage.setItem(KEYS.STATS, JSON.stringify(userStats));
                 updateLevelUI();
+                checkLevelUpReward(); // Added Reward Check
                 
                 // Calculate Totals
                 let subtotal = cart.reduce((sum, i) => sum + i.price, 0);
@@ -2362,6 +2388,58 @@
                     btn.classList.remove('opacity-50', 'cursor-not-allowed');
                 }, 2000);
             }
+        }
+
+        // --- REWARD SYSTEM ---
+        function checkLevelUpReward() {
+            // เช็คว่าครบ 10 ครั้งหรือยัง และเคยรับไปหรือยัง
+            const hasSeenReward = localStorage.getItem('kaprao_reward_seen_level_10');
+            
+            if (userStats.orders >= 10 && !hasSeenReward) {
+                setTimeout(() => {
+                    const modal = document.getElementById('reward-modal');
+                    modal.classList.remove('hidden');
+                    
+                    // จุดพลุฉลองชุดใหญ่
+                    const end = Date.now() + 3000; // 3 วินาที
+                    const colors = ['#FFD755', '#ff0000', '#ffffff'];
+
+                    (function frame() {
+                        confetti({
+                            particleCount: 3,
+                            angle: 60,
+                            spread: 55,
+                            origin: { x: 0 },
+                            colors: colors
+                        });
+                        confetti({
+                            particleCount: 3,
+                            angle: 120,
+                            spread: 55,
+                            origin: { x: 1 },
+                            colors: colors
+                        });
+
+                        if (Date.now() < end) {
+                            requestAnimationFrame(frame);
+                        }
+                    }());
+                    
+                    sfxWin.play(); // ใช้เสียงเดิมที่มีอยู่
+                }, 1500); // ดีเลย์นิดนึงให้ดูสมูทหลังกดสั่ง
+            }
+        }
+
+        function claimReward() {
+            // บันทึกว่าลูกค้าเห็นหน้านี้แล้ว จะได้ไม่เด้งซ้ำ
+            localStorage.setItem('kaprao_reward_seen_level_10', 'true');
+            
+            const modal = document.getElementById('reward-modal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('opacity-0');
+            }, 300);
         }
 
         function randomMenu() {
