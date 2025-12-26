@@ -487,7 +487,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V17.5.0</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V17.5.1</p>
         </div>
 
     </div>
@@ -986,6 +986,7 @@
         let modalQty = 1;
         let userStats = { orders: 0 }; 
         let lottoHistory = []; 
+        let isSubmitting = false; // 🛑 Feature 1: Anti-Spam Flag
         
         const addonIds = ['special', 'kaikhon', 'kaidao', 'kaijiao', 'kaitom', 'kaiyiewma'];
         const addonCalories = { 'special': 80, 'kaikhon': 150, 'kaidao': 120, 'kaijiao': 200, 'kaitom': 75, 'kaiyiewma': 100 };
@@ -1001,7 +1002,7 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '17.5.0'; // UPDATED VERSION
+        const CURRENT_VERSION = '17.5.1'; // UPDATED VERSION
 
         // ป้องกัน XSS (ลูกค้าใส่ชื่อแปลกๆ)
         function escapeHtml(text) {
@@ -1214,6 +1215,17 @@
                 if (document.visibilityState === 'visible') {
                     checkForUpdate();
                 }
+            });
+
+            // ⌨️ Feature 3: Fix Keyboard Viewport Issue
+            const inputs = document.querySelectorAll('input[type="text"], textarea');
+            inputs.forEach(input => {
+                input.addEventListener('focus', () => {
+                    // รอคีย์บอร์ดเด้งขึ้นมาก่อนนิดนึง แล้วค่อยดันจอ
+                    setTimeout(() => {
+                        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 300);
+                });
             });
         });
 
@@ -2091,9 +2103,14 @@
             document.querySelector('.receipt-discount').innerText = '-' + discountValue + '.-';
             document.querySelector('.receipt-total').innerText = netTotal + '.-';
 
-            // SHOW AVATAR ON RECEIPT
+            // 🖼️ Feature 2: Fix CORS Image
             const receiptAvatar = document.getElementById('receipt-avatar-img');
+            receiptAvatar.setAttribute('crossOrigin', 'anonymous'); // Fix CORS
             receiptAvatar.src = userAvatar.image;
+            receiptAvatar.onerror = function() { 
+                 // Fallback if image fails or CORS blocks it
+                 this.src = 'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Dog%20face/3D/dog_face_3d.png';
+            };
             
             // Show hat in receipt
             const receiptHat = document.getElementById('receipt-hat');
@@ -2210,122 +2227,140 @@
         }
 
         // --- UPDATED: SEND TO GOOGLE SHEET & LINE OA DIRECTLY (LIFF SUPPORT) ---
-        // VERSION 17.5.0 LIFF EDITION + SMART FALLBACK + LOGIN BUTTON
+        // VERSION 17.5.1 LIFF EDITION + SMART FALLBACK + LOGIN BUTTON + DOUBLE SUBMIT FIX
         async function submitOrderToLine() {
+            // 🛑 Feature 1: Anti Double Submission Check
+            if (isSubmitting) return;
+
             const name = document.getElementById('user-name').value.trim();
             if (!name) return showToast('กรุณาใส่ชื่อผู้สั่ง');
 
-            // 1. Show Loading
-            showGlobalLoader("กำลังบันทึกและส่งออเดอร์...");
-            sfxOrder.play(); triggerHaptic();
-            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#FFD755', '#7C77D6', '#FFFFFF'] });
-            
-            recordOrderForStreak();
+            // 🛑 Lock Button & Update UI
+            isSubmitting = true;
+            const btn = document.getElementById('btn-submit-order');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> กำลังส่ง...';
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
 
-            userStats.orders++;
-            localStorage.setItem(KEYS.STATS, JSON.stringify(userStats));
-            updateLevelUI();
-            
-            // Calculate Totals
-            let subtotal = cart.reduce((sum, i) => sum + i.price, 0);
-            let netTotal = Math.max(0, subtotal - discountValue);
-            
-            // 2. Prepare Data for Google Sheet
-            const allNotes = cart.filter(i => i.note).map(i => i.note).join(", ");
-            const sheetData = {
-                orderId: currentOrderId,
-                name: name,
-                items: cart,
-                totalPrice: subtotal,
-                discount: discountValue,
-                netTotal: netTotal,
-                allNotes: allNotes
-            };
+            try {
+                // 1. Show Loading
+                showGlobalLoader("กำลังบันทึกและส่งออเดอร์...");
+                sfxOrder.play(); triggerHaptic();
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#FFD755', '#7C77D6', '#FFFFFF'] });
+                
+                recordOrderForStreak();
 
-            // 3. Send to Google Sheet
-            if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
-                fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(sheetData),
-                    keepalive: true 
-                }).catch(err => console.error("Sheet Error:", err));
-            }
+                userStats.orders++;
+                localStorage.setItem(KEYS.STATS, JSON.stringify(userStats));
+                updateLevelUI();
+                
+                // Calculate Totals
+                let subtotal = cart.reduce((sum, i) => sum + i.price, 0);
+                let netTotal = Math.max(0, subtotal - discountValue);
+                
+                // 2. Prepare Data for Google Sheet
+                const allNotes = cart.filter(i => i.note).map(i => i.note).join(", ");
+                const sheetData = {
+                    orderId: currentOrderId,
+                    name: name,
+                    items: cart,
+                    totalPrice: subtotal,
+                    discount: discountValue,
+                    netTotal: netTotal,
+                    allNotes: allNotes
+                };
 
-            // 4. Generate LINE Message
-            const nowStr = `${getStandardDate(new Date())} ${formatTime(new Date())}`;
-            
-            let msg = `🔥 ออเดอร์ใหม่! [${currentOrderId}]\n`;
-            msg += `🎟️ เลขลุ้นหวย: ${currentOrderId.slice(-2)}\n`;
-            msg += `📅 ${nowStr}\n`;
-            msg += `👤 คุณ ${name}\n`;
-            msg += `🏅 สั่งครั้งที่: ${userStats.orders}\n`;
-            msg += `------------------------\n`;
-            cart.forEach((i, index) => {
-                let detail = `${i.name} ${i.meat ? '('+i.meat+')' : ''}`;
-                if(i.addons.length) detail += ` +${i.addons.join('+')}`;
-                if(i.note) detail += ` [${i.note}]`;
-                msg += `${index + 1}. ${detail} (${i.price}.-)\n`;
-            });
-            msg += `------------------------\n`;
-            if (discountValue > 0) {
-                msg += `💵 ยอดรวม: ${subtotal} บาท\n`;
-                msg += `🏷️ ส่วนลด: -${discountValue} บาท\n`;
-            }
-            msg += `💰 ยอดสุทธิ: ${netTotal} บาท\n`;
-            
-            saveTicketToHistory(currentOrderId, netTotal);
-            
-            // --- ส่วนสำคัญที่เปลี่ยน: ใช้ URL Scheme บังคับเด้งไป OA ---
-            const lineOAId = "@772ysswn"; // ID ร้านคุณ
-            const encodedMsg = encodeURIComponent(msg);
-            
-            // ลิงก์นี้จะบังคับเปิดแอป LINE ไปที่ห้องแชท @772ysswn พร้อมข้อความ
-            const targetUrl = `https://line.me/R/oaMessage/${lineOAId}/?${encodedMsg}`;
-
-            // 5. Send Message Logic (Smart Fallback)
-            if (liff.isInClient() && liff.isLoggedIn()) {
-                // พยายามส่งแบบเนียนๆ ก่อน
-                try {
-                    await liff.sendMessages([{
-                        type: 'text',
-                        text: msg
-                    }]);
-                    
-                    // ถ้าสำเร็จ: ปิดหน้าต่าง LIFF
-                    setTimeout(() => {
-                        cart = []; 
-                        saveToLS();
-                        updateMiniCart();
-                        closeCheckout();
-                        hideGlobalLoader();
-                        liff.closeWindow(); 
-                    }, 1000);
-
-                } catch (err) {
-                    console.error("Send Error:", err);
-                    // ⚠️ ถ้าส่งไม่ผ่าน (เช่น ลืมติ๊ก Permission หรือไม่ได้เปิดจาก Rich Menu)
-                    // ให้ใช้แผนสำรอง: เด้งไปหน้าแชทแทนทันที
-                    setTimeout(() => {
-                        cart = []; 
-                        saveToLS();
-                        updateMiniCart();
-                        closeCheckout();
-                        hideGlobalLoader();
-                        window.location.href = targetUrl; // เด้งไปเลย!
-                    }, 500); 
+                // 3. Send to Google Sheet
+                if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
+                    fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(sheetData),
+                        keepalive: true 
+                    }).catch(err => console.error("Sheet Error:", err));
                 }
-            } else {
-                // ถ้าเปิดใน Chrome/Safari ให้เด้งไปหน้าแชทเลย
+
+                // 4. Generate LINE Message
+                const nowStr = `${getStandardDate(new Date())} ${formatTime(new Date())}`;
+                
+                let msg = `🔥 ออเดอร์ใหม่! [${currentOrderId}]\n`;
+                msg += `🎟️ เลขลุ้นหวย: ${currentOrderId.slice(-2)}\n`;
+                msg += `📅 ${nowStr}\n`;
+                msg += `👤 คุณ ${name}\n`;
+                msg += `🏅 สั่งครั้งที่: ${userStats.orders}\n`;
+                msg += `------------------------\n`;
+                cart.forEach((i, index) => {
+                    let detail = `${i.name} ${i.meat ? '('+i.meat+')' : ''}`;
+                    if(i.addons.length) detail += ` +${i.addons.join('+')}`;
+                    if(i.note) detail += ` [${i.note}]`;
+                    msg += `${index + 1}. ${detail} (${i.price}.-)\n`;
+                });
+                msg += `------------------------\n`;
+                if (discountValue > 0) {
+                    msg += `💵 ยอดรวม: ${subtotal} บาท\n`;
+                    msg += `🏷️ ส่วนลด: -${discountValue} บาท\n`;
+                }
+                msg += `💰 ยอดสุทธิ: ${netTotal} บาท\n`;
+                
+                saveTicketToHistory(currentOrderId, netTotal);
+                
+                // --- ใช้ URL Scheme บังคับเด้งไป OA ---
+                const lineOAId = "@772ysswn"; // ID ร้านคุณ
+                const encodedMsg = encodeURIComponent(msg);
+                const targetUrl = `https://line.me/R/oaMessage/${lineOAId}/?${encodedMsg}`;
+
+                // 5. Send Message Logic (Smart Fallback)
+                if (liff.isInClient() && liff.isLoggedIn()) {
+                    try {
+                        await liff.sendMessages([{
+                            type: 'text',
+                            text: msg
+                        }]);
+                        
+                        setTimeout(() => {
+                            cart = []; 
+                            saveToLS();
+                            updateMiniCart();
+                            closeCheckout();
+                            hideGlobalLoader();
+                            liff.closeWindow(); 
+                        }, 1000);
+
+                    } catch (err) {
+                        console.error("Send Error:", err);
+                        setTimeout(() => {
+                            cart = []; 
+                            saveToLS();
+                            updateMiniCart();
+                            closeCheckout();
+                            hideGlobalLoader();
+                            window.location.href = targetUrl; 
+                        }, 500); 
+                    }
+                } else {
+                    setTimeout(() => {
+                        cart = []; 
+                        saveToLS();
+                        updateMiniCart();
+                        closeCheckout();
+                        hideGlobalLoader();
+                        window.location.href = targetUrl;
+                    }, 50); 
+                }
+
+            } catch (error) {
+                // Handle unexpected errors inside try block
+                console.error("Critical Submit Error:", error);
+                hideGlobalLoader();
+                showToast("เกิดข้อผิดพลาด กรุณาลองใหม่");
+            } finally {
+                // 🛑 Reset Button State (Always run)
                 setTimeout(() => {
-                    cart = []; 
-                    saveToLS();
-                    updateMiniCart();
-                    closeCheckout();
-                    hideGlobalLoader();
-                    window.location.href = targetUrl;
-                }, 50); 
+                    isSubmitting = false;
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }, 2000);
             }
         }
 
