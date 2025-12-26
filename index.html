@@ -481,7 +481,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V17.2.1</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V17.3.1</p>
         </div>
 
     </div>
@@ -995,7 +995,7 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '17.2.1'; // UPDATED VERSION
+        const CURRENT_VERSION = '17.3.1'; // UPDATED VERSION
 
         // ป้องกัน XSS (ลูกค้าใส่ชื่อแปลกๆ)
         function escapeHtml(text) {
@@ -2153,7 +2153,7 @@
         }
 
         // --- UPDATED: SEND TO GOOGLE SHEET & LINE OA DIRECTLY (LIFF SUPPORT) ---
-        // VERSION 17.2.0 LIFF EDITION + SMART FALLBACK
+        // VERSION 17.3.1 LIFF EDITION + SMART FALLBACK (CLEAN FOOTER)
         async function submitOrderToLine() {
             const name = document.getElementById('user-name').value.trim();
             if (!name) return showToast('กรุณาใส่ชื่อผู้สั่ง');
@@ -2220,11 +2220,11 @@
             
             saveTicketToHistory(currentOrderId, netTotal);
             
-            // ⭐⭐⭐ จุดที่ต้องแก้ไข ID LINE OA ⭐⭐⭐
-            const lineOAId = "@772ysswn"; // ใส่ ID ร้านคุณที่นี่ (ต้องมี @)
-            
-            // เตรียม URL สำหรับเด้งไปหน้าแชท (แผนสำรอง)
+            // --- ส่วนสำคัญที่เปลี่ยน: ใช้ URL Scheme บังคับเด้งไป OA ---
+            const lineOAId = "@772ysswn"; // ID ร้านคุณ
             const encodedMsg = encodeURIComponent(msg);
+            
+            // ลิงก์นี้จะบังคับเปิดแอป LINE ไปที่ห้องแชท @772ysswn พร้อมข้อความ
             const targetUrl = `https://line.me/R/oaMessage/${lineOAId}/?${encodedMsg}`;
 
             // 5. Send Message Logic (Smart Fallback)
