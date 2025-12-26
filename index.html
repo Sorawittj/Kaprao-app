@@ -12,12 +12,11 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
       gtag('config', 'G-4FR74WPRNY');
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#6D28D9">
+    <meta name="theme-color" content="#FFFFFF">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="manifest" href="manifest.json">
     
@@ -25,7 +24,7 @@
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
     <link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
     
-    <title>Kaprao52 - APP</title> 
+    <title>Kaprao52 - V18</title> 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -38,11 +37,8 @@
                 extend: {
                     colors: {
                         brand: {
-                            purple: '#7C3AED', // Vivid Violet
-                            darkPurple: '#5B21B6',
-                            yellow: '#FFC800', // Golden Yolk (Appetizing)
-                            orange: '#F59E0B', // Fried Food Gold
-                            bg: '#F9FAFB',        
+                            purple: '#8B5CF6', 
+                            yellow: '#FBBF24',
                             text: '#1F2937',        
                         }
                     },
@@ -55,6 +51,15 @@
                     },
                     animation: {
                         'bounce-slow': 'bounce 3s infinite',
+                        'blob': 'blob 7s infinite',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        }
                     }
                 }
             }
@@ -62,8 +67,8 @@
     </script>
 
     <style>
-        /* ล็อกหน้าจอไม่ให้เด้ง (iOS Fix) */
-        body { background-color: #F9FAFB; color: #1F2937; -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; }
+        /* ล็อกหน้าจอ */
+        body { color: #1F2937; -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; background: #f0f2f5; }
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
         
@@ -75,304 +80,195 @@
         .safe-area-pb { padding-bottom: var(--sab); }
         .safe-area-pb-plus { padding-bottom: calc(1rem + var(--sab)); }
 
-        /* --- VIBRANT ANIMATIONS --- */
-        .btn-bounce {
-            transition: transform 0.1s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+        /* --- NEO-GLASSMORPHISM CORE --- */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
         }
-        .btn-bounce:active {
-            transform: scale(0.92);
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border-radius: 1.5rem;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .glass-card:active {
+            background: rgba(255, 255, 255, 0.7);
+            transform: scale(0.98);
         }
 
-        /* Entry Animation (Staggered) */
-        .stagger-item {
-            opacity: 0;
-            animation: fadeInUpSpring 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        .glass-heavy {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(255, 255, 255, 0.9);
         }
-        @keyframes fadeInUpSpring {
-            from { opacity: 0; transform: translateY(30px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+
+        /* Animated Background Orbs */
+        .bg-mesh-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 120vh;
+            z-index: -1;
+            overflow: hidden;
+            background: #f3f4f6;
         }
+        .blob-1 {
+            position: absolute; top: 0; left: -100px; width: 400px; height: 400px;
+            background: #C4B5FD; /* Purple */
+            filter: blur(80px); opacity: 0.6; animation-delay: 0s;
+        }
+        .blob-2 {
+            position: absolute; top: 20%; right: -100px; width: 350px; height: 350px;
+            background: #FDE68A; /* Yellow */
+            filter: blur(80px); opacity: 0.6; animation-delay: 2s;
+        }
+        .blob-3 {
+            position: absolute; bottom: 0; left: 20%; width: 400px; height: 400px;
+            background: #A7F3D0; /* Green/Mint */
+            filter: blur(90px); opacity: 0.5; animation-delay: 4s;
+        }
+
+        /* --- ANIMATIONS --- */
+        .btn-bounce { transition: transform 0.1s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .btn-bounce:active { transform: scale(0.92); }
+
+        .stagger-item { opacity: 0; animation: fadeInUpSpring 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        @keyframes fadeInUpSpring { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
         /* Skeleton Shimmer */
         .skeleton {
-            background: #e5e7eb;
-            background-image: linear-gradient(to right, #e5e7eb 0%, #f3f4f6 20%, #e5e7eb 40%, #e5e7eb 100%);
-            background-repeat: no-repeat;
-            background-size: 800px 100%; 
-            animation: shimmer 1.5s infinite linear forwards;
+            background: rgba(255,255,255,0.4);
+            border: 1px solid rgba(255,255,255,0.6);
+            position: relative; overflow: hidden;
         }
-        @keyframes shimmer {
-            0% { background-position: -400px 0; }
-            100% { background-position: 400px 0; }
+        .skeleton::after {
+            content: ""; position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%);
+            transform: translateX(-100%); animation: shimmer 1.5s infinite;
         }
+        @keyframes shimmer { 100% { transform: translateX(100%); } }
 
         /* Page Transition */
-        .page-transition-enter { animation: pageIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
-        .page-transition-exit { animation: pageOut 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-        
-        @keyframes pageOut { to { opacity: 0; transform: translateY(-10px) scale(0.98); } }
-        @keyframes pageIn { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .page-out { animation: pageOut 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        .page-in { animation: pageIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        @keyframes pageOut { to { opacity: 0; transform: translateY(-10px) scale(0.95); } }
+        @keyframes pageIn { from { opacity: 0; transform: translateY(10px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-        .price-pop { animation: pricePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        @keyframes pricePop { 50% { transform: scale(1.3); color: #F59E0B; } }
+        /* Category Pills */
+        .category-pill-active {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid #FBBF24;
+            color: #1F2937;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+            transform: scale(1.05);
+            backdrop-filter: blur(4px);
+        }
+        .category-pill-inactive {
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            color: #6B7280;
+            backdrop-filter: blur(4px);
+        }
 
-        /* SHAKE ANIMATION */
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-5px); }
-            40% { transform: translateX(5px); }
-            60% { transform: translateX(-5px); }
-            80% { transform: translateX(5px); }
-        }
-        .animate-shake {
-            animation: shake 0.4s ease-in-out;
-            border-color: #ef4444 !important; 
-        }
-
-        /* --- UPDATED COLORS: GRADIENTS --- */
-        .bg-gradient-primary {
-            background: linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%);
-        }
-        .bg-gradient-gold {
-            background: linear-gradient(135deg, #FFC800 0%, #F59E0B 100%);
-        }
-        .text-gradient-purple {
-            background: linear-gradient(to right, #7C3AED, #4C1D95);
+        /* --- GRADIENT TEXT & BUTTONS --- */
+        .text-gradient {
+            background: linear-gradient(to right, #7C3AED, #DB2777);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
-        .category-pill-active {
-            background: linear-gradient(135deg, #FFC800 0%, #F59E0B 100%);
-            color: #1F2937;
-            font-weight: 700;
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-            border: 2px solid transparent;
-            transform: scale(1.05);
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        .btn-gradient {
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+            box-shadow: 0 8px 20px -4px rgba(245, 158, 11, 0.5);
+            border: 1px solid rgba(255,255,255,0.2);
         }
-        
-        .category-pill-inactive {
-            background-color: #FFFFFF;
-            color: #9CA3AF;
-            border: 2px solid #F3F4F6;
-            transition: all 0.3s ease;
-        }
-
-        .menu-card-style {
-            background-color: #FFFFFF;
-            border-radius: 1.5rem;
-            transition: transform 0.1s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
-        }
-        .menu-card-style:active {
-            transform: scale(0.97);
-        }
-
-        .nav-btn {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(4px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .input-success {
-            border-color: #22c55e !important;
-            background-color: #f0fdf4 !important;
-            color: #15803d !important;
+        .btn-gradient-purple {
+            background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
+            box-shadow: 0 8px 20px -4px rgba(139, 92, 246, 0.5);
+            border: 1px solid rgba(255,255,255,0.2);
         }
 
         /* --- GLOBAL LOADER --- */
-        #global-loader {
-            position: fixed;
-            inset: 0;
-            z-index: 9999;
-            background-color: #F9FAFB;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.4s ease, visibility 0.4s;
-        }
-        .loader-hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-        .cooking-pan {
-            font-size: 4rem;
-            animation: panFlip 1.5s infinite ease-in-out;
-            transform-origin: center bottom;
-        }
-        @keyframes panFlip {
-            0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(-10deg); }
-            75% { transform: rotate(10deg); }
-        }
-
-        /* Parallax Background - VIBRANT MESH */
-        #parallax-bg {
-            background: radial-gradient(circle at top right, rgba(124, 58, 237, 0.1), transparent 40%),
-                        radial-gradient(circle at bottom left, rgba(255, 200, 0, 0.1), transparent 40%);
-            opacity: 0.6;
-        }
-
-        /* --- TITLE STYLES --- */
-        .grand-title {
-            display: flex;
-            align-items: baseline;
-            font-weight: 900;
-            font-size: 2.25rem;
-            line-height: 1;
-            letter-spacing: -1px;
-        }
-
-        .title-highlight {
-            color: #F59E0B; 
-            text-shadow: 2px 2px 0px rgba(255, 255, 255, 1); 
-            margin-left: 2px;
-        }
+        #global-loader { position: fixed; inset: 0; z-index: 9999; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.4s ease, visibility 0.4s; }
+        .loader-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .cooking-pan { font-size: 4rem; animation: panFlip 1.5s infinite ease-in-out; transform-origin: center bottom; }
+        @keyframes panFlip { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-10deg); } 75% { transform: rotate(10deg); } }
 
         /* --- LUCKY WHEEL --- */
-        #wheel-container {
-            position: relative;
-            width: 280px;
-            height: 280px;
-            margin: 0 auto 20px auto;
-            filter: drop-shadow(0 15px 25px rgba(0,0,0,0.15));
-        }
-        #wheel-canvas {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            transition: transform 8s cubic-bezier(0.1, 0.99, 0.1, 0.99);
-        }
-        .wheel-pointer {
-            position: absolute;
-            top: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0; height: 0; 
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 35px solid #F59E0B; 
-            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
-            z-index: 20;
-        }
-        .wheel-center {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 50px;
-            height: 50px;
-            background: white;
-            border-radius: 50%;
-            z-index: 10;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
-
-        /* --- FLOATING BUBBLES --- */
-        .bubble {
-            position: absolute;
-            bottom: -50px;
-            background-color: rgba(124, 58, 237, 0.1);
-            border-radius: 50%;
-            pointer-events: none;
-            animation: floatUp 15s infinite linear;
-            z-index: -1;
-        }
-        @keyframes floatUp {
-            0% { transform: translateY(0) scale(1); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateY(-120vh) scale(1.5); opacity: 0; }
-        }
+        #wheel-container { position: relative; width: 280px; height: 280px; margin: 0 auto 20px auto; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1)); }
+        #wheel-canvas { width: 100%; height: 100%; border-radius: 50%; transition: transform 8s cubic-bezier(0.1, 0.99, 0.1, 0.99); }
+        .wheel-pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 35px solid #F59E0B; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2)); z-index: 20; }
+        .wheel-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px; background: white; border-radius: 50%; z-index: 10; box-shadow: 0 0 15px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; font-size: 20px; }
 
         /* --- RECEIPT CAPTURE AREA (Hidden) --- */
-        #receipt-capture {
-            position: fixed;
-            top: -9999px;
-            left: -9999px;
-            width: 400px; 
-            background: #FFFFFF;
-            padding: 0;
-            border-radius: 0;
-            font-family: 'Kanit', sans-serif;
-            color: #1F2937;
-        }
+        #receipt-capture { position: fixed; top: -9999px; left: -9999px; width: 400px; background: #FFFFFF; padding: 0; border-radius: 0; font-family: 'Kanit', sans-serif; color: #1F2937; }
 
         /* --- XP BAR --- */
-        .xp-bar-bg { background-color: #E5E7EB; border-radius: 9999px; overflow: hidden; height: 8px; }
+        .xp-bar-bg { background-color: rgba(200,200,200,0.3); border-radius: 9999px; overflow: hidden; height: 8px; }
         .xp-bar-fill { background: linear-gradient(90deg, #F59E0B, #D97706); height: 100%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
         
         /* --- TICKET STYLES --- */
         .ticket-stub {
-            background-image: radial-gradient(circle at 0 50%, transparent 8px, #FFFFFF 8.5px), radial-gradient(circle at 100% 50%, transparent 8px, #FFFFFF 8.5px);
-            background-position: 0 0, 0 0;
-            background-size: 100% 100%;
-            transition: transform 0.1s ease;
+            background-image: radial-gradient(circle at 0 50%, transparent 8px, rgba(255,255,255,0.8) 8.5px), radial-gradient(circle at 100% 50%, transparent 8px, rgba(255,255,255,0.8) 8.5px);
+            background-position: 0 0, 0 0; background-size: 100% 100%; transition: transform 0.1s ease;
+            backdrop-filter: blur(4px);
         }
-        .ticket-stub:active {
-            transform: scale(0.98);
-        }
-
+        
         /* --- AVATAR --- */
-        .avatar-option {
-            width: 65px; height: 65px; cursor: pointer;
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-            position: relative; display: flex; align-items: center; justify-content: center;
-            border-radius: 50%; background: #ffffff; padding: 5px; border: 2px solid #f3f4f6;
-        }
+        .avatar-option { width: 65px; height: 65px; cursor: pointer; transition: transform 0.2s; position: relative; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255,255,255,0.5); padding: 5px; border: 2px solid rgba(255,255,255,0.8); }
         .avatar-option img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
         .avatar-option:hover { transform: scale(1.1); border-color: #F59E0B; }
-        .avatar-selected { background: #fffbeb !important; border: 2px solid #F59E0B; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3); transform: scale(1.1); }
+        .avatar-selected { background: rgba(255, 255, 255, 0.8) !important; border: 2px solid #F59E0B; box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); transform: scale(1.1); }
         
-        /* New Level Badges */
-        .badge-newbie { background: linear-gradient(135deg, #fefce8, #fff7ed); color: #d97706; border: 2px solid #fde68a; }
-        .badge-regular { background: linear-gradient(135deg, #dbeafe, #60a5fa); color: #1e40af; border: 2px solid #93c5fd; }
-        .badge-god { background: linear-gradient(135deg, #fef3c7, #f59e0b); color: #78350f; border: 2px solid #fcd34d; box-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
+        /* Badges */
+        .badge-newbie { background: rgba(254, 252, 232, 0.8); color: #d97706; border: 1px solid #fde68a; }
+        .badge-regular { background: rgba(219, 234, 254, 0.8); color: #1e40af; border: 1px solid #93c5fd; }
+        .badge-god { background: rgba(254, 243, 199, 0.8); color: #78350f; border: 1px solid #fcd34d; box-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
 
     </style>
 </head>
 <body class="pb-32 font-sans select-none relative overflow-x-hidden safe-area-pt">
+
+    <div class="bg-mesh-container">
+        <div class="blob-1 animate-blob"></div>
+        <div class="blob-2 animate-blob" style="animation-delay: 2s"></div>
+        <div class="blob-3 animate-blob" style="animation-delay: 4s"></div>
+    </div>
 
     <div id="global-loader">
         <div class="relative mb-4">
             <div class="absolute inset-0 bg-yellow-200 rounded-full blur-xl opacity-50 animate-pulse"></div>
             <div class="cooking-pan relative z-10">🍳</div>
         </div>
-        <h2 class="text-xl font-bold text-gray-800 tracking-wider">KAPRAO<span class="text-brand-orange">52</span></h2>
+        <h2 class="text-xl font-bold text-gray-800 tracking-wider">KAPRAO<span class="text-yellow-500">52</span></h2>
         <p id="loader-text" class="text-xs text-gray-400 mt-2 font-medium">กำลังเตรียมร้าน...</p>
     </div>
 
-    <div id="parallax-bg" class="fixed top-0 left-0 w-full h-[120vh] z-[-1] pointer-events-none transition-transform duration-75 ease-out"></div>
-    <div id="bubbles-container" class="fixed inset-0 overflow-hidden pointer-events-none z-[-1]"></div>
-
-    <div id="welcome-modal" class="fixed inset-0 z-[100] bg-gray-900/80 backdrop-blur-sm flex items-center justify-center p-6 stagger-item">
-        <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full text-center shadow-2xl relative overflow-hidden border-4 border-white">
-            <div class="absolute -top-10 -right-10 w-32 h-32 bg-yellow-100 rounded-full opacity-50 blur-2xl"></div>
-            <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-purple-100 rounded-full opacity-50 blur-2xl"></div>
-            
+    <div id="welcome-modal" class="fixed inset-0 z-[100] bg-black/40 backdrop-blur-md flex items-center justify-center p-6 stagger-item">
+        <div class="glass-heavy rounded-[2rem] p-8 max-w-sm w-full text-center shadow-2xl relative overflow-hidden border border-white/50">
             <div class="relative z-10">
-                <div class="w-24 h-24 bg-gradient-gold rounded-full flex items-center justify-center mx-auto mb-4 text-5xl shadow-lg border-4 border-white animate-bounce-slow">
+                <div class="w-24 h-24 bg-white/50 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4 text-5xl shadow-lg border border-white animate-bounce-slow">
                     🎟️
                 </div>
                 <h2 class="text-2xl font-black text-gray-800 mb-2">ลุ้นกินฟรีทุกงวด!</h2>
                 <p class="text-gray-600 mb-6 leading-relaxed text-sm">
-                    <span class="font-bold text-brand-purple text-base">ใบเสร็จมีค่า อย่าทิ้ง!</span><br>
+                    <span class="font-bold text-indigo-600 text-base">ใบเสร็จมีค่า อย่าทิ้ง!</span><br>
                     ลุ้นเป็นเศรษฐี (น้อยๆ) ไปด้วยกัน<br>
                     เลขท้าย Order ID ตรงกับ<br>
-                    <span class="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded font-bold">เลขท้าย 2 ตัว หวยรัฐบาล</span><br>
+                    <span class="bg-yellow-100/80 text-yellow-800 px-2 py-0.5 rounded font-bold border border-yellow-200">เลขท้าย 2 ตัว หวยรัฐบาล</span><br>
                     รับสิทธิ์กินฟรีมื้อหน้าทันที! 🎁
                 </p>
                 <div class="flex flex-col gap-3">
-                      <button onclick="requestNotifPermission()" class="btn-bounce w-full bg-white text-brand-purple font-bold py-3 rounded-xl shadow-sm border border-brand-purple transition-all text-sm">
+                      <button onclick="requestNotifPermission()" class="btn-bounce w-full bg-white/60 hover:bg-white text-indigo-600 font-bold py-3 rounded-xl shadow-sm border border-indigo-200 transition-all text-sm backdrop-blur-sm">
                         <i class="fas fa-bell mr-2"></i> เปิดแจ้งเตือนผลหวย
                     </button>
-                    <button onclick="closeWelcome()" class="btn-bounce w-full bg-gradient-primary text-white font-bold py-4 rounded-xl shadow-xl shadow-purple-300/50 transition-all text-lg border-2 border-transparent hover:scale-[1.02]">
+                    <button onclick="closeWelcome()" class="btn-bounce w-full btn-gradient-purple text-white font-bold py-4 rounded-xl shadow-lg transition-all text-lg hover:scale-[1.02]">
                         สั่งเลย! ลุ้นเลขเด็ด 🎰
                     </button>
                 </div>
@@ -380,19 +276,18 @@
         </div>
     </div>
 
-    <div id="avatar-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[120] hidden transition-opacity opacity-0 flex items-center justify-center p-6">
-        <div class="bg-white rounded-[2rem] p-6 max-w-sm w-full shadow-2xl stagger-item border-4 border-white">
+    <div id="avatar-modal" class="fixed inset-0 bg-black/30 backdrop-blur-md z-[120] hidden transition-opacity opacity-0 flex items-center justify-center p-6">
+        <div class="glass-heavy rounded-[2rem] p-6 max-w-sm w-full shadow-2xl stagger-item border border-white/60">
             <h3 class="text-xl font-bold text-center mb-4 text-gray-800">เลือกรูปประจำตัว 👤</h3>
             
-            <div class="grid grid-cols-4 gap-4 mb-6" id="avatar-grid">
-            </div>
+            <div class="grid grid-cols-4 gap-4 mb-6" id="avatar-grid"></div>
 
             <div class="mb-6">
                  <label class="text-sm font-bold text-gray-700 mb-2 block pl-1">ชื่อเล่นของคุณ 💬</label>
-                 <input type="text" id="pet-name-input" maxlength="12" placeholder="เช่น พี่กะเพรา" class="w-full bg-gray-50 border-2 border-gray-100 rounded-xl p-3 text-center font-bold text-brand-purple focus:border-brand-yellow outline-none transition-all">
+                 <input type="text" id="pet-name-input" maxlength="12" placeholder="เช่น พี่กะเพรา" class="w-full bg-white/50 border border-white rounded-xl p-3 text-center font-bold text-indigo-600 focus:border-indigo-400 outline-none transition-all backdrop-blur-sm">
             </div>
 
-            <button onclick="closeAvatarModal()" class="btn-bounce w-full bg-gradient-gold text-white font-bold py-3 rounded-xl shadow-lg transition-all text-lg text-shadow-sm">
+            <button onclick="closeAvatarModal()" class="btn-bounce w-full btn-gradient text-white font-bold py-3 rounded-xl shadow-lg transition-all text-lg">
                 ตกลง
             </button>
         </div>
@@ -403,41 +298,41 @@
         <div class="flex justify-between items-start mb-6">
             <div class="flex flex-col justify-center">
                 <div class="flex items-center gap-2 mb-1">
-                    <p class="text-xs text-gray-400 font-medium">สวัสดีครับ, วันนี้กินอะไรดี?</p>
+                    <p class="text-xs text-gray-500 font-medium">สวัสดีครับ, วันนี้กินอะไรดี?</p>
                     <button id="line-login-btn" onclick="liff.login()" class="hidden bg-[#06C755] hover:bg-[#05b34c] text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm transition-all flex items-center gap-1 btn-bounce">
                         <i class="fab fa-line"></i> เข้าสู่ระบบ
                     </button>
                 </div>
                 
-                <h1 class="grand-title leading-none tracking-tight mb-2 relative z-10 pt-1">
-                    <span class="text-gradient-purple">KAPRAO</span>
-                    <span class="title-highlight">52</span>
+                <h1 class="text-6xl font-black leading-none tracking-tighter mb-2 relative z-10 pt-1 drop-shadow-sm">
+                    <span class="text-gray-900">KAPRAO</span>
+                    <span class="text-yellow-500">52</span>
                 </h1>
+
                 <div id="streak-display" class="hidden mt-1 inline-flex items-center gap-1 bg-gradient-to-r from-orange-400 to-red-500 text-white text-[10px] px-2 py-0.5 rounded-full w-max shadow-sm animate-pulse">
                     <i class="fas fa-fire"></i> <span id="streak-text">สั่งติดกัน 0 วัน</span>
                 </div>
             </div>
 
             <div class="flex flex-col items-center">
-                 <div id="header-avatar-btn" onclick="openAvatarModal()" class="btn-bounce w-24 h-24 rounded-full bg-white border-4 border-white shadow-xl flex items-center justify-center relative cursor-pointer overflow-hidden">
+                 <div id="header-avatar-btn" onclick="openAvatarModal()" class="btn-bounce w-24 h-24 rounded-full bg-white/40 border border-white shadow-lg flex items-center justify-center relative cursor-pointer overflow-hidden backdrop-blur-md">
                       <img id="avatar-img" src="" class="w-full h-full object-cover">
-                      
-                      <div class="absolute bottom-0 right-0 bg-brand-purple rounded-full w-7 h-7 flex items-center justify-center shadow-md border-2 border-white z-30" style="bottom: 5px; right: 5px;">
+                      <div class="absolute bottom-0 right-0 bg-indigo-500 rounded-full w-7 h-7 flex items-center justify-center shadow-md border-2 border-white z-30" style="bottom: 5px; right: 5px;">
                           <i class="fas fa-pen text-xs text-white"></i>
                       </div>
                 </div>
-                <p id="avatar-name-display" class="text-xs font-round font-bold text-brand-purple mt-3 tracking-wide bg-white/90 backdrop-blur-sm px-4 py-1 rounded-full shadow-md border border-purple-100">ลูกค้า</p>
+                <p id="avatar-name-display" class="text-xs font-round font-bold text-indigo-600 mt-3 tracking-wide bg-white/60 px-4 py-1 rounded-full shadow-sm border border-white/50 backdrop-blur-sm">ลูกค้า</p>
             </div>
         </div>
 
-        <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 mb-1 flex items-center gap-3 stagger-item" style="animation-delay: 0.1s;">
-            <div id="badge-icon" class="w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-inner transition-all duration-500 border-2 border-gray-100">
+        <div class="glass-panel p-3 rounded-xl shadow-sm mb-1 flex items-center gap-3 stagger-item" style="animation-delay: 0.1s;">
+            <div id="badge-icon" class="w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-inner transition-all duration-500 border border-white bg-white/50">
                 🐣
             </div>
             <div class="flex-1">
                 <div class="flex justify-between items-end mb-1">
                     <span id="level-title" class="text-sm font-bold text-gray-700">มือใหม่หัดกิน</span>
-                    <span id="level-count" class="text-[10px] text-gray-400">0/10 ครั้ง</span>
+                    <span id="level-count" class="text-[10px] text-gray-500">0/10 ครั้ง</span>
                 </div>
                 <div class="xp-bar-bg">
                     <div id="level-fill" class="xp-bar-fill" style="width: 0%;"></div>
@@ -446,8 +341,8 @@
         </div>
 
         <div class="flex justify-between items-center mb-4 mt-2">
-            <p class="text-[10px] text-gray-400">สั่งครบ 10 ครั้ง รับรางวัลแทนใจ! 🎁</p>
-            <button onclick="openMyTickets()" class="btn-bounce bg-white px-3 py-1.5 rounded-full border border-gray-100 shadow-sm flex items-center gap-2 text-xs font-bold text-gray-700 active:bg-gray-50 transition-all">
+            <p class="text-[10px] text-gray-500">สั่งครบ 10 ครั้ง รับรางวัลแทนใจ! 🎁</p>
+            <button onclick="openMyTickets()" class="btn-bounce bg-white/60 px-3 py-1.5 rounded-full border border-white shadow-sm flex items-center gap-2 text-xs font-bold text-gray-700 active:bg-white/80 transition-all backdrop-blur-sm">
                 <span>🎫 ตั๋วของฉัน</span>
                 <div id="unread-ticket-dot" class="w-2 h-2 bg-red-500 rounded-full hidden"></div>
             </button>
@@ -459,17 +354,17 @@
         
         <div class="mb-3 flex items-center justify-between">
             <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2">หมวดหมู่ 
-                <button onclick="randomMenu()" class="btn-bounce bg-brand-purple text-white px-3 py-1 rounded-full text-xs font-bold shadow-md hover:bg-brand-darkPurple transition-all flex items-center gap-1 ml-2">
+                <button onclick="randomMenu()" class="btn-bounce bg-white/80 text-indigo-600 px-3 py-1 rounded-full text-xs font-bold shadow-sm border border-white hover:bg-white transition-all flex items-center gap-1 ml-2">
                     <i id="dice-icon" class="fas fa-dice"></i> สุ่มเมนู
                 </button>
             </h3>
             <div class="flex gap-2">
-                <button onclick="scrollTabs(-100)" class="btn-bounce nav-btn w-11 h-11 rounded-full flex items-center justify-center text-gray-500 hover:text-brand-purple transition-all"><i class="fas fa-chevron-left text-xs"></i></button>
-                <button onclick="scrollTabs(100)" class="btn-bounce nav-btn w-11 h-11 rounded-full flex items-center justify-center text-gray-500 hover:text-brand-purple transition-all"><i class="fas fa-chevron-right text-xs"></i></button>
+                <button onclick="scrollTabs(-100)" class="btn-bounce bg-white/50 w-11 h-11 rounded-full flex items-center justify-center text-gray-500 hover:text-indigo-600 transition-all border border-white/50 shadow-sm"><i class="fas fa-chevron-left text-xs"></i></button>
+                <button onclick="scrollTabs(100)" class="btn-bounce bg-white/50 w-11 h-11 rounded-full flex items-center justify-center text-gray-500 hover:text-indigo-600 transition-all border border-white/50 shadow-sm"><i class="fas fa-chevron-right text-xs"></i></button>
             </div>
         </div>
         
-        <div id="tabs-container" class="sticky top-0 z-30 bg-[#F9FAFB] pt-2 pb-4 -mx-5 px-5 flex gap-3 snap-x scroll-smooth overflow-x-auto hide-scroll transition-all">
+        <div id="tabs-container" class="sticky top-0 z-30 pt-2 pb-4 -mx-5 px-5 flex gap-3 snap-x scroll-smooth overflow-x-auto hide-scroll transition-all">
             <button onclick="switchCategory('kaprao')" id="tab-kaprao" class="btn-bounce snap-start category-pill-active min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all">
                 <span class="text-xl">🌶️</span>
                 <span class="text-xs">เมนูกะเพรา</span>
@@ -505,9 +400,9 @@
         </div>
 
         <div id="dessert-msg" class="hidden mb-6 stagger-item">
-            <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4 flex flex-col items-center justify-center text-center">
+            <div class="bg-white/40 border border-white rounded-xl p-4 flex flex-col items-center justify-center text-center backdrop-blur-sm">
                 <div class="text-3xl mb-2">🍨 ✨</div>
-                <h4 class="font-bold text-brand-purple text-sm">รอพบกับเมนูใหม่ๆ เร็วๆ นี้</h4>
+                <h4 class="font-bold text-indigo-600 text-sm">รอพบกับเมนูใหม่ๆ เร็วๆ นี้</h4>
                 <p class="text-xs text-gray-500 mt-1">กำลังคัดสรรความอร่อยมาให้ลูกค้าทุกท่าน</p>
             </div>
         </div>
@@ -515,17 +410,17 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V17.6.0</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V18.0.0</p>
         </div>
 
     </div>
     
-    <div id="tickets-modal-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[110] hidden transition-opacity opacity-0" onclick="closeMyTickets()"></div>
-    <div id="tickets-sheet" class="fixed bottom-0 left-0 right-0 bg-[#F9FAFB] rounded-t-[2.5rem] z-[111] transform translate-y-full transition-transform duration-300 shadow-2xl max-w-md mx-auto h-[70vh] flex flex-col safe-area-pb">
+    <div id="tickets-modal-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[110] hidden transition-opacity opacity-0" onclick="closeMyTickets()"></div>
+    <div id="tickets-sheet" class="fixed bottom-0 left-0 right-0 glass-heavy rounded-t-[2.5rem] z-[111] transform translate-y-full transition-transform duration-300 shadow-2xl max-w-md mx-auto h-[70vh] flex flex-col safe-area-pb">
         <div class="w-full flex justify-center pt-4 pb-2">
              <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
         </div>
-        <div class="px-6 py-2 border-b border-gray-200 flex justify-between items-center bg-white rounded-t-[2.5rem]">
+        <div class="px-6 py-2 border-b border-gray-200/50 flex justify-between items-center">
             <h2 class="text-xl font-bold text-gray-800">🎫 ตั๋วหวยของฉัน</h2>
             <button onclick="closeMyTickets()" class="btn-bounce w-11 h-11 rounded-full bg-gray-100 flex items-center justify-center text-gray-500"><i class="fas fa-times text-sm"></i></button>
         </div>
@@ -538,29 +433,29 @@
     </div>
 
     <div id="mini-cart-bar" class="fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom))] left-5 right-5 z-40 hidden stagger-item">
-        <div onclick="openCheckout()" class="btn-bounce bg-gray-900 text-white p-4 rounded-full shadow-2xl shadow-gray-400/50 flex justify-between items-center cursor-pointer active:bg-black transition-all border border-gray-700">
+        <div onclick="openCheckout()" class="btn-bounce glass-panel bg-white/90 text-gray-800 p-4 rounded-full shadow-2xl flex justify-between items-center cursor-pointer border border-white/60">
             <div class="flex items-center gap-3 pl-2">
-                <div class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center border border-gray-700 text-brand-yellow font-bold" id="mini-count">0</div>
+                <div class="w-10 h-10 bg-gray-900 rounded-full flex items-center justify-center text-yellow-400 font-bold shadow-lg" id="mini-count">0</div>
                 <div class="flex flex-col">
-                    <span class="text-xs text-gray-400">ยอดรวม</span>
-                    <span class="font-bold text-lg leading-none text-brand-yellow" id="mini-total">0 ฿</span>
+                    <span class="text-xs text-gray-500">ยอดรวม</span>
+                    <span class="font-bold text-lg leading-none text-indigo-600" id="mini-total">0 ฿</span>
                 </div>
             </div>
-            <div class="flex items-center gap-2 pr-4 text-brand-yellow font-bold text-sm">
+            <div class="flex items-center gap-2 pr-4 text-indigo-600 font-bold text-sm">
                 <span>ชำระเงิน</span>
                 <i class="fas fa-chevron-up"></i>
             </div>
         </div>
     </div>
 
-    <div id="checkout-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 hidden transition-opacity opacity-0" onclick="closeCheckout()"></div>
-    <div id="checkout-sheet" class="fixed bottom-0 left-0 right-0 bg-white rounded-t-[2.5rem] z-50 transform translate-y-full transition-transform duration-300 shadow-2xl max-w-md mx-auto h-[85vh] flex flex-col touch-pan-y safe-area-pb">
+    <div id="checkout-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden transition-opacity opacity-0" onclick="closeCheckout()"></div>
+    <div id="checkout-sheet" class="fixed bottom-0 left-0 right-0 glass-heavy rounded-t-[2.5rem] z-50 transform translate-y-full transition-transform duration-300 shadow-2xl max-w-md mx-auto h-[85vh] flex flex-col touch-pan-y safe-area-pb">
         
-        <div id="checkout-drag-handle" class="w-full flex justify-center pt-4 pb-2 cursor-grab active:cursor-grabbing z-50 bg-white rounded-t-[2.5rem]">
+        <div id="checkout-drag-handle" class="w-full flex justify-center pt-4 pb-2 cursor-grab active:cursor-grabbing z-50">
             <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
         </div>
 
-        <div class="px-6 pb-4 border-b border-gray-100 flex justify-between items-center">
+        <div class="px-6 pb-4 border-b border-gray-200/50 flex justify-between items-center">
             <h2 class="text-xl font-bold text-gray-800">สรุปออเดอร์</h2>
             <div class="flex gap-2">
                 <button onclick="clearCart()" class="btn-bounce w-11 h-11 rounded-full bg-red-50 flex items-center justify-center text-red-500 active:bg-red-100 transition-all"><i class="fas fa-trash text-xs"></i></button>
@@ -576,13 +471,13 @@
         
         <div id="cart-list-container" class="flex-1 overflow-y-auto px-6 py-4 space-y-3 hide-scroll"></div>
         
-        <div class="p-6 bg-gray-50 rounded-t-[2rem] space-y-3">
-            <div class="bg-white rounded-xl p-3 flex items-center border border-gray-200 shadow-sm gap-2">
+        <div class="p-6 bg-white/50 backdrop-blur-md rounded-t-[2rem] space-y-3 border-t border-white/50">
+            <div class="bg-white/70 rounded-xl p-3 flex items-center border border-white shadow-sm gap-2">
                 <i class="fas fa-user text-gray-400 ml-1"></i>
                 <input type="text" id="user-name" maxlength="20" placeholder="ชื่อผู้สั่ง" class="bg-transparent w-full text-base outline-none text-gray-700">
             </div>
             
-            <div class="bg-white rounded-xl p-2 pl-4 flex items-center border border-gray-200 shadow-sm justify-between transition-colors" id="code-input-container">
+            <div class="bg-white/70 rounded-xl p-2 pl-4 flex items-center border border-white shadow-sm justify-between transition-colors" id="code-input-container">
                 <div class="flex items-center gap-2 w-full">
                     <i class="fas fa-ticket-alt text-gray-400" id="code-icon"></i>
                     <input type="text" id="discount-code" placeholder="โค้ดส่วนลด" class="bg-transparent w-full text-base outline-none text-gray-700 uppercase transition-colors">
@@ -595,28 +490,28 @@
                 <div class="flex flex-col">
                     <span class="text-gray-500 text-sm">ยอดสุทธิ</span>
                 </div>
-                <span id="sheet-grand-total" class="text-2xl font-bold text-brand-purple">0 ฿</span>
+                <span id="sheet-grand-total" class="text-2xl font-bold text-indigo-600">0 ฿</span>
             </div>
 
-            <button onclick="submitOrderToLine()" id="btn-submit-order" class="btn-bounce w-full bg-gradient-gold text-white font-bold py-4 rounded-xl shadow-xl shadow-yellow-500/30 active:scale-95 transition-all flex justify-center items-center gap-2 text-lg text-shadow-sm">
+            <button onclick="submitOrderToLine()" id="btn-submit-order" class="btn-bounce w-full btn-gradient text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-all flex justify-center items-center gap-2 text-lg">
                 <span>ยืนยันการสั่ง</span>
                 <i class="fas fa-paper-plane"></i>
             </button>
             <div class="h-10"></div> </div>
     </div>
 
-    <div id="reward-modal" class="fixed inset-0 z-[130] bg-gray-900/90 backdrop-blur-sm flex items-center justify-center p-6 hidden stagger-item">
-        <div class="bg-gradient-to-b from-yellow-100 to-white rounded-[2rem] p-1 w-full max-w-sm shadow-2xl relative overflow-hidden">
-            <div class="absolute inset-0 z-0 opacity-20" style="background: repeating-conic-gradient(#FFC800 0 15deg, transparent 15deg 30deg);"></div>
+    <div id="reward-modal" class="fixed inset-0 z-[130] bg-black/50 backdrop-blur-md flex items-center justify-center p-6 hidden stagger-item">
+        <div class="bg-white rounded-[2rem] p-1 w-full max-w-sm shadow-2xl relative overflow-hidden border border-white/50">
+            <div class="absolute inset-0 z-0 opacity-20" style="background: repeating-conic-gradient(#F59E0B 0 15deg, transparent 15deg 30deg);"></div>
             
             <div class="bg-white/90 backdrop-blur-sm rounded-[1.8rem] p-6 text-center relative z-10">
-                <div class="w-28 h-28 bg-gradient-gold rounded-full flex items-center justify-center mx-auto mb-4 text-6xl shadow-lg border-4 border-white animate-bounce-slow">
+                <div class="w-28 h-28 btn-gradient rounded-full flex items-center justify-center mx-auto mb-4 text-6xl shadow-lg border-4 border-white animate-bounce-slow">
                     👑
                 </div>
                 <h2 class="text-2xl font-black text-gray-800 mb-1">ยินดีด้วย!</h2>
-                <p class="text-brand-purple font-bold text-lg mb-4">คุณคือ "เทพเจ้ากะเพรา"</p>
+                <p class="text-indigo-600 font-bold text-lg mb-4">คุณคือ "เทพเจ้ากะเพรา"</p>
                 
-                <div class="bg-orange-50 border border-orange-100 rounded-xl p-4 mb-6">
+                <div class="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-6">
                     <p class="text-sm text-gray-600 mb-2">สั่งครบ 10 ครั้งแล้ว รับรางวัลฟรี!</p>
                     <div class="font-bold text-xl text-orange-600">🎁 สินค้า Moshi Moshi</div>
                     <p class="text-[10px] text-gray-400 mt-1">(มูลค่าไม่เกิน 30.-)</p>
@@ -631,10 +526,10 @@
         </div>
     </div>
 
-    <div id="modal-overlay" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-50 hidden transition-opacity opacity-0" onclick="closeModal()"></div>
-    <div id="modal-content" class="fixed bottom-0 left-0 right-0 bg-white rounded-t-[2.5rem] z-50 transform translate-y-full transition-transform duration-300 shadow-2xl max-w-md mx-auto h-[85vh] flex flex-col touch-pan-y safe-area-pb">
+    <div id="modal-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden transition-opacity opacity-0" onclick="closeModal()"></div>
+    <div id="modal-content" class="fixed bottom-0 left-0 right-0 glass-heavy rounded-t-[2.5rem] z-50 transform translate-y-full transition-transform duration-300 shadow-2xl max-w-md mx-auto h-[85vh] flex flex-col touch-pan-y safe-area-pb">
         
-        <div id="modal-drag-handle" class="w-full flex justify-center pt-4 pb-2 cursor-grab active:cursor-grabbing z-50 bg-white rounded-t-[2.5rem]">
+        <div id="modal-drag-handle" class="w-full flex justify-center pt-4 pb-2 cursor-grab active:cursor-grabbing z-50">
             <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
         </div>
 
@@ -644,7 +539,7 @@
 
         <div id="modal-scroll-area" class="flex-1 overflow-y-auto hide-scroll px-6 pb-24 pt-4">
             <div class="flex justify-center mb-6">
-                <div class="w-24 h-24 bg-brand-bg rounded-full flex items-center justify-center text-6xl shadow-inner border-4 border-white">
+                <div class="w-24 h-24 bg-white/70 rounded-full flex items-center justify-center text-6xl shadow-inner border-4 border-white backdrop-blur-sm">
                     <span id="modal-icon">🍜</span>
                 </div>
             </div>
@@ -654,66 +549,66 @@
                 <div class="flex justify-center items-center gap-2">
                     <span id="modal-kcal" class="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-bold transition-all">0 kcal</span>
                     <span class="text-gray-300">|</span>
-                    <span id="modal-price" class="text-xl font-bold text-brand-purple">50</span>
+                    <span id="modal-price" class="text-xl font-bold text-indigo-600">50</span>
                     <span class="text-sm text-gray-400">บาท</span>
                 </div>
             </div>
 
             <div class="flex items-center justify-center gap-6 mb-6">
-                <button onclick="adjustQty(-1)" class="btn-bounce w-12 h-12 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold shadow-sm active:bg-gray-200 transition-all text-lg">-</button>
+                <button onclick="adjustQty(-1)" class="btn-bounce w-12 h-12 rounded-full bg-white text-gray-600 flex items-center justify-center font-bold shadow-sm border border-gray-200 active:bg-gray-100 transition-all text-lg">-</button>
                 <span id="modal-qty" class="text-2xl font-bold text-gray-800 w-8 text-center">1</span>
-                <button onclick="adjustQty(1)" class="btn-bounce w-12 h-12 rounded-full bg-brand-yellow text-gray-800 flex items-center justify-center font-bold shadow-md active:bg-brand-orange transition-all text-lg">+</button>
+                <button onclick="adjustQty(1)" class="btn-bounce w-12 h-12 rounded-full btn-gradient text-white flex items-center justify-center font-bold shadow-md active:scale-95 transition-all text-lg">+</button>
             </div>
 
             <div id="modal-meat-section" class="mb-6 hidden">
                 <h4 class="font-bold text-gray-800 mb-3 text-sm">เลือกเนื้อสัตว์</h4>
                 <div class="flex gap-2 overflow-x-auto pb-2 hide-scroll p-1" id="meat-options-container">
-                    <label class="cursor-pointer flex-shrink-0"><input type="radio" name="modal-meat" value="สันคอ" class="peer sr-only"><div class="px-4 py-2 rounded-xl border-2 border-gray-100 bg-white text-sm text-gray-500 peer-checked:border-brand-yellow peer-checked:bg-yellow-50 peer-checked:text-gray-800 transition-all btn-bounce">สันคอ</div></label>
-                    <label class="cursor-pointer flex-shrink-0"><input type="radio" name="modal-meat" value="หมูสับ" class="peer sr-only"><div class="px-4 py-2 rounded-xl border-2 border-gray-100 bg-white text-sm text-gray-500 peer-checked:border-brand-yellow peer-checked:bg-yellow-50 peer-checked:text-gray-800 transition-all btn-bounce">หมูสับ</div></label>
-                    <label class="cursor-pointer flex-shrink-0"><input type="radio" name="modal-meat" value="หมูเด้ง" class="peer sr-only"><div class="px-4 py-2 rounded-xl border-2 border-gray-100 bg-white text-sm text-gray-500 peer-checked:border-brand-yellow peer-checked:bg-yellow-50 peer-checked:text-gray-800 transition-all btn-bounce">หมูเด้ง</div></label>
+                    <label class="cursor-pointer flex-shrink-0"><input type="radio" name="modal-meat" value="สันคอ" class="peer sr-only"><div class="px-4 py-2 rounded-xl border border-white bg-white/60 text-sm text-gray-500 peer-checked:border-yellow-400 peer-checked:bg-yellow-50 peer-checked:text-gray-800 transition-all btn-bounce backdrop-blur-sm shadow-sm">สันคอ</div></label>
+                    <label class="cursor-pointer flex-shrink-0"><input type="radio" name="modal-meat" value="หมูสับ" class="peer sr-only"><div class="px-4 py-2 rounded-xl border border-white bg-white/60 text-sm text-gray-500 peer-checked:border-yellow-400 peer-checked:bg-yellow-50 peer-checked:text-gray-800 transition-all btn-bounce backdrop-blur-sm shadow-sm">หมูสับ</div></label>
+                    <label class="cursor-pointer flex-shrink-0"><input type="radio" name="modal-meat" value="หมูเด้ง" class="peer sr-only"><div class="px-4 py-2 rounded-xl border border-white bg-white/60 text-sm text-gray-500 peer-checked:border-yellow-400 peer-checked:bg-yellow-50 peer-checked:text-gray-800 transition-all btn-bounce backdrop-blur-sm shadow-sm">หมูเด้ง</div></label>
                 </div>
             </div>
 
             <div class="mb-6">
                 <h4 class="font-bold text-gray-800 mb-3 text-sm">เพิ่มเติมความอร่อย</h4>
                 <div class="space-y-3">
-                    <label class="flex items-center justify-between p-3 rounded-2xl bg-gray-50 border border-transparent hover:border-yellow-200 cursor-pointer transition-all has-[:checked]:bg-yellow-50 has-[:checked]:border-brand-yellow btn-bounce">
+                    <label class="flex items-center justify-between p-3 rounded-2xl bg-white/60 border border-white hover:border-yellow-200 cursor-pointer transition-all has-[:checked]:bg-yellow-50 has-[:checked]:border-yellow-400 btn-bounce backdrop-blur-sm shadow-sm">
                         <div class="flex items-center gap-3"><span class="text-sm font-medium text-gray-700">💎 พิเศษ</span></div>
-                        <div class="flex items-center gap-3"><span class="text-xs font-bold text-gray-400">+10.-</span><input type="checkbox" id="modal-opt-special" class="accent-brand-yellow w-5 h-5 rounded" value="10"></div>
+                        <div class="flex items-center gap-3"><span class="text-xs font-bold text-gray-400">+10.-</span><input type="checkbox" id="modal-opt-special" class="accent-yellow-500 w-5 h-5 rounded" value="10"></div>
                     </label>
                     <div class="grid grid-cols-2 gap-3">
-                        <label class="flex items-center justify-between p-3 rounded-2xl bg-gray-50 border border-transparent has-[:checked]:bg-yellow-50 has-[:checked]:border-brand-yellow cursor-pointer btn-bounce"><span class="text-sm text-gray-700">🍳 ไข่ข้น</span><div class="flex items-center gap-2"><span class="text-xs font-bold text-gray-400">+10.-</span><input type="checkbox" id="modal-opt-kaikhon" class="accent-brand-yellow w-4 h-4" value="10"></div></label>
-                        <label class="flex items-center justify-between p-3 rounded-2xl bg-gray-50 border border-transparent has-[:checked]:bg-yellow-50 has-[:checked]:border-brand-yellow cursor-pointer btn-bounce"><span class="text-sm text-gray-700">🥚 ไข่ดาว</span><div class="flex items-center gap-2"><span class="text-xs font-bold text-gray-400">+10.-</span><input type="checkbox" id="modal-opt-kaidao" class="accent-brand-yellow w-4 h-4" value="10"></div></label>
-                        <label class="flex items-center justify-between p-3 rounded-2xl bg-gray-50 border border-transparent has-[:checked]:bg-yellow-50 has-[:checked]:border-brand-yellow cursor-pointer btn-bounce"><span class="text-sm text-gray-700">🥞 ไข่เจียว</span><div class="flex items-center gap-2"><span class="text-xs font-bold text-gray-400">+10.-</span><input type="checkbox" id="modal-opt-kaijiao" class="accent-brand-yellow w-4 h-4" value="10"></div></label>
-                        <label class="flex items-center justify-between p-3 rounded-2xl bg-gray-50 border border-transparent has-[:checked]:bg-yellow-50 has-[:checked]:border-brand-yellow cursor-pointer btn-bounce"><span class="text-sm text-gray-700">⚫ ไข่เยี่ยวม้า</span><div class="flex items-center gap-2"><span class="text-xs font-bold text-gray-400">+10.-</span><input type="checkbox" id="modal-opt-kaiyiewma" class="accent-brand-yellow w-4 h-4" value="10"></div></label>
-                        <label class="flex items-center justify-between p-3 rounded-2xl bg-gray-50 border border-transparent has-[:checked]:bg-yellow-50 has-[:checked]:border-brand-yellow cursor-pointer btn-bounce"><span class="text-sm text-gray-700">🥚 ไข่ต้ม</span><div class="flex items-center gap-2"><span class="text-xs font-bold text-gray-400">+10.-</span><input type="checkbox" id="modal-opt-kaitom" class="accent-brand-yellow w-4 h-4" value="10"></div></label>
+                        <label class="flex items-center justify-between p-3 rounded-2xl bg-white/60 border border-white has-[:checked]:bg-yellow-50 has-[:checked]:border-yellow-400 cursor-pointer btn-bounce backdrop-blur-sm shadow-sm"><span class="text-sm text-gray-700">🍳 ไข่ข้น</span><div class="flex items-center gap-2"><span class="text-xs font-bold text-gray-400">+10.-</span><input type="checkbox" id="modal-opt-kaikhon" class="accent-yellow-500 w-4 h-4" value="10"></div></label>
+                        <label class="flex items-center justify-between p-3 rounded-2xl bg-white/60 border border-white has-[:checked]:bg-yellow-50 has-[:checked]:border-yellow-400 cursor-pointer btn-bounce backdrop-blur-sm shadow-sm"><span class="text-sm text-gray-700">🥚 ไข่ดาว</span><div class="flex items-center gap-2"><span class="text-xs font-bold text-gray-400">+10.-</span><input type="checkbox" id="modal-opt-kaidao" class="accent-yellow-500 w-4 h-4" value="10"></div></label>
+                        <label class="flex items-center justify-between p-3 rounded-2xl bg-white/60 border border-white has-[:checked]:bg-yellow-50 has-[:checked]:border-yellow-400 cursor-pointer btn-bounce backdrop-blur-sm shadow-sm"><span class="text-sm text-gray-700">🥞 ไข่เจียว</span><div class="flex items-center gap-2"><span class="text-xs font-bold text-gray-400">+10.-</span><input type="checkbox" id="modal-opt-kaijiao" class="accent-yellow-500 w-4 h-4" value="10"></div></label>
+                        <label class="flex items-center justify-between p-3 rounded-2xl bg-white/60 border border-white has-[:checked]:bg-yellow-50 has-[:checked]:border-yellow-400 cursor-pointer btn-bounce backdrop-blur-sm shadow-sm"><span class="text-sm text-gray-700">⚫ ไข่เยี่ยวม้า</span><div class="flex items-center gap-2"><span class="text-xs font-bold text-gray-400">+10.-</span><input type="checkbox" id="modal-opt-kaiyiewma" class="accent-yellow-500 w-4 h-4" value="10"></div></label>
+                        <label class="flex items-center justify-between p-3 rounded-2xl bg-white/60 border border-white has-[:checked]:bg-yellow-50 has-[:checked]:border-yellow-400 cursor-pointer btn-bounce backdrop-blur-sm shadow-sm"><span class="text-sm text-gray-700">🥚 ไข่ต้ม</span><div class="flex items-center gap-2"><span class="text-xs font-bold text-gray-400">+10.-</span><input type="checkbox" id="modal-opt-kaitom" class="accent-yellow-500 w-4 h-4" value="10"></div></label>
                     </div>
                 </div>
             </div>
             
             <div class="mb-4">
                 <h4 class="font-bold text-gray-800 mb-2 text-sm">Note</h4>
-                <textarea id="modal-note" rows="2" maxlength="100" class="w-full bg-gray-50 border-none rounded-2xl p-4 text-base focus:ring-2 focus:ring-brand-purple resize-none" placeholder="เช่น ไม่เผ็ด, ข้าวน้อย..."></textarea>
+                <textarea id="modal-note" rows="2" maxlength="100" class="w-full bg-white/50 border border-white rounded-2xl p-4 text-base focus:ring-2 focus:ring-indigo-400 resize-none shadow-inner" placeholder="เช่น ไม่เผ็ด, ข้าวน้อย..."></textarea>
             </div>
         </div>
 
-        <div class="absolute bottom-0 left-0 right-0 p-5 bg-white border-t border-gray-100 rounded-t-[2rem] safe-area-pb-plus">
-            <button onclick="addToCart()" class="btn-bounce w-full bg-gradient-primary text-white font-bold text-lg py-4 rounded-full shadow-xl shadow-purple-300/50 active:scale-95 transition-all flex justify-center items-center gap-2">
+        <div class="absolute bottom-0 left-0 right-0 p-5 bg-white/50 border-t border-white/60 rounded-t-[2rem] safe-area-pb-plus backdrop-blur-md">
+            <button onclick="addToCart()" class="btn-bounce w-full btn-gradient-purple text-white font-bold text-lg py-4 rounded-full shadow-lg active:scale-95 transition-all flex justify-center items-center gap-2">
                 <span>ใส่ตะกร้า</span>
                 <i class="fas fa-plus bg-white/20 rounded-full w-6 h-6 flex items-center justify-center text-xs"></i>
             </button>
         </div>
     </div>
 
-    <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 transition-all duration-300 opacity-0 -translate-y-10 z-[120] pointer-events-none">
-        <i class="fas fa-info-circle text-brand-yellow"></i>
+    <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 transition-all duration-300 opacity-0 -translate-y-10 z-[120] pointer-events-none">
+        <i class="fas fa-info-circle text-yellow-400"></i>
         <span class="font-medium text-sm" id="toast-msg">Notification</span>
     </div>
 
     <div id="receipt-capture">
         <div class="bg-white p-6 relative">
             <div class="text-center mb-6">
-                <div class="w-16 h-16 bg-brand-yellow rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm relative overflow-hidden">
+                <div class="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm relative overflow-hidden">
                     <img id="receipt-avatar-img" src="" class="w-full h-full object-cover">
                 </div>
                 <h2 class="text-2xl font-black text-gray-800 tracking-wider">KAPRAO52</h2>
@@ -752,7 +647,7 @@
                 </div>
                 <div class="flex justify-between items-end mt-2 pt-2 border-t border-gray-200">
                     <span class="font-bold text-gray-800">TOTAL</span>
-                    <span class="font-black text-3xl text-brand-purple receipt-total">0.-</span>
+                    <span class="font-black text-3xl text-indigo-600 receipt-total">0.-</span>
                 </div>
             </div>
 
@@ -797,7 +692,7 @@
             }
         });
 
-        // --- UPDATED: SOUND EFFECTS ---
+        // --- SOUNDS ---
         const sfxPop = new Audio('https://www.soundjay.com/buttons/sounds/button-16.mp3'); 
         const sfxOrder = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
         const sfxTrash = new Audio('https://www.soundjay.com/misc/sounds/crumple-paper-1.mp3'); 
@@ -946,29 +841,8 @@
             triggerHaptic();
         }
 
-        // --- PARALLAX & BUBBLES ---
-        window.addEventListener('scroll', () => {
-            const scrolled = window.scrollY;
-            const bg = document.getElementById('parallax-bg');
-            if(bg) bg.style.transform = `translateY(${scrolled * 0.3}px)`;
-        });
-
-        function createBubbles() {
-            const container = document.getElementById('bubbles-container');
-            const bubbleCount = 10;
-            for(let i=0; i<bubbleCount; i++){
-                const b = document.createElement('div');
-                b.className = 'bubble';
-                const size = Math.random() * 40 + 20;
-                b.style.width = size + 'px';
-                b.style.height = size + 'px';
-                b.style.left = Math.random() * 100 + '%';
-                b.style.animationDelay = Math.random() * 15 + 's';
-                b.style.animationDuration = Math.random() * 10 + 10 + 's';
-                container.appendChild(b);
-            }
-        }
-        createBubbles();
+        // --- BUBBLES NOT USED IN NEO GLASS BUT KEPT FOR STRUCTURE COMPAT ---
+        function createBubbles() { /* Placeholder */ }
 
         // DATA
         const menuItems = [
@@ -1058,7 +932,8 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '17.6.0'; 
+        // UPDATED VERSION
+        const CURRENT_VERSION = '18.0.0'; 
 
         function escapeHtml(text) {
             if (!text) return text;
@@ -1252,7 +1127,7 @@
             bar.style.width = `${percent}%`;
             txt.innerText = `${count}/10 ครั้ง`;
             
-            icon.className = "w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-inner transition-all duration-500 border-2 border-gray-100";
+            icon.className = "w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-inner transition-all duration-500 border border-white bg-white/50";
 
             if(count >= 10) {
                 icon.innerText = '👑';
@@ -1277,10 +1152,10 @@
         const wheelSegments = [
             { text: "ลด 5 บาท", color: "#FFFFFF", type: "discount_5" },
             { text: "ไม่ได้รางวัล", color: "#F3F4F6", type: "none" },
-            { text: "กินฟรี 40บ.", color: "#F59E0B", type: "free_40" },
+            { text: "กินฟรี 40บ.", color: "#FBBF24", type: "free_40" },
             { text: "ลองใหม่", color: "#FFFFFF", type: "none" }, 
             { text: "ฟรีไข่ดาว", color: "#F3F4F6", type: "free_egg" },
-            { text: "ลด 10 บาท", color: "#F59E0B", type: "discount_10" }
+            { text: "ลด 10 บาท", color: "#FBBF24", type: "discount_10" }
         ];
         function drawWheel() {
             const canvas = document.getElementById('wheel-canvas');
@@ -1363,7 +1238,7 @@
             // Create 6 skeleton cards
             for(let i=0; i<6; i++) {
                 const el = document.createElement('div');
-                el.className = "menu-card-style p-4 flex items-center justify-between shadow-sm border border-gray-100 mb-4";
+                el.className = "glass-card p-4 flex items-center justify-between shadow-sm border border-white mb-4";
                 el.innerHTML = `
                     <div class="flex items-center gap-4 w-full">
                         <div class="w-16 h-16 rounded-2xl skeleton flex-shrink-0"></div>
@@ -1386,8 +1261,8 @@
             const msg = document.getElementById('dessert-msg');
             
             // 1. Fade Out
-            grid.classList.add('page-transition-exit');
-            if(!msg.classList.contains('hidden')) msg.classList.add('page-transition-exit');
+            grid.classList.add('page-out');
+            if(!msg.classList.contains('hidden')) msg.classList.add('page-out');
             
             setTimeout(() => {
                 activeCategory = cat;
@@ -1405,10 +1280,10 @@
                 
                 const title = document.getElementById('section-title');
                 msg.classList.add('hidden');
-                msg.classList.remove('page-transition-exit');
+                msg.classList.remove('page-out');
 
                 // 2. Render Skeleton briefly
-                grid.classList.remove('page-transition-exit');
+                grid.classList.remove('page-out');
                 renderSkeletonLoader();
 
                 // 3. Update Title & Render Real Content after delay
@@ -1431,8 +1306,8 @@
                     document.getElementById('section-title').scrollIntoView({ behavior: 'smooth', block: 'start' });
                     
                     // 4. Fade In new content
-                    grid.classList.add('page-transition-enter');
-                    setTimeout(() => grid.classList.remove('page-transition-enter'), 300);
+                    grid.classList.add('page-in');
+                    setTimeout(() => grid.classList.remove('page-in'), 300);
                 }, 150); 
 
             }, 200);
@@ -1458,7 +1333,7 @@
                 const grayscaleClass = isSoldOut ? 'grayscale opacity-70' : '';
                 const pointerClass = (isDessert || isSoldOut) ? '' : 'cursor-pointer';
 
-                el.className = `menu-card-style p-4 flex items-center justify-between shadow-sm border border-gray-100 stagger-item group ${pointerClass} ${grayscaleClass}`;
+                el.className = `glass-card p-4 flex items-center justify-between shadow-sm border border-white stagger-item group ${pointerClass} ${grayscaleClass}`;
                 
                 el.onclick = () => {
                     if (isSoldOut) {
@@ -1478,11 +1353,11 @@
                 } else if (isDessert) {
                     actionButton = `<span class="text-[10px] font-bold text-white bg-gray-400 px-2 py-1 rounded-full">เร็วๆ นี้</span>`;
                 } else {
-                    actionButton = `<div class="btn-bounce w-8 h-8 rounded-full bg-gradient-gold text-white flex items-center justify-center shadow-md"><i class="fas fa-plus text-xs"></i></div>`;
+                    actionButton = `<div class="btn-bounce w-8 h-8 rounded-full btn-gradient text-white flex items-center justify-center shadow-md"><i class="fas fa-plus text-xs"></i></div>`;
                 }
                 
                 const priceDisplay = (isDessert || isSoldOut) 
-                    ? `<span class="font-bold text-gray-300 text-lg line-through decoration-transparent">${item.price}</span>` 
+                    ? `<span class="font-bold text-gray-400 text-lg line-through decoration-transparent">${item.price}</span>` 
                     : `<span class="font-bold text-gray-700 text-lg">${item.price}</span>`;
                 
                 const contentStyle = (isDessert || isSoldOut) ? 'opacity-60 grayscale-[50%]' : '';
@@ -1493,17 +1368,17 @@
 
                 el.innerHTML = `
                     <div class="flex items-center gap-4 ${contentStyle}">
-                        <div class="relative p-[2px] rounded-2xl bg-gradient-to-br from-brand-yellow to-brand-orange shadow-sm">
+                        <div class="relative p-[2px] rounded-2xl bg-white/60 shadow-sm border border-white">
                             ${newBadge}
                             <div class="w-16 h-16 rounded-2xl bg-white flex items-center justify-center text-3xl">
                                 ${item.icon}
                             </div>
                         </div>
                         <div>
-                            <h3 class="font-bold text-gray-800 text-base group-hover:text-brand-purple transition-colors">${item.name}</h3>
+                            <h3 class="font-bold text-gray-800 text-base group-hover:text-indigo-600 transition-colors">${item.name}</h3>
                             <div class="flex items-center gap-2 mt-1">
-                                <span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-md">${item.kcal} kcal</span>
-                                ${item.reqMeat ? '<span class="text-[10px] text-orange-400 border border-orange-200 px-1.5 rounded">เลือกเนื้อสัตว์</span>' : ''}
+                                <span class="text-xs text-gray-500 bg-white/50 px-2 py-0.5 rounded-md border border-white/50">${item.kcal} kcal</span>
+                                ${item.reqMeat ? '<span class="text-[10px] text-yellow-600 border border-yellow-200 bg-yellow-50 px-1.5 rounded">เลือกเนื้อสัตว์</span>' : ''}
                             </div>
                         </div>
                     </div>
@@ -1522,7 +1397,7 @@
             promotions.forEach((promo, index) => {
                 const el = document.createElement('div');
                 el.style.animationDelay = `${index * 0.1}s`;
-                el.className = "menu-card-style p-0 flex overflow-hidden cursor-pointer shadow-sm border border-gray-100 stagger-item mb-2 btn-bounce";
+                el.className = "glass-card p-0 flex overflow-hidden cursor-pointer shadow-sm border border-white stagger-item mb-2 btn-bounce";
                 el.onclick = () => {
                     navigator.clipboard.writeText(promo.code);
                     showToast(`คัดลอกโค้ด ${promo.code} แล้ว!`);
@@ -1534,28 +1409,28 @@
                         <span class="text-2xl">${promo.icon}</span>
                         <span class="text-[10px] opacity-80 mt-1">TAP</span>
                     </div>
-                    <div class="flex-1 p-4 flex flex-col justify-center relative bg-white">
+                    <div class="flex-1 p-4 flex flex-col justify-center relative bg-white/60 backdrop-blur-sm">
                         <div class="absolute left-0 top-0 bottom-0 border-l-2 border-dashed border-gray-100"></div>
                         <h3 class="font-bold text-gray-800">${promo.title}</h3>
-                        <p class="text-xs text-gray-400 mt-0.5">${promo.desc}</p>
-                        <div class="mt-2 bg-gray-100 inline-block px-2 py-1 rounded text-xs font-bold text-gray-600 tracking-wider w-max border border-gray-200">${promo.code}</div>
+                        <p class="text-xs text-gray-500 mt-0.5">${promo.desc}</p>
+                        <div class="mt-2 bg-white inline-block px-2 py-1 rounded text-xs font-bold text-gray-600 tracking-wider w-max border border-gray-200 shadow-sm">${promo.code}</div>
                     </div>
                 `;
                 grid.appendChild(el);
             });
 
             const wheelDiv = document.createElement('div');
-            wheelDiv.className = "w-full bg-white rounded-[1.5rem] p-6 mt-4 mb-6 shadow-sm border border-gray-100 flex flex-col items-center stagger-item";
+            wheelDiv.className = "w-full glass-card p-6 mt-4 mb-6 shadow-sm border border-white flex flex-col items-center stagger-item";
             wheelDiv.style.animationDelay = "0.3s";
             wheelDiv.innerHTML = `
                 <h3 class="font-bold text-gray-800 text-lg mb-1">วงล้อลุ้นกินฟรี! 🎡</h3>
-                <p class="text-xs text-gray-400 mb-4">ลุ้นรับเมนูราคา 40 บาท ฟรีทันที (3 ครั้ง/วัน)</p>
+                <p class="text-xs text-gray-500 mb-4">ลุ้นรับเมนูราคา 40 บาท ฟรีทันที (3 ครั้ง/วัน)</p>
                 <div id="wheel-container">
                     <div class="wheel-pointer"></div>
                     <canvas id="wheel-canvas" width="300" height="300"></canvas>
                     <div class="wheel-center text-2xl">😋</div>
                 </div>
-                <button onclick="spinWheel()" class="btn-bounce bg-gradient-primary text-white px-8 py-3 rounded-full font-bold shadow-xl shadow-purple-300/50 active:scale-95 transition-all hover:scale-105">หมุนเลย!</button>
+                <button onclick="spinWheel()" class="btn-bounce btn-gradient-purple text-white px-8 py-3 rounded-full font-bold shadow-lg transition-all hover:scale-105">หมุนเลย!</button>
             `;
             grid.appendChild(wheelDiv);
             setTimeout(drawWheel, 100);
@@ -1881,14 +1756,14 @@
                     let statusHtml = '';
                     let statusClass = '';
                     if(t.status === 'pending') {
-                        statusHtml = `<span class="text-brand-purple font-bold"><i class="far fa-clock"></i> รอลุ้นงวด ${t.drawDate || 'เร็วๆนี้'}</span>`;
-                        statusClass = 'border-l-4 border-brand-purple bg-indigo-50';
+                        statusHtml = `<span class="text-indigo-600 font-bold"><i class="far fa-clock"></i> รอลุ้นงวด ${t.drawDate || 'เร็วๆนี้'}</span>`;
+                        statusClass = 'border-l-4 border-indigo-500 bg-indigo-50/50';
                     } else if(t.status === 'won') {
                         statusHtml = '<span class="text-yellow-600 font-bold"><i class="fas fa-trophy"></i> ถูกรางวัล!</span>';
-                        statusClass = 'border-l-4 border-yellow-500 bg-yellow-50';
+                        statusClass = 'border-l-4 border-yellow-500 bg-yellow-50/50';
                     } else {
                         statusHtml = '<span class="text-gray-400 font-bold"><i class="fas fa-times-circle"></i> ไม่ถูกรางวัล</span>';
-                        statusClass = 'border-l-4 border-gray-300 bg-gray-50 opacity-70 grayscale';
+                        statusClass = 'border-l-4 border-gray-300 bg-gray-50/50 opacity-70 grayscale';
                     }
                     const item = document.createElement('div');
                     item.onclick = () => reprintReceipt(index);
@@ -1898,7 +1773,7 @@
                             <div class="text-[10px] text-gray-400">Order ID: ${t.id}</div>
                             <div class="flex items-baseline gap-2 mt-1">
                                 <span class="text-xs text-gray-600">เลขลุ้น:</span>
-                                <span class="text-2xl font-black text-brand-purple tracking-widest">${t.number}</span>
+                                <span class="text-2xl font-black text-indigo-600 tracking-widest">${t.number}</span>
                             </div>
                             <div class="text-[10px] text-gray-400 mt-1">ซื้อเมื่อ: ${t.date}</div>
                             <div class="text-[10px] text-indigo-500 font-bold mt-2"><i class="fas fa-print"></i> กดเพื่อพิมพ์ใบเสร็จ</div>
@@ -1946,19 +1821,19 @@
                  const lottoId = generateOrderId(); 
                  const listContainer = document.getElementById('cart-list-container');
                  const lottoBanner = document.createElement('div');
-                 lottoBanner.className = "bg-gradient-primary text-white p-4 rounded-xl mb-4 flex justify-between items-center shadow-md relative overflow-hidden stagger-item";
+                 lottoBanner.className = "bg-white/50 border border-white p-4 rounded-xl mb-4 flex justify-between items-center shadow-sm relative overflow-hidden stagger-item backdrop-blur-sm";
                  lottoBanner.innerHTML = `
-                    <div class="absolute -right-4 -top-4 bg-white opacity-10 w-20 h-20 rounded-full"></div>
+                    <div class="absolute -right-4 -top-4 bg-indigo-100 opacity-50 w-20 h-20 rounded-full"></div>
                     <div class="flex flex-col z-10">
-                        <span class="text-[10px] opacity-90 uppercase tracking-wider">Order ID ของคุณ</span>
+                        <span class="text-[10px] text-gray-500 uppercase tracking-wider">Order ID ของคุณ</span>
                         <div class="flex items-baseline gap-1">
-                            <span class="font-bold text-xl">${lottoId.slice(0, -2)}</span>
-                            <span class="font-black text-3xl text-brand-yellow drop-shadow-md">${lottoId.slice(-2)}</span>
+                            <span class="font-bold text-xl text-gray-700">${lottoId.slice(0, -2)}</span>
+                            <span class="font-black text-3xl text-yellow-500 drop-shadow-sm">${lottoId.slice(-2)}</span>
                         </div>
                     </div>
                     <div class="z-10 text-right">
                         <div class="text-2xl">🎟️</div>
-                        <span class="text-[10px] font-bold">ลุ้นหวยงวดนี้!</span>
+                        <span class="text-[10px] font-bold text-gray-600">ลุ้นหวยงวดนี้!</span>
                     </div>
                  `;
                  listContainer.insertBefore(lottoBanner, listContainer.firstChild);
@@ -2004,7 +1879,7 @@
             container.innerHTML = '';
             cart.forEach(item => {
                 const el = document.createElement('div');
-                el.className = "bg-white p-3 rounded-xl border border-gray-100 flex justify-between items-start stagger-item";
+                el.className = "bg-white/60 p-3 rounded-xl border border-white flex justify-between items-start stagger-item backdrop-blur-sm";
                 let detail = item.meat ? `<span class="text-orange-500 text-xs bg-orange-50 px-1 rounded">${item.meat}</span> ` : '';
                 if(item.addons.length) detail += `<span class="text-gray-400 text-xs">+${item.addons.join(',')}</span>`;
                 el.innerHTML = `
@@ -2056,7 +1931,7 @@
 
             if (code === '') {
                 msg.innerText = '';
-                inputContainer.className = "bg-white rounded-xl p-2 pl-4 flex items-center border border-gray-200 shadow-sm justify-between transition-colors";
+                inputContainer.className = "bg-white/70 rounded-xl p-2 pl-4 flex items-center border border-white shadow-sm justify-between transition-colors";
                 btn.innerHTML = 'ใช้โค้ด';
                 btn.className = 'btn-bounce bg-gray-800 hover:bg-gray-700 text-white text-xs px-4 py-2 rounded-lg transition-colors font-bold whitespace-nowrap active:bg-gray-900';
                 btn.onclick = applyDiscount; 
@@ -2077,7 +1952,7 @@
             } 
             else {
                 msg.innerHTML = `<span class="text-red-400">${promo ? 'ต้องสั่งครบ '+promo.minOrder : 'ไม่พบโค้ด'}</span>`;
-                inputContainer.className = "bg-white rounded-xl p-2 pl-4 flex items-center border border-red-200 shadow-sm justify-between transition-colors"; 
+                inputContainer.className = "bg-white/70 rounded-xl p-2 pl-4 flex items-center border border-red-200 shadow-sm justify-between transition-colors"; 
                 btn.innerHTML = 'ใช้โค้ด';
                 btn.className = 'btn-bounce bg-gray-800 hover:bg-gray-700 text-white text-xs px-4 py-2 rounded-lg transition-colors font-bold whitespace-nowrap active:bg-gray-900';
                 btn.onclick = applyDiscount; 
@@ -2242,7 +2117,7 @@
             try {
                 showGlobalLoader("กำลังบันทึกและส่งออเดอร์...");
                 sfxOrder.play(); triggerHaptic();
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#FFD755', '#7C77D6', '#FFFFFF'] });
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#F59E0B', '#8B5CF6', '#FFFFFF'] });
                 
                 recordOrderForStreak();
 
@@ -2362,7 +2237,7 @@
                     modal.classList.remove('hidden');
                     
                     const end = Date.now() + 3000; 
-                    const colors = ['#FFD755', '#ff0000', '#ffffff'];
+                    const colors = ['#F59E0B', '#8B5CF6', '#FFFFFF'];
 
                     (function frame() {
                         confetti({
