@@ -27,7 +27,7 @@
     
     <title>Kaprao52 - APP</title> 
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
@@ -45,8 +45,9 @@
                         }
                     },
                     fontFamily: {
+                        // UPDATED: Set everything to Kanit
                         sans: ['Kanit', 'sans-serif'],
-                        round: ['Varela Round', 'sans-serif']
+                        round: ['Kanit', 'sans-serif'] 
                     },
                     borderRadius: {
                         '4xl': '2.5rem',
@@ -80,11 +81,17 @@
         .scale-in { animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         @keyframes scaleIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
 
-        /* Page Transition Effect */
-        .page-out { animation: pageOut 0.2s ease-in forwards; }
-        .page-in { animation: pageIn 0.3s ease-out forwards; }
-        @keyframes pageOut { to { opacity: 0; transform: translateY(-10px) scale(0.95); } }
-        @keyframes pageIn { from { opacity: 0; transform: translateY(10px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        /* UPDATED: Smoother Page Transition Effect */
+        .page-out { animation: pageOut 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        .page-in { animation: pageIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        
+        @keyframes pageOut { 
+            to { opacity: 0; transform: translateY(-5px) scale(0.98); } 
+        }
+        @keyframes pageIn { 
+            from { opacity: 0; transform: translateY(5px) scale(0.98); } 
+            to { opacity: 1; transform: translateY(0) scale(1); } 
+        }
 
         .price-pop { animation: pricePop 0.3s ease-out; }
         @keyframes pricePop { 50% { transform: scale(1.2); } }
@@ -108,6 +115,7 @@
             font-weight: 600;
             box-shadow: 0 4px 6px -1px rgba(255, 215, 85, 0.3);
             border: 2px solid #FFD755;
+            transform: scale(1.05); /* Slight scale for active */
         }
         
         .category-pill-inactive {
@@ -1466,14 +1474,14 @@
                     actionButton = `<div class="w-8 h-8 rounded-full bg-brand-yellow text-gray-800 flex items-center justify-center shadow-md"><i class="fas fa-plus text-xs"></i></div>`;
                 }
                 
-                const priceDisplay = (isDessert || isSoldOut)
-                    ? `<span class="font-bold text-gray-300 text-lg line-through decoration-transparent">${item.price}</span>`
+                const priceDisplay = (isDessert || isSoldOut) 
+                    ? `<span class="font-bold text-gray-300 text-lg line-through decoration-transparent">${item.price}</span>` 
                     : `<span class="font-bold text-gray-700 text-lg">${item.price}</span>`;
                 
                 const contentStyle = (isDessert || isSoldOut) ? 'opacity-60 grayscale-[50%]' : '';
 
                 // NEW BADGE LOGIC
-                const newBadge = item.isNew && !isSoldOut
+                const newBadge = item.isNew && !isSoldOut 
                     ? `<span class="absolute -top-2 -right-2 bg-red-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full border-2 border-white shadow-sm z-10 animate-pulse">NEW!</span>` 
                     : '';
 
