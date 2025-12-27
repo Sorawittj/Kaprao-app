@@ -29,9 +29,7 @@
     <link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
     
     <title>Kaprao52 - APP</title> 
-    
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -94,14 +92,14 @@
         .bubble {
             position: absolute;
             bottom: -100px;
-            background-color: rgba(251, 191, 36, 0.15); /* Yellow Tint */
+            background-color: rgba(251, 191, 36, 0.15);
             border-radius: 50%;
             pointer-events: none;
             animation: floatUp linear infinite;
             z-index: -1;
         }
         .bubble.purple {
-            background-color: rgba(139, 92, 246, 0.1); /* Purple Tint */
+            background-color: rgba(139, 92, 246, 0.1);
         }
         
         @keyframes floatUp {
@@ -122,7 +120,7 @@
         .fast-card {
             background: #FFFFFF;
             border: 1px solid #ffffff;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03); /* Softer Shadow */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
             border-radius: 1.25rem;
             transition: transform 0.1s cubic-bezier(0.34, 1.56, 0.64, 1);
             position: relative;
@@ -147,7 +145,6 @@
         .stagger-item { opacity: 0; animation: fadeInUpSimple 0.4s ease-out forwards; }
         @keyframes fadeInUpSimple { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Skeleton Shimmer */
         .skeleton {
             background: #f0f0f0;
             position: relative; overflow: hidden;
@@ -159,13 +156,11 @@
         }
         @keyframes shimmer { 100% { transform: translateX(100%); } }
 
-        /* Page Transition */
         .page-out { animation: pageOut 0.15s ease-in forwards; }
         .page-in { animation: pageIn 0.2s ease-out forwards; }
         @keyframes pageOut { to { opacity: 0; transform: scale(0.98); } }
         @keyframes pageIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
 
-        /* Category Pills */
         .category-pill-active {
             background: #ffffff;
             border: 2px solid #FBBF24;
@@ -180,7 +175,6 @@
             color: #6B7280;
         }
 
-        /* --- GRADIENT TEXT & BUTTONS --- */
         .text-gradient {
             background: linear-gradient(to right, #7C3AED, #DB2777);
             -webkit-background-clip: text;
@@ -197,38 +191,31 @@
             border: none;
         }
 
-        /* --- GLOBAL LOADER --- */
         #global-loader { position: fixed; inset: 0; z-index: 9999; background: #ffffff; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.4s ease, visibility 0.4s; }
         .loader-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
         .cooking-pan { font-size: 4rem; animation: panFlip 1.5s infinite ease-in-out; transform-origin: center bottom; }
         @keyframes panFlip { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-10deg); } 75% { transform: rotate(10deg); } }
 
-        /* --- LUCKY WHEEL --- */
         #wheel-container { position: relative; width: 280px; height: 280px; margin: 0 auto 20px auto; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1)); }
         #wheel-canvas { width: 100%; height: 100%; border-radius: 50%; transition: transform 8s cubic-bezier(0.1, 0.99, 0.1, 0.99); }
         .wheel-pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 35px solid #F59E0B; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2)); z-index: 20; }
         .wheel-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px; background: white; border-radius: 50%; z-index: 10; box-shadow: 0 0 15px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; font-size: 20px; }
 
-        /* --- RECEIPT CAPTURE AREA (Hidden) --- */
         #receipt-capture { position: fixed; top: -9999px; left: -9999px; width: 400px; background: #FFFFFF; padding: 0; border-radius: 0; font-family: 'Kanit', sans-serif; color: #1F2937; }
 
-        /* --- XP BAR --- */
         .xp-bar-bg { background-color: #e5e7eb; border-radius: 9999px; overflow: hidden; height: 8px; }
         .xp-bar-fill { background: linear-gradient(90deg, #F59E0B, #D97706); height: 100%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
         
-        /* --- TICKET STYLES --- */
         .ticket-stub {
             background-image: radial-gradient(circle at 0 50%, transparent 8px, #ffffff 8.5px), radial-gradient(circle at 100% 50%, transparent 8px, #ffffff 8.5px);
             background-position: 0 0, 0 0; background-size: 100% 100%; transition: transform 0.1s ease;
         }
         
-        /* --- AVATAR --- */
         .avatar-option { width: 65px; height: 65px; cursor: pointer; transition: transform 0.2s; position: relative; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #ffffff; padding: 5px; border: 2px solid #f3f4f6; }
         .avatar-option img { width: 100%; height: 100%; object-fit: contain; }
         .avatar-option:hover { transform: scale(1.1); border-color: #F59E0B; }
         .avatar-selected { background: #fffbeb !important; border: 2px solid #F59E0B; box-shadow: 0 0 10px rgba(245, 158, 11, 0.2); transform: scale(1.1); }
         
-        /* Badges */
         .badge-newbie { background: #fefce8; color: #d97706; border: 1px solid #fde68a; }
         .badge-regular { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
         .badge-god { background: #fef3c7; color: #78350f; border: 1px solid #fcd34d; box-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
@@ -297,11 +284,9 @@
             <div class="flex flex-col justify-center">
                 <div class="flex items-center gap-2 mb-1">
                     <p class="text-xs text-gray-500 font-medium">สวัสดีครับ, วันนี้กินอะไรดี?</p>
-                    
                     <button id="line-login-btn" onclick="handleLogin()" class="hidden bg-[#06C755] hover:bg-[#05b34c] text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm transition-all flex items-center gap-1 btn-bounce">
                         <i class="fab fa-line"></i> เข้าสู่ระบบ
                     </button>
-
                 </div>
                 
                 <h1 class="text-4xl sm:text-5xl font-black leading-none tracking-tighter mb-2 relative z-10 pt-1 drop-shadow-sm whitespace-nowrap flex items-baseline">
@@ -410,7 +395,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V18.4.1 (Opt)</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V18.4.2 (Rec)</p>
         </div>
 
     </div>
@@ -610,10 +595,20 @@
             <div class="bg-white p-2 rounded-lg shadow-2xl mb-4 overflow-hidden">
                 <img id="receipt-result-img" class="w-full h-auto rounded" src="" alt="Receipt">
             </div>
-            <p class="text-white text-center font-bold mb-4 animate-pulse">👆 แตะค้างที่รูปเพื่อบันทึก</p>
-            <button onclick="document.getElementById('receipt-result-modal').classList.add('hidden')" class="btn-bounce bg-white/20 hover:bg-white/30 text-white px-6 py-3 rounded-full font-bold border border-white/50 backdrop-blur-md">
-                ปิดหน้าต่าง
-            </button>
+            
+            <div class="flex flex-col gap-2 w-full px-4">
+                <button onclick="downloadReceiptImage()" class="btn-bounce bg-gradient-to-r from-yellow-400 to-orange-500 text-white w-full py-3 rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 text-lg">
+                    <i class="fas fa-save"></i> บันทึกรูปภาพ
+                </button>
+                
+                <p class="text-white/70 text-xs text-center mb-2">
+                    (หากบันทึกไม่ได้ ให้แคปหน้าจอแทนนะครับ 📸)
+                </p>
+
+                <button onclick="document.getElementById('receipt-result-modal').classList.add('hidden')" class="btn-bounce bg-white/20 hover:bg-white/30 text-white w-full py-3 rounded-xl font-bold border border-white/50 backdrop-blur-md">
+                    ปิดหน้าต่าง
+                </button>
+            </div>
         </div>
     </div>
 
@@ -871,7 +866,6 @@
             }
         }
         
-        // IMPORTANT: Run bubbles on DOM Ready, not wait for window load
         document.addEventListener('DOMContentLoaded', createBubbles);
 
         // DATA
@@ -962,7 +956,7 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '18.4.1'; // Bumped version
+        const CURRENT_VERSION = '18.4.2'; 
 
         function escapeHtml(text) {
             if (!text) return text;
@@ -998,7 +992,6 @@
                     userAvatar = u.avatar || { image: avatarOptions[0], hat: false, name: 'น้องฝึกหัด' };
                     if(u.name) document.getElementById('user-name').value = u.name;
                     
-                    // Restore userId if available
                     if (u.userId) {
                         userAvatar.userId = u.userId;
                     }
@@ -1060,7 +1053,6 @@
             }
         }
 
-        // --- UPDATED: SYNC WITH AUTO-MIGRATION ---
         async function syncUserStatsFromServer(userId) {
             if(!userId) return;
             
@@ -1068,18 +1060,13 @@
             if(levelCount) levelCount.innerText = "กำลังซิงค์...";
 
             try {
-                // 1. ดึงข้อมูลจาก Server
                 const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getUserStats&userId=' + userId);
                 const serverData = await response.json();
                 
-                // 2. เช็คเงื่อนไข: ถ้า Server น้อยกว่า Local (แสดงว่าเพิ่ง Login ครั้งแรก หรือเปลี่ยนเครื่องมา)
-                // เราจะเอาส่วนต่าง (Local - Server) ส่งขึ้นไปเติมให้เท่ากัน
                 if (serverData.orders < userStats.orders) {
-                    
                     const diff = userStats.orders - serverData.orders;
                     console.log(`ตรวจพบประวัติเก่า ${diff} รายการ.. กำลังโอนย้ายไป Cloud`);
 
-                    // ส่งคำสั่ง Migrate ไปที่ doPost
                     await fetch(GOOGLE_SCRIPT_URL, {
                         method: 'POST',
                         mode: 'no-cors',
@@ -1091,12 +1078,10 @@
                         })
                     });
 
-                    // รอแป๊บนึง แล้วดึงข้อมูลใหม่อีกรอบ (Re-sync)
                     setTimeout(() => syncUserStatsFromServer(userId), 1500);
                     return; 
                 }
 
-                // 3. ถ้า Server มากกว่า หรือเท่ากัน ก็ใช้ค่าจาก Server ตามปกติ (กรณีเปลี่ยนเครื่องมา)
                 if(serverData && serverData.orders !== undefined) {
                     userStats.orders = serverData.orders;
                     localStorage.setItem(KEYS.STATS, JSON.stringify(userStats));
@@ -1105,15 +1090,12 @@
                 
             } catch (error) {
                 console.error("Sync Error:", error);
-                // ถ้า Error ให้ใช้ค่าเดิมในเครื่องไปก่อน
                 updateLevelUI();
             }
         }
 
-        // --- IMPROVED INIT LIFF ---
         async function initLIFF() {
             try {
-                // 3. START LIFF IMMEDIATELY (Don't wait for images)
                 await liff.init({ liffId: MY_LIFF_ID });
                 
                 if (liff.isLoggedIn()) {
@@ -1167,24 +1149,20 @@
             }
         }
 
-        // 4. BETTER LOGIN HANDLER
         function handleLogin() {
             const btn = document.getElementById('line-login-btn');
-            // Show Loading State Immediately
             btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> รอสักครู่...';
             btn.classList.add('opacity-75');
             
             if (liff.ready) {
                  liff.login();
             } else {
-                 // Fallback if not ready yet
                  liff.init({ liffId: MY_LIFF_ID }).then(() => {
                      liff.login();
                  });
             }
         }
 
-        // 5. USE DOMCONTENTLOADED INSTEAD OF LOAD (FASTER)
         document.addEventListener('DOMContentLoaded', () => {
             const savedVer = localStorage.getItem(KEYS.VERSION);
             if(savedVer !== CURRENT_VERSION) {
@@ -1193,9 +1171,8 @@
 
             loadUserDataSafe();
             
-            // Start LIFF/Data Fetch Immediately
             fetchLottoResults();
-            initLIFF(); // Call Init Here
+            initLIFF(); 
 
             setTimeout(autoCheckLottery, 1000);
             updateTicketBadge();
@@ -1224,8 +1201,6 @@
             
             renderMenu();
         });
-        
-        // ... (Functions below remain unchanged, but ensuring renderMenu exists) ...
         
         function updateLevelUI() {
             const count = userStats.orders;
@@ -1260,7 +1235,6 @@
             }
         }
 
-        // --- WHEEL ---
         let wheelSpinning = false;
         const wheelSegments = [
             { text: "ลด 5 บาท", color: "#FFFFFF", type: "discount_5" },
@@ -1339,19 +1313,15 @@
             else showToast(`ยินดีด้วย! คุณได้ ${reward.text}`);
         }
 
-        // --- CORE FUNCTIONS ---
         function scrollTabs(amount) {
             document.getElementById('tabs-container').scrollBy({ left: amount, behavior: 'smooth' });
         }
 
-        // --- UPDATED: SKELETON & TRANSITION (PERFORMANCE TUNED) ---
         function renderSkeletonLoader() {
             const grid = document.getElementById('menu-grid');
             grid.innerHTML = '';
-            // Create 6 skeleton cards
             for(let i=0; i<6; i++) {
                 const el = document.createElement('div');
-                // Use fast-card for performance instead of glass
                 el.className = "fast-card p-4 flex items-center justify-between shadow-sm mb-4";
                 el.innerHTML = `
                     <div class="flex items-center gap-4 w-full">
@@ -1368,18 +1338,16 @@
 
         function switchCategory(cat) {
             if(activeCategory === cat) return;
-            activeCategory = cat; // Update state immediately for responsiveness
+            activeCategory = cat; 
             triggerHaptic();
             playSound('switch');
             
             const grid = document.getElementById('menu-grid');
             const msg = document.getElementById('dessert-msg');
             
-            // 1. Fade Out
             grid.classList.add('page-out');
             if(!msg.classList.contains('hidden')) msg.classList.add('page-out');
             
-            // Update Tabs Immediately
             ['kaprao', 'garlic', 'noodle', 'soup', 'others', 'dessert', 'promotion'].forEach(c => {
                 const btn = document.getElementById(`tab-${c}`);
                 if (c === cat) {
@@ -1395,11 +1363,9 @@
                 msg.classList.add('hidden');
                 msg.classList.remove('page-out');
 
-                // 2. Render Skeleton briefly
                 grid.classList.remove('page-out');
                 renderSkeletonLoader();
 
-                // 3. Update Title & Render Real Content after delay
                 setTimeout(() => {
                     if (cat === 'promotion') {
                         title.innerText = "คูปอง & โปรโมชั่น";
@@ -1418,12 +1384,11 @@
                     
                     document.getElementById('section-title').scrollIntoView({ behavior: 'smooth', block: 'start' });
                     
-                    // 4. Fade In new content
                     grid.classList.add('page-in');
                     setTimeout(() => grid.classList.remove('page-in'), 300);
-                }, 50); // Shorter delay for speed
+                }, 50);
 
-            }, 150); // Faster fade out
+            }, 150);
         }
 
         function renderMenu() {
@@ -1441,12 +1406,11 @@
                 const isSoldOut = item.soldOut || false; 
                 
                 const el = document.createElement('div');
-                el.style.animationDelay = `${index * 0.05}s`; // Faster stagger
+                el.style.animationDelay = `${index * 0.05}s`;
                 
                 const grayscaleClass = isSoldOut ? 'grayscale opacity-70' : '';
                 const pointerClass = (isDessert || isSoldOut) ? '' : 'cursor-pointer';
 
-                // PERFORMANCE: Use fast-card instead of glass-card
                 el.className = `fast-card p-4 flex items-center justify-between stagger-item group ${pointerClass} ${grayscaleClass}`;
                 
                 el.onclick = () => {
@@ -1511,7 +1475,6 @@
             promotions.forEach((promo, index) => {
                 const el = document.createElement('div');
                 el.style.animationDelay = `${index * 0.1}s`;
-                // Use fast-card
                 el.className = "fast-card p-0 flex overflow-hidden cursor-pointer shadow-sm mb-2 btn-bounce stagger-item";
                 el.onclick = () => {
                     navigator.clipboard.writeText(promo.code);
@@ -1535,7 +1498,6 @@
             });
 
             const wheelDiv = document.createElement('div');
-            // Use fast-card
             wheelDiv.className = "w-full fast-card p-6 mt-4 mb-6 shadow-sm flex flex-col items-center stagger-item";
             wheelDiv.style.animationDelay = "0.3s";
             wheelDiv.innerHTML = `
@@ -1635,14 +1597,13 @@
             if (currentItem.reqMeat) {
                 const r = document.querySelector('input[name="modal-meat"]:checked');
                 
-                // SHAKE ANIMATION
                 if(!r) {
                     const meatContainer = document.getElementById('meat-options-container');
                     meatContainer.classList.remove('animate-shake');
-                    void meatContainer.offsetWidth; // Trigger reflow
+                    void meatContainer.offsetWidth;
                     meatContainer.classList.add('animate-shake', 'border', 'border-red-500', 'rounded-xl');
                     triggerHaptic();
-                    return; // Stop here
+                    return; 
                 }
                 meat = r.value;
             }
@@ -1704,7 +1665,6 @@
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
 
                 if (todayStr === lastOrderDate) {
-                    // Same day, do nothing
                 } else if (diffDays === 1) {
                     currentStreak++;
                 } else {
@@ -2096,6 +2056,18 @@
             modal.classList.remove('hidden');
         }
 
+        // --- NEW FUNCTION: DOWNLOAD IMAGE ---
+        function downloadReceiptImage() {
+            const img = document.getElementById('receipt-result-img');
+            const link = document.createElement('a');
+            link.href = img.src;
+            link.download = 'kaprao52-receipt-' + Date.now() + '.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('กำลังดาวน์โหลด...');
+        }
+
         function generateOrderCard() {
             showGlobalLoader("กำลังพิมพ์ใบเสร็จ...");
             const name = document.getElementById('user-name').value || 'ลูกค้า';
@@ -2145,7 +2117,7 @@
             }).then(canvas => {
                 hideGlobalLoader();
                 openReceiptResult(canvas.toDataURL());
-                showToast('แตะค้างที่รูปเพื่อบันทึก 📸');
+                showToast('เสร็จแล้ว! กดบันทึกรูปได้เลย');
             }).catch((err) => {
                 console.error(err);
                 hideGlobalLoader();
@@ -2208,7 +2180,7 @@
                 }).then(canvas => {
                     hideGlobalLoader();
                     openReceiptResult(canvas.toDataURL());
-                    showToast('แตะค้างที่รูปเพื่อบันทึก 📸');
+                    showToast('เสร็จแล้ว! กดบันทึกรูปได้เลย');
                 }).catch(() => {
                     hideGlobalLoader();
                     showToast('เกิดข้อผิดพลาดในการบันทึกภาพ');
