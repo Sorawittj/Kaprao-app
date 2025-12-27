@@ -488,7 +488,8 @@
                 <span>ยืนยันการสั่ง</span>
                 <i class="fas fa-paper-plane"></i>
             </button>
-            <div class="h-10"></div> </div>
+            <div class="h-64 md:h-10"></div> 
+        </div>
     </div>
 
     <div id="reward-modal" class="fixed inset-0 z-[130] bg-black/50 backdrop-blur-sm flex items-center justify-center p-6 hidden stagger-item">
@@ -588,71 +589,6 @@
                 <span>ใส่ตะกร้า</span>
                 <i class="fas fa-plus bg-white/20 rounded-full w-6 h-6 flex items-center justify-center text-xs"></i>
             </button>
-        </div>
-    </div>
-
-    <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 transition-all duration-300 opacity-0 -translate-y-10 z-[120] pointer-events-none">
-        <i class="fas fa-info-circle text-yellow-400"></i>
-        <span class="font-medium text-sm" id="toast-msg">Notification</span>
-    </div>
-
-    <div id="receipt-capture">
-        <div class="bg-white p-6 relative">
-            <div class="text-center mb-6">
-                <div class="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm relative overflow-hidden">
-                    <img id="receipt-avatar-img" src="" class="w-full h-full object-cover">
-                </div>
-                <h2 class="text-2xl font-black text-gray-800 tracking-wider">KAPRAO52</h2>
-                <p class="text-[10px] text-gray-400 tracking-widest uppercase mt-1">Authentic Thai Street Food</p>
-                <div class="mt-4 inline-block px-4 py-1 bg-gray-100 rounded-full border border-gray-200">
-                    <p class="text-xs font-bold text-gray-600">RECEIPT / ใบเสร็จรับเงิน</p>
-                </div>
-            </div>
-
-            <div class="border-t-2 border-dashed border-gray-200 my-4"></div>
-
-            <div class="flex justify-between items-center mb-1">
-                <span class="text-xs text-gray-400">Order ID</span>
-                <span class="font-bold text-gray-800 tracking-wide receipt-id">KP-XX99</span>
-            </div>
-            <div class="flex justify-between items-center mb-1">
-                <span class="text-xs text-gray-400">Date</span>
-                <span class="font-medium text-xs text-gray-600 receipt-date">01/01/2024 12:00</span>
-            </div>
-            <div class="flex justify-between items-center mb-4">
-                <span class="text-xs text-gray-400">Customer</span>
-                <span class="font-bold text-sm text-gray-800 receipt-name">Customer</span>
-            </div>
-
-            <div class="bg-gray-50 rounded-lg p-3 mb-4 space-y-2 receipt-items">
-            </div>
-
-            <div class="space-y-1">
-                <div class="flex justify-between text-xs text-gray-500">
-                    <span>Subtotal</span>
-                    <span class="receipt-subtotal">0.-</span>
-                </div>
-                <div class="flex justify-between text-xs text-green-600">
-                    <span>Discount</span>
-                    <span class="receipt-discount">-0.-</span>
-                </div>
-                <div class="flex justify-between items-end mt-2 pt-2 border-t border-gray-200">
-                    <span class="font-bold text-gray-800">TOTAL</span>
-                    <span class="font-black text-3xl text-indigo-600 receipt-total">0.-</span>
-                </div>
-            </div>
-
-            <div class="mt-6 pt-4 border-t-2 border-dotted border-gray-200 text-center">
-                <div class="flex justify-center gap-1 text-2xl text-gray-300 mb-2">
-                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                </div>
-                <p class="text-[10px] text-gray-400">THANK YOU FOR YOUR ORDER</p>
-                <div class="mt-4 flex justify-center opacity-50">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg" class="w-16 h-16 mix-blend-multiply">
-                </div>
-            </div>
-            
-            <div class="absolute bottom-0 left-0 right-0 h-4 bg-white" style="background: linear-gradient(45deg, transparent 33.333%, #ffffff 33.333%, #ffffff 66.667%, transparent 66.667%), linear-gradient(-45deg, transparent 33.333%, #ffffff 33.333%, #ffffff 66.667%, transparent 66.667%); background-size: 20px 40px; transform: translateY(10px);"></div>
         </div>
     </div>
 
@@ -1175,6 +1111,7 @@
                 }
             });
 
+            // 🚨 UPDATE 2: แก้ปัญหาคีย์บอร์ดบังช่องกรอก โดยเลื่อนหน้าจอขึ้น
             const inputs = document.querySelectorAll('input[type="text"], textarea');
             inputs.forEach(input => {
                 input.addEventListener('focus', () => {
@@ -2066,7 +2003,14 @@
 
             const receiptAvatar = document.getElementById('receipt-avatar-img');
             receiptAvatar.setAttribute('crossOrigin', 'anonymous'); 
-            receiptAvatar.src = userAvatar.image;
+            
+            // 🚨 UPDATE 3: แก้ไข CORS รูปโปรไฟล์ LINE เพื่อให้แคปจอได้
+            if (userAvatar.image && userAvatar.image.includes('line-scdn')) {
+                 receiptAvatar.src = 'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Dog%20face/3D/dog_face_3d.png';
+            } else {
+                 receiptAvatar.src = userAvatar.image;
+            }
+
             receiptAvatar.onerror = function() { 
                  this.src = 'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Dog%20face/3D/dog_face_3d.png';
             };
@@ -2271,24 +2215,27 @@
 
                     } catch (err) {
                         console.error("Send Error:", err);
+                        // 🚨 UPDATE 4: ถ้าส่งผ่าน LIFF ไม่ได้ ให้ดีดไปหน้าแชท (แต่ไม่ล้างตะกร้า เผื่อเขากดยกเลิกกลับมา)
                         setTimeout(() => {
-                            cart = []; 
-                            saveToLS();
-                            updateMiniCart();
-                            closeCheckout();
+                            // cart = []; 
+                            // saveToLS();
+                            // updateMiniCart();
+                            // closeCheckout();
                             hideGlobalLoader();
                             window.location.href = targetUrl; 
                         }, 500); 
                     }
                 } else {
+                    // กรณีเปิด Browser ธรรมดา
                     setTimeout(() => {
-                        cart = []; 
-                        saveToLS();
-                        updateMiniCart();
-                        closeCheckout();
+                        // 🚨 UPDATE 4: ไม่ล้างตะกร้า
+                        // cart = []; 
+                        // saveToLS();
+                        // updateMiniCart();
+                        // closeCheckout();
                         hideGlobalLoader();
                         window.location.href = targetUrl;
-                    }, 50); 
+                    }, 500); 
                 }
 
             } catch (error) {
