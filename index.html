@@ -217,12 +217,20 @@
             visibility: hidden; 
         }
 
-        /* --- ENABLE SAVE IMAGE INTERACTION --- */
+        /* --- FIX: ANDROID LONG PRESS --- */
+        /* บังคับให้รูปกดค้างได้ โดย Override ค่า select-none ของ body */
         .force-interact {
-            -webkit-user-select: text !important;
-            user-select: text !important;
             pointer-events: auto !important;
-            -webkit-touch-callout: default !important; /* iOS enable context menu */
+            user-select: auto !important;
+            -webkit-user-select: auto !important; /* Safari/Chrome */
+            -webkit-touch-callout: default !important; /* iOS/Android Menu */
+            z-index: 9999; 
+            position: relative;
+        }
+        
+        /* ป้องกัน Modal Overlay บังการกดรูป */
+        #receipt-preview-modal {
+            pointer-events: auto !important;
         }
 
         /* --- XP BAR --- */
@@ -261,19 +269,21 @@
         <p id="loader-text" class="text-xs text-gray-400 mt-2 font-medium">กำลังเตรียมร้าน...</p>
     </div>
 
-    <div id="receipt-preview-modal" class="fixed inset-0 z-[150] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 hidden">
-        <div class="bg-transparent max-w-sm w-full flex flex-col items-center">
-            <div class="bg-white rounded-lg shadow-2xl overflow-hidden mb-4 p-1">
-                <img id="receipt-preview-img" class="w-full h-auto rounded force-interact" src="" alt="Receipt">
+    <div id="receipt-preview-modal" class="fixed inset-0 z-[150] bg-black/85 backdrop-blur-sm flex items-center justify-center p-6 hidden">
+        <div class="w-full max-w-sm flex flex-col items-center">
+            
+            <p class="text-white font-bold text-sm mb-2 animate-pulse">
+                <i class="fas fa-hand-pointer"></i> แตะค้างที่รูปเพื่อบันทึก
+            </p>
+
+            <div class="bg-white rounded-lg shadow-2xl overflow-hidden mb-4 p-1 w-full relative">
+                <img id="receipt-preview-img" class="w-full h-auto rounded force-interact" src="" alt="Receipt" style="pointer-events: auto !important; user-select: auto !important;">
             </div>
+            
             <div class="flex flex-col gap-3 w-full">
-                <button onclick="downloadReceiptImage()" class="btn-bounce bg-white text-indigo-600 font-bold py-3 rounded-full shadow-lg flex items-center justify-center gap-2">
-                    <i class="fas fa-download"></i> บันทึกลงเครื่อง
+                <button onclick="closeReceiptPreview()" class="btn-bounce bg-white text-gray-800 font-bold py-3 rounded-full shadow-lg border border-gray-200">
+                    <i class="fas fa-times mr-1"></i> ปิดหน้าต่าง
                 </button>
-                <button onclick="closeReceiptPreview()" class="btn-bounce bg-gray-800/80 text-white font-medium py-3 rounded-full shadow-lg">
-                    ปิดหน้าต่าง
-                </button>
-                <p class="text-white/80 text-sm text-center mt-2 font-medium">หากกดปุ่มไม่ได้ <br> ให้ "แตะค้างที่รูป" เพื่อบันทึกครับ</p>
             </div>
         </div>
     </div>
@@ -2100,19 +2110,6 @@
             const modal = document.getElementById('receipt-preview-modal');
             modal.classList.add('hidden');
             if (currentOpenModal === 'preview') history.back();
-        }
-
-        function downloadReceiptImage() {
-            const img = document.getElementById('receipt-preview-img');
-            if (!img.src) return;
-            
-            const link = document.createElement('a');
-            link.download = `Kaprao_Receipt_${Date.now()}.png`;
-            link.href = img.src;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            showToast('กำลังดาวน์โหลด...');
         }
 
         // --- UPDATED: GENERATE ORDER CARD ---
