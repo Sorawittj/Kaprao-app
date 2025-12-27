@@ -201,7 +201,7 @@
         /* --- RECEIPT CAPTURE AREA (Hidden but accessible) --- */
         #receipt-capture { 
             position: fixed; 
-            left: 0; 
+            left: -9999px; /* Move off-screen instead of hidden for better canvas rendering */
             top: 0; 
             width: 400px; 
             background: #FFFFFF; 
@@ -210,7 +210,7 @@
             font-family: 'Kanit', sans-serif; 
             color: #1F2937; 
             z-index: -999;
-            visibility: hidden; 
+            visibility: visible; 
         }
 
         /* --- FIX: ANDROID LONG PRESS --- */
@@ -220,6 +220,7 @@
             user-select: auto !important;
             -webkit-user-select: auto !important; /* Safari/Chrome */
             -webkit-touch-callout: default !important; /* iOS/Android Menu */
+            touch-action: manipulation !important;
             z-index: 9999; 
             position: relative;
         }
@@ -273,7 +274,7 @@
             </p>
 
             <div class="bg-white rounded-lg shadow-2xl overflow-hidden mb-4 p-1 w-full relative">
-                <img id="receipt-preview-img" class="w-full h-auto rounded force-interact" src="" alt="Receipt" style="pointer-events: auto !important; user-select: auto !important;">
+                <img id="receipt-preview-img" class="w-full h-auto rounded force-interact" src="" alt="Receipt" style="pointer-events: auto !important; user-select: auto !important; -webkit-touch-callout: default;">
             </div>
             
             <div class="flex flex-col gap-3 w-full">
@@ -634,16 +635,11 @@
         </div>
     </div>
 
-    <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 transition-all duration-300 opacity-0 -translate-y-10 z-[120] pointer-events-none">
-        <i class="fas fa-info-circle text-yellow-400"></i>
-        <span class="font-medium text-sm" id="toast-msg">Notification</span>
-    </div>
-
     <div id="receipt-capture">
         <div class="bg-white p-6 relative">
             <div class="text-center mb-6">
                 <div class="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm relative overflow-hidden">
-                    <img id="receipt-avatar-img" src="" class="w-full h-full object-cover">
+                    <img id="receipt-avatar-img" src="" class="w-full h-full object-cover" crossOrigin="anonymous">
                 </div>
                 <h2 class="text-2xl font-black text-gray-800 tracking-wider">KAPRAO52</h2>
                 <p class="text-[10px] text-gray-400 tracking-widest uppercase mt-1">Authentic Thai Street Food</p>
@@ -703,7 +699,7 @@
         // --- LIFF CONFIGURATION ---
         const MY_LIFF_ID = '2008781875-6whmY1cf'; 
         
-        // --- GOOGLE SHEET CONFIG (UPDATED) ---
+        // --- GOOGLE SHEET CONFIG ---
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxKKzal49kCIjl6TgXfgeHzCBymMGZAQye1kYQhUp3rYL_WodN8bTmjpCl1HAY8oQjj/exec'; 
         // ---------------------------
 
@@ -1087,8 +1083,9 @@
         async function syncUserStatsFromServer(userId) {
             if(!userId) return;
             
+            // ใช้ Background fetch ไม่ต้องแสดง Loading ให้ user รำคาญ
             const levelCount = document.getElementById('level-count');
-            if(levelCount) levelCount.innerText = "กำลังซิงค์...";
+            // if(levelCount) levelCount.innerText = "กำลังซิงค์...";
 
             try {
                 // 1. ดึงข้อมูลจาก Server
@@ -1136,7 +1133,7 @@
             }
         }
 
-        // --- INIT LIFF ---
+        // --- INIT LIFF (Non-blocking) ---
         async function initLIFF() {
             try {
                 await liff.init({ liffId: MY_LIFF_ID });
@@ -1153,7 +1150,7 @@
                     } catch(e) {}
 
                     savedUser.userId = profile.userId;
-                    userAvatar.userId = profile.userId; // Store globally for submit order
+                    userAvatar.userId = profile.userId; 
 
                     const nameInput = document.getElementById('user-name');
                     if(nameInput && (!nameInput.value || nameInput.value.trim() === '')) {
@@ -1166,6 +1163,7 @@
                         userAvatar.image = profile.pictureUrl;
                         userAvatar.name = profile.displayName; 
                         savedUser.avatar = userAvatar;
+                        // Update UI immediately with profile picture
                         updateAvatarDisplay(); 
                     }
                     
@@ -1177,7 +1175,7 @@
                         renderCheckoutList();
                     }
 
-                    // เพิ่มบรรทัดนี้!!! เพื่อซิงค์ยอดสั่งซื้อทุกครั้งที่เข้าแอพ
+                    // Sync in background - ไม่ต้องรอ
                     syncUserStatsFromServer(profile.userId);
 
                 } else {
@@ -1199,17 +1197,20 @@
                 localStorage.setItem(KEYS.VERSION, CURRENT_VERSION);
             }
 
+            // Load local data first for instant UI
             loadUserDataSafe();
-            fetchLottoResults();
-            initLIFF();
-
-            setTimeout(autoCheckLottery, 1000);
             updateTicketBadge();
             updateStreak(); 
             updateAvatarDisplay();
             updateLevelUI();
             updateMiniCart();
             renderCheckoutList();
+
+            // Then start network requests
+            fetchLottoResults();
+            initLIFF(); // Non-blocking init
+
+            setTimeout(autoCheckLottery, 1000);
             
             setTimeout(checkForUpdate, 2000);
             
@@ -2133,6 +2134,7 @@
             document.querySelector('.receipt-total').innerText = netTotal + '.-';
 
             const receiptAvatar = document.getElementById('receipt-avatar-img');
+            // FIX: Add crossOrigin before setting src
             receiptAvatar.setAttribute('crossOrigin', 'anonymous'); 
             receiptAvatar.src = userAvatar.image;
             receiptAvatar.onerror = function() { 
@@ -2162,23 +2164,24 @@
                 const div = document.getElementById('receipt-capture');
                 
                 // Temporarily make visible for capture but keep behind
-                div.style.visibility = 'visible'; 
+                // div.style.visibility = 'visible'; 
 
                 html2canvas(div, { 
                     scale: 2, 
                     useCORS: true, 
                     allowTaint: false, // *** FIX HERE: Must be false for toDataURL to work ***
-                    backgroundColor: '#ffffff' 
+                    backgroundColor: '#ffffff',
+                    logging: false
                 }).then(canvas => {
-                    div.style.visibility = 'hidden'; // Hide again
-                    showReceiptPreview(canvas.toDataURL());
+                    // div.style.visibility = 'hidden'; // Hide again
+                    showReceiptPreview(canvas.toDataURL("image/png"));
                 }).catch((err) => {
                     console.error("Capture Error:", err);
-                    div.style.visibility = 'hidden';
+                    // div.style.visibility = 'hidden';
                     hideGlobalLoader();
                     showToast('เกิดข้อผิดพลาดในการสร้างภาพ');
                 });
-            }, 500);
+            }, 800); // Increased delay slightly
         }
 
         // --- UPDATED: REPRINT RECEIPT ---
@@ -2236,19 +2239,20 @@
 
             setTimeout(() => {
                 const div = document.getElementById('receipt-capture');
-                div.style.visibility = 'visible'; 
+                // div.style.visibility = 'visible'; 
 
                 html2canvas(div, { 
                     scale: 2, 
                     useCORS: true, 
                     allowTaint: false, // *** FIX HERE: Must be false ***
-                    backgroundColor: '#ffffff' 
+                    backgroundColor: '#ffffff',
+                    logging: false
                 }).then(canvas => {
-                    div.style.visibility = 'hidden'; 
-                    showReceiptPreview(canvas.toDataURL());
+                    // div.style.visibility = 'hidden'; 
+                    showReceiptPreview(canvas.toDataURL("image/png"));
                 }).catch((err) => {
                     console.error(err);
-                    div.style.visibility = 'hidden';
+                    // div.style.visibility = 'hidden';
                     hideGlobalLoader();
                     showToast('เกิดข้อผิดพลาดในการบันทึกภาพ');
                 });
