@@ -395,7 +395,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V18.4.3 (Secure)</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V18.4.4 (FullSync)</p>
         </div>
 
     </div>
@@ -677,7 +677,7 @@
         const MY_LIFF_ID = '2008781875-6whmY1cf'; 
         
         // --- GOOGLE SHEET CONFIG (UPDATED) ---
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx8Lz-VrUwnhEe8aGAUkjEb90Q6LwIe4PT08UxSLntCzi56lkLZIK2hgS5MbmHiXLTt/exec'; 
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyBdJL8CR9lCxTIGmJ4dGt0SQu8TYED8Ciy_9KGZDUTRzto00Uz8T3a_KrGL5zw5cT7/exec'; 
         // ---------------------------
 
         // --- GLOBAL SYNC LOCK ---
@@ -959,7 +959,7 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '18.4.3'; 
+        const CURRENT_VERSION = '18.4.4'; 
 
         function escapeHtml(text) {
             if (!text) return text;
@@ -1056,6 +1056,61 @@
             }
         }
 
+        // 🔥 เพิ่มใหม่: Sync History จาก Server -> Client (Pull) 🔥
+        async function syncTicketHistory(userId) {
+            try {
+                // เรียก getHistory จาก Backend
+                const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getHistory&userId=' + userId);
+                const serverTickets = await response.json();
+
+                if (!Array.isArray(serverTickets) || serverTickets.length === 0) return;
+
+                let updated = false;
+                
+                // Merge ข้อมูล: เอาของ Server มาเติมลง Local ถ้ายังไม่มี
+                serverTickets.forEach(serverT => {
+                    // เช็คว่ามี Ticket ID นี้ในเครื่องยัง?
+                    const exists = lottoHistory.some(localT => localT.id === serverT.id);
+                    if (!exists) {
+                        // ถ้าไม่มี ให้สร้าง Ticket ใหม่จากข้อมูล Server
+                        const drawDateObj = getNextDrawDate(); // คำนวณวันหวยออกคร่าวๆ (อาจไม่เป๊ะถ้าย้อนหลังนาน)
+                        
+                        // สร้าง Ticket Object
+                        const newTicket = {
+                            id: serverT.id,
+                            number: serverT.id.slice(-2),
+                            date: serverT.date,
+                            drawDate: getStandardDate(drawDateObj), // ใช้วันหวยออกถัดไปเป็นค่า Default
+                            drawDateTimestamp: drawDateObj.getTime(),
+                            timestamp: Date.now(), // ใช้วันปัจจุบันไปก่อนเพราะเราไม่รู้วันที่แน่นอนจาก Server (ถ้า Server ไม่ส่งมา)
+                            price: serverT.price,
+                            status: 'pending',
+                            checkedDate: null,
+                            items: [{ name: serverT.itemsStr, price: serverT.price }], // แปลง string กลับเป็น object คร่าวๆ
+                            customerName: 'Synced'
+                        };
+                        
+                        lottoHistory.push(newTicket);
+                        updated = true;
+                    }
+                });
+
+                if (updated) {
+                    // เรียงลำดับใหม่ (เอาล่าสุดขึ้นก่อน) และตัดให้เหลือ 20
+                    lottoHistory.sort((a, b) => b.timestamp - a.timestamp); // Sort descending
+                    if(lottoHistory.length > 20) lottoHistory = lottoHistory.slice(0, 20);
+                    
+                    localStorage.setItem(KEYS.HISTORY, JSON.stringify(lottoHistory));
+                    updateTicketBadge();
+                    autoCheckLottery(); // ตรวจรางวัลใหม่อีกรอบเผื่อตั๋วที่เพิ่งมาถูกรางวัล
+                    console.log("History Synced from Server");
+                }
+
+            } catch (e) {
+                console.error("Sync History Failed", e);
+            }
+        }
+
         async function syncUserStatsFromServer(userId) {
             if(!userId) return;
             
@@ -1146,14 +1201,11 @@
                     }
 
                     // ============================================
-                    // 🔥 เพิ่มใหม่: ระบบเคลมออเดอร์เก่า (Auto Claim) 🔥
+                    // 🔥 STEP 1: Claim Local Orders (Push) 🔥
                     // ============================================
-                    
-                    // 1. ดึงรายการ ID จากประวัติในเครื่อง
                     const localHistoryIds = lottoHistory.map(t => t.id);
                     
                     if (localHistoryIds.length > 0) {
-                        // ส่งไปบอก Server ว่า ID พวกนี้ เป็นของ User นี้นะ
                         fetch(GOOGLE_SCRIPT_URL, {
                             method: 'POST',
                             mode: 'no-cors',
@@ -1164,15 +1216,16 @@
                                 orderIds: localHistoryIds
                             })
                         }).then(() => {
-                            console.log("Claim request sent for: ", localHistoryIds);
-                            // พอเคลมเสร็จ ก็ดึง Level ล่าสุดมาโชว์
-                            setTimeout(() => syncUserStatsFromServer(profile.userId), 2000);
+                            console.log("Claim request sent.");
+                            // หลังจาก Claim เสร็จ ให้ทำ Step 2
+                            syncUserStatsFromServer(profile.userId); // Sync Level
+                            syncTicketHistory(profile.userId);       // 🔥 STEP 2: Pull History (Sync Down) 🔥
                         });
                     } else {
-                        // ถ้าไม่มีประวัติเก่า ก็ Sync ปกติ
+                        // ถ้าไม่มีอะไรให้เคลม ก็ Sync ลงมาเลย
                         syncUserStatsFromServer(profile.userId);
+                        syncTicketHistory(profile.userId); // 🔥 STEP 2: Pull History (Sync Down) 🔥
                     }
-                    // ============================================
 
                 } else {
                     if (!liff.isInClient()) {
