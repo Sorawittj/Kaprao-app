@@ -339,7 +339,7 @@
         
         <div class="mb-3 flex items-center justify-between">
             <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2">หมวดหมู่ 
-                <button onclick="randomMenu()" class="btn-bounce bg-white text-indigo-600 px-3 py-1 rounded-full text-xs font-bold shadow-sm border border-gray-200 hover:bg-gray-50 transition-all flex items-center gap-1 ml-2">
+                <button onclick="window.randomMenu()" class="btn-bounce bg-white text-indigo-600 px-3 py-1 rounded-full text-xs font-bold shadow-sm border border-gray-200 hover:bg-gray-50 transition-all flex items-center gap-1 ml-2">
                     <i id="dice-icon" class="fas fa-dice"></i> สุ่มเมนู
                 </button>
             </h3>
@@ -673,12 +673,81 @@
     </div>
 
     <script>
+        // ============================================
+        // 1. DATA (MOVE TO TOP to prevent undefined errors)
+        // ============================================
+        
         // --- LIFF CONFIGURATION ---
         const MY_LIFF_ID = '2008781875-6whmY1cf'; 
         
         // --- GOOGLE SHEET CONFIG (UPDATED) ---
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyU3QVueNDPWcA5WqYnD3elmlGZFtrXSTesVLUEo-ae9eBcFPwfnX93_LcuF6xU0mFb/exec'; 
-        // ---------------------------
+        
+        const menuItems = [
+            { id: 2, name: "กะเพราหน่อไม้", price: 55, icon: "🎍", category: "kaprao", reqMeat: true, kcal: 350 },
+            { id: 3, name: "กะเพราหมูสับ", price: 50, icon: "🐷", category: "kaprao", reqMeat: false, kcal: 520 },
+            { id: 4, name: "กะเพราหมูเด้ง", price: 50, icon: "🥓", category: "kaprao", reqMeat: false, kcal: 550 },
+            { id: 5, name: "กะเพราสันคอ", price: 50, icon: "🥩", category: "kaprao", reqMeat: false, kcal: 600 },
+            { id: 6, name: "กะเพราไข่เยี่ยวม้า", price: 60, icon: "⚫", category: "kaprao", reqMeat: false, kcal: 650 },
+            { id: 102, name: "กะเพรากุ้ง", price: 60, icon: "🦐", category: "kaprao", reqMeat: false, kcal: 450, isNew: true },
+            { id: 105, name: "กะเพราไก่", price: 50, icon: "🐔", category: "kaprao", reqMeat: false, kcal: 450, isNew: true }, 
+            { id: 108, name: "กะเพราปลาหมึก", price: 60, icon: "🦑", category: "kaprao", reqMeat: false, kcal: 480, isNew: true }, 
+
+            { id: 10, name: "มาม่าผัดกะเพรา", price: 50, icon: "🍜", category: "noodle", reqMeat: true, kcal: 450 },
+            { id: 1, name: "กะเพราวุ้นเส้น", price: 55, icon: "🍝", category: "noodle", reqMeat: true, kcal: 400 },
+            
+            { id: 7, name: "หมูสับกระเทียม", price: 50, icon: "🧄", category: "garlic", reqMeat: false, kcal: 500 },
+            { id: 8, name: "สันคอกระเทียม", price: 50, icon: "🍖", category: "garlic", reqMeat: false, kcal: 580 },
+            { id: 9, name: "หมูเด้งกระเทียม", price: 50, icon: "🍘", category: "garlic", reqMeat: false, kcal: 530 },
+            { id: 103, name: "กุ้งกระเทียม", price: 60, icon: "🍤", category: "garlic", reqMeat: false, kcal: 480, isNew: true },
+
+            { id: 101, name: "ต้มจืดไข่น้ำ (ไข่เจียว)", price: 40, icon: "🥘", category: "soup", reqMeat: false, kcal: 350, isNew: true },
+
+            { id: 11, name: "ข้าวไข่ข้นพริกเผา", price: 40, icon: "🌶️", category: "others", reqMeat: false, desc: "ไข่ 2 ฟอง", kcal: 450 },
+            { id: 12, name: "ข้าวไข่ข้น", price: 40, icon: "🍚", category: "others", reqMeat: false, desc: "ไข่ 2 ฟอง", kcal: 380 },
+            { id: 13, name: "ข้าวไข่เจียวพริกสด", price: 50, icon: "🥘", category: "others", reqMeat: false, kcal: 420 },
+            { id: 14, name: "ข้าวไข่ดาว 3 ฟอง", price: 50, icon: "🍳", category: "others", reqMeat: false, kcal: 480 },
+            { id: 15, name: "หน่อไม้ผัดไข่", price: 50, icon: "🎋", category: "others", reqMeat: true, kcal: 300 },
+            { id: 104, name: "ข้าวไข่ข้นกุ้ง", price: 60, icon: "🍳", category: "others", reqMeat: false, kcal: 550, isNew: true },
+            { id: 106, name: "ข้าวผัดไข่", price: 50, icon: "🍛", category: "others", reqMeat: false, kcal: 520, isNew: true }, 
+            { id: 107, name: "ข้าวผัดหมูชิ้น (สันคอ)", price: 50, icon: "🍛", category: "others", reqMeat: false, kcal: 600, isNew: true }, 
+
+            { id: 20, name: "เฉาก๊วยนมสด", price: 30, icon: "🧊", category: "dessert", reqMeat: false, kcal: 150 },
+            { id: 21, name: "กล้วยเชื่อม", price: 25, icon: "🍌", category: "dessert", reqMeat: false, kcal: 220 },
+        ];
+
+        const promotions = [
+            { 
+                code: "SAVE10", 
+                title: "Set อิ่มคุ้ม (Value) 🥉", 
+                desc: "ครบ 150.- ลด 10 บาท", 
+                minOrder: 150, 
+                type: "discount", 
+                value: 10, 
+                color: "bg-orange-400", 
+                icon: "🥡" 
+            },
+            { 
+                code: "SAVE25", 
+                title: "Set ยกแก๊ง (Gang) 🥈", 
+                desc: "ครบ 300.- ลด 25 บาท", 
+                minOrder: 300, 
+                type: "discount", 
+                value: 25, 
+                color: "bg-blue-500", 
+                icon: "🛵" 
+            },
+            { 
+                code: "SAVE50", 
+                title: "Set จัดเต็ม (Grand) 🥇", 
+                desc: "ครบ 500.- ลด 50 บาท", 
+                minOrder: 500, 
+                type: "discount", 
+                value: 50, 
+                color: "bg-brand-purple", 
+                icon: "🏢" 
+            }
+        ];
 
         // --- GLOBAL SYNC LOCK ---
         let isSyncing = false;
@@ -754,6 +823,18 @@
                     triggerHaptic();
                 }
             });
+        }
+        
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const msg = document.getElementById('toast-msg');
+            msg.innerText = message;
+            toast.classList.remove('-translate-y-10', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('-translate-y-10', 'opacity-0');
+            }, 3000);
         }
 
         setTimeout(() => {
@@ -870,74 +951,6 @@
         }
         
         document.addEventListener('DOMContentLoaded', createBubbles);
-
-        // DATA
-        const menuItems = [
-            { id: 2, name: "กะเพราหน่อไม้", price: 55, icon: "🎍", category: "kaprao", reqMeat: true, kcal: 350 },
-            { id: 3, name: "กะเพราหมูสับ", price: 50, icon: "🐷", category: "kaprao", reqMeat: false, kcal: 520 },
-            { id: 4, name: "กะเพราหมูเด้ง", price: 50, icon: "🥓", category: "kaprao", reqMeat: false, kcal: 550 },
-            { id: 5, name: "กะเพราสันคอ", price: 50, icon: "🥩", category: "kaprao", reqMeat: false, kcal: 600 },
-            { id: 6, name: "กะเพราไข่เยี่ยวม้า", price: 60, icon: "⚫", category: "kaprao", reqMeat: false, kcal: 650 },
-            { id: 102, name: "กะเพรากุ้ง", price: 60, icon: "🦐", category: "kaprao", reqMeat: false, kcal: 450, isNew: true },
-            { id: 105, name: "กะเพราไก่", price: 50, icon: "🐔", category: "kaprao", reqMeat: false, kcal: 450, isNew: true }, 
-            { id: 108, name: "กะเพราปลาหมึก", price: 60, icon: "🦑", category: "kaprao", reqMeat: false, kcal: 480, isNew: true }, 
-
-            { id: 10, name: "มาม่าผัดกะเพรา", price: 50, icon: "🍜", category: "noodle", reqMeat: true, kcal: 450 },
-            { id: 1, name: "กะเพราวุ้นเส้น", price: 55, icon: "🍝", category: "noodle", reqMeat: true, kcal: 400 },
-            
-            { id: 7, name: "หมูสับกระเทียม", price: 50, icon: "🧄", category: "garlic", reqMeat: false, kcal: 500 },
-            { id: 8, name: "สันคอกระเทียม", price: 50, icon: "🍖", category: "garlic", reqMeat: false, kcal: 580 },
-            { id: 9, name: "หมูเด้งกระเทียม", price: 50, icon: "🍘", category: "garlic", reqMeat: false, kcal: 530 },
-            { id: 103, name: "กุ้งกระเทียม", price: 60, icon: "🍤", category: "garlic", reqMeat: false, kcal: 480, isNew: true },
-
-            { id: 101, name: "ต้มจืดไข่น้ำ (ไข่เจียว)", price: 40, icon: "🥘", category: "soup", reqMeat: false, kcal: 350, isNew: true },
-
-            { id: 11, name: "ข้าวไข่ข้นพริกเผา", price: 40, icon: "🌶️", category: "others", reqMeat: false, desc: "ไข่ 2 ฟอง", kcal: 450 },
-            { id: 12, name: "ข้าวไข่ข้น", price: 40, icon: "🍚", category: "others", reqMeat: false, desc: "ไข่ 2 ฟอง", kcal: 380 },
-            { id: 13, name: "ข้าวไข่เจียวพริกสด", price: 50, icon: "🥘", category: "others", reqMeat: false, kcal: 420 },
-            { id: 14, name: "ข้าวไข่ดาว 3 ฟอง", price: 50, icon: "🍳", category: "others", reqMeat: false, kcal: 480 },
-            { id: 15, name: "หน่อไม้ผัดไข่", price: 50, icon: "🎋", category: "others", reqMeat: true, kcal: 300 },
-            { id: 104, name: "ข้าวไข่ข้นกุ้ง", price: 60, icon: "🍳", category: "others", reqMeat: false, kcal: 550, isNew: true },
-            { id: 106, name: "ข้าวผัดไข่", price: 50, icon: "🍛", category: "others", reqMeat: false, kcal: 520, isNew: true }, 
-            { id: 107, name: "ข้าวผัดหมูชิ้น (สันคอ)", price: 50, icon: "🍛", category: "others", reqMeat: false, kcal: 600, isNew: true }, 
-
-            { id: 20, name: "เฉาก๊วยนมสด", price: 30, icon: "🧊", category: "dessert", reqMeat: false, kcal: 150 },
-            { id: 21, name: "กล้วยเชื่อม", price: 25, icon: "🍌", category: "dessert", reqMeat: false, kcal: 220 },
-        ];
-
-        // --- NEW PROMOTIONS LOGIC ---
-        const promotions = [
-            { 
-                code: "SAVE10", 
-                title: "Set อิ่มคุ้ม (Value) 🥉", 
-                desc: "ครบ 150.- ลด 10 บาท", 
-                minOrder: 150, 
-                type: "discount", 
-                value: 10, 
-                color: "bg-orange-400", 
-                icon: "🥡" 
-            },
-            { 
-                code: "SAVE25", 
-                title: "Set ยกแก๊ง (Gang) 🥈", 
-                desc: "ครบ 300.- ลด 25 บาท", 
-                minOrder: 300, 
-                type: "discount", 
-                value: 25, 
-                color: "bg-blue-500", 
-                icon: "🛵" 
-            },
-            { 
-                code: "SAVE50", 
-                title: "Set จัดเต็ม (Grand) 🥇", 
-                desc: "ครบ 500.- ลด 50 บาท", 
-                minOrder: 500, 
-                type: "discount", 
-                value: 50, 
-                color: "bg-brand-purple", 
-                icon: "🏢" 
-            }
-        ];
 
         // --- STATE MANAGEMENT ---
         let cart = [];
@@ -1249,11 +1262,39 @@
                  liff.login();
             } else {
                  liff.init({ liffId: MY_LIFF_ID }).then(() => {
-                     liff.login();
+                      liff.login();
                  });
             }
         }
 
+        // 🔥 FIXED: Random Menu Function (Attached to window)
+        window.randomMenu = function() {
+            // 1. คัดกรองเมนู (ไม่เอาของหวาน และไม่เอาโปรโมชั่น)
+            const availableItems = menuItems.filter(i => 
+                i.category !== 'dessert' && 
+                i.category !== 'promotion' && 
+                !i.soldOut
+            );
+
+            if (availableItems.length === 0) {
+                showToast('ไม่พบเมนูครับ');
+                return;
+            }
+
+            // 2. เอฟเฟกต์เสียงและการสั่น
+            playSound('switch');
+            triggerHaptic();
+
+            // 3. หมุนติ้วๆ (จำลองด้วยการหน่วงเวลาเล็กน้อย) หรือสุ่มเลย
+            const randomIndex = Math.floor(Math.random() * availableItems.length);
+            const selectedItem = availableItems[randomIndex];
+
+            // 4. แสดงผล
+            showToast(`🎲 สุ่มได้: ${selectedItem.name}`);
+            openModal(selectedItem);
+        }
+
+        // --- DOMContentLoaded ---
         document.addEventListener('DOMContentLoaded', () => {
             const savedVer = localStorage.getItem(KEYS.VERSION);
             if(savedVer !== CURRENT_VERSION) {
@@ -1560,6 +1601,7 @@
             });
         }
 
+        // 🔥 FIXED: Render Promotions (Fail-Safe Copy)
         function renderPromotions() {
             const grid = document.getElementById('menu-grid');
             grid.innerHTML = '';
@@ -1567,12 +1609,29 @@
                 const el = document.createElement('div');
                 el.style.animationDelay = `${index * 0.1}s`;
                 el.className = "fast-card p-0 flex overflow-hidden cursor-pointer shadow-sm mb-2 btn-bounce stagger-item";
+                
+                // --- FIXED ONCLICK LOGIC ---
                 el.onclick = () => {
-                    navigator.clipboard.writeText(promo.code);
-                    showToast(`คัดลอกโค้ด ${promo.code} แล้ว!`);
-                    document.getElementById('discount-code').value = promo.code;
+                    // 1. นำโค้ดไปใส่ในช่องกรอกทันที (สำคัญที่สุด)
+                    const input = document.getElementById('discount-code');
+                    if(input) {
+                        input.value = promo.code;
+                        applyDiscount(); 
+                    }
+
+                    // 2. ลอง Copy ลง Clipboard (ใส่ try-catch กัน Error)
+                    if(navigator.clipboard) {
+                        navigator.clipboard.writeText(promo.code).catch(err => console.warn('Copy failed (non-secure context)', err));
+                    } else {
+                        console.warn('Clipboard API not available');
+                    }
+
+                    showToast(`ใช้โค้ด ${promo.code} เรียบร้อย!`);
                     playSound('pop');
+                    triggerHaptic();
                 };
+                // -----------------------------
+
                 el.innerHTML = `
                     <div class="w-24 ${promo.color} flex flex-col items-center justify-center text-white p-2">
                         <span class="text-2xl">${promo.icon}</span>
