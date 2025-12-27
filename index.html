@@ -2192,6 +2192,12 @@
             const name = document.getElementById('user-name').value.trim();
             if (!name) return showToast('กรุณาใส่ชื่อผู้สั่ง');
 
+            // --- 1. เช็คก่อนว่า Login หรือยัง ---
+            if (!liff.isLoggedIn()) {
+                liff.login();
+                return;
+            }
+
             isSubmitting = true;
             const btn = document.getElementById('btn-submit-order');
             const originalText = btn.innerHTML;
@@ -2200,40 +2206,14 @@
 
             try {
                 showGlobalLoader("กำลังบันทึกและส่งออเดอร์...");
-                sfxOrder.play(); triggerHaptic();
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#F59E0B', '#8B5CF6', '#FFFFFF'] });
                 
-                recordOrderForStreak();
-
-                userStats.orders++;
-                localStorage.setItem(KEYS.STATS, JSON.stringify(userStats));
-                updateLevelUI();
-                checkLevelUpReward(); 
-                
+                // --- คำนวณยอดและสร้างข้อความ (เหมือนเดิม) ---
                 let subtotal = cart.reduce((sum, i) => sum + i.price, 0);
                 let netTotal = Math.max(0, subtotal - discountValue);
-                
                 const allNotes = cart.filter(i => i.note).map(i => i.note).join(", ");
-                const sheetData = {
-                    orderId: currentOrderId,
-                    name: name,
-                    items: cart,
-                    totalPrice: subtotal,
-                    discount: discountValue,
-                    netTotal: netTotal,
-                    allNotes: allNotes,
-                    userId: userAvatar.userId 
-                };
-
-                if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
-                    fetch(GOOGLE_SCRIPT_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(sheetData),
-                        keepalive: true 
-                    }).catch(err => console.error("Sheet Error:", err));
-                }
+                
+                // สร้าง Order ID
+                if(!currentOrderId) generateOrderId();
 
                 const nowStr = `${getStandardDate(new Date())} ${formatTime(new Date())}`;
                 
@@ -2241,7 +2221,7 @@
                 msg += `🎟️ เลขลุ้นหวย: ${currentOrderId.slice(-2)}\n`;
                 msg += `📅 ${nowStr}\n`;
                 msg += `👤 คุณ ${name}\n`;
-                msg += `🏅 สั่งครั้งที่: ${userStats.orders}\n`;
+                msg += `🏅 สั่งครั้งที่: ${userStats.orders + 1}\n`; // +1 ล่วงหน้าสำหรับโชว์
                 msg += `------------------------\n`;
                 cart.forEach((i, index) => {
                     let detail = `${i.name} ${i.meat ? '('+i.meat+')' : ''}`;
@@ -2255,25 +2235,65 @@
                     msg += `🏷️ ส่วนลด: -${discountValue} บาท\n`;
                 }
                 msg += `💰 ยอดสุทธิ: ${netTotal} บาท\n`;
-                
+
+                // --- 2. ส่งข้อมูลลง Google Sheet (Backend) ---
+                const sheetData = {
+                    orderId: currentOrderId,
+                    name: name,
+                    items: cart,
+                    totalPrice: subtotal,
+                    discount: discountValue,
+                    netTotal: netTotal,
+                    allNotes: allNotes,
+                    userId: userAvatar.userId 
+                };
+
+                if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
+                    // ยิงไป Google Sheet โดยไม่ต้องรอ response นาน (Fire and forget)
+                    fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(sheetData),
+                        keepalive: true 
+                    }).catch(err => console.error("Sheet Error:", err));
+                }
+
+                // --- 3. อัพเดท Stats และ UI (Local) ---
+                recordOrderForStreak();
+                userStats.orders++;
+                localStorage.setItem(KEYS.STATS, JSON.stringify(userStats));
                 saveTicketToHistory(currentOrderId, netTotal);
                 
-                const lineOAId = "@772ysswn"; 
-                const encodedMsg = encodeURIComponent(msg);
-                
-                // FIX: Force URL Redirect instead of liff.sendMessages
-                // This ensures the message goes to the OA, not the current chat context.
-                const targetUrl = `https://line.me/R/oaMessage/${lineOAId}/?${encodedMsg}`;
-
-                setTimeout(() => {
-                    cart = []; 
-                    saveToLS();
-                    updateMiniCart();
-                    closeCheckout();
-                    hideGlobalLoader();
-                    // Go to Line OA
-                    window.location.href = targetUrl;
-                }, 1500);
+                // --- 4. ส่งข้อความเข้า LINE (จุดที่แก้) ---
+                if (liff.isInClient()) {
+                    // กรณีเปิดใน LINE: ใช้ liff.sendMessages (หน้าจะไม่เด้งหาย)
+                    try {
+                        await liff.sendMessages([{
+                            type: 'text',
+                            text: msg
+                        }]);
+                        // ส่งสำเร็จ
+                        handleOrderSuccess();
+                    } catch (err) {
+                        console.error("LIFF Send Error:", err);
+                        // ถ้าส่งไม่ผ่าน (เช่น ลืมเปิด permission) ให้ Fallback ไปใช้วิธี Redirect เหมือนเดิม
+                        const lineOAId = "@772ysswn"; 
+                        const encodedMsg = encodeURIComponent(msg);
+                        window.location.href = `https://line.me/R/oaMessage/${lineOAId}/?${encodedMsg}`;
+                    }
+                } else {
+                    // กรณีเปิดใน Browser ข้างนอก: ต้องใช้ Redirect เหมือนเดิม
+                    const lineOAId = "@772ysswn"; 
+                    const encodedMsg = encodeURIComponent(msg);
+                    
+                    // ทำ Success ใน local ก่อนเด้งออก
+                    handleOrderSuccess(false); // false = ไม่ต้องปิด loader เพราะจะเด้งหน้าแล้ว
+                    
+                    setTimeout(() => {
+                        window.location.href = `https://line.me/R/oaMessage/${lineOAId}/?${encodedMsg}`;
+                    }, 1000);
+                }
 
             } catch (error) {
                 console.error("Critical Submit Error:", error);
@@ -2283,6 +2303,40 @@
                 btn.innerHTML = originalText;
                 btn.classList.remove('opacity-50', 'cursor-not-allowed');
             }
+        }
+
+        // ฟังก์ชันจัดการหลังสั่งสำเร็จ (แยกออกมาเพื่อให้โค้ดสะอาด)
+        function handleOrderSuccess(closeLoader = true) {
+            sfxOrder.play(); 
+            triggerHaptic();
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#F59E0B', '#8B5CF6', '#FFFFFF'] });
+            
+            updateLevelUI();
+            checkLevelUpReward(); 
+
+            // เคลียร์ตะกร้า
+            cart = []; 
+            saveToLS();
+            updateMiniCart();
+            
+            // ปิด Modal Checkout
+            closeCheckout();
+            
+            if(closeLoader) hideGlobalLoader();
+
+            // แสดง Toast แจ้งเตือน
+            showToast("ส่งออเดอร์เรียบร้อย! ✅");
+            
+            // รีเซ็ตปุ่ม
+            isSubmitting = false;
+            const btn = document.getElementById('btn-submit-order');
+            if(btn) {
+                btn.innerHTML = `<span>ยืนยันการสั่ง</span> <i class="fas fa-paper-plane"></i>`;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+
+            // สร้างเลข Order ใหม่สำหรับรอบหน้า
+            generateOrderId();
         }
 
         function checkLevelUpReward() {
