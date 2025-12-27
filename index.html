@@ -4,6 +4,14 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#FFFFFF">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <link rel="preconnect" href="https://static.line-scdn.net">
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
 
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
@@ -14,22 +22,21 @@
       gtag('js', new Date());
       gtag('config', 'G-4FR74WPRNY');
     </script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#FFFFFF">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <link rel="manifest" href="manifest.json">
     
+    <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
     <link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
     
     <title>Kaprao52 - APP</title> 
+    
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script defer src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     
     <script>
         tailwind.config = {
@@ -76,7 +83,7 @@
         .safe-area-pb { padding-bottom: var(--sab); }
         .safe-area-pb-plus { padding-bottom: calc(1rem + var(--sab)); }
 
-        /* --- BACKGROUND ANIMATION (Optimized) --- */
+        /* --- BACKGROUND ANIMATION --- */
         #bubbles-container {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -290,9 +297,11 @@
             <div class="flex flex-col justify-center">
                 <div class="flex items-center gap-2 mb-1">
                     <p class="text-xs text-gray-500 font-medium">สวัสดีครับ, วันนี้กินอะไรดี?</p>
-                    <button id="line-login-btn" onclick="liff.login()" class="hidden bg-[#06C755] hover:bg-[#05b34c] text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm transition-all flex items-center gap-1 btn-bounce">
+                    
+                    <button id="line-login-btn" onclick="handleLogin()" class="hidden bg-[#06C755] hover:bg-[#05b34c] text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm transition-all flex items-center gap-1 btn-bounce">
                         <i class="fab fa-line"></i> เข้าสู่ระบบ
                     </button>
+
                 </div>
                 
                 <h1 class="text-4xl sm:text-5xl font-black leading-none tracking-tighter mb-2 relative z-10 pt-1 drop-shadow-sm whitespace-nowrap flex items-baseline">
@@ -401,7 +410,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V18.4.0</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V18.4.1 (Opt)</p>
         </div>
 
     </div>
@@ -861,7 +870,9 @@
                 container.appendChild(b);
             }
         }
-        createBubbles();
+        
+        // IMPORTANT: Run bubbles on DOM Ready, not wait for window load
+        document.addEventListener('DOMContentLoaded', createBubbles);
 
         // DATA
         const menuItems = [
@@ -1099,9 +1110,10 @@
             }
         }
 
-        // --- INIT LIFF ---
+        // --- IMPROVED INIT LIFF ---
         async function initLIFF() {
             try {
+                // 3. START LIFF IMMEDIATELY (Don't wait for images)
                 await liff.init({ liffId: MY_LIFF_ID });
                 
                 if (liff.isLoggedIn()) {
@@ -1116,7 +1128,7 @@
                     } catch(e) {}
 
                     savedUser.userId = profile.userId;
-                    userAvatar.userId = profile.userId; // Store globally for submit order
+                    userAvatar.userId = profile.userId; 
 
                     const nameInput = document.getElementById('user-name');
                     if(nameInput && (!nameInput.value || nameInput.value.trim() === '')) {
@@ -1140,7 +1152,6 @@
                         renderCheckoutList();
                     }
 
-                    // เพิ่มบรรทัดนี้!!! เพื่อซิงค์ยอดสั่งซื้อทุกครั้งที่เข้าแอพ
                     syncUserStatsFromServer(profile.userId);
 
                 } else {
@@ -1156,15 +1167,35 @@
             }
         }
 
-        window.addEventListener('load', () => {
+        // 4. BETTER LOGIN HANDLER
+        function handleLogin() {
+            const btn = document.getElementById('line-login-btn');
+            // Show Loading State Immediately
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> รอสักครู่...';
+            btn.classList.add('opacity-75');
+            
+            if (liff.ready) {
+                 liff.login();
+            } else {
+                 // Fallback if not ready yet
+                 liff.init({ liffId: MY_LIFF_ID }).then(() => {
+                     liff.login();
+                 });
+            }
+        }
+
+        // 5. USE DOMCONTENTLOADED INSTEAD OF LOAD (FASTER)
+        document.addEventListener('DOMContentLoaded', () => {
             const savedVer = localStorage.getItem(KEYS.VERSION);
             if(savedVer !== CURRENT_VERSION) {
                 localStorage.setItem(KEYS.VERSION, CURRENT_VERSION);
             }
 
             loadUserDataSafe();
+            
+            // Start LIFF/Data Fetch Immediately
             fetchLottoResults();
-            initLIFF();
+            initLIFF(); // Call Init Here
 
             setTimeout(autoCheckLottery, 1000);
             updateTicketBadge();
@@ -1190,8 +1221,12 @@
                     }, 300);
                 });
             });
+            
+            renderMenu();
         });
-
+        
+        // ... (Functions below remain unchanged, but ensuring renderMenu exists) ...
+        
         function updateLevelUI() {
             const count = userStats.orders;
             const bar = document.getElementById('level-fill');
@@ -1333,6 +1368,7 @@
 
         function switchCategory(cat) {
             if(activeCategory === cat) return;
+            activeCategory = cat; // Update state immediately for responsiveness
             triggerHaptic();
             playSound('switch');
             
@@ -1343,20 +1379,18 @@
             grid.classList.add('page-out');
             if(!msg.classList.contains('hidden')) msg.classList.add('page-out');
             
+            // Update Tabs Immediately
+            ['kaprao', 'garlic', 'noodle', 'soup', 'others', 'dessert', 'promotion'].forEach(c => {
+                const btn = document.getElementById(`tab-${c}`);
+                if (c === cat) {
+                    btn.className = "snap-start category-pill-active min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all transform scale-105 btn-bounce";
+                } else {
+                    btn.className = "snap-start category-pill-inactive min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all btn-bounce";
+                    if(c === 'promotion') btn.classList.add('border-dashed', 'border-red-300', 'text-red-400');
+                }
+            });
+
             setTimeout(() => {
-                activeCategory = cat;
-                
-                // Update Tabs
-                ['kaprao', 'garlic', 'noodle', 'soup', 'others', 'dessert', 'promotion'].forEach(c => {
-                    const btn = document.getElementById(`tab-${c}`);
-                    if (c === cat) {
-                        btn.className = "snap-start category-pill-active min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all transform scale-105 btn-bounce";
-                    } else {
-                        btn.className = "snap-start category-pill-inactive min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all btn-bounce";
-                        if(c === 'promotion') btn.classList.add('border-dashed', 'border-red-300', 'text-red-400');
-                    }
-                });
-                
                 const title = document.getElementById('section-title');
                 msg.classList.add('hidden');
                 msg.classList.remove('page-out');
@@ -1387,7 +1421,7 @@
                     // 4. Fade In new content
                     grid.classList.add('page-in');
                     setTimeout(() => grid.classList.remove('page-in'), 300);
-                }, 100); // Shorter delay for speed
+                }, 50); // Shorter delay for speed
 
             }, 150); // Faster fade out
         }
@@ -2055,7 +2089,6 @@
             document.getElementById('sheet-grand-total').innerText = final + " ฿";
         }
 
-        // --- NEW: Open Receipt Result Modal instead of downloading ---
         function openReceiptResult(imgData) {
             const modal = document.getElementById('receipt-result-modal');
             const img = document.getElementById('receipt-result-img');
@@ -2080,7 +2113,6 @@
             document.querySelector('.receipt-total').innerText = netTotal + '.-';
 
             const receiptAvatar = document.getElementById('receipt-avatar-img');
-            // Ensure crossorigin is set for canvas
             receiptAvatar.src = userAvatar.image;
             receiptAvatar.onerror = function() { 
                  this.src = 'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Dog%20face/3D/dog_face_3d.png';
@@ -2112,7 +2144,6 @@
                 backgroundColor: null 
             }).then(canvas => {
                 hideGlobalLoader();
-                // FIX: Instead of link.click(), open a modal
                 openReceiptResult(canvas.toDataURL());
                 showToast('แตะค้างที่รูปเพื่อบันทึก 📸');
             }).catch((err) => {
@@ -2176,7 +2207,6 @@
                     backgroundColor: null 
                 }).then(canvas => {
                     hideGlobalLoader();
-                    // FIX: Open modal
                     openReceiptResult(canvas.toDataURL());
                     showToast('แตะค้างที่รูปเพื่อบันทึก 📸');
                 }).catch(() => {
@@ -2249,25 +2279,21 @@
                     }).catch(err => console.error("Sheet Error:", err));
                 }
 
-                // บันทึก History ก่อนเด้งออกไป LINE
                 recordOrderForStreak();
                 userStats.orders++;
                 localStorage.setItem(KEYS.STATS, JSON.stringify(userStats));
                 saveTicketToHistory(currentOrderId, netTotal);
                 
-                // ใช้ URL Scheme เพื่อบังคับเด้งไปหน้าแชท (ชัวร์สุด)
                 const lineOAId = "@772ysswn";
                 const encodedMsg = encodeURIComponent(msg);
                 
                 setTimeout(() => {
-                    // เคลียร์ตะกร้าและ UI ก่อนเด้ง
                     cart = []; 
                     saveToLS();
                     updateMiniCart();
                     closeCheckout();
                     hideGlobalLoader();
                     
-                    // สั่งเด้งไป LINE OA
                     window.location.href = `https://line.me/R/oaMessage/${lineOAId}/?${encodedMsg}`;
                     
                     isSubmitting = false;
@@ -2285,47 +2311,7 @@
             }
         }
 
-        // ฟังก์ชัน checkLevelUpReward (คงเดิมไว้เผื่อกลับมาใช้)
-        function checkLevelUpReward() {
-            const hasSeenReward = localStorage.getItem('kaprao_reward_seen_level_10');
-            if (userStats.orders >= 10 && !hasSeenReward) {
-                setTimeout(() => {
-                    const modal = document.getElementById('reward-modal');
-                    modal.classList.remove('hidden');
-                    sfxWin.play(); 
-                }, 1500); 
-            }
-        }
-
-        function claimReward() {
-            localStorage.setItem('kaprao_reward_seen_level_10', 'true');
-            const modal = document.getElementById('reward-modal');
-            modal.classList.add('opacity-0');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                modal.classList.remove('opacity-0');
-            }, 300);
-        }
-
-        function randomMenu() {
-            triggerHaptic();
-            const dice = document.getElementById('dice-icon');
-            dice.classList.add('fa-spin');
-            setTimeout(() => {
-                dice.classList.remove('fa-spin');
-                const item = menuItems[Math.floor(Math.random() * menuItems.length)];
-                if(item.category) switchCategory(item.category);
-                openModal(item);
-            }, 500);
-        }
-
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            document.getElementById('toast-msg').innerText = msg;
-            t.classList.remove('opacity-0', '-translate-y-10');
-            setTimeout(() => t.classList.add('opacity-0', '-translate-y-10'), 2000);
-        }
-
+        // --- SWIPE UTILS ---
         function enableSwipeToClose(el, scrollEl, closeCallback) {
             let startY = 0;
             let currentY = 0;
@@ -2351,7 +2337,6 @@
         enableSwipeToClose(document.getElementById('tickets-sheet'), document.getElementById('tickets-list'), closeMyTickets);
 
         document.getElementById('user-name').addEventListener('input', saveToLS);
-        renderMenu();
     </script>
 </body>
 </html>
