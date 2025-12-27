@@ -256,7 +256,7 @@
 
     </style>
 </head>
-<body class="pb-32 font-sans select-none relative overflow-x-hidden safe-area-pt">
+<body id="app-body" class="pb-32 font-sans select-none relative overflow-x-hidden safe-area-pt">
 
     <div id="bubbles-container"></div>
 
@@ -2104,11 +2104,18 @@
             img.src = dataUrl;
             modal.classList.remove('hidden');
             pushModalState('preview');
+
+            // FIX: Remove select-none from body to allow Android long-press
+            document.body.classList.remove('select-none');
         }
 
         function closeReceiptPreview() {
             const modal = document.getElementById('receipt-preview-modal');
             modal.classList.add('hidden');
+            
+            // FIX: Restore select-none
+            document.body.classList.add('select-none');
+
             if (currentOpenModal === 'preview') history.back();
         }
 
