@@ -2338,5 +2338,15 @@
 
         document.getElementById('user-name').addEventListener('input', saveToLS);
     </script>
+    <script>
+        document.addEventListener('error', function(e) {
+            if (e.target.tagName.toLowerCase() === 'img') {
+                // ถ้ารูปโหลดไม่ได้ ให้เปลี่ยนเป็นรูปนี้แทน
+                e.target.src = 'https://cdn-icons-png.flaticon.com/512/135/135161.png'; // รูปจานข้าว generic
+                e.target.alt = 'Image not found';
+                e.target.classList.add('opacity-50'); // ทำให้จางลงหน่อยจะได้รู้ว่าเป็นรูปแทน
+            }
+        }, true);
+    </script>
 </body>
 </html>
