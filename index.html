@@ -596,11 +596,23 @@
         <span class="font-medium text-sm" id="toast-msg">Notification</span>
     </div>
 
+    <div id="receipt-result-modal" class="fixed inset-0 z-[140] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 hidden">
+        <div class="bg-transparent w-full max-w-sm flex flex-col items-center">
+            <div class="bg-white p-2 rounded-lg shadow-2xl mb-4 overflow-hidden">
+                <img id="receipt-result-img" class="w-full h-auto rounded" src="" alt="Receipt">
+            </div>
+            <p class="text-white text-center font-bold mb-4 animate-pulse">👆 แตะค้างที่รูปเพื่อบันทึก</p>
+            <button onclick="document.getElementById('receipt-result-modal').classList.add('hidden')" class="btn-bounce bg-white/20 hover:bg-white/30 text-white px-6 py-3 rounded-full font-bold border border-white/50 backdrop-blur-md">
+                ปิดหน้าต่าง
+            </button>
+        </div>
+    </div>
+
     <div id="receipt-capture">
         <div class="bg-white p-6 relative">
             <div class="text-center mb-6">
                 <div class="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm relative overflow-hidden">
-                    <img id="receipt-avatar-img" src="" class="w-full h-full object-cover">
+                    <img id="receipt-avatar-img" src="" class="w-full h-full object-cover" crossorigin="anonymous">
                 </div>
                 <h2 class="text-2xl font-black text-gray-800 tracking-wider">KAPRAO52</h2>
                 <p class="text-[10px] text-gray-400 tracking-widest uppercase mt-1">Authentic Thai Street Food</p>
@@ -840,14 +852,12 @@
             for(let i=0; i<bubbleCount; i++){
                 const b = document.createElement('div');
                 b.className = 'bubble';
-                if(i % 2 === 0) b.classList.add('purple'); // Alternate colors
-                
-                const size = Math.random() * 60 + 20; 
-                b.style.width = size + 'px';
-                b.style.height = size + 'px';
+                b.style.width = Math.random() * 60 + 20 + 'px';
+                b.style.height = b.style.width;
                 b.style.left = Math.random() * 100 + '%';
                 b.style.animationDelay = Math.random() * 15 + 's';
                 b.style.animationDuration = Math.random() * 10 + 15 + 's'; 
+                if(i % 2 === 0) b.classList.add('purple'); // Alternate colors
                 container.appendChild(b);
             }
         }
@@ -941,7 +951,7 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '18.4.0'; 
+        const CURRENT_VERSION = '18.4.1'; // Bumped version
 
         function escapeHtml(text) {
             if (!text) return text;
@@ -1051,9 +1061,6 @@
                 const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getUserStats&userId=' + userId);
                 const serverData = await response.json();
                 
-                console.log("Server Orders:", serverData.orders);
-                console.log("Local Orders:", userStats.orders);
-
                 // 2. เช็คเงื่อนไข: ถ้า Server น้อยกว่า Local (แสดงว่าเพิ่ง Login ครั้งแรก หรือเปลี่ยนเครื่องมา)
                 // เราจะเอาส่วนต่าง (Local - Server) ส่งขึ้นไปเติมให้เท่ากัน
                 if (serverData.orders < userStats.orders) {
@@ -2048,6 +2055,14 @@
             document.getElementById('sheet-grand-total').innerText = final + " ฿";
         }
 
+        // --- NEW: Open Receipt Result Modal instead of downloading ---
+        function openReceiptResult(imgData) {
+            const modal = document.getElementById('receipt-result-modal');
+            const img = document.getElementById('receipt-result-img');
+            img.src = imgData;
+            modal.classList.remove('hidden');
+        }
+
         function generateOrderCard() {
             showGlobalLoader("กำลังพิมพ์ใบเสร็จ...");
             const name = document.getElementById('user-name').value || 'ลูกค้า';
@@ -2065,7 +2080,7 @@
             document.querySelector('.receipt-total').innerText = netTotal + '.-';
 
             const receiptAvatar = document.getElementById('receipt-avatar-img');
-            receiptAvatar.setAttribute('crossOrigin', 'anonymous'); 
+            // Ensure crossorigin is set for canvas
             receiptAvatar.src = userAvatar.image;
             receiptAvatar.onerror = function() { 
                  this.src = 'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Dog%20face/3D/dog_face_3d.png';
@@ -2090,8 +2105,6 @@
             });
 
             const div = document.getElementById('receipt-capture');
-            const nowFile = new Date();
-            const filename = `Kaprao_${nowFile.toISOString().split('T')[0]}_${nowFile.getHours()}-${nowFile.getMinutes()}.png`;
 
             html2canvas(div, { 
                 scale: 2, 
@@ -2099,14 +2112,13 @@
                 backgroundColor: null 
             }).then(canvas => {
                 hideGlobalLoader();
-                const link = document.createElement('a');
-                link.download = filename;
-                link.href = canvas.toDataURL();
-                link.click();
-                showToast('บันทึกใบเสร็จแล้ว 📸');
-            }).catch(() => {
+                // FIX: Instead of link.click(), open a modal
+                openReceiptResult(canvas.toDataURL());
+                showToast('แตะค้างที่รูปเพื่อบันทึก 📸');
+            }).catch((err) => {
+                console.error(err);
                 hideGlobalLoader();
-                showToast('เกิดข้อผิดพลาดในการบันทึกภาพ');
+                showToast('เกิดข้อผิดพลาดในการสร้างภาพ');
             });
         }
 
@@ -2157,7 +2169,6 @@
 
             setTimeout(() => {
                 const div = document.getElementById('receipt-capture');
-                const filename = `Kaprao_Reprint_${tDate.toISOString().split('T')[0]}.png`;
 
                 html2canvas(div, { 
                     scale: 2, 
@@ -2165,11 +2176,9 @@
                     backgroundColor: null 
                 }).then(canvas => {
                     hideGlobalLoader();
-                    const link = document.createElement('a');
-                    link.download = filename;
-                    link.href = canvas.toDataURL();
-                    link.click();
-                    showToast('บันทึกใบเสร็จย้อนหลังแล้ว 📸');
+                    // FIX: Open modal
+                    openReceiptResult(canvas.toDataURL());
+                    showToast('แตะค้างที่รูปเพื่อบันทึก 📸');
                 }).catch(() => {
                     hideGlobalLoader();
                     showToast('เกิดข้อผิดพลาดในการบันทึกภาพ');
@@ -2213,7 +2222,7 @@
                     discount: discountValue,
                     netTotal: netTotal,
                     allNotes: allNotes,
-                    userId: userAvatar.userId // Send User ID for tracking
+                    userId: userAvatar.userId 
                 };
 
                 if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
@@ -2251,56 +2260,28 @@
                 
                 const lineOAId = "@772ysswn"; 
                 const encodedMsg = encodeURIComponent(msg);
+                
+                // FIX: Force URL Redirect instead of liff.sendMessages
+                // This ensures the message goes to the OA, not the current chat context.
                 const targetUrl = `https://line.me/R/oaMessage/${lineOAId}/?${encodedMsg}`;
 
-                if (liff.isInClient() && liff.isLoggedIn()) {
-                    try {
-                        await liff.sendMessages([{
-                            type: 'text',
-                            text: msg
-                        }]);
-                        
-                        setTimeout(() => {
-                            cart = []; 
-                            saveToLS();
-                            updateMiniCart();
-                            closeCheckout();
-                            hideGlobalLoader();
-                            liff.closeWindow(); 
-                        }, 1000);
-
-                    } catch (err) {
-                        console.error("Send Error:", err);
-                        setTimeout(() => {
-                            cart = []; 
-                            saveToLS();
-                            updateMiniCart();
-                            closeCheckout();
-                            hideGlobalLoader();
-                            window.location.href = targetUrl; 
-                        }, 500); 
-                    }
-                } else {
-                    setTimeout(() => {
-                        cart = []; 
-                        saveToLS();
-                        updateMiniCart();
-                        closeCheckout();
-                        hideGlobalLoader();
-                        window.location.href = targetUrl;
-                    }, 50); 
-                }
+                setTimeout(() => {
+                    cart = []; 
+                    saveToLS();
+                    updateMiniCart();
+                    closeCheckout();
+                    hideGlobalLoader();
+                    // Go to Line OA
+                    window.location.href = targetUrl;
+                }, 1500);
 
             } catch (error) {
                 console.error("Critical Submit Error:", error);
                 hideGlobalLoader();
                 showToast("เกิดข้อผิดพลาด กรุณาลองใหม่");
-            } finally {
-                setTimeout(() => {
-                    isSubmitting = false;
-                    btn.innerHTML = originalText;
-                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                }, 2000);
+                isSubmitting = false;
+                btn.innerHTML = originalText;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
             }
         }
 
