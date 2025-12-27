@@ -14,15 +14,11 @@
       gtag('js', new Date());
       gtag('config', 'G-4FR74WPRNY');
     </script>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#FFFFFF">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <link rel="manifest" href="manifest.json">
-    
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
-    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
-    <link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
     
     <title>Kaprao52 - APP</title> 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -76,7 +72,7 @@
         .safe-area-pb { padding-bottom: var(--sab); }
         .safe-area-pb-plus { padding-bottom: calc(1rem + var(--sab)); }
 
-        /* --- BACKGROUND ANIMATION (Optimized) --- */
+        /* --- BACKGROUND ANIMATION --- */
         #bubbles-container {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -115,7 +111,7 @@
         .fast-card {
             background: #FFFFFF;
             border: 1px solid #ffffff;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03); /* Softer Shadow */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
             border-radius: 1.25rem;
             transition: transform 0.1s cubic-bezier(0.34, 1.56, 0.64, 1);
             position: relative;
@@ -448,7 +444,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V18.4.0</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V18.4.1</p>
         </div>
 
     </div>
@@ -989,7 +985,7 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '18.4.0'; 
+        const CURRENT_VERSION = '18.4.1'; // Bump Version
 
         function escapeHtml(text) {
             if (!text) return text;
@@ -2171,11 +2167,13 @@
                 html2canvas(div, { 
                     scale: 2, 
                     useCORS: true, 
-                    backgroundColor: null 
+                    allowTaint: false, // *** FIX HERE: Must be false for toDataURL to work ***
+                    backgroundColor: '#ffffff' 
                 }).then(canvas => {
                     div.style.visibility = 'hidden'; // Hide again
                     showReceiptPreview(canvas.toDataURL());
-                }).catch(() => {
+                }).catch((err) => {
+                    console.error("Capture Error:", err);
                     div.style.visibility = 'hidden';
                     hideGlobalLoader();
                     showToast('เกิดข้อผิดพลาดในการสร้างภาพ');
@@ -2243,8 +2241,8 @@
                 html2canvas(div, { 
                     scale: 2, 
                     useCORS: true, 
-                    allowTaint: true, 
-                    backgroundColor: null 
+                    allowTaint: false, // *** FIX HERE: Must be false ***
+                    backgroundColor: '#ffffff' 
                 }).then(canvas => {
                     div.style.visibility = 'hidden'; 
                     showReceiptPreview(canvas.toDataURL());
@@ -2293,7 +2291,7 @@
                     discount: discountValue,
                     netTotal: netTotal,
                     allNotes: allNotes,
-                    userId: userAvatar.userId // Send User ID for tracking
+                    userId: userAvatar.userId 
                 };
 
                 if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
