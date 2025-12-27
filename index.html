@@ -202,8 +202,21 @@
         .wheel-pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 35px solid #F59E0B; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2)); z-index: 20; }
         .wheel-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px; background: white; border-radius: 50%; z-index: 10; box-shadow: 0 0 15px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; font-size: 20px; }
 
-        /* --- RECEIPT CAPTURE AREA (Hidden) --- */
-        #receipt-capture { position: fixed; top: -9999px; left: -9999px; width: 400px; background: #FFFFFF; padding: 0; border-radius: 0; font-family: 'Kanit', sans-serif; color: #1F2937; }
+        /* --- RECEIPT CAPTURE AREA (Hidden but accessible) --- */
+        /* Changed from top: -9999px to z-index method to ensure rendering */
+        #receipt-capture { 
+            position: fixed; 
+            left: 0; 
+            top: 0; 
+            width: 400px; 
+            background: #FFFFFF; 
+            padding: 0; 
+            border-radius: 0; 
+            font-family: 'Kanit', sans-serif; 
+            color: #1F2937; 
+            z-index: -999;
+            visibility: hidden; /* Only visible during capture */
+        }
 
         /* --- XP BAR --- */
         .xp-bar-bg { background-color: #e5e7eb; border-radius: 9999px; overflow: hidden; height: 8px; }
@@ -239,6 +252,23 @@
         </div>
         <h2 class="text-xl font-bold text-gray-800 tracking-wider">KAPRAO<span class="text-yellow-500">52</span></h2>
         <p id="loader-text" class="text-xs text-gray-400 mt-2 font-medium">กำลังเตรียมร้าน...</p>
+    </div>
+
+    <div id="receipt-preview-modal" class="fixed inset-0 z-[150] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 hidden">
+        <div class="bg-transparent max-w-sm w-full flex flex-col items-center">
+            <div class="bg-white rounded-lg shadow-2xl overflow-hidden mb-4 p-1">
+                <img id="receipt-preview-img" class="w-full h-auto rounded" src="" alt="Receipt">
+            </div>
+            <div class="flex flex-col gap-3 w-full">
+                <button onclick="downloadReceiptImage()" class="btn-bounce bg-white text-indigo-600 font-bold py-3 rounded-full shadow-lg flex items-center justify-center gap-2">
+                    <i class="fas fa-download"></i> บันทึกลงเครื่อง
+                </button>
+                <button onclick="closeReceiptPreview()" class="btn-bounce bg-gray-800/80 text-white font-medium py-3 rounded-full shadow-lg">
+                    ปิดหน้าต่าง
+                </button>
+                <p class="text-white/70 text-xs text-center mt-2">หากกดบันทึกไม่ได้ ให้แตะค้างที่รูปภาพเพื่อบันทึก</p>
+            </div>
+        </div>
     </div>
 
     <div id="welcome-modal" class="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-6 stagger-item">
@@ -678,6 +708,7 @@
                 else if (currentOpenModal === 'checkout') closeCheckout(true);
                 else if (currentOpenModal === 'tickets') closeMyTickets(true);
                 else if (currentOpenModal === 'avatar') closeAvatarModal(true);
+                else if (currentOpenModal === 'preview') closeReceiptPreview();
                 
                 currentOpenModal = null;
             }
@@ -2048,8 +2079,38 @@
             document.getElementById('sheet-grand-total').innerText = final + " ฿";
         }
 
+        // --- NEW: Helper for Image Generation ---
+        function showReceiptPreview(dataUrl) {
+            hideGlobalLoader();
+            const modal = document.getElementById('receipt-preview-modal');
+            const img = document.getElementById('receipt-preview-img');
+            img.src = dataUrl;
+            modal.classList.remove('hidden');
+            pushModalState('preview');
+        }
+
+        function closeReceiptPreview() {
+            const modal = document.getElementById('receipt-preview-modal');
+            modal.classList.add('hidden');
+            if (currentOpenModal === 'preview') history.back();
+        }
+
+        function downloadReceiptImage() {
+            const img = document.getElementById('receipt-preview-img');
+            if (!img.src) return;
+            
+            const link = document.createElement('a');
+            link.download = `Kaprao_Receipt_${Date.now()}.png`;
+            link.href = img.src;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('กำลังดาวน์โหลด...');
+        }
+
+        // --- UPDATED: GENERATE ORDER CARD ---
         function generateOrderCard() {
-            showGlobalLoader("กำลังพิมพ์ใบเสร็จ...");
+            showGlobalLoader("กำลังสร้างใบเสร็จ...");
             const name = document.getElementById('user-name').value || 'ลูกค้า';
             
             const nowStr = `${getStandardDate(new Date())} ${formatTime(new Date())}`;
@@ -2089,27 +2150,29 @@
                 itemsContainer.appendChild(row);
             });
 
-            const div = document.getElementById('receipt-capture');
-            const nowFile = new Date();
-            const filename = `Kaprao_${nowFile.toISOString().split('T')[0]}_${nowFile.getHours()}-${nowFile.getMinutes()}.png`;
+            // Wait slightly for image load
+            setTimeout(() => {
+                const div = document.getElementById('receipt-capture');
+                
+                // Temporarily make visible for capture but keep behind
+                div.style.visibility = 'visible'; 
 
-            html2canvas(div, { 
-                scale: 2, 
-                useCORS: true, 
-                backgroundColor: null 
-            }).then(canvas => {
-                hideGlobalLoader();
-                const link = document.createElement('a');
-                link.download = filename;
-                link.href = canvas.toDataURL();
-                link.click();
-                showToast('บันทึกใบเสร็จแล้ว 📸');
-            }).catch(() => {
-                hideGlobalLoader();
-                showToast('เกิดข้อผิดพลาดในการบันทึกภาพ');
-            });
+                html2canvas(div, { 
+                    scale: 2, 
+                    useCORS: true, 
+                    backgroundColor: null 
+                }).then(canvas => {
+                    div.style.visibility = 'hidden'; // Hide again
+                    showReceiptPreview(canvas.toDataURL());
+                }).catch(() => {
+                    div.style.visibility = 'hidden';
+                    hideGlobalLoader();
+                    showToast('เกิดข้อผิดพลาดในการสร้างภาพ');
+                });
+            }, 500);
         }
 
+        // --- UPDATED: REPRINT RECEIPT ---
         function reprintReceipt(ticketIndex) {
             triggerHaptic();
             playSound('pop');
@@ -2120,7 +2183,7 @@
                 return;
             }
 
-            showGlobalLoader("กำลังดึงข้อมูลใบเสร็จ...");
+            showGlobalLoader("กำลังสร้างใบเสร็จ...");
             
             const name = ticket.customerName || 'ลูกค้า';
             const subtotal = ticket.items.reduce((sum, i) => sum + i.price, 0);
@@ -2137,15 +2200,12 @@
             document.querySelector('.receipt-discount').innerText = '-' + discount + '.-';
             document.querySelector('.receipt-total').innerText = netTotal + '.-';
 
-            // --- [ส่วนที่เพิ่มใหม่] แก้ปัญหาค้าง: จัดการรูป Avatar ให้ถูกต้อง ---
             const receiptAvatar = document.getElementById('receipt-avatar-img');
             receiptAvatar.setAttribute('crossOrigin', 'anonymous'); 
-            // ใช้รูปจาก userAvatar ปัจจุบัน หรือถ้าจะให้เป๊ะควรเก็บ avatar ไว้ใน history แต่ใช้ปัจจุบันก็พอแก้ขัดได้
             receiptAvatar.src = userAvatar.image; 
             receiptAvatar.onerror = function() { 
                  this.src = 'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Dog%20face/3D/dog_face_3d.png';
             };
-            // -----------------------------------------------------------
 
             const itemsContainer = document.querySelector('.receipt-items');
             itemsContainer.innerHTML = '';
@@ -2165,29 +2225,25 @@
                 itemsContainer.appendChild(row);
             });
 
-            // เพิ่มเวลา timeout นิดหน่อยเพื่อให้มั่นใจว่ารูปโหลดทัน
             setTimeout(() => {
                 const div = document.getElementById('receipt-capture');
-                const filename = `Kaprao_Reprint_${tDate.toISOString().split('T')[0]}.png`;
+                div.style.visibility = 'visible'; 
 
                 html2canvas(div, { 
                     scale: 2, 
-                    useCORS: true, // สำคัญมาก
-                    allowTaint: true, // เพิ่มตัวนี้ช่วยกันเหนียว
+                    useCORS: true, 
+                    allowTaint: true, 
                     backgroundColor: null 
                 }).then(canvas => {
-                    hideGlobalLoader();
-                    const link = document.createElement('a');
-                    link.download = filename;
-                    link.href = canvas.toDataURL();
-                    link.click();
-                    showToast('บันทึกใบเสร็จย้อนหลังแล้ว 📸');
+                    div.style.visibility = 'hidden'; 
+                    showReceiptPreview(canvas.toDataURL());
                 }).catch((err) => {
                     console.error(err);
+                    div.style.visibility = 'hidden';
                     hideGlobalLoader();
                     showToast('เกิดข้อผิดพลาดในการบันทึกภาพ');
                 });
-            }, 800); // เพิ่มเวลาจาก 500 เป็น 800ms เพื่อรอรูปโหลด
+            }, 800); 
         }
 
         async function submitOrderToLine() {
