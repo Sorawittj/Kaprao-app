@@ -677,7 +677,7 @@
         const MY_LIFF_ID = '2008781875-6whmY1cf'; 
         
         // --- GOOGLE SHEET CONFIG (UPDATED) ---
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw7JWJDzPgoSLTx1yt6yfsfxpxsRe-ArvsJsIeke1kXItHfEeKFxmVH8EYP845zhfVA/exec'; 
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbym36MQ_W566ALj_dBNx6JerGX2x2QxUcHTGYXgKA7HX-L21Ob77OGPj-IIq1u8A_yZ/exec'; 
         // ---------------------------
 
         // --- GLOBAL SYNC LOCK ---
@@ -1145,7 +1145,34 @@
                         renderCheckoutList();
                     }
 
-                    syncUserStatsFromServer(profile.userId);
+                    // ============================================
+                    // 🔥 เพิ่มใหม่: ระบบเคลมออเดอร์เก่า (Auto Claim) 🔥
+                    // ============================================
+                    
+                    // 1. ดึงรายการ ID จากประวัติในเครื่อง
+                    const localHistoryIds = lottoHistory.map(t => t.id);
+                    
+                    if (localHistoryIds.length > 0) {
+                        // ส่งไปบอก Server ว่า ID พวกนี้ เป็นของ User นี้นะ
+                        fetch(GOOGLE_SCRIPT_URL, {
+                            method: 'POST',
+                            mode: 'no-cors',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                action: 'claim_orders',
+                                userId: profile.userId,
+                                orderIds: localHistoryIds
+                            })
+                        }).then(() => {
+                            console.log("Claim request sent for: ", localHistoryIds);
+                            // พอเคลมเสร็จ ก็ดึง Level ล่าสุดมาโชว์
+                            setTimeout(() => syncUserStatsFromServer(profile.userId), 2000);
+                        });
+                    } else {
+                        // ถ้าไม่มีประวัติเก่า ก็ Sync ปกติ
+                        syncUserStatsFromServer(profile.userId);
+                    }
+                    // ============================================
 
                 } else {
                     if (!liff.isInClient()) {
