@@ -14,11 +14,15 @@
       gtag('js', new Date());
       gtag('config', 'G-4FR74WPRNY');
     </script>
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#FFFFFF">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="manifest.json">
+    
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
+    <link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
     
     <title>Kaprao52 - APP</title> 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -72,7 +76,7 @@
         .safe-area-pb { padding-bottom: var(--sab); }
         .safe-area-pb-plus { padding-bottom: calc(1rem + var(--sab)); }
 
-        /* --- BACKGROUND ANIMATION --- */
+        /* --- BACKGROUND ANIMATION (Optimized) --- */
         #bubbles-container {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -111,7 +115,7 @@
         .fast-card {
             background: #FFFFFF;
             border: 1px solid #ffffff;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03); /* Softer Shadow */
             border-radius: 1.25rem;
             transition: transform 0.1s cubic-bezier(0.34, 1.56, 0.64, 1);
             position: relative;
@@ -198,37 +202,8 @@
         .wheel-pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 35px solid #F59E0B; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2)); z-index: 20; }
         .wheel-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px; background: white; border-radius: 50%; z-index: 10; box-shadow: 0 0 15px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; font-size: 20px; }
 
-        /* --- RECEIPT CAPTURE AREA (Hidden but accessible) --- */
-        #receipt-capture { 
-            position: fixed; 
-            left: -9999px; /* Move off-screen instead of hidden for better canvas rendering */
-            top: 0; 
-            width: 400px; 
-            background: #FFFFFF; 
-            padding: 0; 
-            border-radius: 0; 
-            font-family: 'Kanit', sans-serif; 
-            color: #1F2937; 
-            z-index: -999;
-            visibility: visible; 
-        }
-
-        /* --- FIX: ANDROID LONG PRESS --- */
-        /* บังคับให้รูปกดค้างได้ โดย Override ค่า select-none ของ body */
-        .force-interact {
-            pointer-events: auto !important;
-            user-select: auto !important;
-            -webkit-user-select: auto !important; /* Safari/Chrome */
-            -webkit-touch-callout: default !important; /* iOS/Android Menu */
-            touch-action: manipulation !important;
-            z-index: 9999; 
-            position: relative;
-        }
-        
-        /* ป้องกัน Modal Overlay บังการกดรูป */
-        #receipt-preview-modal {
-            pointer-events: auto !important;
-        }
+        /* --- RECEIPT CAPTURE AREA (Hidden) --- */
+        #receipt-capture { position: fixed; top: -9999px; left: -9999px; width: 400px; background: #FFFFFF; padding: 0; border-radius: 0; font-family: 'Kanit', sans-serif; color: #1F2937; }
 
         /* --- XP BAR --- */
         .xp-bar-bg { background-color: #e5e7eb; border-radius: 9999px; overflow: hidden; height: 8px; }
@@ -253,7 +228,7 @@
 
     </style>
 </head>
-<body id="app-body" class="pb-32 font-sans select-none relative overflow-x-hidden safe-area-pt">
+<body class="pb-32 font-sans select-none relative overflow-x-hidden safe-area-pt">
 
     <div id="bubbles-container"></div>
 
@@ -264,25 +239,6 @@
         </div>
         <h2 class="text-xl font-bold text-gray-800 tracking-wider">KAPRAO<span class="text-yellow-500">52</span></h2>
         <p id="loader-text" class="text-xs text-gray-400 mt-2 font-medium">กำลังเตรียมร้าน...</p>
-    </div>
-
-    <div id="receipt-preview-modal" class="fixed inset-0 z-[150] bg-black/85 backdrop-blur-sm flex items-center justify-center p-6 hidden">
-        <div class="w-full max-w-sm flex flex-col items-center">
-            
-            <p class="text-white font-bold text-sm mb-2 animate-pulse">
-                <i class="fas fa-hand-pointer"></i> แตะค้างที่รูปเพื่อบันทึก
-            </p>
-
-            <div class="bg-white rounded-lg shadow-2xl overflow-hidden mb-4 p-1 w-full relative">
-                <img id="receipt-preview-img" class="w-full h-auto rounded force-interact" src="" alt="Receipt" style="pointer-events: auto !important; user-select: auto !important; -webkit-touch-callout: default;">
-            </div>
-            
-            <div class="flex flex-col gap-3 w-full">
-                <button onclick="closeReceiptPreview()" class="btn-bounce bg-white text-gray-800 font-bold py-3 rounded-full shadow-lg border border-gray-200">
-                    <i class="fas fa-times mr-1"></i> ปิดหน้าต่าง
-                </button>
-            </div>
-        </div>
     </div>
 
     <div id="welcome-modal" class="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-6 stagger-item">
@@ -445,7 +401,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V18.4.1</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V18.4.0</p>
         </div>
 
     </div>
@@ -635,11 +591,16 @@
         </div>
     </div>
 
+    <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 transition-all duration-300 opacity-0 -translate-y-10 z-[120] pointer-events-none">
+        <i class="fas fa-info-circle text-yellow-400"></i>
+        <span class="font-medium text-sm" id="toast-msg">Notification</span>
+    </div>
+
     <div id="receipt-capture">
         <div class="bg-white p-6 relative">
             <div class="text-center mb-6">
                 <div class="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm relative overflow-hidden">
-                    <img id="receipt-avatar-img" src="" class="w-full h-full object-cover" crossOrigin="anonymous">
+                    <img id="receipt-avatar-img" src="" class="w-full h-full object-cover">
                 </div>
                 <h2 class="text-2xl font-black text-gray-800 tracking-wider">KAPRAO52</h2>
                 <p class="text-[10px] text-gray-400 tracking-widest uppercase mt-1">Authentic Thai Street Food</p>
@@ -699,7 +660,7 @@
         // --- LIFF CONFIGURATION ---
         const MY_LIFF_ID = '2008781875-6whmY1cf'; 
         
-        // --- GOOGLE SHEET CONFIG ---
+        // --- GOOGLE SHEET CONFIG (UPDATED) ---
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxKKzal49kCIjl6TgXfgeHzCBymMGZAQye1kYQhUp3rYL_WodN8bTmjpCl1HAY8oQjj/exec'; 
         // ---------------------------
 
@@ -717,7 +678,6 @@
                 else if (currentOpenModal === 'checkout') closeCheckout(true);
                 else if (currentOpenModal === 'tickets') closeMyTickets(true);
                 else if (currentOpenModal === 'avatar') closeAvatarModal(true);
-                else if (currentOpenModal === 'preview') closeReceiptPreview();
                 
                 currentOpenModal = null;
             }
@@ -981,7 +941,7 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '18.4.1'; // Bump Version
+        const CURRENT_VERSION = '18.4.0'; 
 
         function escapeHtml(text) {
             if (!text) return text;
@@ -1083,9 +1043,8 @@
         async function syncUserStatsFromServer(userId) {
             if(!userId) return;
             
-            // ใช้ Background fetch ไม่ต้องแสดง Loading ให้ user รำคาญ
             const levelCount = document.getElementById('level-count');
-            // if(levelCount) levelCount.innerText = "กำลังซิงค์...";
+            if(levelCount) levelCount.innerText = "กำลังซิงค์...";
 
             try {
                 // 1. ดึงข้อมูลจาก Server
@@ -1133,7 +1092,7 @@
             }
         }
 
-        // --- INIT LIFF (Non-blocking) ---
+        // --- INIT LIFF ---
         async function initLIFF() {
             try {
                 await liff.init({ liffId: MY_LIFF_ID });
@@ -1150,7 +1109,7 @@
                     } catch(e) {}
 
                     savedUser.userId = profile.userId;
-                    userAvatar.userId = profile.userId; 
+                    userAvatar.userId = profile.userId; // Store globally for submit order
 
                     const nameInput = document.getElementById('user-name');
                     if(nameInput && (!nameInput.value || nameInput.value.trim() === '')) {
@@ -1163,7 +1122,6 @@
                         userAvatar.image = profile.pictureUrl;
                         userAvatar.name = profile.displayName; 
                         savedUser.avatar = userAvatar;
-                        // Update UI immediately with profile picture
                         updateAvatarDisplay(); 
                     }
                     
@@ -1175,7 +1133,7 @@
                         renderCheckoutList();
                     }
 
-                    // Sync in background - ไม่ต้องรอ
+                    // เพิ่มบรรทัดนี้!!! เพื่อซิงค์ยอดสั่งซื้อทุกครั้งที่เข้าแอพ
                     syncUserStatsFromServer(profile.userId);
 
                 } else {
@@ -1197,20 +1155,17 @@
                 localStorage.setItem(KEYS.VERSION, CURRENT_VERSION);
             }
 
-            // Load local data first for instant UI
             loadUserDataSafe();
+            fetchLottoResults();
+            initLIFF();
+
+            setTimeout(autoCheckLottery, 1000);
             updateTicketBadge();
             updateStreak(); 
             updateAvatarDisplay();
             updateLevelUI();
             updateMiniCart();
             renderCheckoutList();
-
-            // Then start network requests
-            fetchLottoResults();
-            initLIFF(); // Non-blocking init
-
-            setTimeout(autoCheckLottery, 1000);
             
             setTimeout(checkForUpdate, 2000);
             
@@ -2093,32 +2048,8 @@
             document.getElementById('sheet-grand-total').innerText = final + " ฿";
         }
 
-        // --- NEW: Helper for Image Generation ---
-        function showReceiptPreview(dataUrl) {
-            hideGlobalLoader();
-            const modal = document.getElementById('receipt-preview-modal');
-            const img = document.getElementById('receipt-preview-img');
-            img.src = dataUrl;
-            modal.classList.remove('hidden');
-            pushModalState('preview');
-
-            // FIX: Remove select-none from body to allow Android long-press
-            document.body.classList.remove('select-none');
-        }
-
-        function closeReceiptPreview() {
-            const modal = document.getElementById('receipt-preview-modal');
-            modal.classList.add('hidden');
-            
-            // FIX: Restore select-none
-            document.body.classList.add('select-none');
-
-            if (currentOpenModal === 'preview') history.back();
-        }
-
-        // --- UPDATED: GENERATE ORDER CARD ---
         function generateOrderCard() {
-            showGlobalLoader("กำลังสร้างใบเสร็จ...");
+            showGlobalLoader("กำลังพิมพ์ใบเสร็จ...");
             const name = document.getElementById('user-name').value || 'ลูกค้า';
             
             const nowStr = `${getStandardDate(new Date())} ${formatTime(new Date())}`;
@@ -2134,7 +2065,6 @@
             document.querySelector('.receipt-total').innerText = netTotal + '.-';
 
             const receiptAvatar = document.getElementById('receipt-avatar-img');
-            // FIX: Add crossOrigin before setting src
             receiptAvatar.setAttribute('crossOrigin', 'anonymous'); 
             receiptAvatar.src = userAvatar.image;
             receiptAvatar.onerror = function() { 
@@ -2159,32 +2089,27 @@
                 itemsContainer.appendChild(row);
             });
 
-            // Wait slightly for image load
-            setTimeout(() => {
-                const div = document.getElementById('receipt-capture');
-                
-                // Temporarily make visible for capture but keep behind
-                // div.style.visibility = 'visible'; 
+            const div = document.getElementById('receipt-capture');
+            const nowFile = new Date();
+            const filename = `Kaprao_${nowFile.toISOString().split('T')[0]}_${nowFile.getHours()}-${nowFile.getMinutes()}.png`;
 
-                html2canvas(div, { 
-                    scale: 2, 
-                    useCORS: true, 
-                    allowTaint: false, // *** FIX HERE: Must be false for toDataURL to work ***
-                    backgroundColor: '#ffffff',
-                    logging: false
-                }).then(canvas => {
-                    // div.style.visibility = 'hidden'; // Hide again
-                    showReceiptPreview(canvas.toDataURL("image/png"));
-                }).catch((err) => {
-                    console.error("Capture Error:", err);
-                    // div.style.visibility = 'hidden';
-                    hideGlobalLoader();
-                    showToast('เกิดข้อผิดพลาดในการสร้างภาพ');
-                });
-            }, 800); // Increased delay slightly
+            html2canvas(div, { 
+                scale: 2, 
+                useCORS: true, 
+                backgroundColor: null 
+            }).then(canvas => {
+                hideGlobalLoader();
+                const link = document.createElement('a');
+                link.download = filename;
+                link.href = canvas.toDataURL();
+                link.click();
+                showToast('บันทึกใบเสร็จแล้ว 📸');
+            }).catch(() => {
+                hideGlobalLoader();
+                showToast('เกิดข้อผิดพลาดในการบันทึกภาพ');
+            });
         }
 
-        // --- UPDATED: REPRINT RECEIPT ---
         function reprintReceipt(ticketIndex) {
             triggerHaptic();
             playSound('pop');
@@ -2195,7 +2120,7 @@
                 return;
             }
 
-            showGlobalLoader("กำลังสร้างใบเสร็จ...");
+            showGlobalLoader("กำลังดึงข้อมูลใบเสร็จ...");
             
             const name = ticket.customerName || 'ลูกค้า';
             const subtotal = ticket.items.reduce((sum, i) => sum + i.price, 0);
@@ -2211,13 +2136,6 @@
             document.querySelector('.receipt-subtotal').innerText = subtotal + '.-';
             document.querySelector('.receipt-discount').innerText = '-' + discount + '.-';
             document.querySelector('.receipt-total').innerText = netTotal + '.-';
-
-            const receiptAvatar = document.getElementById('receipt-avatar-img');
-            receiptAvatar.setAttribute('crossOrigin', 'anonymous'); 
-            receiptAvatar.src = userAvatar.image; 
-            receiptAvatar.onerror = function() { 
-                 this.src = 'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Dog%20face/3D/dog_face_3d.png';
-            };
 
             const itemsContainer = document.querySelector('.receipt-items');
             itemsContainer.innerHTML = '';
@@ -2239,24 +2157,24 @@
 
             setTimeout(() => {
                 const div = document.getElementById('receipt-capture');
-                // div.style.visibility = 'visible'; 
+                const filename = `Kaprao_Reprint_${tDate.toISOString().split('T')[0]}.png`;
 
                 html2canvas(div, { 
                     scale: 2, 
                     useCORS: true, 
-                    allowTaint: false, // *** FIX HERE: Must be false ***
-                    backgroundColor: '#ffffff',
-                    logging: false
+                    backgroundColor: null 
                 }).then(canvas => {
-                    // div.style.visibility = 'hidden'; 
-                    showReceiptPreview(canvas.toDataURL("image/png"));
-                }).catch((err) => {
-                    console.error(err);
-                    // div.style.visibility = 'hidden';
+                    hideGlobalLoader();
+                    const link = document.createElement('a');
+                    link.download = filename;
+                    link.href = canvas.toDataURL();
+                    link.click();
+                    showToast('บันทึกใบเสร็จย้อนหลังแล้ว 📸');
+                }).catch(() => {
                     hideGlobalLoader();
                     showToast('เกิดข้อผิดพลาดในการบันทึกภาพ');
                 });
-            }, 800); 
+            }, 500);
         }
 
         async function submitOrderToLine() {
@@ -2295,7 +2213,7 @@
                     discount: discountValue,
                     netTotal: netTotal,
                     allNotes: allNotes,
-                    userId: userAvatar.userId 
+                    userId: userAvatar.userId // Send User ID for tracking
                 };
 
                 if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
