@@ -350,7 +350,12 @@
         </div>
         
         <div id="tabs-container" class="sticky top-0 z-30 pt-2 pb-4 -mx-5 px-5 flex gap-3 snap-x scroll-smooth overflow-x-auto hide-scroll transition-all">
-            <button onclick="switchCategory('kaprao')" id="tab-kaprao" class="btn-bounce snap-start category-pill-active min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all">
+            <button onclick="switchCategory('tray')" id="tab-tray" class="btn-bounce snap-start category-pill-active min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all text-indigo-600 border border-indigo-100">
+                <span class="text-xl">🍱</span>
+                <span class="text-xs font-bold">ชุดถาดสุดคุ้ม</span>
+            </button>
+
+            <button onclick="switchCategory('kaprao')" id="tab-kaprao" class="btn-bounce snap-start category-pill-inactive min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all">
                 <span class="text-xl">🌶️</span>
                 <span class="text-xs">เมนูกะเพรา</span>
             </button>
@@ -554,7 +559,9 @@
                 </div>
             </div>
 
-            <div class="mb-6">
+            <div id="tray-options-container" class="mb-6 hidden"></div>
+
+            <div class="mb-6" id="addons-section">
                 <h4 class="font-bold text-gray-800 mb-3 text-sm">เพิ่มเติมความอร่อย</h4>
                 <div class="space-y-3">
                     <label class="flex items-center justify-between p-3 rounded-2xl bg-white border border-gray-100 hover:border-yellow-200 cursor-pointer transition-all has-[:checked]:bg-yellow-50 has-[:checked]:border-yellow-400 btn-bounce shadow-sm">
@@ -684,6 +691,30 @@
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyU3QVueNDPWcA5WqYnD3elmlGZFtrXSTesVLUEo-ae9eBcFPwfnX93_LcuF6xU0mFb/exec'; 
         
         const menuItems = [
+            // 🔥 เพิ่มเมนูใหม่: ชุดถาด (Moved to top of logic, but rendering order depends on category switch) 🔥
+            { 
+                id: 201, 
+                name: "Set 1: Solo Tray (ลุยเดี่ยว)", 
+                price: 89, 
+                icon: "📦", 
+                category: "tray", 
+                reqMeat: false, 
+                isTray: true, 
+                trayType: 1, 
+                kcal: 750 
+            },
+            { 
+                id: 202, 
+                name: "Set 2: Buddy Tray (คู่หู)", 
+                price: 149, 
+                icon: "🍱", 
+                category: "tray", 
+                reqMeat: false, 
+                isTray: true, 
+                trayType: 2, 
+                kcal: 1400 
+            },
+
             { id: 2, name: "กะเพราหน่อไม้", price: 55, icon: "🎍", category: "kaprao", reqMeat: true, kcal: 350 },
             { id: 3, name: "กะเพราหมูสับ", price: 50, icon: "🐷", category: "kaprao", reqMeat: false, kcal: 520 },
             { id: 4, name: "กะเพราหมูเด้ง", price: 50, icon: "🥓", category: "kaprao", reqMeat: false, kcal: 550 },
@@ -1069,10 +1100,8 @@
             }
         }
 
-        // 🔥 เพิ่มใหม่: Sync History จาก Server -> Client (Pull) 🔥
         async function syncTicketHistory(userId) {
             try {
-                // เรียก getHistory จาก Backend
                 const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getHistory&userId=' + userId);
                 const serverTickets = await response.json();
 
@@ -1080,26 +1109,22 @@
 
                 let updated = false;
                 
-                // Merge ข้อมูล: เอาของ Server มาเติมลง Local ถ้ายังไม่มี
                 serverTickets.forEach(serverT => {
-                    // เช็คว่ามี Ticket ID นี้ในเครื่องยัง?
                     const exists = lottoHistory.some(localT => localT.id === serverT.id);
                     if (!exists) {
-                        // ถ้าไม่มี ให้สร้าง Ticket ใหม่จากข้อมูล Server
-                        const drawDateObj = getNextDrawDate(); // คำนวณวันหวยออกคร่าวๆ (อาจไม่เป๊ะถ้าย้อนหลังนาน)
+                        const drawDateObj = getNextDrawDate(); 
                         
-                        // สร้าง Ticket Object
                         const newTicket = {
                             id: serverT.id,
                             number: serverT.id.slice(-2),
                             date: serverT.date,
-                            drawDate: getStandardDate(drawDateObj), // ใช้วันหวยออกถัดไปเป็นค่า Default
+                            drawDate: getStandardDate(drawDateObj), 
                             drawDateTimestamp: drawDateObj.getTime(),
-                            timestamp: Date.now(), // ใช้วันปัจจุบันไปก่อนเพราะเราไม่รู้วันที่แน่นอนจาก Server (ถ้า Server ไม่ส่งมา)
+                            timestamp: Date.now(), 
                             price: serverT.price,
                             status: 'pending',
                             checkedDate: null,
-                            items: [{ name: serverT.itemsStr, price: serverT.price }], // แปลง string กลับเป็น object คร่าวๆ
+                            items: [{ name: serverT.itemsStr, price: serverT.price }], 
                             customerName: 'Synced'
                         };
                         
@@ -1109,13 +1134,12 @@
                 });
 
                 if (updated) {
-                    // เรียงลำดับใหม่ (เอาล่าสุดขึ้นก่อน) และตัดให้เหลือ 20
-                    lottoHistory.sort((a, b) => b.timestamp - a.timestamp); // Sort descending
+                    lottoHistory.sort((a, b) => b.timestamp - a.timestamp); 
                     if(lottoHistory.length > 20) lottoHistory = lottoHistory.slice(0, 20);
                     
                     localStorage.setItem(KEYS.HISTORY, JSON.stringify(lottoHistory));
                     updateTicketBadge();
-                    autoCheckLottery(); // ตรวจรางวัลใหม่อีกรอบเผื่อตั๋วที่เพิ่งมาถูกรางวัล
+                    autoCheckLottery(); 
                     console.log("History Synced from Server");
                 }
 
@@ -1130,7 +1154,6 @@
             const levelCount = document.getElementById('level-count');
             if(levelCount) levelCount.innerText = "กำลังซิงค์...";
             
-            // LOCK: Start Sync
             isSyncing = true; 
 
             try {
@@ -1162,13 +1185,11 @@
                     updateLevelUI();
                 }
                 
-                // UNLOCK: Sync Success
                 isSyncing = false;
 
             } catch (error) {
                 console.error("Sync Error:", error);
                 updateLevelUI();
-                // UNLOCK: Sync Failed (Allow user to proceed with local data)
                 isSyncing = false;
             }
         }
@@ -1213,9 +1234,6 @@
                         renderCheckoutList();
                     }
 
-                    // ============================================
-                    // 🔥 STEP 1: Claim Local Orders (Push) 🔥
-                    // ============================================
                     const localHistoryIds = lottoHistory.map(t => t.id);
                     
                     if (localHistoryIds.length > 0) {
@@ -1230,14 +1248,12 @@
                             })
                         }).then(() => {
                             console.log("Claim request sent.");
-                            // หลังจาก Claim เสร็จ ให้ทำ Step 2
-                            syncUserStatsFromServer(profile.userId); // Sync Level
-                            syncTicketHistory(profile.userId);       // 🔥 STEP 2: Pull History (Sync Down) 🔥
+                            syncUserStatsFromServer(profile.userId); 
+                            syncTicketHistory(profile.userId);       
                         });
                     } else {
-                        // ถ้าไม่มีอะไรให้เคลม ก็ Sync ลงมาเลย
                         syncUserStatsFromServer(profile.userId);
-                        syncTicketHistory(profile.userId); // 🔥 STEP 2: Pull History (Sync Down) 🔥
+                        syncTicketHistory(profile.userId); 
                     }
 
                 } else {
@@ -1267,9 +1283,7 @@
             }
         }
 
-        // 🔥 FIXED: Random Menu Function (Attached to window)
         window.randomMenu = function() {
-            // 1. คัดกรองเมนู (ไม่เอาของหวาน และไม่เอาโปรโมชั่น)
             const availableItems = menuItems.filter(i => 
                 i.category !== 'dessert' && 
                 i.category !== 'promotion' && 
@@ -1281,20 +1295,16 @@
                 return;
             }
 
-            // 2. เอฟเฟกต์เสียงและการสั่น
             playSound('switch');
             triggerHaptic();
 
-            // 3. หมุนติ้วๆ (จำลองด้วยการหน่วงเวลาเล็กน้อย) หรือสุ่มเลย
             const randomIndex = Math.floor(Math.random() * availableItems.length);
             const selectedItem = availableItems[randomIndex];
 
-            // 4. แสดงผล
             showToast(`🎲 สุ่มได้: ${selectedItem.name}`);
             openModal(selectedItem);
         }
 
-        // --- DOMContentLoaded ---
         document.addEventListener('DOMContentLoaded', () => {
             const savedVer = localStorage.getItem(KEYS.VERSION);
             if(savedVer !== CURRENT_VERSION) {
@@ -1468,6 +1478,130 @@
             }
         }
 
+        // 🔥 เพิ่มฟังก์ชันสำหรับสร้างตัวเลือกเมนูถาด (Updated Grid Layout)
+        function renderTrayOptions(type) {
+            const container = document.getElementById('tray-options-container');
+            let html = '';
+
+            // --- SET 1: SOLO TRAY ---
+            if (type === 1) {
+                html += `<h4 class="font-bold text-gray-800 mb-2 text-sm">1. เลือกเนื้อสัตว์หลัก</h4>`;
+                html += `<div class="grid grid-cols-2 gap-3 mb-4">`; // Use Grid Layout
+                const meats = [
+                    {n:'กะเพราหมูสับ', p:0, i:'🐷'}, {n:'กะเพราไก่ชิ้น', p:0, i:'🐔'},
+                    {n:'กะเพราหน่อไม้-หมูสับ', p:0, i:'🎍'}, {n:'กะเพราหมูเด้ง', p:10, i:'🥓'},
+                    {n:'กะเพราสันคอ', p:10, i:'🥩'}, {n:'กะเพราทะเล (กุ้ง/หมึก)', p:20, i:'🦐'}
+                ];
+                meats.forEach((m, i) => {
+                    html += `
+                    <label class="cursor-pointer group relative">
+                        <input type="radio" name="tray-meat" value="${m.n}" data-price="${m.p}" ${i===0?'checked':''} onchange="updateModalPrice()" class="peer sr-only">
+                        <div class="h-full bg-white border-2 border-gray-100 rounded-2xl p-3 flex flex-col items-center justify-center gap-2 transition-all peer-checked:border-yellow-400 peer-checked:bg-yellow-50 peer-checked:shadow-md">
+                            <div class="text-3xl filter group-hover:scale-110 transition-transform">${m.i}</div>
+                            <div class="text-xs font-bold text-center leading-tight text-gray-700">${m.n}</div>
+                            ${m.p>0 ? `<div class="text-[10px] text-white bg-orange-500 px-2 py-0.5 rounded-full font-bold">+${m.p}</div>` : ''}
+                            <div class="absolute top-2 right-2 opacity-0 peer-checked:opacity-100 text-yellow-500 transition-opacity"><i class="fas fa-check-circle"></i></div>
+                        </div>
+                    </label>`;
+                });
+                html += `</div>`;
+
+                html += `<h4 class="font-bold text-gray-800 mb-2 text-sm">2. เลือกไข่คู่ใจ</h4>`;
+                html += `<div class="grid grid-cols-3 gap-2 mb-4">`; // Use Grid Layout
+                const eggs = [{n:'ไข่ดาว', p:0, i:'🍳'}, {n:'ไข่เจียว', p:5, i:'🥞'}, {n:'ไข่ข้น', p:10, i:'🥘'}];
+                eggs.forEach((e, i) => {
+                    html += `
+                    <label class="cursor-pointer group relative">
+                        <input type="radio" name="tray-egg" value="${e.n}" data-price="${e.p}" ${i===0?'checked':''} onchange="updateModalPrice()" class="peer sr-only">
+                        <div class="h-full bg-white border-2 border-gray-100 rounded-2xl p-2 flex flex-col items-center justify-center gap-1 transition-all peer-checked:border-yellow-400 peer-checked:bg-yellow-50 peer-checked:shadow-md">
+                            <div class="text-2xl">${e.i}</div>
+                            <div class="text-xs font-bold text-center text-gray-700">${e.n}</div>
+                            ${e.p>0 ? `<div class="text-[9px] text-orange-500 font-bold">+${e.p}</div>` : ''}
+                        </div>
+                    </label>`;
+                });
+                html += `</div>`;
+            } 
+            // --- SET 2: BUDDY TRAY ---
+            else if (type === 2) {
+                html += `<h4 class="font-bold text-gray-800 mb-2 text-sm">1. เลือกเนื้อสัตว์หลัก (จานยักษ์)</h4>`;
+                html += `<div class="grid grid-cols-2 gap-3 mb-4">`; // Use Grid Layout
+                const meats = [
+                    {n:'กะเพราหมูสับ', p:0, i:'🐷'}, {n:'กะเพราไก่ชิ้น', p:0, i:'🐔'},
+                    {n:'กะเพราหน่อไม้-หมูสับ', p:0, i:'🎍'}, 
+                    {n:'กะเพราหมูเด้ง', p:20, i:'🥓'}, {n:'กะเพราสันคอ', p:20, i:'🥩'},
+                    {n:'กะเพราทะเล', p:30, i:'🦐'}, {n:'ทูโทน (หมูสับ+ไก่)', p:10, i:'✨'}
+                ];
+                meats.forEach((m, i) => {
+                    html += `
+                    <label class="cursor-pointer group relative">
+                        <input type="radio" name="tray-meat" value="${m.n}" data-price="${m.p}" ${i===0?'checked':''} onchange="updateModalPrice()" class="peer sr-only">
+                        <div class="h-full bg-white border-2 border-gray-100 rounded-2xl p-3 flex flex-col items-center justify-center gap-2 transition-all peer-checked:border-yellow-400 peer-checked:bg-yellow-50 peer-checked:shadow-md">
+                            <div class="text-3xl filter group-hover:scale-110 transition-transform">${m.i}</div>
+                            <div class="text-xs font-bold text-center leading-tight text-gray-700">${m.n}</div>
+                            ${m.p>0 ? `<div class="text-[10px] text-white bg-orange-500 px-2 py-0.5 rounded-full font-bold">+${m.p}</div>` : ''}
+                            <div class="absolute top-2 right-2 opacity-0 peer-checked:opacity-100 text-yellow-500 transition-opacity"><i class="fas fa-check-circle"></i></div>
+                        </div>
+                    </label>`;
+                });
+                html += `</div>`;
+
+                html += `<h4 class="font-bold text-gray-800 mb-2 text-sm">2. เลือกไข่คู่ใจ (ได้ 2 ฟอง)</h4>`;
+                html += `<div class="grid grid-cols-3 gap-2 mb-4">`; // Use Grid Layout
+                const eggs = [{n:'ไข่ดาวคู่', p:0, i:'🍳🍳'}, {n:'ไข่เจียวแผ่นยักษ์', p:0, i:'🥞'}, {n:'ไข่ข้นราดข้าว', p:15, i:'🥘'}];
+                eggs.forEach((e, i) => {
+                    html += `
+                    <label class="cursor-pointer group relative">
+                        <input type="radio" name="tray-egg" value="${e.n}" data-price="${e.p}" ${i===0?'checked':''} onchange="updateModalPrice()" class="peer sr-only">
+                        <div class="h-full bg-white border-2 border-gray-100 rounded-2xl p-2 flex flex-col items-center justify-center gap-1 transition-all peer-checked:border-yellow-400 peer-checked:bg-yellow-50 peer-checked:shadow-md">
+                            <div class="text-2xl">${e.i}</div>
+                            <div class="text-xs font-bold text-center text-gray-700">${e.n}</div>
+                            ${e.p>0 ? `<div class="text-[9px] text-orange-500 font-bold">+${e.p}</div>` : ''}
+                        </div>
+                    </label>`;
+                });
+                html += `</div>`;
+            }
+
+            // 🔥 เพิ่มส่วนสรุปรายการ (Summary) 🔥
+            html += `
+            <div class="mt-6 p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="text-lg">🍱</span>
+                    <h4 class="text-sm font-bold text-indigo-800">สรุปความอร่อยในถาด:</h4>
+                </div>
+                <p id="tray-summary-text" class="text-sm text-gray-700 leading-relaxed pl-1"></p>
+                <div class="mt-3 pt-2 border-t border-indigo-100 flex items-center gap-2 text-[10px] text-indigo-400">
+                    <i class="fas fa-utensils"></i>
+                    <span>เสิร์ฟพร้อมแตงกวาและน้ำซุปฟรี!</span>
+                </div>
+            </div>`;
+
+            container.innerHTML = html;
+        }
+
+        // 🔥 ฟังก์ชันอัปเดตสรุปรายการในถาด
+        function updateTraySummary() {
+            if(!currentItem || !currentItem.isTray) return;
+            const meat = document.querySelector('input[name="tray-meat"]:checked');
+            const egg = document.querySelector('input[name="tray-egg"]:checked');
+            const txt = document.getElementById('tray-summary-text');
+
+            if(meat && egg && txt) {
+                // อัปเดตข้อความสรุปโดยไม่มีระดับความเผ็ด
+                txt.innerHTML = `
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-gray-500">1. เมนูหลัก:</span>
+                        <span class="font-bold text-gray-800">${meat.value}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-500">2. ไข่คู่ใจ:</span>
+                        <span class="font-bold text-gray-800">${egg.value}</span>
+                    </div>
+                `;
+            }
+        }
+
         function switchCategory(cat) {
             if(activeCategory === cat) return;
             activeCategory = cat; 
@@ -1480,13 +1614,15 @@
             grid.classList.add('page-out');
             if(!msg.classList.contains('hidden')) msg.classList.add('page-out');
             
-            ['kaprao', 'garlic', 'noodle', 'soup', 'others', 'dessert', 'promotion'].forEach(c => {
+            // 🔥 เพิ่ม tab-tray ใน array นี้ (อยู่แรกสุด)
+            ['tray', 'kaprao', 'garlic', 'noodle', 'soup', 'others', 'dessert', 'promotion'].forEach(c => {
                 const btn = document.getElementById(`tab-${c}`);
                 if (c === cat) {
                     btn.className = "snap-start category-pill-active min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all transform scale-105 btn-bounce";
                 } else {
                     btn.className = "snap-start category-pill-inactive min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all btn-bounce";
                     if(c === 'promotion') btn.classList.add('border-dashed', 'border-red-300', 'text-red-400');
+                    if(c === 'tray') btn.classList.add('text-indigo-600', 'border-indigo-100');
                 }
             });
 
@@ -1508,6 +1644,9 @@
                         renderMenu();
                     } else if (cat === 'soup') {
                         title.innerText = "เมนูแกง/ต้ม";
+                        renderMenu();
+                    } else if (cat === 'tray') {
+                        title.innerText = "ชุดถาดสุดคุ้ม";
                         renderMenu();
                     } else {
                         title.innerText = "รายการแนะนำ";
@@ -1601,7 +1740,6 @@
             });
         }
 
-        // 🔥 FIXED: Render Promotions (Fail-Safe Copy)
         function renderPromotions() {
             const grid = document.getElementById('menu-grid');
             grid.innerHTML = '';
@@ -1610,16 +1748,13 @@
                 el.style.animationDelay = `${index * 0.1}s`;
                 el.className = "fast-card p-0 flex overflow-hidden cursor-pointer shadow-sm mb-2 btn-bounce stagger-item";
                 
-                // --- FIXED ONCLICK LOGIC ---
                 el.onclick = () => {
-                    // 1. นำโค้ดไปใส่ในช่องกรอกทันที (สำคัญที่สุด)
                     const input = document.getElementById('discount-code');
                     if(input) {
                         input.value = promo.code;
                         applyDiscount(); 
                     }
 
-                    // 2. ลอง Copy ลง Clipboard (ใส่ try-catch กัน Error)
                     if(navigator.clipboard) {
                         navigator.clipboard.writeText(promo.code).catch(err => console.warn('Copy failed (non-secure context)', err));
                     } else {
@@ -1630,7 +1765,6 @@
                     playSound('pop');
                     triggerHaptic();
                 };
-                // -----------------------------
 
                 el.innerHTML = `
                     <div class="w-24 ${promo.color} flex flex-col items-center justify-center text-white p-2">
@@ -1664,6 +1798,7 @@
             setTimeout(drawWheel, 100);
         }
 
+        // 🔥 Updated Open Modal
         function openModal(item) {
             pushModalState('menu'); 
             
@@ -1675,13 +1810,31 @@
             document.getElementById('modal-title').innerText = item.name;
             document.getElementById('modal-icon').innerText = item.icon;
             document.getElementById('modal-note').value = '';
+            
+            // Reset Standard Options
             document.querySelectorAll('input[name="modal-meat"]').forEach(el => el.checked = false);
             addonIds.forEach(id => document.getElementById(`modal-opt-${id}`).checked = false);
+            
             const meatSec = document.getElementById('modal-meat-section');
+            const traySec = document.getElementById('tray-options-container'); 
+            const addonsSec = document.getElementById('addons-section'); // 🔥 เลือกส่วนเพิ่มเติมความอร่อย
             
             document.getElementById('meat-options-container').classList.remove('animate-shake', 'border', 'border-red-500', 'rounded-xl');
 
-            if(item.reqMeat) meatSec.classList.remove('hidden'); else meatSec.classList.add('hidden');
+            // --- LOGIC ใหม่: สลับการแสดงผล ---
+            if(item.isTray) {
+                meatSec.classList.add('hidden'); // ซ่อนเลือกเนื้อแบบปกติ
+                traySec.classList.remove('hidden'); // โชว์เลือกแบบถาด
+                addonsSec.classList.add('hidden'); // 🔥 ซ่อนเพิ่มเติมความอร่อยสำหรับชุดถาด
+                renderTrayOptions(item.trayType); 
+                updateTraySummary(); // เรียกอัปเดตสรุปทันที
+            } else {
+                traySec.classList.add('hidden'); // ซ่อนแบบถาด
+                addonsSec.classList.remove('hidden'); // 🔥 โชว์เพิ่มเติมความอร่อยสำหรับเมนูปกติ
+                // โชว์/ซ่อนเนื้อปกติ
+                if(item.reqMeat) meatSec.classList.remove('hidden'); else meatSec.classList.add('hidden');
+            }
+            
             updateModalPrice();
             const overlay = document.getElementById('modal-overlay');
             const content = document.getElementById('modal-content');
@@ -1719,16 +1872,30 @@
             updateModalPrice();
         }
 
+        // 🔥 Updated Price Logic
         function updateModalPrice() {
             if (!currentItem) return;
             let total = currentItem.price;
             let totalKcal = currentItem.kcal || 0;
+            
+            // --- คำนวณราคาสำหรับเมนูถาด ---
+            if(currentItem.isTray) {
+                const meatOpt = document.querySelector('input[name="tray-meat"]:checked');
+                const eggOpt = document.querySelector('input[name="tray-egg"]:checked');
+                if(meatOpt) total += parseInt(meatOpt.getAttribute('data-price') || 0);
+                if(eggOpt) total += parseInt(eggOpt.getAttribute('data-price') || 0);
+                
+                updateTraySummary(); // 🔥 อัปเดตสรุปทุกครั้งที่ราคาเปลี่ยน (เลือกช้อยส์ใหม่)
+            }
+            
+            // --- คำนวณราคา Addon ปกติ ---
             addonIds.forEach(id => {
                 if(document.getElementById(`modal-opt-${id}`).checked) {
                     total += 10;
                     totalKcal += (addonCalories[id] || 0); 
                 }
             });
+            
             total = total * modalQty;
             totalKcal = totalKcal * modalQty;
             const priceEl = document.getElementById('modal-price');
@@ -1741,10 +1908,22 @@
 
         addonIds.forEach(id => document.getElementById(`modal-opt-${id}`).addEventListener('change', updateModalPrice));
 
+        // 🔥 Updated Add To Cart
         function addToCart() {
             if (!currentItem) return;
             let meat = null;
-            if (currentItem.reqMeat) {
+            let noteExtra = "";
+
+            // --- LOGIC ใหม่สำหรับเมนูถาด ---
+            if (currentItem.isTray) {
+                 const meatOpt = document.querySelector('input[name="tray-meat"]:checked');
+                 const eggOpt = document.querySelector('input[name="tray-egg"]:checked');
+                 
+                 meat = meatOpt ? meatOpt.value : 'หมูสับ'; // Default กันเหนียว
+                 noteExtra = `[${eggOpt ? eggOpt.value : ''}]`;
+            } 
+            // --- LOGIC เดิม ---
+            else if (currentItem.reqMeat) {
                 const r = document.querySelector('input[name="modal-meat"]:checked');
                 
                 if(!r) {
@@ -1757,6 +1936,7 @@
                 }
                 meat = r.value;
             }
+
             let addons = [];
             let addPrice = 0;
             const names = {special:'พิเศษ', kaikhon:'ไข่ข้น', kaidao:'ไข่ดาว', kaijiao:'ไข่เจียว', kaitom:'ไข่ต้ม', kaiyiewma:'ไข่เยี่ยวม้า'};
@@ -1767,13 +1947,23 @@
                 }
             });
             
-            const noteSafe = escapeHtml(document.getElementById('modal-note').value.trim());
+            // ราคาที่บวกเพิ่มจากตัวเลือกถาด
+            let trayAddPrice = 0;
+            if(currentItem.isTray) {
+                const meatOpt = document.querySelector('input[name="tray-meat"]:checked');
+                const eggOpt = document.querySelector('input[name="tray-egg"]:checked');
+                if(meatOpt) trayAddPrice += parseInt(meatOpt.getAttribute('data-price') || 0);
+                if(eggOpt) trayAddPrice += parseInt(eggOpt.getAttribute('data-price') || 0);
+            }
+            
+            let noteSafe = escapeHtml(document.getElementById('modal-note').value.trim());
+            if(noteExtra) noteSafe = (noteSafe ? noteSafe + " " : "") + noteExtra;
 
             for(let i=0; i<modalQty; i++){
                 cart.push({
                     id: Date.now() + i,
                     name: currentItem.name,
-                    price: currentItem.price + addPrice,
+                    price: currentItem.price + addPrice + trayAddPrice,
                     meat: meat,
                     addons: addons,
                     note: noteSafe
@@ -1910,11 +2100,9 @@
             
             lottoHistory.unshift(ticket);
             
-            // --- FIX: Limit History Size ---
             if (lottoHistory.length > 20) {
                 lottoHistory = lottoHistory.slice(0, 20); 
             }
-            // ------------------------------
 
             localStorage.setItem(KEYS.HISTORY, JSON.stringify(lottoHistory));
             updateTicketBadge();
