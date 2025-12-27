@@ -202,8 +202,21 @@
         .wheel-pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 35px solid #F59E0B; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2)); z-index: 20; }
         .wheel-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px; background: white; border-radius: 50%; z-index: 10; box-shadow: 0 0 15px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; font-size: 20px; }
 
-        /* --- RECEIPT CAPTURE AREA (Hidden) --- */
-        #receipt-capture { position: fixed; top: -9999px; left: -9999px; width: 400px; background: #FFFFFF; padding: 0; border-radius: 0; font-family: 'Kanit', sans-serif; color: #1F2937; }
+        /* --- RECEIPT CAPTURE AREA (Updated for Html2Canvas) --- */
+        #receipt-capture { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 400px; 
+            background: #FFFFFF; 
+            padding: 0; 
+            border-radius: 0; 
+            font-family: 'Kanit', sans-serif; 
+            color: #1F2937;
+            z-index: -999; /* Hide behind content but keep rendered */
+            opacity: 0; 
+            pointer-events: none;
+        }
 
         /* --- XP BAR --- */
         .xp-bar-bg { background-color: #e5e7eb; border-radius: 9999px; overflow: hidden; height: 8px; }
@@ -401,7 +414,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V18.4.0</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V18.4.1</p>
         </div>
 
     </div>
@@ -2063,7 +2076,25 @@
             modal.classList.remove('hidden');
         }
 
-        function generateOrderCard() {
+        // ฟังก์ชันแปลง URL รูปเป็น Base64 แก้ปัญหา CORS
+        async function getBase64ImageFromUrl(imageUrl) {
+            try {
+                const res = await fetch(imageUrl);
+                const blob = await res.blob();
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(blob);
+                });
+            } catch (error) {
+                console.error("Image convert error:", error);
+                // ถ้าโหลดไม่ได้ ให้ใช้รูปหมา Default แทน
+                return 'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Dog%20face/3D/dog_face_3d.png'; 
+            }
+        }
+
+        async function generateOrderCard() {
             showGlobalLoader("กำลังพิมพ์ใบเสร็จ...");
             const name = document.getElementById('user-name').value || 'ลูกค้า';
             
@@ -2072,6 +2103,7 @@
             let subtotal = cart.reduce((sum, i) => sum + i.price, 0);
             let netTotal = Math.max(0, subtotal - discountValue);
 
+            // Set ข้อมูลลงในใบเสร็จ
             document.querySelector('.receipt-id').innerText = currentOrderId || 'KP-XXXX';
             document.querySelector('.receipt-date').innerText = nowStr;
             document.querySelector('.receipt-name').innerText = escapeHtml(name);
@@ -2079,13 +2111,6 @@
             document.querySelector('.receipt-discount').innerText = '-' + discountValue + '.-';
             document.querySelector('.receipt-total').innerText = netTotal + '.-';
 
-            const receiptAvatar = document.getElementById('receipt-avatar-img');
-            // Ensure crossorigin is set for canvas
-            receiptAvatar.src = userAvatar.image;
-            receiptAvatar.onerror = function() { 
-                 this.src = 'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Dog%20face/3D/dog_face_3d.png';
-            };
-            
             const itemsContainer = document.querySelector('.receipt-items');
             itemsContainer.innerHTML = '';
             cart.forEach((i, index) => {
@@ -2104,22 +2129,49 @@
                 itemsContainer.appendChild(row);
             });
 
-            const div = document.getElementById('receipt-capture');
+            // --- ส่วนแก้ไขสำคัญ: จัดการรูปภาพก่อน Render ---
+            const receiptAvatar = document.getElementById('receipt-avatar-img');
+            
+            // 1. แปลงรูปเป็น Base64
+            let avatarUrlToUse = userAvatar.image;
+            // ถ้าเป็นรูปจาก LINE Profile (ไม่ใช่ local assets) ให้แปลงก่อน
+            if (avatarUrlToUse.startsWith('http')) {
+                try {
+                     // ใช้ Default Avatar ชั่วคราวไปก่อนถ้ารูปโหลดไม่ผ่าน
+                    const base64Img = await getBase64ImageFromUrl(avatarUrlToUse);
+                    receiptAvatar.src = base64Img;
+                } catch (e) {
+                    receiptAvatar.src = avatarOptions[0]; // fallback
+                }
+            } else {
+                receiptAvatar.src = avatarUrlToUse;
+            }
 
-            html2canvas(div, { 
-                scale: 2, 
-                useCORS: true, 
-                backgroundColor: null 
-            }).then(canvas => {
+            // 2. รอแป๊บนึงให้ DOM อัปเดต src เสร็จ
+            await new Promise(r => setTimeout(r, 500));
+
+            const div = document.getElementById('receipt-capture');
+            
+            // 3. สั่ง Render
+            try {
+                const canvas = await html2canvas(div, { 
+                    scale: 3, // เพิ่มความชัด
+                    useCORS: true, 
+                    allowTaint: true, // อนุญาตให้ render แม้จะมี element แปลกปลอม
+                    backgroundColor: '#ffffff', // บังคับพื้นหลังขาว
+                    logging: false
+                });
+
                 hideGlobalLoader();
-                // FIX: Instead of link.click(), open a modal
-                openReceiptResult(canvas.toDataURL());
+                openReceiptResult(canvas.toDataURL('image/png'));
                 showToast('แตะค้างที่รูปเพื่อบันทึก 📸');
-            }).catch((err) => {
+
+            } catch (err) {
                 console.error(err);
                 hideGlobalLoader();
                 showToast('เกิดข้อผิดพลาดในการสร้างภาพ');
-            });
+                // Fallback: ถ้า Error ให้ลองเปิด Modal เปล่าๆ หรือแจ้งเตือน
+            }
         }
 
         function reprintReceipt(ticketIndex) {
@@ -2167,22 +2219,24 @@
                 itemsContainer.appendChild(row);
             });
 
-            setTimeout(() => {
+            setTimeout(async () => {
                 const div = document.getElementById('receipt-capture');
-
-                html2canvas(div, { 
-                    scale: 2, 
-                    useCORS: true, 
-                    backgroundColor: null 
-                }).then(canvas => {
+                
+                // ใช้ Logic เดียวกับ generateOrderCard
+                try {
+                    const canvas = await html2canvas(div, { 
+                        scale: 3, 
+                        useCORS: true, 
+                        allowTaint: true,
+                        backgroundColor: '#ffffff'
+                    });
                     hideGlobalLoader();
-                    // FIX: Open modal
-                    openReceiptResult(canvas.toDataURL());
+                    openReceiptResult(canvas.toDataURL('image/png'));
                     showToast('แตะค้างที่รูปเพื่อบันทึก 📸');
-                }).catch(() => {
+                } catch(err) {
                     hideGlobalLoader();
                     showToast('เกิดข้อผิดพลาดในการบันทึกภาพ');
-                });
+                }
             }, 500);
         }
 
