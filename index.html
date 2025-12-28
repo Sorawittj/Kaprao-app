@@ -400,7 +400,7 @@
         <div id="menu-grid" class="flex flex-col gap-4 min-h-[300px]"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V18.4.4 (FullSync)</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V18.4.5</p>
         </div>
 
     </div>
@@ -1003,7 +1003,7 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '18.4.4'; 
+        const CURRENT_VERSION = '18.4.5'; 
 
         function escapeHtml(text) {
             if (!text) return text;
@@ -1675,16 +1675,26 @@
             filteredItems.forEach((item, index) => {
                 const isDessert = item.category === 'dessert';
                 const isSoldOut = item.soldOut || false; 
+                // 🔥 เช็คว่าเป็นชุดถาดหรือไม่
+                const isTrayWait = (item.id === 201 || item.id === 202); 
                 
                 const el = document.createElement('div');
                 el.style.animationDelay = `${index * 0.05}s`;
                 
-                const grayscaleClass = isSoldOut ? 'grayscale opacity-70' : '';
-                const pointerClass = (isDessert || isSoldOut) ? '' : 'cursor-pointer';
+                // 🔥 ปรับ class ให้เป็นสีเทาถ้าเป็น tray wait
+                const grayscaleClass = (isSoldOut || isTrayWait) ? 'grayscale opacity-70' : '';
+                const pointerClass = (isDessert || isSoldOut || isTrayWait) ? '' : 'cursor-pointer';
 
                 el.className = `fast-card p-4 flex items-center justify-between stagger-item group ${pointerClass} ${grayscaleClass}`;
                 
                 el.onclick = () => {
+                    // 🔥 เพิ่ม Logic เตือนเมื่อกด
+                    if (isTrayWait) {
+                        showToast('⚠️ เมนูนี้พร้อมขายหลังปีใหม่ครับ');
+                        triggerHaptic();
+                        return;
+                    }
+                    
                     if (isSoldOut) {
                         showToast('⛔ เมนูนี้หมดชั่วคราวครับ');
                         triggerHaptic();
@@ -1697,7 +1707,10 @@
                 };
 
                 let actionButton;
-                if (isSoldOut) {
+                // 🔥 เปลี่ยนปุ่มกดเป็นข้อความ
+                if (isTrayWait) {
+                    actionButton = `<span class="text-[10px] font-bold text-white bg-indigo-400 px-2 py-1 rounded-full whitespace-nowrap">หลังปีใหม่</span>`;
+                } else if (isSoldOut) {
                     actionButton = `<span class="text-[10px] font-bold text-white bg-red-400 px-2 py-1 rounded-full">หมด</span>`;
                 } else if (isDessert) {
                     actionButton = `<span class="text-[10px] font-bold text-white bg-gray-400 px-2 py-1 rounded-full">เร็วๆ นี้</span>`;
@@ -1705,11 +1718,11 @@
                     actionButton = `<div class="btn-bounce w-8 h-8 rounded-full btn-gradient text-white flex items-center justify-center shadow-md"><i class="fas fa-plus text-xs"></i></div>`;
                 }
                 
-                const priceDisplay = (isDessert || isSoldOut) 
+                const priceDisplay = (isDessert || isSoldOut || isTrayWait) 
                     ? `<span class="font-bold text-gray-400 text-lg line-through decoration-transparent">${item.price}</span>` 
                     : `<span class="font-bold text-gray-700 text-lg">${item.price}</span>`;
                 
-                const contentStyle = (isDessert || isSoldOut) ? 'opacity-60 grayscale-[50%]' : '';
+                const contentStyle = (isDessert || isSoldOut || isTrayWait) ? 'opacity-60 grayscale-[50%]' : '';
 
                 const newBadge = item.isNew && !isSoldOut 
                     ? `<span class="absolute -top-2 -right-2 bg-red-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full border-2 border-white shadow-sm z-10 animate-pulse">NEW!</span>` 
