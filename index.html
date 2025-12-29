@@ -78,6 +78,18 @@
             --card-hover: #334155;
             --shadow: rgba(0, 0, 0, 0.3);
             --shadow-hover: rgba(0, 0, 0, 0.4);
+            --close-btn-bg: #1E293B;
+            --close-btn-color: #94A3B8;
+            
+            /* เมนูเลือกเนื้อสัตว์ - Dark Theme */
+            --meat-option-bg: #1E293B;
+            --meat-option-border: rgba(148, 163, 184, 0.3);
+            --meat-option-text: #F1F5F9;
+            --meat-option-hover-bg: #334155;
+            --meat-option-selected-bg: rgba(251, 191, 36, 0.25);
+            --meat-option-selected-border: #FBBF24;
+            --meat-option-selected-text: #FBBF24;
+            --meat-option-icon-color: #FBBF24;
         }
         
         [data-theme="light"] {
@@ -94,6 +106,18 @@
             --card-hover: #FFF8F0;
             --shadow: rgba(212, 175, 55, 0.15);
             --shadow-hover: rgba(212, 175, 55, 0.25);
+            --close-btn-bg: #F5F5F5;
+            --close-btn-color: #4A4A4A;
+            
+            /* เมนูเลือกเนื้อสัตว์ - Light Theme */
+            --meat-option-bg: #FFFFFF;
+            --meat-option-border: rgba(212, 175, 55, 0.3);
+            --meat-option-text: #4A4A4A;
+            --meat-option-hover-bg: #FFF8F0;
+            --meat-option-selected-bg: rgba(212, 175, 55, 0.25);
+            --meat-option-selected-border: #D4AF37;
+            --meat-option-selected-text: #8B6914;
+            --meat-option-icon-color: #D4AF37;
         }
 
         /* Base Styles */
@@ -290,44 +314,87 @@
         [data-theme="light"] .badge-newbie { background: rgba(212, 175, 55, 0.2); color: #B8860B; border: 1px solid rgba(212, 175, 55, 0.4); }
         [data-theme="light"] .badge-god { background: linear-gradient(135deg, rgba(212, 175, 55, 0.25) 0%, rgba(184, 134, 11, 0.25) 100%); color: #8B6914; border: 1px solid rgba(212, 175, 55, 0.5); box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); }
 
-        /* === THEME TOGGLE BUTTON === */
-        #theme-toggle {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #FBBF24 0%, #D97706 100%);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 3px 15px rgba(251, 191, 36, 0.4);
+        /* === ปุ่มปิด (กากบาท) ที่มองเห็นชัดใน Light Theme === */
+        .close-button {
+            background: var(--close-btn-bg) !important;
+            color: var(--close-btn-color) !important;
+            border: 2px solid var(--border-color) !important;
+        }
+        [data-theme="light"] .close-button {
+            background: #F5F5F5 !important;
+            color: #4A4A4A !important;
+            border-color: rgba(212, 175, 55, 0.2) !important;
+        }
+
+        /* === เมนูเลือกเนื้อสัตว์ที่มองเห็นชัดในทั้งสองธีม === */
+        .meat-option-container {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .meat-option {
+            background: var(--meat-option-bg);
+            border: 2px solid var(--meat-option-border);
+            color: var(--meat-option-text);
+            border-radius: 1rem;
+            padding: 12px 16px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            backdrop-filter: blur(10px);
-            flex-shrink: 0;
+            min-width: 100px;
+            position: relative;
+            overflow: hidden;
         }
-        #theme-toggle:hover {
-            transform: scale(1.1) rotate(15deg);
-            box-shadow: 0 5px 25px rgba(251, 191, 36, 0.6);
+        
+        .meat-option:hover {
+            background: var(--meat-option-hover-bg);
+            border-color: var(--meat-option-selected-border);
+            transform: translateY(-2px);
         }
-        #theme-toggle:active {
-            transform: scale(0.95) rotate(15deg);
+        
+        .meat-option.selected {
+            background: var(--meat-option-selected-bg) !important;
+            border: 2px solid var(--meat-option-selected-border) !important;
+            color: var(--meat-option-selected-text) !important;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+            transform: translateY(-2px) scale(1.05);
         }
-        #theme-toggle i {
-            font-size: 1.2rem;
-            color: white;
-            transition: transform 0.3s ease;
+        
+        .meat-option.selected::after {
+            content: "✓";
+            position: absolute;
+            top: 4px;
+            right: 6px;
+            color: var(--meat-option-icon-color);
+            font-weight: bold;
+            font-size: 0.75rem;
+            background: rgba(255, 255, 255, 0.2);
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        #theme-toggle:hover i {
-            transform: rotate(180deg);
+        
+        [data-theme="light"] .meat-option.selected::after {
+            background: rgba(255, 255, 255, 0.3);
         }
-        [data-theme="light"] #theme-toggle {
-            background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%);
-            border-color: rgba(255, 255, 255, 0.5);
-            box-shadow: 0 3px 20px rgba(212, 175, 55, 0.5);
+        
+        /* เพิ่มแอนิเมชันเมื่อเลือก */
+        @keyframes selectPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1.05); }
         }
-        [data-theme="light"] #theme-toggle:hover {
-            box-shadow: 0 5px 30px rgba(212, 175, 55, 0.7);
+        
+        .meat-option.selected {
+            animation: selectPulse 0.3s ease-out forwards;
         }
 
         /* === LIGHT THEME OVERRIDES === */
@@ -381,6 +448,46 @@
         [data-theme="light"] .glass-heavy {
             background: rgba(255, 255, 255, 0.98);
             border-top: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        /* === ปุ่ม Theme Toggle === */
+        #theme-toggle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FBBF24 0%, #D97706 100%);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 3px 15px rgba(251, 191, 36, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            backdrop-filter: blur(10px);
+            flex-shrink: 0;
+        }
+        #theme-toggle:hover {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0 5px 25px rgba(251, 191, 36, 0.6);
+        }
+        #theme-toggle:active {
+            transform: scale(0.95) rotate(15deg);
+        }
+        #theme-toggle i {
+            font-size: 1.2rem;
+            color: white;
+            transition: transform 0.3s ease;
+        }
+        #theme-toggle:hover i {
+            transform: rotate(180deg);
+        }
+        [data-theme="light"] #theme-toggle {
+            background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%);
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 3px 20px rgba(212, 175, 55, 0.5);
+        }
+        [data-theme="light"] #theme-toggle:hover {
+            box-shadow: 0 5px 30px rgba(212, 175, 55, 0.7);
         }
 
     </style>
@@ -491,9 +598,6 @@
         <div class="flex justify-between items-center mb-4 mt-2">
             <p class="text-[10px] text-slate-400">สั่งครบ 10 ครั้ง รับรางวัลแทนใจ! 🎁</p>
             <div class="flex items-center gap-2">
-                <button id="theme-toggle" onclick="toggleTheme()" class="btn-bounce" aria-label="สลับธีม">
-                    <i class="fas fa-sun" id="theme-icon"></i>
-                </button>
                 <button onclick="openMyTickets()" class="btn-bounce bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700 shadow-sm flex items-center gap-2 text-xs font-bold text-slate-200 active:bg-slate-700 transition-all">
                     <span>🎫 ตั๋วของฉัน</span>
                     <div id="unread-ticket-dot" class="w-2 h-2 bg-red-500 rounded-full hidden"></div>
@@ -512,6 +616,9 @@
                 </button>
             </h3>
             <div class="flex gap-2">
+                <button id="theme-toggle" onclick="toggleTheme()" class="btn-bounce" aria-label="สลับธีม">
+                    <i class="fas fa-sun" id="theme-icon"></i>
+                </button>
                 <button onclick="scrollTabs(-100)" class="btn-bounce bg-slate-800 w-11 h-11 rounded-full flex items-center justify-center text-slate-400 hover:text-indigo-400 transition-all border border-slate-700 shadow-sm"><i class="fas fa-chevron-left text-xs"></i></button>
                 <button onclick="scrollTabs(100)" class="btn-bounce bg-slate-800 w-11 h-11 rounded-full flex items-center justify-center text-slate-400 hover:text-indigo-400 transition-all border border-slate-700 shadow-sm"><i class="fas fa-chevron-right text-xs"></i></button>
             </div>
@@ -580,7 +687,7 @@
         </div>
         <div class="px-6 py-2 border-b border-slate-700/50 flex justify-between items-center">
             <h2 class="text-xl font-bold text-slate-200">🎫 ตั๋วหวยของฉัน</h2>
-            <button onclick="closeMyTickets()" class="btn-bounce w-11 h-11 rounded-full bg-slate-700 flex items-center justify-center text-slate-400"><i class="fas fa-times text-sm"></i></button>
+            <button onclick="closeMyTickets()" class="btn-bounce w-11 h-11 rounded-full close-button flex items-center justify-center"><i class="fas fa-times text-sm"></i></button>
         </div>
         <div id="tickets-list" class="flex-1 overflow-y-auto p-4 space-y-3 hide-scroll">
             <div class="text-center text-slate-400 mt-10">
@@ -623,7 +730,7 @@
                     <span>บันทึกบิล</span>
                 </button>
 
-                <button onclick="closeCheckout()" class="btn-bounce w-11 h-11 rounded-full bg-slate-700 flex items-center justify-center text-slate-400 active:bg-slate-600 transition-all"><i class="fas fa-times text-sm"></i></button>
+                <button onclick="closeCheckout()" class="btn-bounce w-11 h-11 rounded-full close-button flex items-center justify-center active:bg-slate-600 transition-all"><i class="fas fa-times text-sm"></i></button>
             </div>
         </div>
         
@@ -691,7 +798,7 @@
             <div class="w-12 h-1.5 bg-slate-600 rounded-full"></div>
         </div>
 
-        <button onclick="closeModal()" class="btn-bounce absolute top-4 right-4 z-50 bg-slate-800 text-white w-11 h-11 rounded-full flex items-center justify-center shadow-lg active:bg-slate-900 transition-all border-2 border-slate-700">
+        <button onclick="closeModal()" class="btn-bounce absolute top-4 right-4 z-50 close-button w-11 h-11 rounded-full flex items-center justify-center shadow-lg active:bg-slate-900 transition-all border-2">
             <i class="fas fa-times text-sm"></i>
         </button>
 
@@ -721,9 +828,7 @@
             <div id="modal-meat-section" class="mb-6 hidden">
                 <h4 class="font-bold text-slate-200 mb-3 text-sm">เลือกเนื้อสัตว์</h4>
                 <div class="flex gap-2 overflow-x-auto pb-2 hide-scroll p-1" id="meat-options-container">
-                    <label class="cursor-pointer flex-shrink-0"><input type="radio" name="modal-meat" value="สันคอ" class="peer sr-only"><div class="px-4 py-2 rounded-xl border border-slate-700 bg-slate-800 text-sm text-slate-300 peer-checked:border-yellow-500 peer-checked:bg-yellow-500/20 peer-checked:text-yellow-400 transition-all btn-bounce shadow-sm">สันคอ</div></label>
-                    <label class="cursor-pointer flex-shrink-0"><input type="radio" name="modal-meat" value="หมูสับ" class="peer sr-only"><div class="px-4 py-2 rounded-xl border border-slate-700 bg-slate-800 text-sm text-slate-300 peer-checked:border-yellow-500 peer-checked:bg-yellow-500/20 peer-checked:text-yellow-400 transition-all btn-bounce shadow-sm">หมูสับ</div></label>
-                    <label class="cursor-pointer flex-shrink-0"><input type="radio" name="modal-meat" value="หมูเด้ง" class="peer sr-only"><div class="px-4 py-2 rounded-xl border border-slate-700 bg-slate-800 text-sm text-slate-300 peer-checked:border-yellow-500 peer-checked:bg-yellow-500/20 peer-checked:text-yellow-400 transition-all btn-bounce shadow-sm">หมูเด้ง</div></label>
+                    <!-- เมนูเลือกเนื้อสัตว์จะถูกสร้างโดย JavaScript -->
                 </div>
             </div>
 
@@ -1513,6 +1618,69 @@
             openModal(selectedItem);
         }
 
+        // --- ฟังก์ชันสร้างเมนูเลือกเนื้อสัตว์ ---
+        function createMeatOptions() {
+            const container = document.getElementById('meat-options-container');
+            container.innerHTML = '';
+            
+            const meatOptions = [
+                { value: 'สันคอ', label: 'สันคอ' },
+                { value: 'หมูสับ', label: 'หมูสับ' },
+                { value: 'หมูเด้ง', label: 'หมูเด้ง' }
+            ];
+            
+            meatOptions.forEach((meat, index) => {
+                const optionId = `meat-option-${meat.value}`;
+                const label = document.createElement('label');
+                label.className = 'cursor-pointer flex-shrink-0 meat-option-container';
+                
+                const input = document.createElement('input');
+                input.type = 'radio';
+                input.name = 'modal-meat';
+                input.value = meat.value;
+                input.id = optionId;
+                input.className = 'peer sr-only';
+                if (index === 0) input.checked = true;
+                
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'meat-option';
+                optionDiv.textContent = meat.label;
+                optionDiv.setAttribute('data-value', meat.value);
+                
+                label.appendChild(input);
+                label.appendChild(optionDiv);
+                container.appendChild(label);
+                
+                // เพิ่ม event listener สำหรับ visual feedback
+                input.addEventListener('change', function() {
+                    // ลบคลาส selected จากทั้งหมด
+                    document.querySelectorAll('.meat-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    
+                    // เพิ่มคลาส selected ให้ตัวที่เลือก
+                    if (this.checked) {
+                        const selectedDiv = this.nextElementSibling;
+                        selectedDiv.classList.add('selected');
+                        
+                        // เพิ่ม haptic feedback
+                        triggerHaptic();
+                        playSound('pop');
+                    }
+                });
+            });
+            
+            // ตั้งค่าเริ่มต้นให้ตัวเลือกแรก
+            if (container.firstChild) {
+                const firstInput = container.firstChild.querySelector('input');
+                const firstDiv = container.firstChild.querySelector('.meat-option');
+                if (firstInput && firstDiv) {
+                    firstInput.checked = true;
+                    firstDiv.classList.add('selected');
+                }
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             // Initialize theme first
             initTheme();
@@ -1709,9 +1877,9 @@
                     html += `
                     <label class="cursor-pointer group relative">
                         <input type="radio" name="tray-meat" value="${m.n}" data-price="${m.p}" ${i===0?'checked':''} onchange="updateModalPrice()" class="peer sr-only">
-                        <div class="h-full bg-slate-800 border-2 border-slate-700 rounded-2xl p-3 flex flex-col items-center justify-center gap-2 transition-all peer-checked:border-yellow-500 peer-checked:bg-yellow-500/20 peer-checked:shadow-md">
+                        <div class="h-full meat-option peer-checked:selected rounded-2xl p-3 flex flex-col items-center justify-center gap-2 transition-all">
                             <div class="text-3xl filter group-hover:scale-110 transition-transform">${m.i}</div>
-                            <div class="text-xs font-bold text-center leading-tight text-slate-200">${m.n}</div>
+                            <div class="text-xs font-bold text-center leading-tight">${m.n}</div>
                             ${m.p>0 ? `<div class="text-[10px] text-white bg-orange-500 px-2 py-0.5 rounded-full font-bold">+${m.p}</div>` : ''}
                             <div class="absolute top-2 right-2 opacity-0 peer-checked:opacity-100 text-yellow-400 transition-opacity"><i class="fas fa-check-circle"></i></div>
                         </div>
@@ -1726,9 +1894,9 @@
                     html += `
                     <label class="cursor-pointer group relative">
                         <input type="radio" name="tray-egg" value="${e.n}" data-price="${e.p}" ${i===0?'checked':''} onchange="updateModalPrice()" class="peer sr-only">
-                        <div class="h-full bg-slate-800 border-2 border-slate-700 rounded-2xl p-2 flex flex-col items-center justify-center gap-1 transition-all peer-checked:border-yellow-500 peer-checked:bg-yellow-500/20 peer-checked:shadow-md">
+                        <div class="h-full meat-option peer-checked:selected rounded-2xl p-2 flex flex-col items-center justify-center gap-1 transition-all">
                             <div class="text-2xl">${e.i}</div>
-                            <div class="text-xs font-bold text-center text-slate-200">${e.n}</div>
+                            <div class="text-xs font-bold text-center">${e.n}</div>
                             ${e.p>0 ? `<div class="text-[9px] text-orange-400 font-bold">+${e.p}</div>` : ''}
                         </div>
                     </label>`;
@@ -1749,9 +1917,9 @@
                     html += `
                     <label class="cursor-pointer group relative">
                         <input type="radio" name="tray-meat" value="${m.n}" data-price="${m.p}" ${i===0?'checked':''} onchange="updateModalPrice()" class="peer sr-only">
-                        <div class="h-full bg-slate-800 border-2 border-slate-700 rounded-2xl p-3 flex flex-col items-center justify-center gap-2 transition-all peer-checked:border-yellow-500 peer-checked:bg-yellow-500/20 peer-checked:shadow-md">
+                        <div class="h-full meat-option peer-checked:selected rounded-2xl p-3 flex flex-col items-center justify-center gap-2 transition-all">
                             <div class="text-3xl filter group-hover:scale-110 transition-transform">${m.i}</div>
-                            <div class="text-xs font-bold text-center leading-tight text-slate-200">${m.n}</div>
+                            <div class="text-xs font-bold text-center leading-tight">${m.n}</div>
                             ${m.p>0 ? `<div class="text-[10px] text-white bg-orange-500 px-2 py-0.5 rounded-full font-bold">+${m.p}</div>` : ''}
                             <div class="absolute top-2 right-2 opacity-0 peer-checked:opacity-100 text-yellow-400 transition-opacity"><i class="fas fa-check-circle"></i></div>
                         </div>
@@ -1766,9 +1934,9 @@
                     html += `
                     <label class="cursor-pointer group relative">
                         <input type="radio" name="tray-egg" value="${e.n}" data-price="${e.p}" ${i===0?'checked':''} onchange="updateModalPrice()" class="peer sr-only">
-                        <div class="h-full bg-slate-800 border-2 border-slate-700 rounded-2xl p-2 flex flex-col items-center justify-center gap-1 transition-all peer-checked:border-yellow-500 peer-checked:bg-yellow-500/20 peer-checked:shadow-md">
+                        <div class="h-full meat-option peer-checked:selected rounded-2xl p-2 flex flex-col items-center justify-center gap-1 transition-all">
                             <div class="text-2xl">${e.i}</div>
-                            <div class="text-xs font-bold text-center text-slate-200">${e.n}</div>
+                            <div class="text-xs font-bold text-center">${e.n}</div>
                             ${e.p>0 ? `<div class="text-[9px] text-orange-400 font-bold">+${e.p}</div>` : ''}
                         </div>
                     </label>`;
@@ -1791,6 +1959,15 @@
             </div>`;
 
             container.innerHTML = html;
+            
+            // ตั้งค่า selected ให้กับตัวเลือกแรกในเมนูถาด
+            setTimeout(() => {
+                document.querySelectorAll('.meat-option').forEach((opt, index) => {
+                    if (index === 0) {
+                        opt.classList.add('selected');
+                    }
+                });
+            }, 50);
         }
 
         // 🔥 ฟังก์ชันอัปเดตสรุปรายการในถาด
@@ -2063,7 +2240,13 @@
                 traySec.classList.add('hidden'); // ซ่อนแบบถาด
                 addonsSec.classList.remove('hidden'); // 🔥 โชว์เพิ่มเติมความอร่อยสำหรับเมนูปกติ
                 // โชว์/ซ่อนเนื้อปกติ
-                if(item.reqMeat) meatSec.classList.remove('hidden'); else meatSec.classList.add('hidden');
+                if(item.reqMeat) {
+                    meatSec.classList.remove('hidden');
+                    // สร้างเมนูเลือกเนื้อสัตว์ใหม่
+                    createMeatOptions();
+                } else {
+                    meatSec.classList.add('hidden');
+                }
             }
             
             updateModalPrice();
