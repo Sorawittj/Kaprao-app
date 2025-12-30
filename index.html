@@ -847,7 +847,7 @@
         <div id="menu-grid" class="grid grid-cols-2 gap-4 mb-20" role="grid" aria-label="เมนูอาหาร"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-slate-500 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V20.0.0</p>
+            <p class="text-[10px] font-bold tracking-widest text-slate-500 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V20.5.0</p>
         </div>
 
     </div>
@@ -1547,7 +1547,7 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '20.0.0'; 
+        const CURRENT_VERSION = '20.5.0'; 
 
         function escapeHtml(text) {
             if (!text) return text;
@@ -1636,7 +1636,8 @@
                                 await Promise.all(names.map(name => caches.delete(name)));
                             } catch(e) {}
                         }
-                        window.location.reload(true);
+                        // Use standard reload (boolean param deprecated)
+                        window.location.reload();
                     }
                 }
             } catch (err) {
@@ -2578,7 +2579,10 @@
             document.getElementById('modal-kcal').innerText = totalKcal + ' kcal';
         }
 
-        addonIds.forEach(id => document.getElementById(`modal-opt-${id}`).addEventListener('change', updateModalPrice));
+        addonIds.forEach(id => {
+            const el = document.getElementById(`modal-opt-${id}`);
+            if (el) el.addEventListener('change', updateModalPrice);
+        });
 
         // 🔥 Updated Add To Cart with Confetti Animation
 
@@ -2902,15 +2906,17 @@
                     updated = true;
                 }
             });
-            if (updated) {
-                localStorage.setItem(KEYS.HISTORY, JSON.stringify(lottoHistory));
-                if(winCount > 0) {
-                    sfxWin.play();
-                    confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
-                    showToast(`🎉 ยินดีด้วย! คุณถูกรางวัล ${winCount} ใบ!`);
+                if (updated) {
+                    localStorage.setItem(KEYS.HISTORY, JSON.stringify(lottoHistory));
+                    if(winCount > 0) {
+                        sfxWin.play();
+                        if (typeof confetti === 'function') {
+                            confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
+                        }
+                        showToast(`🎉 ยินดีด้วย! คุณถูกรางวัล ${winCount} ใบ!`);
+                    }
+                    updateTicketBadge();
                 }
-                updateTicketBadge();
-            }
         }
 
         function updateTicketBadge() {
@@ -3420,9 +3426,18 @@
                 currentY = 0;
             });
         }
-        enableSwipeToClose(document.getElementById('modal-content'), document.getElementById('modal-scroll-area'), closeModal);
-        enableSwipeToClose(document.getElementById('checkout-sheet'), document.getElementById('cart-list-container'), closeCheckout);
-        enableSwipeToClose(document.getElementById('tickets-sheet'), document.getElementById('tickets-list'), closeMyTickets);
+        // Ensure elements exist before enabling swipe handlers (safe in varied load scenarios)
+        const _modalContent = document.getElementById('modal-content');
+        const _modalScroll = document.getElementById('modal-scroll-area');
+        if (_modalContent && _modalScroll) enableSwipeToClose(_modalContent, _modalScroll, closeModal);
+
+        const _checkoutSheet = document.getElementById('checkout-sheet');
+        const _cartList = document.getElementById('cart-list-container');
+        if (_checkoutSheet && _cartList) enableSwipeToClose(_checkoutSheet, _cartList, closeCheckout);
+
+        const _ticketsSheet = document.getElementById('tickets-sheet');
+        const _ticketsList = document.getElementById('tickets-list');
+        if (_ticketsSheet && _ticketsList) enableSwipeToClose(_ticketsSheet, _ticketsList, closeMyTickets);
 
         // --- KEYBOARD HANDLING ---
         document.addEventListener('keydown', function(e) {
