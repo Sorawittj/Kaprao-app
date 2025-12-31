@@ -521,159 +521,6 @@
             50% { transform: scale(1.22); }
             100% { transform: scale(1.15); }
         }
-        
-        .badge-newbie { 
-            background: rgba(251, 191, 36, 0.15); 
-            color: #FBBF24; 
-            border: 1.5px solid rgba(251, 191, 36, 0.4);
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 4px 12px rgba(251, 191, 36, 0.1);
-        }
-        .badge-newbie:hover {
-            background: rgba(251, 191, 36, 0.22);
-            box-shadow: 0 6px 16px rgba(251, 191, 36, 0.2);
-        }
-        .badge-regular { 
-            background: rgba(59, 130, 246, 0.15); 
-            color: #60A5FA; 
-            border: 1.5px solid rgba(59, 130, 246, 0.4);
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
-        }
-        .badge-regular:hover {
-            background: rgba(59, 130, 246, 0.22);
-            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.2);
-        }
-        .badge-god { 
-            background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(251, 191, 36, 0.12)); 
-            color: #FCD34D; 
-            border: 1.5px solid rgba(251, 191, 36, 0.5); 
-            box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .badge-god:hover {
-            box-shadow: 0 0 28px rgba(245, 158, 11, 0.6);
-            transform: scale(1.02);
-        }
-        [data-theme="light"] .badge-newbie { 
-            background: rgba(212, 175, 55, 0.2); 
-            color: #B8860B; 
-            border: 1.5px solid rgba(212, 175, 55, 0.5);
-            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
-        }
-        [data-theme="light"] .badge-newbie:hover {
-            background: rgba(212, 175, 55, 0.28);
-            box-shadow: 0 6px 16px rgba(212, 175, 55, 0.25);
-        }
-        [data-theme="light"] .badge-god { 
-            background: linear-gradient(135deg, rgba(212, 175, 55, 0.25) 0%, rgba(184, 134, 11, 0.25) 100%); 
-            color: #8B6914; 
-            border: 1.5px solid rgba(212, 175, 55, 0.6); 
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.35);
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        [data-theme="light"] .badge-god:hover {
-            box-shadow: 0 0 28px rgba(212, 175, 55, 0.5);
-            transform: scale(1.02);
-        }
-
-        /* === ปุ่มปิด (กากบาท) ที่มองเห็นชัดใน Light Theme === */
-        .close-button {
-            background: var(--close-btn-bg) !important;
-            color: var(--close-btn-color) !important;
-            border: 2px solid var(--border-color) !important;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-        }
-        .close-button:hover {
-            transform: scale(1.1) rotate(90deg);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
-        .close-button:active {
-            transform: scale(0.92) rotate(90deg);
-        }
-        [data-theme="light"] .close-button {
-            background: #F5F5F5 !important;
-            color: #4A4A4A !important;
-            border-color: rgba(212, 175, 55, 0.2) !important;
-        }
-        [data-theme="light"] .close-button:hover {
-            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.15);
-            background: #F0F0F0 !important;
-        }
-
-        /* === เมนูเลือกเนื้อสัตว์ที่มองเห็นชัดในทั้งสองธีม === */
-        .meat-option-container {
-            position: relative;
-            display: inline-block;
-        }
-        
-        .meat-option {
-            background: var(--meat-option-bg);
-            border: 2px solid var(--meat-option-border);
-            color: var(--meat-option-text);
-            border-radius: 1.125rem;
-            padding: 14px 18px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 110px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .meat-option:hover {
-            background: var(--meat-option-hover-bg);
-            border-color: rgba(251, 191, 36, 0.6);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(251, 191, 36, 0.15);
-        }
-        
-        .meat-option.selected {
-            background: linear-gradient(135deg, var(--meat-option-selected-bg), rgba(251, 191, 36, 0.08)) !important;
-            border: 2px solid var(--meat-option-selected-border) !important;
-            color: var(--meat-option-selected-text) !important;
-            font-weight: 700;
-            box-shadow: 0 8px 24px rgba(251, 191, 36, 0.3);
-            transform: translateY(-3px) scale(1.08);
-            animation: selectPulseSmooth 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
-        
-        .meat-option.selected::after {
-            content: "✓";
-            position: absolute;
-            top: 2px;
-            right: 4px;
-            color: var(--meat-option-icon-color);
-            font-weight: bold;
-            font-size: 0.8rem;
-            background: rgba(251, 191, 36, 0.2);
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 8px rgba(251, 191, 36, 0.2);
-        }
-        
-        [data-theme="light"] .meat-option.selected::after {
-            background: rgba(212, 175, 55, 0.25);
-        }
-        
-        /* เพิ่มแอนิเมชันเมื่อเลือก */
-        @keyframes selectPulseSmooth {
-            0% { transform: scale(0.95) translateY(-3px); }
-            50% { transform: scale(1.12) translateY(-3px); }
-            100% { transform: scale(1.08) translateY(-3px); }
-        }
-        
-        .meat-option.selected {
-            animation: selectPulseSmooth 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
 
         /* === ACCESSIBILITY FEATURES === */
         .sr-only {
@@ -952,10 +799,6 @@
                     <span class="text-slate-100">KAPRAO</span>
                     <span class="text-yellow-500 ml-1">52</span>
                 </h1>
-
-                <div id="streak-display" class="hidden mt-1 inline-flex items-center gap-1 bg-gradient-to-r from-orange-400 to-red-500 text-white text-[10px] px-2 py-0.5 rounded-full w-max shadow-sm animate-pulse">
-                    <i class="fas fa-fire"></i> <span id="streak-text">สั่งติดกัน 0 วัน</span>
-                </div>
             </div>
 
             <div class="flex flex-col items-center">
@@ -970,23 +813,27 @@
             </div>
         </div>
 
-        <div class="glass-panel p-3 rounded-xl shadow-sm mb-1 flex items-center gap-3 stagger-item" style="animation-delay: 0.1s;">
-            <div id="badge-icon" class="w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-inner transition-all duration-500 border border-slate-700 bg-slate-800">
-                🐣
+        <div class="glass-panel p-4 rounded-xl shadow-sm mb-1 flex items-center gap-4 stagger-item" style="animation-delay: 0.1s;">
+            <div class="w-16 h-16 rounded-full flex items-center justify-center text-3xl shadow-inner border-2 border-yellow-500/30 bg-gradient-to-br from-yellow-500/20 to-orange-500/10">
+                🪙
             </div>
             <div class="flex-1">
-                <div class="flex justify-between items-end mb-1">
-                    <span id="level-title" class="text-sm font-bold text-slate-200">มือใหม่หัดกิน</span>
-                    <span id="level-count" class="text-[10px] text-slate-400">0/10 ครั้ง</span>
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm font-bold text-slate-200">KAPRAO POINTS</span>
+                    <button onclick="openPointsHistory()" class="text-xs text-indigo-400 hover:text-indigo-300 transition-colors font-medium">
+                        ประวัติ →
+                    </button>
                 </div>
-                <div class="xp-bar-bg">
-                    <div id="level-fill" class="xp-bar-fill" style="width: 0%;"></div>
+                <div class="flex items-baseline gap-2">
+                    <span id="points-count" class="text-3xl font-black text-yellow-500">0</span>
+                    <span class="text-sm text-slate-400">พอยต์</span>
                 </div>
+                <p class="text-[10px] text-slate-400 mt-1">100 พอยต์ = 10.- ส่วนลด</p>
             </div>
         </div>
 
         <div class="flex justify-between items-center mb-4 mt-2">
-            <p class="text-[10px] text-slate-400">สั่งครบ 10 ครั้ง รับรางวัลแทนใจ! 🎁</p>
+            <p class="text-[10px] text-slate-400">สะสมพอยต์แลกส่วนลดสุดคุ้ม!</p>
             <div class="flex items-center gap-2">
                 <button onclick="openMyTickets()" class="btn-bounce bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700 shadow-sm flex items-center gap-2 text-xs font-bold text-slate-200 active:bg-slate-700 transition-all">
                     <span>🎫 ตั๋วของฉัน</span>
@@ -1065,7 +912,7 @@
         <div id="menu-grid" class="grid grid-cols-2 gap-4 mb-20" role="grid" aria-label="เมนูอาหาร"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-slate-500 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V20.5.0</p>
+            <p class="text-[10px] font-bold tracking-widest text-slate-500 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V21.0.0</p>
         </div>
 
     </div>
@@ -1141,6 +988,36 @@
             </div>
             <p id="discount-msg" class="text-xs h-4 pl-2 font-medium"></p>
 
+            <!-- Points System Section -->
+            <div class="space-y-3" id="points-section">
+                <div class="bg-slate-800 rounded-xl p-4 border border-slate-700 shadow-sm">
+                    <h4 class="font-bold text-slate-200 mb-3 text-sm flex items-center gap-2">
+                        <i class="fas fa-coins text-yellow-500"></i> ระบบพอยต์
+                    </h4>
+                    
+                    <div class="mb-3">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm text-slate-300">พอยต์ของคุณ</span>
+                            <span id="user-points-balance" class="font-bold text-yellow-500">0</span>
+                        </div>
+                        
+                        <div class="flex gap-2">
+                            <input type="number" id="points-to-use" min="0" max="1000" 
+                                   placeholder="ใช้พอยต์ (100=10.-)" 
+                                   class="flex-1 bg-slate-900 border border-slate-700 rounded-lg p-3 text-center text-slate-200 placeholder:text-slate-500">
+                            <button onclick="applyPointsDiscount()" class="btn-bounce bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-3 rounded-lg font-bold whitespace-nowrap">
+                                ใช้
+                            </button>
+                        </div>
+                        <p class="text-[10px] text-slate-400 mt-1 text-center">100 พอยต์ = ส่วนลด 10.-</p>
+                    </div>
+                    
+                    <div id="points-discount-display" class="hidden"></div>
+                    <div id="points-earned-info" class="mt-3"></div>
+                    <div id="points-upsell-msg" class="text-xs text-center mt-2 p-2 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-yellow-400 font-bold hidden"></div>
+                </div>
+            </div>
+
             <div class="flex justify-between items-end mb-2 px-2">
                 <div class="flex flex-col">
                     <span class="text-slate-400 text-sm">ยอดสุทธิ</span>
@@ -1152,30 +1029,28 @@
                 <span>ยืนยันการสั่ง</span>
                 <i class="fas fa-paper-plane"></i>
             </button>
-            <div class="h-10"></div> </div>
+            <div class="h-10"></div>
+        </div>
     </div>
 
-    <div id="reward-modal" class="fixed inset-0 z-[130] bg-black/50 backdrop-blur-sm flex items-center justify-center p-6 hidden stagger-item">
+    <div id="points-history-modal" class="fixed inset-0 z-[130] bg-black/50 backdrop-blur-sm flex items-center justify-center p-6 hidden">
         <div class="bg-slate-800 rounded-[2rem] p-1 w-full max-w-sm shadow-2xl relative overflow-hidden border border-slate-700">
-            <div class="absolute inset-0 z-0 opacity-20" style="background: repeating-conic-gradient(#F59E0B 0 15deg, transparent 15deg 30deg);"></div>
-            
             <div class="bg-slate-900/90 backdrop-blur-sm rounded-[1.8rem] p-6 text-center relative z-10">
-                <div class="w-28 h-28 btn-gradient rounded-full flex items-center justify-center mx-auto mb-4 text-6xl shadow-lg border-4 border-slate-700 animate-bounce-slow">
-                    👑
+                <div class="w-20 h-20 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-lg border-4 border-slate-700">
+                    🪙
                 </div>
-                <h2 class="text-2xl font-black text-slate-200 mb-1">ยินดีด้วย!</h2>
-                <p class="text-indigo-400 font-bold text-lg mb-4">คุณคือ "เทพเจ้ากะเพรา"</p>
+                <h2 class="text-2xl font-black text-slate-200 mb-1">ประวัติพอยต์</h2>
+                <p class="text-indigo-400 font-bold text-sm mb-4">KAPRAO POINTS HISTORY</p>
                 
-                <div class="bg-orange-500/20 border border-orange-500/30 rounded-xl p-4 mb-6">
-                    <p class="text-sm text-slate-300 mb-2">สั่งครบ 10 ครั้งแล้ว รับรางวัลฟรี!</p>
-                    <div class="font-bold text-xl text-orange-400">🎁 สินค้า Moshi Moshi</div>
-                    <p class="text-[10px] text-slate-400 mt-1">(มูลค่าไม่เกิน 30.-)</p>
+                <div id="points-history-list" class="max-h-60 overflow-y-auto mb-4">
+                    <div class="text-center text-slate-400 py-8">
+                        <i class="fas fa-history text-3xl mb-2 opacity-30"></i>
+                        <p class="text-sm">ยังไม่มีการใช้พอยต์</p>
+                    </div>
                 </div>
 
-                <p class="text-xs text-slate-400 mb-4">แคปหน้าจอนี้ไว้ยื่นให้พนักงานเพื่อรับรางวัล</p>
-
-                <button onclick="claimReward()" class="btn-bounce w-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-3 rounded-xl shadow-lg transition-all text-lg">
-                    รับทราบ / แคปจอแล้ว 📸
+                <button onclick="closePointsHistory()" class="btn-bounce w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl shadow-lg transition-all">
+                    ปิด
                 </button>
             </div>
         </div>
@@ -1351,7 +1226,7 @@
         const MY_LIFF_ID = '2008781875-6whmY1cf'; 
         
         // --- GOOGLE SHEET CONFIG (UPDATED) ---
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyU3QVueNDPWcA5WqYnD3elmlGZFtrXSTesVLUEo-ae9eBcFPwfnX93_LcuF6xU0mFb/exec'; 
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJLm7apFr5a6tZc1OcPUT84JATeVlVMs_cWiDs3cdh7BepP78OAs-TsF-2WqCRh9pj/exec'; 
         
         const menuItems = [
             // 🔥 เพิ่มเมนูใหม่: ชุดถาด (Moved to top of logic, but rendering order depends on category switch) 🔥
@@ -1460,6 +1335,7 @@
                 else if (currentOpenModal === 'checkout') closeCheckout(true);
                 else if (currentOpenModal === 'tickets') closeMyTickets(true);
                 else if (currentOpenModal === 'avatar') closeAvatarModal(true);
+                else if (currentOpenModal === 'points-history') closePointsHistory(true);
                 
                 currentOpenModal = null;
             }
@@ -1751,9 +1627,10 @@
         let activeCategory = 'kaprao';
         let discountValue = 0;
         let modalQty = 1;
-        let userStats = { orders: 0 }; 
+        let userStats = { points: 0 }; 
         let lottoHistory = []; 
         let isSubmitting = false; 
+        let pointsRedeemed = 0;
         
         const addonIds = ['special', 'kaikhon', 'kaidao', 'kaijiao', 'kaitom', 'kaiyiewma'];
         const addonCalories = { 'special': 80, 'kaikhon': 150, 'kaidao': 120, 'kaijiao': 200, 'kaitom': 75, 'kaiyiewma': 100 };
@@ -1765,7 +1642,157 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '20.5.0'; 
+        const CURRENT_VERSION = '21.0.0'; 
+
+        // ============================================
+        // POINT SYSTEM FUNCTIONS
+        // ============================================
+
+        function calculatePoints(netTotal) {
+            if (netTotal < 60) return 0;
+            if (netTotal < 100) return 10;
+            if (netTotal < 150) return 20;
+            if (netTotal < 200) return 30;
+            if (netTotal < 250) return 40;
+            if (netTotal < 300) return 50;
+            return 60;
+        }
+
+        function getNextTierInfo(currentTotal) {
+            if (currentTotal < 60) return { needed: 60 - currentTotal, points: 10 };
+            if (currentTotal < 100) return { needed: 100 - currentTotal, points: 20 };
+            if (currentTotal < 150) return { needed: 150 - currentTotal, points: 30 };
+            if (currentTotal < 200) return { needed: 200 - currentTotal, points: 40 };
+            if (currentTotal < 250) return { needed: 250 - currentTotal, points: 50 };
+            if (currentTotal < 300) return { needed: 300 - currentTotal, points: 60 };
+            return null; // Already at max tier
+        }
+
+        function updatePointsDisplay() {
+            const points = userStats.points || 0;
+            document.getElementById('points-count').innerText = points;
+            
+            // Update checkout display if open
+            updateCheckoutPointsInfo();
+        }
+
+        function updateCheckoutPointsInfo() {
+            const subtotal = cart.reduce((sum, i) => sum + i.price, 0);
+            const netTotal = Math.max(0, subtotal - discountValue);
+            const pointsEarned = calculatePoints(netTotal);
+            
+            // Update user points balance in checkout
+            const userPointsBalance = document.getElementById('user-points-balance');
+            if (userPointsBalance) {
+                userPointsBalance.innerText = userStats.points || 0;
+            }
+            
+            const pointsInfo = document.getElementById('points-earned-info');
+            if (pointsInfo) {
+                pointsInfo.innerHTML = `
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-slate-300">พอยต์ที่จะได้รับ</span>
+                        <span class="font-bold text-yellow-500">+${pointsEarned} พอยต์</span>
+                    </div>
+                `;
+            }
+            
+            // Upsell message
+            const upsellMsg = document.getElementById('points-upsell-msg');
+            if (upsellMsg) {
+                const nextTier = getNextTierInfo(netTotal);
+                if (nextTier && nextTier.needed > 0 && nextTier.needed <= 50) {
+                    upsellMsg.classList.remove('hidden');
+                    upsellMsg.innerHTML = `เพิ่มอีก ${nextTier.needed}.- เพื่อรับ +${nextTier.points} พอยต์!`;
+                } else {
+                    upsellMsg.classList.add('hidden');
+                }
+            }
+        }
+
+        function applyPointsDiscount() {
+            const pointsInput = document.getElementById('points-to-use');
+            const pointsToUse = parseInt(pointsInput.value) || 0;
+            const userPoints = userStats.points || 0;
+            
+            if (pointsToUse < 0) {
+                showToast('กรุณากรอกจำนวนพอยต์ที่ถูกต้อง', 'error');
+                return;
+            }
+            
+            if (pointsToUse > userPoints) {
+                showToast(`คุณมีพอยต์เพียง ${userPoints} พอยต์`, 'error');
+                pointsInput.value = userPoints;
+                return;
+            }
+            
+            // Calculate discount (100 points = 10 THB)
+            pointsRedeemed = pointsToUse;
+            const discountFromPoints = Math.floor(pointsRedeemed / 100) * 10;
+            
+            // Update discount value
+            discountValue = discountFromPoints;
+            
+            // Update UI
+            const pointsDiscountDisplay = document.getElementById('points-discount-display');
+            if (pointsDiscountDisplay) {
+                if (discountFromPoints > 0) {
+                    pointsDiscountDisplay.classList.remove('hidden');
+                    pointsDiscountDisplay.innerHTML = `
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-green-400">ส่วนลดจากพอยต์</span>
+                            <span class="font-bold text-green-400">-${discountFromPoints}.-</span>
+                        </div>
+                    `;
+                } else {
+                    pointsDiscountDisplay.classList.add('hidden');
+                }
+            }
+            
+            updateTotalSummary();
+            showToast(`ใช้ ${pointsRedeemed} พอยต์ ส่วนลด ${discountFromPoints}.-`);
+        }
+
+        function resetPointsDiscount() {
+            pointsRedeemed = 0;
+            const pointsInput = document.getElementById('points-to-use');
+            if (pointsInput) pointsInput.value = '';
+            
+            const pointsDiscountDisplay = document.getElementById('points-discount-display');
+            if (pointsDiscountDisplay) pointsDiscountDisplay.classList.add('hidden');
+            
+            // Re-apply any code discount
+            applyDiscount();
+        }
+
+        function openPointsHistory() {
+            pushModalState('points-history');
+            
+            const modal = document.getElementById('points-history-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+            
+            // In a real app, you would fetch and display points history here
+            const historyList = document.getElementById('points-history-list');
+            historyList.innerHTML = `
+                <div class="text-center text-slate-400 py-8">
+                    <i class="fas fa-history text-3xl mb-2 opacity-30"></i>
+                    <p class="text-sm">ยังไม่มีการใช้พอยต์</p>
+                </div>
+            `;
+        }
+
+        function closePointsHistory(isBackNav = false) {
+            if (!isBackNav && currentOpenModal === 'points-history') { 
+                history.back(); 
+                return; 
+            }
+            
+            const modal = document.getElementById('points-history-modal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+            currentOpenModal = null;
+        }
 
         function escapeHtml(text) {
             if (!text) return text;
@@ -1813,11 +1840,12 @@
 
                 const savedStats = localStorage.getItem(KEYS.STATS);
                 if (savedStats) {
-                    userStats = JSON.parse(savedStats) || { orders: 0 };
+                    userStats = JSON.parse(savedStats) || { points: 0 };
                 }
 
             } catch (error) {
                 console.error("เกิดข้อผิดพลาดในการโหลดข้อมูล:", error);
+                userStats = { points: 0 };
             }
         }
 
@@ -1914,45 +1942,23 @@
         async function syncUserStatsFromServer(userId) {
             if(!userId) return;
             
-            const levelCount = document.getElementById('level-count');
-            if(levelCount) levelCount.innerText = "กำลังซิงค์...";
-            
             isSyncing = true; 
 
             try {
                 const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getUserStats&userId=' + userId);
                 const serverData = await response.json();
                 
-                if (serverData.orders < userStats.orders) {
-                    const diff = userStats.orders - serverData.orders;
-                    console.log(`ตรวจพบประวัติเก่า ${diff} รายการ.. กำลังโอนย้ายไป Cloud`);
-
-                    await fetch(GOOGLE_SCRIPT_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            action: 'migrate_guest',
-                            userId: userId,
-                            count: diff
-                        })
-                    });
-
-                    setTimeout(() => syncUserStatsFromServer(userId), 1500);
-                    return; 
-                }
-
-                if(serverData && serverData.orders !== undefined) {
-                    userStats.orders = serverData.orders;
+                if(serverData && serverData.points !== undefined) {
+                    userStats.points = serverData.points;
                     localStorage.setItem(KEYS.STATS, JSON.stringify(userStats));
-                    updateLevelUI();
+                    updatePointsDisplay();
                 }
                 
                 isSyncing = false;
 
             } catch (error) {
                 console.error("Sync Error:", error);
-                updateLevelUI();
+                updatePointsDisplay();
                 isSyncing = false;
             }
         }
@@ -2159,9 +2165,8 @@
 
             setTimeout(autoCheckLottery, 1000);
             updateTicketBadge();
-            updateStreak(); 
             updateAvatarDisplay();
-            updateLevelUI();
+            updatePointsDisplay();
             updateMiniCart();
             renderCheckoutList();
             
@@ -2203,39 +2208,6 @@
             } catch(e) {}
         });
         
-        function updateLevelUI() {
-            const count = userStats.orders;
-            const bar = document.getElementById('level-fill');
-            const txt = document.getElementById('level-count');
-            const title = document.getElementById('level-title');
-            const icon = document.getElementById('badge-icon');
-            
-            let percent = (count % 10) * 10;
-            if(count > 0 && count % 10 === 0) percent = 100;
-            
-            bar.style.width = `${percent}%`;
-            txt.innerText = `${count}/10 ครั้ง`;
-            
-            icon.className = "w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-inner transition-all duration-500 border border-slate-700 bg-slate-800";
-
-            if(count >= 10) {
-                icon.innerText = '👑';
-                icon.classList.add('badge-god');
-                title.innerText = "เทพเจ้ากะเพรา";
-                title.style.color = '#d97706';
-            } else if(count >= 5) {
-                icon.innerText = '😎';
-                icon.classList.add('badge-regular');
-                title.innerText = "ลูกค้าประจำ";
-                title.style.color = '#1e40af';
-            } else {
-                icon.innerText = '🐣';
-                icon.classList.add('badge-newbie');
-                title.innerText = "มือใหม่หัดกิน";
-                title.style.color = '#d97706';
-            }
-        }
-
         let wheelSpinning = false;
         const wheelSegments = [
             { text: "ลด 5 บาท", color: "#FFFFFF", type: "discount_5" },
@@ -2958,48 +2930,6 @@
             saveToLS();
             showToast(`เพิ่ม ${modalQty} รายการแล้ว!`, 'success');
         }
-        
-        function updateStreak() {
-            const today = new Date().toDateString();
-            const lastOrderDate = localStorage.getItem('kaprao_last_order_date');
-            let currentStreak = parseInt(localStorage.getItem('kaprao_streak') || 0);
-
-            const display = document.getElementById('streak-display');
-            const text = document.getElementById('streak-text');
-            
-            if (currentStreak > 1) {
-                display.classList.remove('hidden');
-                text.innerText = `สั่งติดกัน ${currentStreak} วัน!`;
-            } else {
-                display.classList.add('hidden');
-            }
-        }
-
-        function recordOrderForStreak() {
-            const today = new Date();
-            const todayStr = today.toDateString();
-            const lastOrderDate = localStorage.getItem('kaprao_last_order_date');
-            let currentStreak = parseInt(localStorage.getItem('kaprao_streak') || 0);
-
-            if (lastOrderDate) {
-                const lastDate = new Date(lastOrderDate);
-                const diffTime = Math.abs(today - lastDate);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-
-                if (todayStr === lastOrderDate) {
-                } else if (diffDays === 1) {
-                    currentStreak++;
-                } else {
-                    currentStreak = 1;
-                }
-            } else {
-                currentStreak = 1;
-            }
-
-            localStorage.setItem('kaprao_last_order_date', todayStr);
-            localStorage.setItem('kaprao_streak', currentStreak);
-            updateStreak();
-        }
 
         function getNextDrawDate() {
             const today = new Date();
@@ -3320,6 +3250,7 @@
             cart = [];
             saveToLS();
             removeDiscount();
+            resetPointsDiscount();
             updateMiniCart();
             closeCheckout();
             showToast('ล้างตะกร้าเรียบร้อย 🗑️');
@@ -3376,6 +3307,9 @@
             let total = cart.reduce((sum, i) => sum + i.price, 0);
             let final = Math.max(0, total - discountValue);
             document.getElementById('sheet-grand-total').innerText = final + " ฿";
+            
+            // Update points info
+            updateCheckoutPointsInfo();
         }
 
         function openReceiptResult(imgData) {
@@ -3545,6 +3479,19 @@
                 
                 let subtotal = cart.reduce((sum, i) => sum + i.price, 0);
                 let netTotal = Math.max(0, subtotal - discountValue);
+                
+                // Calculate points
+                const pointsEarned = calculatePoints(netTotal);
+                const currentPoints = userStats.points || 0;
+                const newPointsBalance = currentPoints + pointsEarned - pointsRedeemed;
+                
+                // Update user stats
+                userStats.points = newPointsBalance;
+                localStorage.setItem(KEYS.STATS, JSON.stringify(userStats));
+                
+                // Update display immediately
+                updatePointsDisplay();
+                
                 const allNotes = cart.filter(i => i.note).map(i => i.note).join(", ");
                 
                 if(!currentOrderId) generateOrderId();
@@ -3555,7 +3502,7 @@
                 msg += `🎟️ เลขลุ้นหวย: ${currentOrderId.slice(-2)}\n`;
                 msg += `📅 ${nowStr}\n`;
                 msg += `👤 คุณ ${name}\n`;
-                msg += `🏅 สั่งครั้งที่: ${userStats.orders + 1}\n`;
+                msg += `🪙 พอยต์ที่จะได้: +${pointsEarned} พอยต์\n`;
                 msg += `------------------------\n`;
                 cart.forEach((i, index) => {
                     let detail = `${i.name} ${i.meat ? '('+i.meat+')' : ''}`;
@@ -3568,6 +3515,9 @@
                     msg += `💵 ยอดรวม: ${subtotal} บาท\n`;
                     msg += `🏷️ ส่วนลด: -${discountValue} บาท\n`;
                 }
+                if (pointsRedeemed > 0) {
+                    msg += `🪙 ใช้พอยต์: ${pointsRedeemed} พอยต์\n`;
+                }
                 msg += `💰 ยอดสุทธิ: ${netTotal} บาท\n`;
 
                 const sheetData = {
@@ -3577,6 +3527,9 @@
                     totalPrice: subtotal,
                     discount: discountValue,
                     netTotal: netTotal,
+                    pointsEarned: pointsEarned,
+                    pointsRedeemed: pointsRedeemed,
+                    pointsBalance: newPointsBalance,
                     allNotes: allNotes,
                     userId: userAvatar.userId 
                 };
@@ -3591,9 +3544,6 @@
                     }).catch(err => console.error("Sheet Error:", err));
                 }
 
-                recordOrderForStreak();
-                userStats.orders++;
-                localStorage.setItem(KEYS.STATS, JSON.stringify(userStats));
                 saveTicketToHistory(currentOrderId, netTotal);
                 
                 const lineOAId = "@772ysswn";
@@ -3601,6 +3551,8 @@
                 
                 setTimeout(() => {
                     cart = []; 
+                    discountValue = 0;
+                    pointsRedeemed = 0;
                     saveToLS();
                     updateMiniCart();
                     closeCheckout();
@@ -3666,6 +3618,7 @@
                 else if (currentOpenModal === 'checkout') closeCheckout(true);
                 else if (currentOpenModal === 'tickets') closeMyTickets(true);
                 else if (currentOpenModal === 'avatar') closeAvatarModal(true);
+                else if (currentOpenModal === 'points-history') closePointsHistory(true);
                 else if (!document.getElementById('welcome-modal').classList.contains('hidden')) {
                     closeWelcome();
                 }
@@ -3692,6 +3645,11 @@
                 // Apply discount code
                 if (activeElement && activeElement.id === 'discount-code') {
                     applyDiscount();
+                }
+                
+                // Apply points discount
+                if (activeElement && activeElement.id === 'points-to-use') {
+                    applyPointsDiscount();
                 }
             }
             
