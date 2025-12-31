@@ -683,46 +683,6 @@
             border-top: 1px solid rgba(212, 175, 55, 0.15);
         }
 
-        /* === ปุ่ม Theme Toggle === */
-        #theme-toggle {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #FBBF24 0%, #D97706 100%);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 24px rgba(251, 191, 36, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            backdrop-filter: blur(12px);
-            flex-shrink: 0;
-        }
-        #theme-toggle:hover {
-            transform: scale(1.15) rotate(20deg);
-            box-shadow: 0 12px 32px rgba(251, 191, 36, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.3);
-        }
-        #theme-toggle:active {
-            transform: scale(0.92) rotate(20deg);
-        }
-        #theme-toggle i {
-            font-size: 1.3rem;
-            color: white;
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        #theme-toggle:hover i {
-            transform: rotate(200deg) scale(1.1);
-        }
-        [data-theme="light"] #theme-toggle {
-            background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%);
-            border-color: rgba(255, 255, 255, 0.5);
-            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.3);
-        }
-        [data-theme="light"] #theme-toggle:hover {
-            box-shadow: 0 12px 32px rgba(212, 175, 55, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.4);
-        }
-
         /* === STYLES FOR MEAT SELECTION OPTIONS === */
         .meat-option {
             background: var(--meat-option-bg);
@@ -790,12 +750,102 @@
             border-top: 1px solid var(--border-color);
             padding: 1rem;
         }
+        
+        /* === แก้ไขข้อ 4: ป้ายชื่ออาหารในตะกร้าให้เล็กลง === */
+        .cart-item-title {
+            font-size: 0.85rem !important;
+            line-height: 1.2 !important;
+            margin-bottom: 0.25rem !important;
+        }
+        
+        .cart-item-details {
+            font-size: 0.75rem !important;
+        }
+        
+        /* === แก้ไขข้อ 6: ปุ่มเปลี่ยนธีมใหม่ === */
+        #theme-toggle-new {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FBBF24 0%, #D97706 100%);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 24px rgba(251, 191, 36, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            backdrop-filter: blur(12px);
+            flex-shrink: 0;
+            z-index: 100;
+        }
+        
+        #theme-toggle-new:hover {
+            transform: scale(1.15) rotate(20deg);
+            box-shadow: 0 12px 32px rgba(251, 191, 36, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+        }
+        
+        #theme-toggle-new:active {
+            transform: scale(0.92) rotate(20deg);
+        }
+        
+        #theme-toggle-new i {
+            font-size: 1.3rem;
+            color: white;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        #theme-toggle-new:hover i {
+            transform: rotate(200deg) scale(1.1);
+        }
+        
+        [data-theme="light"] #theme-toggle-new {
+            background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%);
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+        }
+        
+        [data-theme="light"] #theme-toggle-new:hover {
+            box-shadow: 0 12px 32px rgba(212, 175, 55, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+        }
+        
+        /* === สไตล์สำหรับแสดงราคาส่วนลด === */
+        .price-breakdown {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        
+        .price-line {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            padding: 0.25rem 0;
+        }
+        
+        .discount-line {
+            color: #10B981;
+        }
+        
+        .points-line {
+            color: #F59E0B;
+        }
 
     </style>
 </head>
 <body class="pb-32 font-sans select-none relative overflow-x-hidden safe-area-pt">
 
     <div id="bubbles-container"></div>
+
+    <!-- ปุ่มเปลี่ยนธีมใหม่ (แก้ไขข้อ 6) -->
+    <button id="theme-toggle-new" onclick="toggleTheme()" aria-label="สลับธีม">
+        <i class="fas fa-moon" id="theme-icon-new"></i>
+    </button>
 
     <div id="global-loader">
         <div class="relative mb-4">
@@ -916,14 +966,10 @@
         
         <div class="mb-3 flex items-center justify-between">
             <h3 class="font-bold text-slate-200 text-lg flex items-center gap-2">หมวดหมู่ 
-                        <button onclick="window.randomMenu()" aria-label="สุ่มเมนู" class="btn-bounce bg-slate-800 text-indigo-400 px-3 py-1 rounded-full text-xs font-bold shadow-sm border border-slate-700 hover:bg-slate-700 transition-all flex items-center gap-1 ml-2">
-                            <i id="dice-icon" class="fas fa-dice" aria-hidden="true"></i> สุ่มเมนู
-                        </button>
+                        <!-- ลบปุ่มสุ่มเมนูออก (แก้ไขข้อ 5) -->
             </h3>
             <div class="flex gap-2">
-                <button id="theme-toggle" onclick="toggleTheme()" class="btn-bounce" aria-label="สลับธีม">
-                    <i class="fas fa-sun" id="theme-icon"></i>
-                </button>
+                <!-- ปุ่มเปลี่ยนธีมเดิมถูกย้ายไปด้านบนแล้ว -->
                 <button onclick="scrollTabs(-100)" class="btn-bounce bg-slate-800 w-11 h-11 rounded-full flex items-center justify-center text-slate-400 hover:text-indigo-400 transition-all border border-slate-700 shadow-sm"><i class="fas fa-chevron-left text-xs"></i></button>
                 <button onclick="scrollTabs(100)" class="btn-bounce bg-slate-800 w-11 h-11 rounded-full flex items-center justify-center text-slate-400 hover:text-indigo-400 transition-all border border-slate-700 shadow-sm"><i class="fas fa-chevron-right text-xs"></i></button>
             </div>
@@ -980,7 +1026,7 @@
         <div id="menu-grid" class="grid grid-cols-2 gap-4 mb-20" role="grid" aria-label="เมนูอาหาร"></div>
 
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-slate-500 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V21.0.0</p>
+            <p class="text-[10px] font-bold tracking-widest text-slate-500 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ V21.0.1</p>
         </div>
 
     </div>
@@ -1047,6 +1093,11 @@
         <!-- CART ITEMS SECTION -->
         <div id="cart-list-container" class="flex-1 overflow-y-auto px-6 py-2 space-y-2 hide-scroll"></div>
         
+        <!-- ราคาส่วนลดแสดงแยก (แก้ไขข้อ 3) -->
+        <div id="price-breakdown-container" class="hidden mx-6 mt-2">
+            <!-- จะแสดงรายละเอียดราคา -->
+        </div>
+        
         <!-- FIXED INPUTS SECTION - COMPACT REDESIGN -->
         <div class="checkout-fixed-section space-y-3">
             <!-- Row 1: User Name | Discount Code -->
@@ -1082,7 +1133,8 @@
                         <input type="number" id="points-to-use" min="0" max="1000" 
                                placeholder="ใช้พอยต์ (100=10.-)" 
                                class="flex-1 bg-slate-900 border border-slate-700 rounded p-2 text-sm text-center text-slate-200 placeholder:text-slate-500">
-                        <button onclick="applyPointsDiscount()" class="btn-bounce bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded font-bold whitespace-nowrap text-sm">
+                        <!-- ปุ่มใช้/ไม่ใช้พอยต์ (แก้ไขข้อ 2) -->
+                        <button onclick="togglePointsDiscount()" id="btn-toggle-points" class="btn-bounce bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded font-bold whitespace-nowrap text-sm">
                             ใช้
                         </button>
                     </div>
@@ -1092,14 +1144,6 @@
                     <!-- Points Info Compact -->
                     <div id="points-earned-info" class="mt-2 text-xs"></div>
                     <div id="points-upsell-msg" class="text-xs text-center mt-1 p-1 bg-yellow-500/10 border border-yellow-500/30 rounded text-yellow-400 font-bold hidden"></div>
-                    
-                    <!-- Cancel Points Button -->
-                    <div id="points-cancel-container" class="hidden mt-2">
-                        <button onclick="cancelPointsDiscount()" class="btn-bounce w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-1.5 rounded transition-all text-xs flex items-center justify-center gap-1">
-                            <i class="fas fa-times"></i>
-                            ยกเลิกพอยต์
-                        </button>
-                    </div>
                 </div>
             </div>
 
@@ -1690,9 +1734,9 @@
         }
         
         function updateThemeIcon(theme) {
-            const icon = document.getElementById('theme-icon');
+            const icon = document.getElementById('theme-icon-new');
             if (icon) {
-                icon.className = theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+                icon.className = theme === 'light' ? 'fas fa-sun' : 'fas fa-moon';
             }
         }
         
@@ -1716,6 +1760,7 @@
         let lottoHistory = []; 
         let isSubmitting = false; 
         let pointsRedeemed = 0;
+        let isPointsActive = false; // เพิ่มตัวแปรสำหรับติดตามสถานะพอยต์
         
         const addonIds = ['special', 'kaikhon', 'kaidao', 'kaijiao', 'kaitom', 'kaiyiewma'];
         const addonCalories = { 'special': 80, 'kaikhon': 150, 'kaidao': 120, 'kaijiao': 200, 'kaitom': 75, 'kaiyiewma': 100 };
@@ -1727,7 +1772,7 @@
             VERSION: 'kaprao_ver'
         };
 
-        const CURRENT_VERSION = '21.0.0'; 
+        const CURRENT_VERSION = '21.0.1'; 
 
         // ============================================
         // POINT SYSTEM FUNCTIONS
@@ -1795,100 +1840,112 @@
             }
         }
 
-        function applyPointsDiscount() {
+        // แก้ไขข้อ 2: ฟังก์ชันสลับใช้/ไม่ใช้พอยต์
+        function togglePointsDiscount() {
             const pointsInput = document.getElementById('points-to-use');
-            const pointsToUse = parseInt(pointsInput.value) || 0;
-            const userPoints = userStats.points || 0;
+            const btnToggle = document.getElementById('btn-toggle-points');
             
-            if (pointsToUse < 0) {
-                showToast('กรุณากรอกจำนวนพอยต์ที่ถูกต้อง', 'error');
-                return;
-            }
-            
-            if (pointsToUse > userPoints) {
-                showToast(`คุณมีพอยต์เพียง ${userPoints} พอยต์`, 'error');
-                pointsInput.value = userPoints;
-                return;
-            }
-            
-            if (pointsToUse === 0) {
-                showToast('กรุณากรอกจำนวนพอยต์ที่ต้องการใช้', 'warning');
-                return;
-            }
-            
-            // Calculate discount (100 points = 10 THB)
-            pointsRedeemed = pointsToUse;
-            const discountFromPoints = Math.floor(pointsRedeemed / 100) * 10;
-            
-            // Update discount value
-            discountValue = discountFromPoints;
-            
-            // Update UI
-            const pointsDiscountDisplay = document.getElementById('points-discount-display');
-            const pointsCancelContainer = document.getElementById('points-cancel-container');
-            
-            if (discountFromPoints > 0) {
-                pointsDiscountDisplay.classList.remove('hidden');
-                pointsDiscountDisplay.innerHTML = `
-                    <div class="points-discount-active">
-                        <div class="flex justify-between items-center text-xs mb-1">
-                            <span class="text-green-400 font-bold">ส่วนลดจากพอยต์</span>
-                            <span class="font-bold text-green-400">-${discountFromPoints}.-</span>
-                        </div>
-                        <div class="flex justify-between items-center text-[10px] text-slate-400">
-                            <span>ใช้พอยต์ไป ${pointsRedeemed} พอยต์</span>
-                            <span>คงเหลือ ${userPoints - pointsRedeemed} พอยต์</span>
-                        </div>
-                    </div>
-                `;
+            if (!isPointsActive) {
+                // เปิดใช้งานพอยต์
+                const pointsToUse = parseInt(pointsInput.value) || 0;
+                const userPoints = userStats.points || 0;
                 
-                // Show cancel button
-                pointsCancelContainer.classList.remove('hidden');
+                if (pointsToUse < 0) {
+                    showToast('กรุณากรอกจำนวนพอยต์ที่ถูกต้อง', 'error');
+                    return;
+                }
                 
-                // Disable input and apply button
-                pointsInput.disabled = true;
+                if (pointsToUse > userPoints) {
+                    showToast(`คุณมีพอยต์เพียง ${userPoints} พอยต์`, 'error');
+                    pointsInput.value = userPoints;
+                    return;
+                }
+                
+                if (pointsToUse === 0) {
+                    showToast('กรุณากรอกจำนวนพอยต์ที่ต้องการใช้', 'warning');
+                    return;
+                }
+                
+                // Calculate discount (100 points = 10 THB)
+                pointsRedeemed = pointsToUse;
+                const discountFromPoints = Math.floor(pointsRedeemed / 100) * 10;
+                
+                // Update discount value
+                discountValue = discountFromPoints;
+                
+                // Update UI
+                const pointsDiscountDisplay = document.getElementById('points-discount-display');
+                
+                if (discountFromPoints > 0) {
+                    pointsDiscountDisplay.classList.remove('hidden');
+                    pointsDiscountDisplay.innerHTML = `
+                        <div class="points-discount-active">
+                            <div class="flex justify-between items-center text-xs mb-1">
+                                <span class="text-green-400 font-bold">ส่วนลดจากพอยต์</span>
+                                <span class="font-bold text-green-400">-${discountFromPoints}.-</span>
+                            </div>
+                            <div class="flex justify-between items-center text-[10px] text-slate-400">
+                                <span>ใช้พอยต์ไป ${pointsRedeemed} พอยต์</span>
+                                <span>คงเหลือ ${userPoints - pointsRedeemed} พอยต์</span>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // เปลี่ยนปุ่มเป็น "ไม่ใช้"
+                    btnToggle.innerHTML = 'ไม่ใช้';
+                    btnToggle.className = 'btn-bounce bg-slate-700 hover:bg-slate-600 text-white px-3 py-2 rounded font-bold whitespace-nowrap text-sm';
+                    btnToggle.onclick = togglePointsDiscount;
+                    
+                    // Disable input
+                    pointsInput.disabled = true;
+                    isPointsActive = true;
+                } else {
+                    pointsDiscountDisplay.classList.add('hidden');
+                }
+                
+                updateTotalSummary();
+                showToast(`ใช้ ${pointsRedeemed} พอยต์ ส่วนลด ${discountFromPoints}.-`);
             } else {
-                pointsDiscountDisplay.classList.add('hidden');
-                pointsCancelContainer.classList.add('hidden');
-            }
-            
-            updateTotalSummary();
-            showToast(`ใช้ ${pointsRedeemed} พอยต์ ส่วนลด ${discountFromPoints}.-`);
-        }
-
-        function cancelPointsDiscount() {
-            pointsRedeemed = 0;
-            const pointsInput = document.getElementById('points-to-use');
-            if (pointsInput) {
-                pointsInput.value = '';
+                // ปิดใช้งานพอยต์
+                pointsRedeemed = 0;
+                const pointsDiscountDisplay = document.getElementById('points-discount-display');
+                if (pointsDiscountDisplay) pointsDiscountDisplay.classList.add('hidden');
+                
+                // เปลี่ยนปุ่มกลับเป็น "ใช้"
+                btnToggle.innerHTML = 'ใช้';
+                btnToggle.className = 'btn-bounce bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded font-bold whitespace-nowrap text-sm';
+                btnToggle.onclick = togglePointsDiscount;
+                
+                // Enable input
                 pointsInput.disabled = false;
+                pointsInput.value = '';
+                isPointsActive = false;
+                
+                // Re-apply any code discount
+                applyDiscount();
+                
+                showToast('ยกเลิกการใช้พอยต์แล้ว');
             }
-            
-            const pointsDiscountDisplay = document.getElementById('points-discount-display');
-            if (pointsDiscountDisplay) pointsDiscountDisplay.classList.add('hidden');
-            
-            const pointsCancelContainer = document.getElementById('points-cancel-container');
-            if (pointsCancelContainer) pointsCancelContainer.classList.add('hidden');
-            
-            // Re-apply any code discount
-            applyDiscount();
-            
-            showToast('ยกเลิกการใช้พอยต์แล้ว');
         }
 
         function resetPointsDiscount() {
             pointsRedeemed = 0;
+            isPointsActive = false;
             const pointsInput = document.getElementById('points-to-use');
             if (pointsInput) {
                 pointsInput.value = '';
                 pointsInput.disabled = false;
             }
             
+            const btnToggle = document.getElementById('btn-toggle-points');
+            if (btnToggle) {
+                btnToggle.innerHTML = 'ใช้';
+                btnToggle.className = 'btn-bounce bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded font-bold whitespace-nowrap text-sm';
+                btnToggle.onclick = togglePointsDiscount;
+            }
+            
             const pointsDiscountDisplay = document.getElementById('points-discount-display');
             if (pointsDiscountDisplay) pointsDiscountDisplay.classList.add('hidden');
-            
-            const pointsCancelContainer = document.getElementById('points-cancel-container');
-            if (pointsCancelContainer) pointsCancelContainer.classList.add('hidden');
             
             // Re-apply any code discount
             applyDiscount();
@@ -2186,27 +2243,8 @@
             }
         }
 
-        window.randomMenu = function() {
-            const availableItems = menuItems.filter(i => 
-                i.category !== 'dessert' && 
-                i.category !== 'promotion' && 
-                !i.soldOut
-            );
-
-            if (availableItems.length === 0) {
-                showToast('ไม่พบเมนูครับ', 'warning');
-                return;
-            }
-
-            playSound('switch');
-            triggerHaptic();
-
-            const randomIndex = Math.floor(Math.random() * availableItems.length);
-            const selectedItem = availableItems[randomIndex];
-
-            showToast(`🎲 สุ่มได้: ${selectedItem.name}`, 'info');
-            openModal(selectedItem);
-        }
+        // แก้ไขข้อ 5: ลบฟังก์ชันสุ่มเมนูออก
+        // function randomMenu() ได้ถูกลบออกแล้ว
 
         // --- ฟังก์ชันสร้างเมนูเลือกเนื้อสัตว์ (แก้ไขแล้ว) ---
         function createMeatOptions() {
@@ -3346,6 +3384,34 @@
             }
         }
 
+        // แก้ไขข้อ 1: ฟังก์ชันลบรายการอาหารเฉพาะรายการ
+        function removeFromCart(id) {
+            // หาดัชนีของรายการที่จะลบ
+            const index = cart.findIndex(item => item.id === id);
+            if (index !== -1) {
+                // ลบรายการออกจากตะกร้า
+                cart.splice(index, 1);
+                saveToLS();
+                
+                // ถ้าตะกร้าว่าง ให้รีเซ็ตส่วนลด
+                if(cart.length === 0) {
+                    removeDiscount();
+                    resetPointsDiscount();
+                } else if(discountValue > 0) {
+                    applyDiscount();
+                }
+                
+                renderCheckoutList();
+                updateMiniCart();
+                if(cart.length === 0) closeCheckout();
+                
+                // แสดงข้อความแจ้งเตือน
+                showToast('ลบรายการเรียบร้อย', 'success');
+                triggerHaptic();
+            }
+        }
+
+        // แก้ไขข้อ 4: ปรับขนาดป้ายชื่ออาหารในตะกร้าให้เล็กลง
         function renderCheckoutList() {
             const container = document.getElementById('cart-list-container');
             container.innerHTML = '';
@@ -3356,8 +3422,8 @@
                 if(item.addons.length) detail += `<span class="text-slate-400 text-xs">+${item.addons.join(',')}</span>`;
                 el.innerHTML = `
                     <div>
-                        <h4 class="font-bold text-slate-200 text-sm">${item.name}</h4>
-                        <div class="mt-1">${detail}</div>
+                        <h4 class="cart-item-title font-bold text-slate-200">${item.name}</h4>
+                        <div class="cart-item-details mt-1">${detail}</div>
                         ${item.note ? `<div class="text-[10px] text-slate-400 mt-1">Note: ${item.note}</div>` : ''}
                     </div>
                     <div class="flex flex-col items-end gap-2">
@@ -3370,16 +3436,6 @@
             updateTotalSummary();
         }
 
-        function removeFromCart(id) {
-            cart = cart.filter(i => i.id !== id);
-            saveToLS();
-            if(cart.length === 0) removeDiscount();
-            else if(discountValue > 0) applyDiscount();
-            renderCheckoutList();
-            updateMiniCart();
-            if(cart.length === 0) closeCheckout();
-        }
-        
         function clearCart() {
             if(cart.length === 0) return;
             if(!confirm('คุณต้องการล้างตะกร้าทั้งหมดใช่ไหม?')) return;
@@ -3387,6 +3443,7 @@
             cart = [];
             discountValue = 0;
             pointsRedeemed = 0;
+            isPointsActive = false;
             currentOrderId = "";
             
             // Reset discount code input
@@ -3400,11 +3457,16 @@
                 pointsInput.disabled = false;
             }
             
+            // Reset points button
+            const btnToggle = document.getElementById('btn-toggle-points');
+            if (btnToggle) {
+                btnToggle.innerHTML = 'ใช้';
+                btnToggle.className = 'btn-bounce bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded font-bold whitespace-nowrap text-sm';
+                btnToggle.onclick = togglePointsDiscount;
+            }
+            
             const pointsDiscountDisplay = document.getElementById('points-discount-display');
             if (pointsDiscountDisplay) pointsDiscountDisplay.classList.add('hidden');
-            
-            const pointsCancelContainer = document.getElementById('points-cancel-container');
-            if (pointsCancelContainer) pointsCancelContainer.classList.add('hidden');
             
             saveToLS();
             
@@ -3418,6 +3480,61 @@
             // Hide order ID banner
             const bannerContainer = document.getElementById('order-id-banner');
             if (bannerContainer) bannerContainer.classList.add('hidden');
+            
+            // Hide price breakdown
+            const priceBreakdownContainer = document.getElementById('price-breakdown-container');
+            if (priceBreakdownContainer) priceBreakdownContainer.classList.add('hidden');
+        }
+
+        // แก้ไขข้อ 3: แสดงราคาส่วนลดแยก
+        function updatePriceBreakdown() {
+            const container = document.getElementById('price-breakdown-container');
+            const subtotal = cart.reduce((sum, i) => sum + i.price, 0);
+            let discountFromCode = 0;
+            let discountFromPoints = 0;
+            
+            // คำนวณส่วนลดจากโค้ด
+            const code = document.getElementById('discount-code').value.trim().toUpperCase();
+            const promo = promotions.find(p => p.code === code);
+            if (promo && subtotal >= promo.minOrder) {
+                discountFromCode = promo.value;
+            }
+            
+            // คำนวณส่วนลดจากพอยต์
+            if (pointsRedeemed > 0) {
+                discountFromPoints = Math.floor(pointsRedeemed / 100) * 10;
+            }
+            
+            const netTotal = Math.max(0, subtotal - discountFromCode - discountFromPoints);
+            
+            // แสดงผลเมื่อมีส่วนลด
+            if (discountFromCode > 0 || discountFromPoints > 0) {
+                container.classList.remove('hidden');
+                container.innerHTML = `
+                    <div class="price-breakdown">
+                        <div class="price-line">
+                            <span class="text-slate-300">ราคารวม</span>
+                            <span class="font-bold text-slate-200">${subtotal}.-</span>
+                        </div>
+                        ${discountFromCode > 0 ? `
+                        <div class="price-line discount-line">
+                            <span>ส่วนลดจากโค้ด</span>
+                            <span class="font-bold">-${discountFromCode}.-</span>
+                        </div>` : ''}
+                        ${discountFromPoints > 0 ? `
+                        <div class="price-line points-line">
+                            <span>ส่วนลดจากพอยต์</span>
+                            <span class="font-bold">-${discountFromPoints}.-</span>
+                        </div>` : ''}
+                        <div class="price-line pt-2 border-t border-slate-600">
+                            <span class="font-bold text-indigo-400">ยอดสุทธิ</span>
+                            <span class="font-bold text-xl text-indigo-400">${netTotal}.-</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                container.classList.add('hidden');
+            }
         }
 
         function applyDiscount() {
@@ -3436,6 +3553,7 @@
                 btn.className = 'btn-bounce bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-3 py-1 rounded transition-colors font-bold whitespace-nowrap active:bg-indigo-700';
                 btn.onclick = applyDiscount; 
                 updateTotalSummary();
+                updatePriceBreakdown();
                 return;
             }
 
@@ -3458,6 +3576,7 @@
                 btn.onclick = applyDiscount; 
             }
             updateTotalSummary();
+            updatePriceBreakdown();
         }
 
         function removeDiscount() {
@@ -3469,7 +3588,22 @@
 
         function updateTotalSummary() {
             let total = cart.reduce((sum, i) => sum + i.price, 0);
-            let final = Math.max(0, total - discountValue);
+            let discountFromCode = 0;
+            let discountFromPoints = 0;
+            
+            // คำนวณส่วนลดจากโค้ด
+            const code = document.getElementById('discount-code').value.trim().toUpperCase();
+            const promo = promotions.find(p => p.code === code);
+            if (promo && total >= promo.minOrder) {
+                discountFromCode = promo.value;
+            }
+            
+            // คำนวณส่วนลดจากพอยต์
+            if (pointsRedeemed > 0) {
+                discountFromPoints = Math.floor(pointsRedeemed / 100) * 10;
+            }
+            
+            const final = Math.max(0, total - discountFromCode - discountFromPoints);
             document.getElementById('sheet-grand-total').innerText = final + " ฿";
             
             // Update points info
@@ -3501,13 +3635,28 @@
             const nowStr = `${getStandardDate(new Date())} ${formatTime(new Date())}`;
 
             let subtotal = cart.reduce((sum, i) => sum + i.price, 0);
-            let netTotal = Math.max(0, subtotal - discountValue);
+            let discountFromCode = 0;
+            let discountFromPoints = 0;
+            
+            // คำนวณส่วนลดจากโค้ด
+            const code = document.getElementById('discount-code').value.trim().toUpperCase();
+            const promo = promotions.find(p => p.code === code);
+            if (promo && subtotal >= promo.minOrder) {
+                discountFromCode = promo.value;
+            }
+            
+            // คำนวณส่วนลดจากพอยต์
+            if (pointsRedeemed > 0) {
+                discountFromPoints = Math.floor(pointsRedeemed / 100) * 10;
+            }
+            
+            const netTotal = Math.max(0, subtotal - discountFromCode - discountFromPoints);
 
             document.querySelector('.receipt-id').innerText = currentOrderId || 'KP-XXXX';
             document.querySelector('.receipt-date').innerText = nowStr;
             document.querySelector('.receipt-name').innerText = escapeHtml(name);
             document.querySelector('.receipt-subtotal').innerText = subtotal + '.-';
-            document.querySelector('.receipt-discount').innerText = '-' + discountValue + '.-';
+            document.querySelector('.receipt-discount').innerText = '-' + (discountFromCode + discountFromPoints) + '.-';
             document.querySelector('.receipt-total').innerText = netTotal + '.-';
 
             const receiptAvatar = document.getElementById('receipt-avatar-img');
@@ -3642,7 +3791,22 @@
                 showGlobalLoader("กำลังสร้างบิลและส่งไลน์...");
                 
                 let subtotal = cart.reduce((sum, i) => sum + i.price, 0);
-                let netTotal = Math.max(0, subtotal - discountValue);
+                
+                // คำนวณส่วนลดจากโค้ด
+                let discountFromCode = 0;
+                const code = document.getElementById('discount-code').value.trim().toUpperCase();
+                const promo = promotions.find(p => p.code === code);
+                if (promo && subtotal >= promo.minOrder) {
+                    discountFromCode = promo.value;
+                }
+                
+                // คำนวณส่วนลดจากพอยต์
+                let discountFromPoints = 0;
+                if (pointsRedeemed > 0) {
+                    discountFromPoints = Math.floor(pointsRedeemed / 100) * 10;
+                }
+                
+                const netTotal = Math.max(0, subtotal - discountFromCode - discountFromPoints);
                 
                 // Calculate points
                 const pointsEarned = calculatePoints(netTotal);
@@ -3675,9 +3839,12 @@
                     msg += `${index + 1}. ${detail} (${i.price}.-)\n`;
                 });
                 msg += `------------------------\n`;
-                if (discountValue > 0) {
-                    msg += `💵 ยอดรวม: ${subtotal} บาท\n`;
-                    msg += `🏷️ ส่วนลด: -${discountValue} บาท\n`;
+                msg += `💵 ยอดรวม: ${subtotal} บาท\n`;
+                if (discountFromCode > 0) {
+                    msg += `🏷️ ส่วนลดโค้ด: -${discountFromCode} บาท\n`;
+                }
+                if (discountFromPoints > 0) {
+                    msg += `🪙 ส่วนลดพอยต์: -${discountFromPoints} บาท\n`;
                 }
                 if (pointsRedeemed > 0) {
                     msg += `🪙 ใช้พอยต์: ${pointsRedeemed} พอยต์\n`;
@@ -3689,7 +3856,8 @@
                     name: name,
                     items: cart,
                     totalPrice: subtotal,
-                    discount: discountValue,
+                    discountCode: discountFromCode,
+                    discountPoints: discountFromPoints,
                     netTotal: netTotal,
                     pointsEarned: pointsEarned,
                     pointsRedeemed: pointsRedeemed,
@@ -3717,6 +3885,7 @@
                     cart = []; 
                     discountValue = 0;
                     pointsRedeemed = 0;
+                    isPointsActive = false;
                     currentOrderId = "";
                     saveToLS();
                     updateMiniCart();
@@ -3814,7 +3983,7 @@
                 
                 // Apply points discount
                 if (activeElement && activeElement.id === 'points-to-use') {
-                    applyPointsDiscount();
+                    togglePointsDiscount();
                 }
             }
             
