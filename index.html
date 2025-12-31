@@ -708,6 +708,67 @@
             color: #F59E0B;
         }
 
+        /* === หมวดหมู่เมนูใหม่ (แก้ไขข้อ 4) === */
+        .category-pill {
+            min-width: 100px;
+            padding: 0.75rem 0.5rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 2px solid transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .category-pill:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .category-pill-active {
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+            color: white;
+            border-color: #B45309;
+            box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+        }
+
+        .category-pill-inactive {
+            background: linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 100%);
+            color: #4B5563;
+            border-color: #E5E7EB;
+        }
+
+        .category-pill-inactive:hover {
+            background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
+            border-color: #D1D5DB;
+        }
+
+        .category-pill-promotion {
+            background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+            color: #92400E;
+            border-color: #F59E0B;
+        }
+
+        .category-pill-promotion:hover {
+            background: linear-gradient(135deg, #FDE68A 0%, #FCD34D 100%);
+        }
+
+        .category-pill-tray {
+            background: linear-gradient(135deg, #E0E7FF 0%, #C7D2FE 100%);
+            color: #3730A3;
+            border-color: #818CF8;
+        }
+
+        .category-pill-tray:hover {
+            background: linear-gradient(135deg, #C7D2FE 0%, #A5B4FC 100%);
+        }
+
     </style>
 </head>
 <body class="pb-32 font-sans select-none relative overflow-x-hidden safe-area-pt">
@@ -833,47 +894,45 @@
     <div class="max-w-md mx-auto px-5 relative z-10">
         
         <div class="mb-3 flex items-center justify-between">
-            <h3 class="font-bold text-slate-200 text-lg flex items-center gap-2">หมวดหมู่ 
-                        <!-- ลบปุ่มสุ่มเมนูออก (แก้ไขข้อ 5) -->
-            </h3>
+            <h3 class="font-bold text-slate-200 text-lg flex items-center gap-2">หมวดหมู่</h3>
             <div class="flex gap-2">
-                <!-- ปุ่มเปลี่ยนธีมเดิมถูกย้ายไปด้านบนแล้ว -->
                 <button onclick="scrollTabs(-100)" class="btn-bounce bg-slate-800 w-11 h-11 rounded-full flex items-center justify-center text-slate-400 hover:text-indigo-400 transition-all border border-slate-700 shadow-sm"><i class="fas fa-chevron-left text-xs"></i></button>
                 <button onclick="scrollTabs(100)" class="btn-bounce bg-slate-800 w-11 h-11 rounded-full flex items-center justify-center text-slate-400 hover:text-indigo-400 transition-all border border-slate-700 shadow-sm"><i class="fas fa-chevron-right text-xs"></i></button>
             </div>
         </div>
         
         <div id="tabs-container" class="sticky top-0 z-30 pt-2 pb-4 -mx-5 px-5 flex gap-3 snap-x scroll-smooth overflow-x-auto hide-scroll transition-all">
-            <button onclick="switchCategory('tray')" id="tab-tray" aria-label="ชุดถาดสุดคุ้ม" class="btn-bounce snap-start category-pill-active min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all text-indigo-400 border border-indigo-500/30">
+            <!-- แก้ไขข้อ 4: หมวดหมู่เมนูใหม่ -->
+            <button onclick="switchCategory('tray')" id="tab-tray" aria-label="ชุดถาดสุดคุ้ม" class="category-pill category-pill-tray snap-start">
                 <span class="text-xl tab-icon" aria-hidden="true">🍱</span>
                 <span class="text-xs font-bold">ชุดถาดสุดคุ้ม</span>
             </button>
 
-            <button onclick="switchCategory('kaprao')" id="tab-kaprao" aria-label="เมนูกะเพรา" class="btn-bounce snap-start category-pill-inactive min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all">
+            <button onclick="switchCategory('kaprao')" id="tab-kaprao" aria-label="เมนูกะเพรา" class="category-pill category-pill-inactive snap-start">
                 <span class="text-xl tab-icon" aria-hidden="true">🌶️</span>
                 <span class="text-xs">เมนูกะเพรา</span>
             </button>
-            <button onclick="switchCategory('garlic')" id="tab-garlic" aria-label="เมนูกระเทียม" class="btn-bounce snap-start category-pill-inactive min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all">
+            <button onclick="switchCategory('garlic')" id="tab-garlic" aria-label="เมนูกระเทียม" class="category-pill category-pill-inactive snap-start">
                 <span class="text-xl tab-icon" aria-hidden="true">🧄</span>
                 <span class="text-xs">เมนูกระเทียม</span>
             </button>
-            <button onclick="switchCategory('noodle')" id="tab-noodle" aria-label="เมนูเส้น" class="btn-bounce snap-start category-pill-inactive min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all">
+            <button onclick="switchCategory('noodle')" id="tab-noodle" aria-label="เมนูเส้น" class="category-pill category-pill-inactive snap-start">
                 <span class="text-xl tab-icon" aria-hidden="true">🍜</span>
                 <span class="text-xs">เมนูเส้น</span>
             </button>
-            <button onclick="switchCategory('soup')" id="tab-soup" aria-label="เมนูแกง/ต้ม" class="btn-bounce snap-start category-pill-inactive min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all">
+            <button onclick="switchCategory('soup')" id="tab-soup" aria-label="เมนูแกง/ต้ม" class="category-pill category-pill-inactive snap-start">
                 <span class="text-xl tab-icon" aria-hidden="true">🍲</span>
                 <span class="text-xs">เมนูแกง/ต้ม</span>
             </button>
-            <button onclick="switchCategory('others')" id="tab-others" aria-label="เมนูไข่/อื่นๆ" class="btn-bounce snap-start category-pill-inactive min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all">
+            <button onclick="switchCategory('others')" id="tab-others" aria-label="เมนูไข่/อื่นๆ" class="category-pill category-pill-inactive snap-start">
                 <span class="text-xl tab-icon" aria-hidden="true">🍳</span>
                 <span class="text-xs">เมนูไข่/อื่นๆ</span>
             </button>
-            <button onclick="switchCategory('dessert')" id="tab-dessert" aria-label="ของหวาน" class="btn-bounce snap-start category-pill-inactive min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all">
+            <button onclick="switchCategory('dessert')" id="tab-dessert" aria-label="ของหวาน" class="category-pill category-pill-inactive snap-start">
                 <span class="text-xl tab-icon" aria-hidden="true">🍨</span>
                 <span class="text-xs">ของหวาน</span>
             </button>
-            <button onclick="switchCategory('promotion')" id="tab-promotion" aria-label="ส่วนลด" class="btn-bounce snap-start category-pill-inactive min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all border-dashed border-red-300 text-red-500">
+            <button onclick="switchCategory('promotion')" id="tab-promotion" aria-label="ส่วนลด" class="category-pill category-pill-promotion snap-start">
                 <span class="text-xl tab-icon" aria-hidden="true">🧧</span>
                 <span class="text-xs font-bold">ส่วนลด</span>
             </button>
@@ -933,7 +992,8 @@
     </div>
 
     <div id="checkout-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden transition-opacity opacity-0" onclick="closeCheckout()"></div>
-    <div id="checkout-sheet" class="fixed bottom-0 left-0 right-0 glass-heavy rounded-t-[2.5rem] z-50 transform translate-y-full transition-transform duration-300 shadow-2xl max-w-md mx-auto h-[90vh] flex flex-col touch-pan-y">
+    <!-- แก้ไขข้อ 1: ปรับโครงสร้าง checkout sheet -->
+    <div id="checkout-sheet" class="fixed bottom-0 left-0 right-0 glass-heavy rounded-t-[2.5rem] z-50 transform translate-y-full transition-transform duration-300 shadow-2xl max-w-md mx-auto h-[85vh] flex flex-col touch-pan-y">
         
         <div id="checkout-drag-handle" class="w-full flex justify-center pt-4 pb-2 cursor-grab active:cursor-grabbing z-50">
             <div class="w-12 h-1.5 bg-slate-600 rounded-full"></div>
@@ -967,7 +1027,7 @@
         </div>
         
         <!-- FIXED INPUTS SECTION - COMPACT REDESIGN -->
-        <div class="checkout-fixed-section space-y-2 pb-8 safe-area-pb">
+        <div class="checkout-fixed-section space-y-2 pb-4">
             <!-- Row 1: User Name | Discount Code -->
             <div class="grid grid-cols-2 gap-2">
                 <div class="bg-slate-800 rounded-lg p-2 flex items-center gap-2 border border-slate-700">
@@ -1001,8 +1061,8 @@
                         <input type="number" id="points-to-use" min="0" max="1000" 
                                placeholder="ใช้พอยต์ (100=10.-)" 
                                class="flex-1 bg-slate-900 border border-slate-700 rounded p-2 text-sm text-center text-slate-200 placeholder:text-slate-500">
-                        <!-- ปุ่มใช้/ไม่ใช้พอยต์ (แก้ไขข้อ 2) -->
-                        <button onclick="togglePointsDiscount()" id="btn-toggle-points" class="btn-bounce bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded font-bold whitespace-nowrap text-sm">
+                        <!-- แก้ไขข้อ 2: ปุ่มใช้/ยกเลิกพอยต์ -->
+                        <button onclick="togglePointsDiscount()" id="btn-toggle-points" class="btn-bounce bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded font-bold whitespace-nowrap text-sm min-w-[60px]">
                             ใช้
                         </button>
                     </div>
@@ -1015,19 +1075,22 @@
                 </div>
             </div>
 
-            <!-- Row 3: Total and Confirm - Inline -->
+            <!-- Row 3: Total and Confirm - แก้ไขข้อ 1: ปรับโครงสร้าง -->
             <div class="flex justify-between items-center pt-2 border-t border-slate-700/50">
                 <div class="flex flex-col">
                     <span class="text-slate-400 text-xs">ยอดสุทธิ</span>
                     <span id="sheet-grand-total" class="text-xl font-bold text-indigo-400">0 ฿</span>
                 </div>
                 
-                <button onclick="submitOrderToLine()" id="btn-submit-order" class="btn-bounce btn-gradient text-white font-bold py-3 px-6 rounded-xl shadow-lg active:scale-95 transition-all flex justify-center items-center gap-2 text-base mb-2">
+                <button onclick="submitOrderToLine()" id="btn-submit-order" class="btn-bounce btn-gradient text-white font-bold py-3 px-6 rounded-xl shadow-lg active:scale-95 transition-all flex justify-center items-center gap-2 text-base">
                     <span>ยืนยันการสั่ง</span>
                     <i class="fas fa-paper-plane text-sm"></i>
                 </button>
             </div>
         </div>
+        
+        <!-- Padding สำหรับ safe area -->
+        <div class="safe-area-pb"></div>
     </div>
 
     <div id="points-history-modal" class="fixed inset-0 z-[130] bg-black/50 backdrop-blur-sm flex items-center justify-center p-6 hidden">
@@ -1565,10 +1628,6 @@
         
         // === ENHANCED THEME MANAGEMENT ===
         
-        
-        
-        
-
         // --- STATE MANAGEMENT ---
         let cart = [];
         let currentItem = null;
@@ -1659,7 +1718,7 @@
             }
         }
 
-        // แก้ไขข้อ 2: ฟังก์ชันสลับใช้/ไม่ใช้พอยต์
+        // แก้ไขข้อ 2: ฟังก์ชันสลับใช้/ยกเลิกพอยต์
         function togglePointsDiscount() {
             const pointsInput = document.getElementById('points-to-use');
             const btnToggle = document.getElementById('btn-toggle-points');
@@ -1710,9 +1769,9 @@
                         </div>
                     `;
                     
-                    // เปลี่ยนปุ่มเป็น "ไม่ใช้"
-                    btnToggle.innerHTML = 'ไม่ใช้';
-                    btnToggle.className = 'btn-bounce bg-slate-700 hover:bg-slate-600 text-white px-3 py-2 rounded font-bold whitespace-nowrap text-sm';
+                    // เปลี่ยนปุ่มเป็น "ยกเลิก"
+                    btnToggle.innerHTML = 'ยกเลิก';
+                    btnToggle.className = 'btn-bounce bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded font-bold whitespace-nowrap text-sm min-w-[60px]';
                     btnToggle.onclick = togglePointsDiscount;
                     
                     // Disable input
@@ -1724,7 +1783,7 @@
                 
                 updateTotalSummary();
                 updatePriceBreakdown();
-                showToast(`ใช้ ${pointsRedeemed} พอยต์ ส่วนลด ${discountFromPoints}.-`);
+                showToast(`ใช้ ${pointsRedeemed} พอยต์ ส่วนลด ${discountFromPoints}.-`, 'success');
             } else {
                 // ปิดใช้งานพอยต์
                 pointsRedeemed = 0;
@@ -1733,7 +1792,7 @@
                 
                 // เปลี่ยนปุ่มกลับเป็น "ใช้"
                 btnToggle.innerHTML = 'ใช้';
-                btnToggle.className = 'btn-bounce bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded font-bold whitespace-nowrap text-sm';
+                btnToggle.className = 'btn-bounce bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded font-bold whitespace-nowrap text-sm min-w-[60px]';
                 btnToggle.onclick = togglePointsDiscount;
                 
                 // Enable input
@@ -1744,7 +1803,7 @@
                 // Re-apply any code discount
                 applyDiscount();
                 
-                showToast('ยกเลิกการใช้พอยต์แล้ว');
+                showToast('ยกเลิกการใช้พอยต์แล้ว', 'info');
             }
         }
 
@@ -1760,7 +1819,7 @@
             const btnToggle = document.getElementById('btn-toggle-points');
             if (btnToggle) {
                 btnToggle.innerHTML = 'ใช้';
-                btnToggle.className = 'btn-bounce bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded font-bold whitespace-nowrap text-sm';
+                btnToggle.className = 'btn-bounce bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded font-bold whitespace-nowrap text-sm min-w-[60px]';
                 btnToggle.onclick = togglePointsDiscount;
             }
             
@@ -2058,9 +2117,6 @@
                  });
             }
         }
-
-        // แก้ไขข้อ 5: ลบฟังก์ชันสุ่มเมนูออก
-        // function randomMenu() ได้ถูกลบออกแล้ว
 
         // --- ฟังก์ชันสร้างเมนูเลือกเนื้อสัตว์ (แก้ไขแล้ว) ---
         function createMeatOptions() {
@@ -2424,6 +2480,7 @@
             }
         }
 
+        // แก้ไขข้อ 4: ฟังก์ชัน switchCategory ใหม่
         function switchCategory(cat) {
             if(activeCategory === cat) return;
             activeCategory = cat; 
@@ -2436,15 +2493,28 @@
             grid.classList.add('page-out');
             if(!msg.classList.contains('hidden')) msg.classList.add('page-out');
             
-            // 🔥 เพิ่ม tab-tray ใน array นี้ (อยู่แรกสุด)
-            ['tray', 'kaprao', 'garlic', 'noodle', 'soup', 'others', 'dessert', 'promotion'].forEach(c => {
+            // อัปเดตปุ่มหมวดหมู่ตามสไตล์ใหม่
+            const categories = ['tray', 'kaprao', 'garlic', 'noodle', 'soup', 'others', 'dessert', 'promotion'];
+            categories.forEach(c => {
                 const btn = document.getElementById(`tab-${c}`);
                 if (c === cat) {
-                    btn.className = "snap-start category-pill-active min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all transform scale-105 btn-bounce";
+                    // ตั้งค่าเป็น active
+                    if (c === 'promotion') {
+                        btn.className = "category-pill category-pill-promotion category-pill-active snap-start";
+                    } else if (c === 'tray') {
+                        btn.className = "category-pill category-pill-tray category-pill-active snap-start";
+                    } else {
+                        btn.className = "category-pill category-pill-active snap-start";
+                    }
                 } else {
-                    btn.className = "snap-start category-pill-inactive min-w-[100px] py-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all btn-bounce";
-                    if(c === 'promotion') btn.classList.add('border-dashed', 'border-red-300', 'text-red-400');
-                    if(c === 'tray') btn.classList.add('text-indigo-600', 'border-indigo-100');
+                    // ตั้งค่าเป็น inactive
+                    if (c === 'promotion') {
+                        btn.className = "category-pill category-pill-promotion snap-start";
+                    } else if (c === 'tray') {
+                        btn.className = "category-pill category-pill-tray snap-start";
+                    } else {
+                        btn.className = "category-pill category-pill-inactive snap-start";
+                    }
                 }
             });
 
@@ -2483,7 +2553,6 @@
 
             }, 150);
         }
-
                 
         function renderMenu() {
             const grid = document.getElementById('menu-grid');
@@ -2576,7 +2645,8 @@
                 grid.appendChild(el);
             });
         }
-            function renderPromotions() {
+        
+        function renderPromotions() {
             const grid = document.getElementById('menu-grid');
             grid.innerHTML = '';
             promotions.forEach((promo, index) => {
@@ -3197,16 +3267,12 @@
             }
         }
 
-        // แก้ไขข้อ 1: ฟังก์ชันลบรายการอาหารเฉพาะรายการ
         function removeFromCart(id) {
-            // หาดัชนีของรายการที่จะลบ
             const index = cart.findIndex(item => item.id === id);
             if (index !== -1) {
-                // ลบรายการออกจากตะกร้า
                 cart.splice(index, 1);
                 saveToLS();
                 
-                // ถ้าตะกร้าว่าง ให้รีเซ็ตส่วนลด
                 if(cart.length === 0) {
                     removeDiscount();
                     resetPointsDiscount();
@@ -3218,13 +3284,11 @@
                 updateMiniCart();
                 if(cart.length === 0) closeCheckout();
                 
-                // แสดงข้อความแจ้งเตือน
                 showToast('ลบรายการเรียบร้อย', 'success');
                 triggerHaptic();
             }
         }
 
-        // แก้ไขข้อ 4: ปรับขนาดป้ายชื่ออาหารในตะกร้าให้เล็กลง
         function renderCheckoutList() {
             const container = document.getElementById('cart-list-container');
             container.innerHTML = '';
@@ -3274,7 +3338,7 @@
             const btnToggle = document.getElementById('btn-toggle-points');
             if (btnToggle) {
                 btnToggle.innerHTML = 'ใช้';
-                btnToggle.className = 'btn-bounce bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded font-bold whitespace-nowrap text-sm';
+                btnToggle.className = 'btn-bounce bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded font-bold whitespace-nowrap text-sm min-w-[60px]';
                 btnToggle.onclick = togglePointsDiscount;
             }
             
@@ -3299,7 +3363,6 @@
             if (priceBreakdownContainer) priceBreakdownContainer.classList.add('hidden');
         }
 
-        // แก้ไขข้อ 3: แสดงราคาส่วนลดแยก
         function updatePriceBreakdown() {
             const container = document.getElementById('price-breakdown-container');
             const subtotal = cart.reduce((sum, i) => sum + i.price, 0);
@@ -3361,8 +3424,8 @@
 
             if (code === '') {
                 msg.innerText = '';
-                inputContainer.className = "bg-white rounded-lg p-2 pl-4 flex items-center border border-slate-300 shadow-sm justify-between transition-colors";
-                btn.innerHTML = 'ใช้โค้ด';
+                inputContainer.className = "bg-slate-800 rounded-lg p-2 flex items-center gap-2 border border-slate-700 justify-between";
+                btn.innerHTML = 'ใช้';
                 btn.className = 'btn-bounce bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-3 py-1 rounded transition-colors font-bold whitespace-nowrap active:bg-indigo-700';
                 btn.onclick = applyDiscount;
                 updateTotalSummary();
@@ -3375,7 +3438,7 @@
             if (promo && total >= promo.minOrder) {
                 discountValue = promo.value;
                 msg.innerHTML = `<span class="text-green-400"><i class="fas fa-check-circle"></i> ใช้โค้ดลด ${promo.value} บาท</span>`;
-                inputContainer.className = "bg-green-50 border-green-300 rounded-lg p-2 pl-4 flex items-center border shadow-sm justify-between transition-colors";
+                inputContainer.className = "bg-green-500/20 border-green-300 rounded-lg p-2 pl-4 flex items-center border shadow-sm justify-between transition-colors";
                 btn.innerHTML = '<i class="fas fa-times"></i> ยกเลิก';
                 btn.className = 'btn-bounce bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded transition-colors font-bold whitespace-nowrap';
                 btn.onclick = removeDiscount;
@@ -3383,8 +3446,8 @@
             }
             else {
                 msg.innerHTML = `<span class="text-red-400">${promo ? 'ต้องสั่งครบ '+promo.minOrder : 'ไม่พบโค้ด'}</span>`;
-                inputContainer.className = "bg-red-50 rounded-lg p-2 pl-4 flex items-center border border-red-300 shadow-sm justify-between transition-colors";
-                btn.innerHTML = 'ใช้โค้ด';
+                inputContainer.className = "bg-red-500/20 rounded-lg p-2 pl-4 flex items-center border border-red-300 shadow-sm justify-between transition-colors";
+                btn.innerHTML = 'ใช้';
                 btn.className = 'btn-bounce bg-gray-500 hover:bg-gray-600 text-white text-xs px-3 py-1 rounded transition-colors font-bold whitespace-nowrap active:bg-gray-700';
                 btn.onclick = applyDiscount;
             }
@@ -3514,6 +3577,7 @@
             });
         }
 
+        // แก้ไขข้อ 3: ฟังก์ชัน reprintReceipt แก้ไขข้อความ loading
         function reprintReceipt(ticketIndex) {
             triggerHaptic();
             playSound('pop');
@@ -3524,7 +3588,7 @@
                 return;
             }
 
-            showGlobalLoader("กำลังดึงข้อมูลใบเสร็จ...");
+            showGlobalLoader("กำลังโหลดใบเสร็จเก่า..."); // แก้ไขข้อความนี้
             
             const name = ticket.customerName || 'ลูกค้า';
             const subtotal = ticket.items.reduce((sum, i) => sum + i.price, 0);
@@ -3744,18 +3808,23 @@
                 currentY = 0;
             });
         }
-        // Ensure elements exist before enabling swipe handlers (safe in varied load scenarios)
-        const _modalContent = document.getElementById('modal-content');
-        const _modalScroll = document.getElementById('modal-scroll-area');
-        if (_modalContent && _modalScroll) enableSwipeToClose(_modalContent, _modalScroll, closeModal);
+        
+        // เรียกใช้ swipe handlers หลังจาก DOM โหลดเสร็จ
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                const _modalContent = document.getElementById('modal-content');
+                const _modalScroll = document.getElementById('modal-scroll-area');
+                if (_modalContent && _modalScroll) enableSwipeToClose(_modalContent, _modalScroll, closeModal);
 
-        const _checkoutSheet = document.getElementById('checkout-sheet');
-        const _cartList = document.getElementById('cart-list-container');
-        if (_checkoutSheet && _cartList) enableSwipeToClose(_checkoutSheet, _cartList, closeCheckout);
+                const _checkoutSheet = document.getElementById('checkout-sheet');
+                const _cartList = document.getElementById('cart-list-container');
+                if (_checkoutSheet && _cartList) enableSwipeToClose(_checkoutSheet, _cartList, closeCheckout);
 
-        const _ticketsSheet = document.getElementById('tickets-sheet');
-        const _ticketsList = document.getElementById('tickets-list');
-        if (_ticketsSheet && _ticketsList) enableSwipeToClose(_ticketsSheet, _ticketsList, closeMyTickets);
+                const _ticketsSheet = document.getElementById('tickets-sheet');
+                const _ticketsList = document.getElementById('tickets-list');
+                if (_ticketsSheet && _ticketsList) enableSwipeToClose(_ticketsSheet, _ticketsList, closeMyTickets);
+            }, 500);
+        });
 
         // --- KEYBOARD HANDLING ---
         document.addEventListener('keydown', function(e) {
@@ -3816,6 +3885,18 @@
         });
 
         document.getElementById('user-name').addEventListener('input', saveToLS);
+        
+        // แก้ไขข้อ 5: จัดการกับ error ที่อาจเกิดขึ้น
+        window.addEventListener('error', function(e) {
+            console.error('Global error caught:', e.error);
+            // ป้องกันไม่ให้ error ส่งผลต่อการทำงานของ app
+            e.preventDefault();
+        });
+        
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('Unhandled promise rejection:', e.reason);
+            e.preventDefault();
+        });
     </script>
     <script>
         document.addEventListener('error', function(e) {
