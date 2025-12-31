@@ -6,7 +6,7 @@
     <meta http-equiv="Expires" content="0">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#0F172A">
+    <meta name="theme-color" content="#FEF9F3">
     <meta name="apple-mobile-web-app-capable" content="yes">
     
     <link rel="preconnect" href="https://static.line-scdn.net">
@@ -64,35 +64,6 @@
     <style>
         /* === THEME VARIABLES === */
         :root {
-            --bg-primary: #0F172A;
-            --bg-secondary: #1E293B;
-            --bg-tertiary: #334155;
-            --text-primary: #F1F5F9;
-            --text-secondary: #94A3B8;
-            --text-tertiary: #64748B;
-            --border-color: rgba(148, 163, 184, 0.15);
-            --glass-bg: rgba(30, 41, 59, 0.85);
-            --glass-heavy-bg: rgba(15, 23, 42, 0.95);
-            --card-bg: #1E293B;
-            --card-hover: #334155;
-            --shadow: rgba(0, 0, 0, 0.3);
-            --shadow-hover: rgba(0, 0, 0, 0.4);
-            --close-btn-bg: #1E293B;
-            --close-btn-color: #94A3B8;
-            
-            /* เมนูเลือกเนื้อสัตว์ - Dark Theme */
-            --meat-option-bg: #1E293B;
-            --meat-option-border: rgba(148, 163, 184, 0.3);
-            --meat-option-text: #F1F5F9;
-            --meat-option-hover-bg: #334155;
-            --meat-option-selected-bg: rgba(251, 191, 36, 0.25);
-            --meat-option-selected-border: #FBBF24;
-            --meat-option-selected-text: #FBBF24;
-            --meat-option-icon-color: #FBBF24;
-        }
-        
-        /* === ENHANCED LIGHT THEME === */
-        [data-theme="light"] {
             --bg-primary: #FEF9F3;
             --bg-secondary: #FFFFFF;
             --bg-tertiary: #FFF8F0;
@@ -108,7 +79,7 @@
             --shadow-hover: rgba(212, 175, 55, 0.25);
             --close-btn-bg: #F5F5F5;
             --close-btn-color: #4A4A4A;
-            
+
             /* เมนูเลือกเนื้อสัตว์ - Light Theme */
             --meat-option-bg: #FFFFFF;
             --meat-option-border: rgba(212, 175, 55, 0.3);
@@ -118,7 +89,7 @@
             --meat-option-selected-border: #D4AF37;
             --meat-option-selected-text: #8B6914;
             --meat-option-icon-color: #D4AF37;
-            
+
             /* Enhanced light theme colors */
             --accent-primary: #D4AF37;
             --accent-secondary: #8B6914;
@@ -128,42 +99,7 @@
             --info-color: #3B82F6;
         }
         
-        /* === ENHANCED DARK THEME === */
-        [data-theme="dark"] {
-            --bg-primary: #0F172A;
-            --bg-secondary: #1E293B;
-            --bg-tertiary: #334155;
-            --text-primary: #F1F5F9;
-            --text-secondary: #94A3B8;
-            --text-tertiary: #64748B;
-            --border-color: rgba(148, 163, 184, 0.15);
-            --glass-bg: rgba(30, 41, 59, 0.85);
-            --glass-heavy-bg: rgba(15, 23, 42, 0.95);
-            --card-bg: #1E293B;
-            --card-hover: #334155;
-            --shadow: rgba(0, 0, 0, 0.3);
-            --shadow-hover: rgba(0, 0, 0, 0.4);
-            --close-btn-bg: #1E293B;
-            --close-btn-color: #94A3B8;
-            
-            /* เมนูเลือกเนื้อสัตว์ - Dark Theme */
-            --meat-option-bg: #1E293B;
-            --meat-option-border: rgba(148, 163, 184, 0.3);
-            --meat-option-text: #F1F5F9;
-            --meat-option-hover-bg: #334155;
-            --meat-option-selected-bg: rgba(251, 191, 36, 0.25);
-            --meat-option-selected-border: #FBBF24;
-            --meat-option-selected-text: #FBBF24;
-            --meat-option-icon-color: #FBBF24;
-            
-            /* Enhanced dark theme colors */
-            --accent-primary: #FBBF24;
-            --accent-secondary: #F59E0B;
-            --success-color: #10B981;
-            --warning-color: #F59E0B;
-            --error-color: #EF4444;
-            --info-color: #3B82F6;
-        }
+        
 
         /* Base Styles */
         body { 
@@ -191,11 +127,6 @@
         }
         
         ::selection {
-            background-color: rgba(251, 191, 36, 0.3);
-            color: var(--text-primary);
-        }
-        
-        [data-theme="light"] ::selection {
             background-color: rgba(212, 175, 55, 0.3);
             color: var(--text-primary);
         }
@@ -211,19 +142,13 @@
         .bubble {
             position: absolute;
             bottom: -100px;
-            background-color: rgba(251, 191, 36, 0.08);
+            background-color: rgba(212, 175, 55, 0.12);
             border-radius: 50%;
             pointer-events: none;
             animation: floatUpSmooth linear infinite;
             z-index: -1;
         }
         .bubble.purple {
-            background-color: rgba(139, 92, 246, 0.06);
-        }
-        [data-theme="light"] .bubble {
-            background-color: rgba(212, 175, 55, 0.12);
-        }
-        [data-theme="light"] .bubble.purple {
             background-color: rgba(184, 134, 11, 0.08);
         }
         
@@ -246,7 +171,7 @@
         .fast-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 8px 32px rgba(212, 175, 55, 0.12), 0 2px 8px rgba(212, 175, 55, 0.08);
             border-radius: 1.5rem;
             transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
             position: relative;
@@ -256,18 +181,12 @@
         }
         .fast-card:hover {
             transform: translateY(-6px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 8px 16px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 40px rgba(212, 175, 55, 0.2), 0 8px 16px rgba(212, 175, 55, 0.12);
             border-color: rgba(251, 191, 36, 0.4);
         }
         .fast-card:active {
             transform: scale(0.96) translateY(-2px);
             background: var(--card-hover);
-        }
-        [data-theme="light"] .fast-card {
-            box-shadow: 0 8px 32px rgba(212, 175, 55, 0.12), 0 2px 8px rgba(212, 175, 55, 0.08);
-        }
-        [data-theme="light"] .fast-card:hover {
-            box-shadow: 0 20px 40px rgba(212, 175, 55, 0.2), 0 8px 16px rgba(212, 175, 55, 0.12);
         }
         .line-clamp-2 {
             display: -webkit-box;
@@ -361,18 +280,13 @@
         @keyframes pageIn { from { opacity: 0; transform: scale(0.96) translateY(-10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 
         .category-pill-active {
-            background: linear-gradient(135deg, var(--bg-tertiary), rgba(251, 191, 36, 0.1));
-            border: 2px solid #FBBF24;
-            color: var(--text-primary);
-            font-weight: 700;
-            box-shadow: 0 8px 20px rgba(251, 191, 36, 0.3);
-            transform: scale(1.06);
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        [data-theme="light"] .category-pill-active {
             background: linear-gradient(135deg, #FFF8F0 0%, rgba(212, 175, 55, 0.15) 100%);
             border: 2px solid #D4AF37;
+            color: var(--text-primary);
+            font-weight: 700;
             box-shadow: 0 8px 20px rgba(212, 175, 55, 0.25);
+            transform: scale(1.06);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .category-pill-inactive {
             background: var(--card-bg);
@@ -536,12 +450,8 @@
         }
         
         .focus-visible:focus {
-            outline: 2px solid #FBBF24;
+            outline: 2px solid #D4AF37;
             outline-offset: 3px;
-        }
-        
-        [data-theme="light"] .focus-visible:focus {
-            outline-color: #D4AF37;
         }
         
         /* === SMOOTH INPUT STYLES === */
@@ -627,57 +537,77 @@
             height: 200px;
         }
         
-        /* === ENHANCED THEME VARIABLES === */
-        [data-theme="light"] .text-slate-100,
-        [data-theme="light"] .text-slate-200,
-        [data-theme="light"] .text-slate-300,
-        [data-theme="light"] .text-slate-400,
-        [data-theme="light"] .text-slate-500 {
+        /* === CLOSE BUTTON STYLING === */
+        .close-button {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            color: var(--text-secondary);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .close-button:hover {
+            background: var(--card-hover);
+            border-color: rgba(212, 175, 55, 0.4);
+            color: var(--text-primary);
+            transform: scale(1.1);
+        }
+
+        .close-button:active {
+            transform: scale(0.95);
+            background: var(--card-bg);
+        }
+
+        /* === THEME OVERRIDES === */
+        .text-slate-100,
+        .text-slate-200,
+        .text-slate-300,
+        .text-slate-400,
+        .text-slate-500 {
             color: var(--text-primary) !important;
         }
-        [data-theme="light"] .text-slate-400 {
+        .text-slate-400 {
             color: var(--text-secondary) !important;
         }
-        [data-theme="light"] .text-slate-500 {
+        .text-slate-500 {
             color: var(--text-tertiary) !important;
         }
-        [data-theme="light"] .bg-slate-800,
-        [data-theme="light"] .bg-slate-700,
-        [data-theme="light"] .bg-slate-900 {
+        .bg-slate-800,
+        .bg-slate-700,
+        .bg-slate-900 {
             background-color: var(--card-bg) !important;
         }
-        [data-theme="light"] .border-slate-700,
-        [data-theme="light"] .border-slate-600 {
+        .border-slate-700,
+        .border-slate-600 {
             border-color: var(--border-color) !important;
         }
-        [data-theme="light"] .bg-slate-800\/50,
-        [data-theme="light"] .bg-slate-800\/80,
-        [data-theme="light"] .bg-slate-800\/90 {
+        .bg-slate-800\/50,
+        .bg-slate-800\/80,
+        .bg-slate-800\/90 {
             background-color: rgba(255, 255, 255, 0.9) !important;
         }
-        [data-theme="light"] .text-indigo-400 {
+        .text-indigo-400 {
             color: #8B5CF6 !important;
         }
-        [data-theme="light"] .bg-indigo-500 {
+        .bg-indigo-500 {
             background-color: #8B5CF6 !important;
         }
-        [data-theme="light"] .bg-indigo-600 {
+        .bg-indigo-600 {
             background-color: #7C3AED !important;
         }
-        [data-theme="light"] body {
+        body {
             background: linear-gradient(135deg, #FEF9F3 0%, #FFFBF5 50%, #FEF9F3 100%);
             transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
-        [data-theme="light"] .fast-card {
+        .fast-card {
             background: linear-gradient(135deg, #FFFFFF 0%, #FFFEF9 100%);
             border: 1px solid rgba(212, 175, 55, 0.15);
         }
-        [data-theme="light"] .glass-panel {
+        .glass-panel {
             background: rgba(255, 255, 255, 0.96);
             backdrop-filter: blur(20px) saturate(180%);
             border-bottom: 1px solid rgba(212, 175, 55, 0.12);
         }
-        [data-theme="light"] .glass-heavy {
+        .glass-heavy {
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(24px) saturate(180%);
             border-top: 1px solid rgba(212, 175, 55, 0.15);
@@ -710,26 +640,17 @@
             border: 2px solid var(--meat-option-selected-border);
             color: var(--meat-option-selected-text);
             font-weight: 700;
-            box-shadow: 0 4px 16px rgba(251, 191, 36, 0.25);
-            transform: translateY(-2px) scale(1.05);
-        }
-        
-        [data-theme="light"] .meat-option.selected {
             box-shadow: 0 4px 16px rgba(212, 175, 55, 0.25);
+            transform: translateY(-2px) scale(1.05);
         }
         
         /* === STYLES FOR POINTS SYSTEM === */
         .points-discount-active {
-            background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(251, 191, 36, 0.05));
-            border: 1px solid rgba(251, 191, 36, 0.3);
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(212, 175, 55, 0.05));
+            border: 1px solid rgba(212, 175, 55, 0.3);
             border-radius: 0.75rem;
             padding: 0.75rem;
             margin-top: 0.5rem;
-        }
-        
-        [data-theme="light"] .points-discount-active {
-            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(212, 175, 55, 0.05));
-            border: 1px solid rgba(212, 175, 55, 0.3);
         }
         
         /* === STYLES FOR CHECKOUT LAYOUT === */
@@ -762,55 +683,6 @@
             font-size: 0.75rem !important;
         }
         
-        /* === แก้ไขข้อ 6: ปุ่มเปลี่ยนธีมใหม่ === */
-        #theme-toggle-new {
-            position: fixed;
-            top: 1rem;
-            right: 1rem;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #FBBF24 0%, #D97706 100%);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 24px rgba(251, 191, 36, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            backdrop-filter: blur(12px);
-            flex-shrink: 0;
-            z-index: 100;
-        }
-        
-        #theme-toggle-new:hover {
-            transform: scale(1.15) rotate(20deg);
-            box-shadow: 0 12px 32px rgba(251, 191, 36, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.3);
-        }
-        
-        #theme-toggle-new:active {
-            transform: scale(0.92) rotate(20deg);
-        }
-        
-        #theme-toggle-new i {
-            font-size: 1.3rem;
-            color: white;
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        
-        #theme-toggle-new:hover i {
-            transform: rotate(200deg) scale(1.1);
-        }
-        
-        [data-theme="light"] #theme-toggle-new {
-            background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%);
-            border-color: rgba(255, 255, 255, 0.5);
-            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.3);
-        }
-        
-        [data-theme="light"] #theme-toggle-new:hover {
-            box-shadow: 0 12px 32px rgba(212, 175, 55, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.4);
-        }
         
         /* === สไตล์สำหรับแสดงราคาส่วนลด === */
         .price-breakdown {
@@ -842,10 +714,6 @@
 
     <div id="bubbles-container"></div>
 
-    <!-- ปุ่มเปลี่ยนธีมใหม่ (แก้ไขข้อ 6) -->
-    <button id="theme-toggle-new" onclick="toggleTheme()" aria-label="สลับธีม">
-        <i class="fas fa-moon" id="theme-icon-new"></i>
-    </button>
 
     <div id="global-loader">
         <div class="relative mb-4">
@@ -1107,7 +975,7 @@
                     <input type="text" id="user-name" maxlength="20" placeholder="ชื่อผู้สั่ง" class="bg-transparent w-full text-sm outline-none text-slate-200 placeholder:text-slate-500">
                 </div>
                 
-                <div class="bg-slate-800 rounded-lg p-2 flex items-center justify-between gap-2 border border-slate-700">
+                <div id="code-input-container" class="bg-slate-800 rounded-lg p-2 flex items-center justify-between gap-2 border border-slate-700">
                     <div class="flex items-center gap-2 w-full">
                         <i class="fas fa-ticket-alt text-slate-400 text-sm" id="code-icon"></i>
                         <input type="text" id="discount-code" placeholder="โค้ด" class="bg-transparent w-full text-sm outline-none text-slate-200 placeholder:text-slate-500 uppercase">
@@ -1696,59 +1564,10 @@
         document.addEventListener('DOMContentLoaded', createBubbles);
         
         // === ENHANCED THEME MANAGEMENT ===
-        function initTheme() {
-            // Check system preference
-            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const savedTheme = localStorage.getItem('kaprao52_theme') || (systemPrefersDark ? 'dark' : 'light');
-            
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            updateThemeIcon(savedTheme);
-            updateMetaThemeColor(savedTheme);
-            
-            // Listen for system theme changes
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-                if (!localStorage.getItem('kaprao52_theme')) {
-                    const newTheme = e.matches ? 'dark' : 'light';
-                    document.documentElement.setAttribute('data-theme', newTheme);
-                    updateThemeIcon(newTheme);
-                    updateMetaThemeColor(newTheme);
-                }
-            });
-        }
         
-        function toggleTheme() {
-            const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('kaprao52_theme', newTheme);
-            updateThemeIcon(newTheme);
-            updateMetaThemeColor(newTheme);
-            
-            // Animation effect
-            triggerHaptic('medium');
-            playSound('pop');
-            
-            // Show toast
-            showToast(newTheme === 'light' ? '✨ เปลี่ยนเป็น Light Theme แล้ว' : '🌙 เปลี่ยนเป็น Dark Theme แล้ว', 'success');
-        }
         
-        function updateThemeIcon(theme) {
-            const icon = document.getElementById('theme-icon-new');
-            if (icon) {
-                icon.className = theme === 'light' ? 'fas fa-sun' : 'fas fa-moon';
-            }
-        }
         
-        function updateMetaThemeColor(theme) {
-            const metaTheme = document.querySelector('meta[name="theme-color"]');
-            if (metaTheme) {
-                metaTheme.content = theme === 'light' ? '#FEF9F3' : '#0F172A';
-            }
-        }
         
-        // Initialize theme on load
-        initTheme();
 
         // --- STATE MANAGEMENT ---
         let cart = [];
@@ -1904,6 +1723,7 @@
                 }
                 
                 updateTotalSummary();
+                updatePriceBreakdown();
                 showToast(`ใช้ ${pointsRedeemed} พอยต์ ส่วนลด ${discountFromPoints}.-`);
             } else {
                 // ปิดใช้งานพอยต์
@@ -2061,7 +1881,6 @@
                 if (serverVerMatch && serverVerMatch[1]) {
                     const serverVer = serverVerMatch[1];
                     if (serverVer !== CURRENT_VERSION) {
-                        console.log(`New version found: ${serverVer} (Current: ${CURRENT_VERSION})`);
                         if ('caches' in window) {
                             try {
                                 const names = await caches.keys();
@@ -2073,7 +1892,6 @@
                     }
                 }
             } catch (err) {
-                console.log("Check update failed (Offline?)", err);
             }
         }
 
@@ -2117,7 +1935,6 @@
                     localStorage.setItem(KEYS.HISTORY, JSON.stringify(lottoHistory));
                     updateTicketBadge();
                     autoCheckLottery(); 
-                    console.log("History Synced from Server");
                 }
 
             } catch (e) {
@@ -2205,7 +2022,6 @@
                                 orderIds: localHistoryIds
                             })
                         }).then(() => {
-                            console.log("Claim request sent.");
                             syncUserStatsFromServer(profile.userId); 
                             syncTicketHistory(profile.userId);       
                         });
@@ -2317,9 +2133,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Initialize theme first
-            initTheme();
-            
             const savedVer = localStorage.getItem(KEYS.VERSION);
             if(savedVer !== CURRENT_VERSION) {
                 localStorage.setItem(KEYS.VERSION, CURRENT_VERSION);
@@ -3548,10 +3361,10 @@
 
             if (code === '') {
                 msg.innerText = '';
-                inputContainer.className = "bg-slate-800 rounded-lg p-2 pl-4 flex items-center border border-slate-700 shadow-sm justify-between transition-colors";
+                inputContainer.className = "bg-white rounded-lg p-2 pl-4 flex items-center border border-slate-300 shadow-sm justify-between transition-colors";
                 btn.innerHTML = 'ใช้โค้ด';
                 btn.className = 'btn-bounce bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-3 py-1 rounded transition-colors font-bold whitespace-nowrap active:bg-indigo-700';
-                btn.onclick = applyDiscount; 
+                btn.onclick = applyDiscount;
                 updateTotalSummary();
                 updatePriceBreakdown();
                 return;
@@ -3562,18 +3375,18 @@
             if (promo && total >= promo.minOrder) {
                 discountValue = promo.value;
                 msg.innerHTML = `<span class="text-green-400"><i class="fas fa-check-circle"></i> ใช้โค้ดลด ${promo.value} บาท</span>`;
-                inputContainer.className = "input-success rounded-lg p-2 pl-4 flex items-center border shadow-sm justify-between transition-colors";
+                inputContainer.className = "bg-green-50 border-green-300 rounded-lg p-2 pl-4 flex items-center border shadow-sm justify-between transition-colors";
                 btn.innerHTML = '<i class="fas fa-times"></i> ยกเลิก';
                 btn.className = 'btn-bounce bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded transition-colors font-bold whitespace-nowrap';
                 btn.onclick = removeDiscount;
                 playSound('pop');
-            } 
+            }
             else {
                 msg.innerHTML = `<span class="text-red-400">${promo ? 'ต้องสั่งครบ '+promo.minOrder : 'ไม่พบโค้ด'}</span>`;
-                inputContainer.className = "bg-slate-800 rounded-lg p-2 pl-4 flex items-center border border-red-500/50 shadow-sm justify-between transition-colors"; 
+                inputContainer.className = "bg-red-50 rounded-lg p-2 pl-4 flex items-center border border-red-300 shadow-sm justify-between transition-colors";
                 btn.innerHTML = 'ใช้โค้ด';
-                btn.className = 'btn-bounce bg-gray-800 hover:bg-gray-700 text-white text-xs px-3 py-1 rounded transition-colors font-bold whitespace-nowrap active:bg-gray-900';
-                btn.onclick = applyDiscount; 
+                btn.className = 'btn-bounce bg-gray-500 hover:bg-gray-600 text-white text-xs px-3 py-1 rounded transition-colors font-bold whitespace-nowrap active:bg-gray-700';
+                btn.onclick = applyDiscount;
             }
             updateTotalSummary();
             updatePriceBreakdown();
@@ -3584,6 +3397,7 @@
             document.getElementById('discount-msg').innerText = '';
             discountValue = 0;
             applyDiscount();
+            updatePriceBreakdown();
         }
 
         function updateTotalSummary() {
