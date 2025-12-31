@@ -3340,6 +3340,9 @@
                 document.getElementById('mini-total').innerText = total + " ฿";
             } else {
                 miniBar.classList.add('hidden');
+                // Reset mini cart display when empty
+                document.getElementById('mini-count').innerText = '0';
+                document.getElementById('mini-total').innerText = '0 ฿';
             }
         }
 
@@ -3382,12 +3385,39 @@
             if(!confirm('คุณต้องการล้างตะกร้าทั้งหมดใช่ไหม?')) return;
             sfxTrash.play();
             cart = [];
+            discountValue = 0;
+            pointsRedeemed = 0;
+            currentOrderId = "";
+            
+            // Reset discount code input
+            document.getElementById('discount-code').value = '';
+            document.getElementById('discount-msg').innerText = '';
+            
+            // Reset points input
+            const pointsInput = document.getElementById('points-to-use');
+            if (pointsInput) {
+                pointsInput.value = '';
+                pointsInput.disabled = false;
+            }
+            
+            const pointsDiscountDisplay = document.getElementById('points-discount-display');
+            if (pointsDiscountDisplay) pointsDiscountDisplay.classList.add('hidden');
+            
+            const pointsCancelContainer = document.getElementById('points-cancel-container');
+            if (pointsCancelContainer) pointsCancelContainer.classList.add('hidden');
+            
             saveToLS();
-            removeDiscount();
-            resetPointsDiscount();
+            
+            // Update UI components
             updateMiniCart();
+            renderCheckoutList();
+            updateTotalSummary();
             closeCheckout();
             showToast('ล้างตะกร้าเรียบร้อย 🗑️');
+            
+            // Hide order ID banner
+            const bannerContainer = document.getElementById('order-id-banner');
+            if (bannerContainer) bannerContainer.classList.add('hidden');
         }
 
         function applyDiscount() {
@@ -3687,6 +3717,7 @@
                     cart = []; 
                     discountValue = 0;
                     pointsRedeemed = 0;
+                    currentOrderId = "";
                     saveToLS();
                     updateMiniCart();
                     closeCheckout();
