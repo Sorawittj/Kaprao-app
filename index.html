@@ -723,6 +723,75 @@
             box-shadow: 0 12px 32px rgba(212, 175, 55, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.4);
         }
 
+        /* === STYLES FOR MEAT SELECTION OPTIONS === */
+        .meat-option {
+            background: var(--meat-option-bg);
+            border: 2px solid var(--meat-option-border);
+            color: var(--meat-option-text);
+            border-radius: 1rem;
+            padding: 0.75rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-align: center;
+            min-width: 100px;
+            flex-shrink: 0;
+        }
+        
+        .meat-option:hover {
+            background: var(--meat-option-hover-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .meat-option.selected {
+            background: var(--meat-option-selected-bg);
+            border: 2px solid var(--meat-option-selected-border);
+            color: var(--meat-option-selected-text);
+            font-weight: 700;
+            box-shadow: 0 4px 16px rgba(251, 191, 36, 0.25);
+            transform: translateY(-2px) scale(1.05);
+        }
+        
+        [data-theme="light"] .meat-option.selected {
+            box-shadow: 0 4px 16px rgba(212, 175, 55, 0.25);
+        }
+        
+        /* === STYLES FOR POINTS SYSTEM === */
+        .points-discount-active {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(251, 191, 36, 0.05));
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            border-radius: 0.75rem;
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        
+        [data-theme="light"] .points-discount-active {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(212, 175, 55, 0.05));
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+        
+        /* === STYLES FOR CHECKOUT LAYOUT === */
+        #checkout-sheet {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #cart-list-container {
+            flex: 1;
+            min-height: 0; /* Important for flex scrolling */
+            padding-top: 1rem;
+        }
+        
+        .checkout-fixed-section {
+            flex-shrink: 0;
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 1.5rem;
+            margin-top: auto;
+        }
+
     </style>
 </head>
 <body class="pb-32 font-sans select-none relative overflow-x-hidden safe-area-pt">
@@ -971,9 +1040,16 @@
             </div>
         </div>
         
-        <div id="cart-list-container" class="flex-1 overflow-y-auto px-6 py-4 space-y-3 hide-scroll"></div>
+        <!-- ORDER ID BANNER - MOVED TO TOP OF CONTENT -->
+        <div id="order-id-banner" class="hidden mx-6 mt-4 mb-2">
+            <!-- Will be populated by JavaScript -->
+        </div>
         
-        <div class="p-6 bg-slate-900/90 backdrop-blur-md rounded-t-[2rem] space-y-3 border-t border-slate-700/50">
+        <!-- CART ITEMS SECTION -->
+        <div id="cart-list-container" class="flex-1 overflow-y-auto px-6 py-2 space-y-3 hide-scroll"></div>
+        
+        <!-- FIXED INPUTS SECTION -->
+        <div class="checkout-fixed-section space-y-3">
             <div class="bg-slate-800 rounded-xl p-3 flex items-center border border-slate-700 shadow-sm gap-2">
                 <i class="fas fa-user text-slate-400 ml-1"></i>
                 <input type="text" id="user-name" maxlength="20" placeholder="ชื่อผู้สั่ง" class="bg-transparent w-full text-base outline-none text-slate-200 placeholder:text-slate-500">
@@ -1015,6 +1091,14 @@
                     <div id="points-discount-display" class="hidden"></div>
                     <div id="points-earned-info" class="mt-3"></div>
                     <div id="points-upsell-msg" class="text-xs text-center mt-2 p-2 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-yellow-400 font-bold hidden"></div>
+                    
+                    <!-- Add Cancel Points Button -->
+                    <div id="points-cancel-container" class="hidden mt-3">
+                        <button onclick="cancelPointsDiscount()" class="btn-bounce w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 rounded-lg transition-all text-sm flex items-center justify-center gap-2">
+                            <i class="fas fa-times"></i>
+                            ยกเลิกการใช้พอยต์
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -1726,6 +1810,11 @@
                 return;
             }
             
+            if (pointsToUse === 0) {
+                showToast('กรุณากรอกจำนวนพอยต์ที่ต้องการใช้', 'warning');
+                return;
+            }
+            
             // Calculate discount (100 points = 10 THB)
             pointsRedeemed = pointsToUse;
             const discountFromPoints = Math.floor(pointsRedeemed / 100) * 10;
@@ -1735,31 +1824,70 @@
             
             // Update UI
             const pointsDiscountDisplay = document.getElementById('points-discount-display');
-            if (pointsDiscountDisplay) {
-                if (discountFromPoints > 0) {
-                    pointsDiscountDisplay.classList.remove('hidden');
-                    pointsDiscountDisplay.innerHTML = `
-                        <div class="flex justify-between items-center text-sm">
-                            <span class="text-green-400">ส่วนลดจากพอยต์</span>
+            const pointsCancelContainer = document.getElementById('points-cancel-container');
+            
+            if (discountFromPoints > 0) {
+                pointsDiscountDisplay.classList.remove('hidden');
+                pointsDiscountDisplay.innerHTML = `
+                    <div class="points-discount-active">
+                        <div class="flex justify-between items-center text-sm mb-1">
+                            <span class="text-green-400 font-bold">ส่วนลดจากพอยต์</span>
                             <span class="font-bold text-green-400">-${discountFromPoints}.-</span>
                         </div>
-                    `;
-                } else {
-                    pointsDiscountDisplay.classList.add('hidden');
-                }
+                        <div class="flex justify-between items-center text-xs text-slate-400">
+                            <span>ใช้พอยต์ไป ${pointsRedeemed} พอยต์</span>
+                            <span>คงเหลือ ${userPoints - pointsRedeemed} พอยต์</span>
+                        </div>
+                    </div>
+                `;
+                
+                // Show cancel button
+                pointsCancelContainer.classList.remove('hidden');
+                
+                // Disable input and apply button
+                pointsInput.disabled = true;
+            } else {
+                pointsDiscountDisplay.classList.add('hidden');
+                pointsCancelContainer.classList.add('hidden');
             }
             
             updateTotalSummary();
             showToast(`ใช้ ${pointsRedeemed} พอยต์ ส่วนลด ${discountFromPoints}.-`);
         }
 
-        function resetPointsDiscount() {
+        function cancelPointsDiscount() {
             pointsRedeemed = 0;
             const pointsInput = document.getElementById('points-to-use');
-            if (pointsInput) pointsInput.value = '';
+            if (pointsInput) {
+                pointsInput.value = '';
+                pointsInput.disabled = false;
+            }
             
             const pointsDiscountDisplay = document.getElementById('points-discount-display');
             if (pointsDiscountDisplay) pointsDiscountDisplay.classList.add('hidden');
+            
+            const pointsCancelContainer = document.getElementById('points-cancel-container');
+            if (pointsCancelContainer) pointsCancelContainer.classList.add('hidden');
+            
+            // Re-apply any code discount
+            applyDiscount();
+            
+            showToast('ยกเลิกการใช้พอยต์แล้ว');
+        }
+
+        function resetPointsDiscount() {
+            pointsRedeemed = 0;
+            const pointsInput = document.getElementById('points-to-use');
+            if (pointsInput) {
+                pointsInput.value = '';
+                pointsInput.disabled = false;
+            }
+            
+            const pointsDiscountDisplay = document.getElementById('points-discount-display');
+            if (pointsDiscountDisplay) pointsDiscountDisplay.classList.add('hidden');
+            
+            const pointsCancelContainer = document.getElementById('points-cancel-container');
+            if (pointsCancelContainer) pointsCancelContainer.classList.add('hidden');
             
             // Re-apply any code discount
             applyDiscount();
@@ -2079,12 +2207,12 @@
             openModal(selectedItem);
         }
 
-        // --- ฟังก์ชันสร้างเมนูเลือกเนื้อสัตว์ ---
+        // --- ฟังก์ชันสร้างเมนูเลือกเนื้อสัตว์ (แก้ไขแล้ว) ---
         function createMeatOptions() {
             const container = document.getElementById('meat-options-container');
             container.innerHTML = '';
             
-                const meatOptions = [
+            const meatOptions = [
                 { value: 'สันคอ', label: 'สันคอ' },
                 { value: 'หมูสับ', label: 'หมูสับ' },
                 { value: 'หมูเด้ง', label: 'หมูเด้ง' }
@@ -2093,7 +2221,7 @@
             meatOptions.forEach((meat, index) => {
                 const optionId = `meat-option-${meat.value}`;
                 const label = document.createElement('label');
-                label.className = 'cursor-pointer flex-shrink-0 meat-option-container';
+                label.className = 'cursor-pointer flex-shrink-0';
                 
                 const input = document.createElement('input');
                 input.type = 'radio';
@@ -3152,27 +3280,32 @@
             playSound('pop');
             renderCheckoutList();
             if(document.getElementById('discount-code').value.trim() !== '' && discountValue > 0) applyDiscount();
+            
+            // Show Order ID Banner
+            const bannerContainer = document.getElementById('order-id-banner');
             if(cart.length > 0) {
-                 const lottoId = generateOrderId(); 
-                 const listContainer = document.getElementById('cart-list-container');
-                 const lottoBanner = document.createElement('div');
-                 lottoBanner.className = "bg-slate-800 border border-slate-700 p-4 rounded-xl mb-4 flex justify-between items-center shadow-sm relative overflow-hidden stagger-item";
-                 lottoBanner.innerHTML = `
-                    <div class="absolute -right-4 -top-4 bg-indigo-500/20 opacity-50 w-20 h-20 rounded-full"></div>
-                    <div class="flex flex-col z-10">
-                        <span class="text-[10px] text-slate-400 uppercase tracking-wider">Order ID ของคุณ</span>
-                        <div class="flex items-baseline gap-1">
-                            <span class="font-bold text-xl text-slate-200">${lottoId.slice(0, -2)}</span>
-                            <span class="font-black text-3xl text-yellow-500 drop-shadow-sm">${lottoId.slice(-2)}</span>
+                const lottoId = generateOrderId(); 
+                bannerContainer.classList.remove('hidden');
+                bannerContainer.innerHTML = `
+                    <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl mb-2 flex justify-between items-center shadow-sm relative overflow-hidden stagger-item">
+                        <div class="absolute -right-4 -top-4 bg-indigo-500/20 opacity-50 w-20 h-20 rounded-full"></div>
+                        <div class="flex flex-col z-10">
+                            <span class="text-[10px] text-slate-400 uppercase tracking-wider">Order ID ของคุณ</span>
+                            <div class="flex items-baseline gap-1">
+                                <span class="font-bold text-xl text-slate-200">${lottoId.slice(0, -2)}</span>
+                                <span class="font-black text-3xl text-yellow-500 drop-shadow-sm">${lottoId.slice(-2)}</span>
+                            </div>
+                        </div>
+                        <div class="z-10 text-right">
+                            <div class="text-2xl">🎟️</div>
+                            <span class="text-[10px] font-bold text-slate-300">ลุ้นหวยงวดนี้!</span>
                         </div>
                     </div>
-                    <div class="z-10 text-right">
-                        <div class="text-2xl">🎟️</div>
-                        <span class="text-[10px] font-bold text-slate-300">ลุ้นหวยงวดนี้!</span>
-                    </div>
-                 `;
-                 listContainer.insertBefore(lottoBanner, listContainer.firstChild);
+                `;
+            } else {
+                bannerContainer.classList.add('hidden');
             }
+            
             const overlay = document.getElementById('checkout-overlay');
             const sheet = document.getElementById('checkout-sheet');
             sheet.style.transform = '';
