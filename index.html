@@ -769,6 +769,110 @@
             background: linear-gradient(135deg, #C7D2FE 0%, #A5B4FC 100%);
         }
 
+        /* === New Stepper Styles === */
+        .stepper-container {
+            display: flex;
+            align-items: center;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            height: 40px;
+        }
+        
+        .stepper-btn {
+            width: 40px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-tertiary);
+            border: none;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .stepper-btn:hover {
+            background: var(--card-hover);
+        }
+        
+        .stepper-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .stepper-decrease {
+            border-right: 1px solid var(--border-color);
+        }
+        
+        .stepper-increase {
+            border-left: 1px solid var(--border-color);
+        }
+        
+        .stepper-input {
+            flex: 1;
+            text-align: center;
+            border: none;
+            background: transparent;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            outline: none;
+            padding: 0 0.5rem;
+        }
+        
+        /* === Toggle Switch Styles === */
+        .toggle-switch {
+            position: relative;
+            width: 52px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+        
+        .toggle-checkbox {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            position: absolute;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        .toggle-checkbox:checked + .toggle-slider {
+            background-color: #F59E0B;
+        }
+        
+        .toggle-checkbox:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        
+        .toggle-checkbox:focus + .toggle-slider {
+            box-shadow: 0 0 1px #F59E0B;
+        }
+
     </style>
 </head>
 <body class="pb-32 font-sans select-none relative overflow-x-hidden safe-area-pt">
@@ -991,106 +1095,150 @@
         </div>
     </div>
 
+    <!-- UPDATED CHECKOUT SHEET - REFACTORED LAYOUT -->
     <div id="checkout-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden transition-opacity opacity-0" onclick="closeCheckout()"></div>
-    <!-- แก้ไขข้อ 1: ปรับโครงสร้าง checkout sheet -->
-    <div id="checkout-sheet" class="fixed bottom-0 left-0 right-0 glass-heavy rounded-t-[2.5rem] z-50 transform translate-y-full transition-transform duration-300 shadow-2xl max-w-md mx-auto h-[85vh] flex flex-col touch-pan-y">
+    
+    <div id="checkout-sheet" class="fixed bottom-0 w-full h-[90vh] flex flex-col max-w-md mx-auto z-50 transform translate-y-full transition-transform duration-300 bg-slate-900/95 backdrop-blur-xl rounded-t-[2.5rem] overflow-hidden shadow-2xl">
         
-        <div id="checkout-drag-handle" class="w-full flex justify-center pt-4 pb-2 cursor-grab active:cursor-grabbing z-50">
-            <div class="w-12 h-1.5 bg-slate-600 rounded-full"></div>
-        </div>
-
-        <div class="px-6 pb-2 border-b border-slate-700/50 flex justify-between items-center">
-            <h2 class="text-xl font-bold text-slate-200">สรุปออเดอร์</h2>
-            <div class="flex gap-2">
-                <button onclick="clearCart()" class="btn-bounce w-11 h-11 rounded-full bg-red-500/20 flex items-center justify-center text-red-400 active:bg-red-500/30 transition-all"><i class="fas fa-trash text-xs"></i></button>
-                
-                <button onclick="generateOrderCard()" class="btn-bounce h-11 px-4 rounded-full bg-indigo-500/20 flex items-center gap-2 text-indigo-400 font-bold text-xs active:bg-indigo-500/30 transition-all shadow-sm border border-indigo-500/30">
-                    <i class="fas fa-download"></i>
-                    <span>บันทึกบิล</span>
-                </button>
-
-                <button onclick="closeCheckout()" class="btn-bounce w-11 h-11 rounded-full close-button flex items-center justify-center active:bg-slate-600 transition-all"><i class="fas fa-times text-sm"></i></button>
-            </div>
-        </div>
-        
-        <!-- ORDER ID BANNER - MOVED TO TOP OF CONTENT -->
-        <div id="order-id-banner" class="hidden mx-6 mt-4 mb-2">
-            <!-- Will be populated by JavaScript -->
-        </div>
-        
-        <!-- CART ITEMS SECTION -->
-        <div id="cart-list-container" class="flex-1 overflow-y-auto px-6 py-2 space-y-2 hide-scroll"></div>
-        
-        <!-- ราคาส่วนลดแสดงแยก (แก้ไขข้อ 3) -->
-        <div id="price-breakdown-container" class="hidden mx-6 mt-2">
-            <!-- จะแสดงรายละเอียดราคา -->
-        </div>
-        
-        <!-- FIXED INPUTS SECTION - COMPACT REDESIGN -->
-        <div class="checkout-fixed-section space-y-2 pb-4">
-            <!-- Row 1: User Name | Discount Code -->
-            <div class="grid grid-cols-2 gap-2">
-                <div class="bg-slate-800 rounded-lg p-2 flex items-center gap-2 border border-slate-700">
-                    <i class="fas fa-user text-slate-400 text-sm ml-1"></i>
-                    <input type="text" id="user-name" maxlength="20" placeholder="ชื่อผู้สั่ง" class="bg-transparent w-full text-sm outline-none text-slate-200 placeholder:text-slate-500">
-                </div>
-                
-                <div id="code-input-container" class="bg-slate-800 rounded-lg p-2 flex items-center justify-between gap-2 border border-slate-700">
-                    <div class="flex items-center gap-2 w-full">
-                        <i class="fas fa-ticket-alt text-slate-400 text-sm" id="code-icon"></i>
-                        <input type="text" id="discount-code" placeholder="โค้ด" class="bg-transparent w-full text-sm outline-none text-slate-200 placeholder:text-slate-500 uppercase">
-                    </div>
-                    <button onclick="applyDiscount()" id="btn-apply-code" class="btn-bounce bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-3 py-1 rounded transition-colors font-bold whitespace-nowrap active:bg-indigo-700">ใช้</button>
-                </div>
+        <!-- ZONE A: FIXED HEADER -->
+        <div class="flex-none pt-4 pb-2 px-6 border-b border-slate-700/50">
+            <!-- Drag Handle -->
+            <div class="w-full flex justify-center mb-2">
+                <div class="w-12 h-1.5 bg-slate-600 rounded-full"></div>
             </div>
             
-            <p id="discount-msg" class="text-xs h-4 pl-1 font-medium"></p>
-
-            <!-- Row 2: Points System - Compact -->
-            <div class="space-y-2" id="points-section">
-                <div class="bg-slate-800 rounded-lg p-3 border border-slate-700">
-                    <div class="flex items-center justify-between mb-2">
-                        <div class="flex items-center gap-2">
-                            <i class="fas fa-coins text-yellow-500 text-sm"></i>
-                            <span class="text-sm font-bold text-slate-200">พอยต์</span>
-                        </div>
-                        <span id="user-points-balance" class="font-bold text-yellow-500 text-sm">0</span>
+            <!-- Title Row -->
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="text-xl font-bold text-slate-200">สรุปออเดอร์</h2>
+                <button onclick="closeCheckout()" class="btn-bounce w-11 h-11 rounded-full close-button flex items-center justify-center">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+            
+            <!-- Order ID Card -->
+            <div id="order-id-banner" class="hidden mb-3">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- ZONE B: SCROLLABLE CONTENT -->
+        <div id="checkout-scrollable" class="flex-1 overflow-y-auto hide-scroll">
+            <!-- Cart Items -->
+            <div id="cart-list-container" class="px-6 py-4 space-y-3"></div>
+            
+            <!-- Inputs Section -->
+            <div class="px-6 py-4 space-y-4">
+                <!-- User Name Input -->
+                <div>
+                    <label class="text-xs font-bold text-slate-300 mb-2 block">ชื่อผู้สั่ง / Note</label>
+                    <div class="bg-slate-800 rounded-lg p-3 flex items-center gap-2 border border-slate-700">
+                        <i class="fas fa-user text-slate-400 text-sm"></i>
+                        <input type="text" id="user-name" maxlength="20" placeholder="เช่น พี่กะเพรา" 
+                               class="bg-transparent w-full text-sm outline-none text-slate-200 placeholder:text-slate-500">
                     </div>
-                    
+                </div>
+                
+                <!-- Discount Code Input -->
+                <div>
+                    <label class="text-xs font-bold text-slate-300 mb-2 block">โค้ดส่วนลด</label>
                     <div class="flex gap-2">
-                        <input type="number" id="points-to-use" min="0" max="1000" 
-                               placeholder="ใช้พอยต์ (100=10.-)" 
-                               class="flex-1 bg-slate-900 border border-slate-700 rounded p-2 text-sm text-center text-slate-200 placeholder:text-slate-500">
-                        <!-- แก้ไขข้อ 2: ปุ่มใช้/ยกเลิกพอยต์ -->
-                        <button onclick="togglePointsDiscount()" id="btn-toggle-points" class="btn-bounce bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded font-bold whitespace-nowrap text-sm min-w-[60px]">
+                        <div class="flex-1 bg-slate-800 rounded-lg p-3 flex items-center gap-2 border border-slate-700">
+                            <i class="fas fa-ticket-alt text-slate-400 text-sm" id="code-icon"></i>
+                            <input type="text" id="discount-code" placeholder="SAVE10, SAVE25, SAVE50" 
+                                   class="bg-transparent w-full text-sm outline-none text-slate-200 placeholder:text-slate-500 uppercase">
+                        </div>
+                        <button onclick="applyDiscount()" id="btn-apply-code" 
+                                class="btn-bounce bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 rounded-lg transition-colors whitespace-nowrap text-sm">
                             ใช้
                         </button>
                     </div>
-                    
-                    <div id="points-discount-display" class="hidden mt-2"></div>
-                    
-                    <!-- Points Info Compact -->
-                    <div id="points-earned-info" class="mt-2 text-xs"></div>
-                    <div id="points-upsell-msg" class="text-xs text-center mt-1 p-1 bg-yellow-500/10 border border-yellow-500/30 rounded text-yellow-400 font-bold hidden"></div>
-                </div>
-            </div>
-
-            <!-- Row 3: Total and Confirm - แก้ไขข้อ 1: ปรับโครงสร้าง -->
-            <div class="flex justify-between items-center pt-2 border-t border-slate-700/50">
-                <div class="flex flex-col">
-                    <span class="text-slate-400 text-xs">ยอดสุทธิ</span>
-                    <span id="sheet-grand-total" class="text-xl font-bold text-indigo-400">0 ฿</span>
+                    <p id="discount-msg" class="text-xs h-4 mt-1 font-medium"></p>
                 </div>
                 
-                <button onclick="submitOrderToLine()" id="btn-submit-order" class="btn-bounce btn-gradient text-white font-bold py-3 px-6 rounded-xl shadow-lg active:scale-95 transition-all flex justify-center items-center gap-2 text-base">
-                    <span>ยืนยันการสั่ง</span>
-                    <i class="fas fa-paper-plane text-sm"></i>
-                </button>
+                <!-- Points System - Redesigned -->
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="text-xs font-bold text-slate-300">ใช้พอยต์ส่วนลด</label>
+                        <span id="user-points-balance" class="text-xs font-bold text-yellow-500">มี <span id="available-points">0</span> พอยต์</span>
+                    </div>
+                    
+                    <!-- Toggle Switch + Stepper -->
+                    <div class="space-y-3">
+                        <!-- Toggle Row -->
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-slate-300">ใช้พอยต์</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="points-toggle" class="toggle-checkbox" onclick="togglePointsUsage()">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <!-- Stepper (Hidden by default) -->
+                        <div id="points-stepper-container" class="hidden">
+                            <div class="stepper-container">
+                                <button onclick="adjustPoints(-100)" class="stepper-btn stepper-decrease text-slate-400">
+                                    -
+                                </button>
+                                <input type="text" id="points-input" value="100" 
+                                       class="stepper-input" readonly>
+                                <span class="text-xs text-slate-400 mr-2">พอยต์</span>
+                                <button onclick="adjustPoints(100)" class="stepper-btn stepper-increase text-slate-400">
+                                    +
+                                </button>
+                            </div>
+                            <div class="flex justify-between items-center mt-2">
+                                <span class="text-xs text-slate-400">ส่วนลดจะได้รับ:</span>
+                                <span id="points-discount-amount" class="text-xs font-bold text-green-400">10.-</span>
+                            </div>
+                            <p class="text-xs text-slate-400 mt-1">100 พอยต์ = ส่วนลด 10 บาท</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Price Breakdown (Inside scroll area) -->
+                <div id="price-summary" class="mt-4 pt-4 border-t border-slate-700/50">
+                    <!-- Will be populated by JavaScript -->
+                </div>
             </div>
         </div>
         
-        <!-- Padding สำหรับ safe area -->
-        <div class="safe-area-pb"></div>
+        <!-- ZONE C: STICKY FOOTER -->
+        <div class="flex-none bg-slate-900/95 backdrop-blur-xl border-t border-slate-700/50 px-6 py-4 space-y-3">
+            <!-- Upsell Banner -->
+            <div id="points-upsell-msg" class="text-center text-xs p-2 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-yellow-400 font-bold hidden">
+                <!-- Will be populated by JavaScript -->
+            </div>
+            
+            <!-- Order Summary -->
+            <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-slate-400">ยอดรวม</span>
+                    <span id="summary-subtotal" class="text-sm font-bold text-slate-200">0.-</span>
+                </div>
+                <div id="discount-summary" class="flex justify-between items-center text-xs hidden">
+                    <span class="text-green-400">ส่วนลดจากโค้ด</span>
+                    <span class="font-bold text-green-400">-0.-</span>
+                </div>
+                <div id="points-summary" class="flex justify-between items-center text-xs hidden">
+                    <span class="text-yellow-400">ส่วนลดจากพอยต์</span>
+                    <span class="font-bold text-yellow-400">-0.-</span>
+                </div>
+                <div class="flex justify-between items-center pt-2 border-t border-slate-700">
+                    <span class="text-lg font-bold text-slate-200">ยอดสุทธิ</span>
+                    <span id="summary-grand-total" class="text-2xl font-black text-indigo-400">0.-</span>
+                </div>
+            </div>
+            
+            <!-- Confirm Button -->
+            <button onclick="submitOrderToLine()" id="btn-submit-order" 
+                    class="btn-bounce w-full btn-gradient text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-all flex justify-center items-center gap-2 text-lg mt-2">
+                <span>ยืนยันการสั่ง</span>
+                <i class="fas fa-paper-plane text-sm"></i>
+            </button>
+            
+            <!-- Safe Area Padding -->
+            <div class="safe-area-pb"></div>
+        </div>
     </div>
 
     <div id="points-history-modal" class="fixed inset-0 z-[130] bg-black/50 backdrop-blur-sm flex items-center justify-center p-6 hidden">
@@ -1653,7 +1801,7 @@
         const CURRENT_VERSION = '21.0.1'; 
 
         // ============================================
-        // POINT SYSTEM FUNCTIONS
+        // UPDATED POINT SYSTEM FUNCTIONS FOR NEW UI
         // ============================================
 
         function calculatePoints(netTotal) {
@@ -1679,6 +1827,7 @@
         function updatePointsDisplay() {
             const points = userStats.points || 0;
             document.getElementById('points-count').innerText = points;
+            document.getElementById('available-points').innerText = points;
             
             // Update checkout display if open
             updateCheckoutPointsInfo();
@@ -1692,17 +1841,7 @@
             // Update user points balance in checkout
             const userPointsBalance = document.getElementById('user-points-balance');
             if (userPointsBalance) {
-                userPointsBalance.innerText = userStats.points || 0;
-            }
-            
-            const pointsInfo = document.getElementById('points-earned-info');
-            if (pointsInfo) {
-                pointsInfo.innerHTML = `
-                    <div class="flex justify-between items-center text-xs">
-                        <span class="text-slate-300">พอยต์ที่จะได้รับ</span>
-                        <span class="font-bold text-yellow-500">+${pointsEarned}</span>
-                    </div>
-                `;
+                userPointsBalance.innerHTML = `มี <span id="available-points">${userStats.points || 0}</span> พอยต์`;
             }
             
             // Upsell message
@@ -1716,118 +1855,97 @@
                     upsellMsg.classList.add('hidden');
                 }
             }
+            
+            // Update summary
+            updateTotalSummary();
         }
 
-        // แก้ไขข้อ 2: ฟังก์ชันสลับใช้/ยกเลิกพอยต์
-        function togglePointsDiscount() {
-            const pointsInput = document.getElementById('points-to-use');
-            const btnToggle = document.getElementById('btn-toggle-points');
+        // NEW: Toggle points usage
+        function togglePointsUsage() {
+            const toggle = document.getElementById('points-toggle');
+            const stepperContainer = document.getElementById('points-stepper-container');
             
-            if (!isPointsActive) {
-                // เปิดใช้งานพอยต์
-                const pointsToUse = parseInt(pointsInput.value) || 0;
+            if (toggle.checked) {
+                // Turn ON points usage
                 const userPoints = userStats.points || 0;
-                
-                if (pointsToUse < 0) {
-                    showToast('กรุณากรอกจำนวนพอยต์ที่ถูกต้อง', 'error');
+                if (userPoints < 100) {
+                    showToast(`คุณมีพอยต์เพียง ${userPoints} พอยต์ (ต้องการอย่างน้อย 100 พอยต์)`, 'error');
+                    toggle.checked = false;
                     return;
                 }
                 
-                if (pointsToUse > userPoints) {
-                    showToast(`คุณมีพอยต์เพียง ${userPoints} พอยต์`, 'error');
-                    pointsInput.value = userPoints;
-                    return;
-                }
+                stepperContainer.classList.remove('hidden');
+                isPointsActive = true;
                 
-                if (pointsToUse === 0) {
-                    showToast('กรุณากรอกจำนวนพอยต์ที่ต้องการใช้', 'warning');
-                    return;
-                }
+                // Set initial points value (100 points minimum)
+                const pointsInput = document.getElementById('points-input');
+                pointsInput.value = '100';
+                updatePointsDiscount();
                 
-                // Calculate discount (100 points = 10 THB)
-                pointsRedeemed = pointsToUse;
-                const discountFromPoints = Math.floor(pointsRedeemed / 100) * 10;
-                
-                // Update discount value
-                discountValue = discountFromPoints;
-                
-                // Update UI
-                const pointsDiscountDisplay = document.getElementById('points-discount-display');
-                
-                if (discountFromPoints > 0) {
-                    pointsDiscountDisplay.classList.remove('hidden');
-                    pointsDiscountDisplay.innerHTML = `
-                        <div class="points-discount-active">
-                            <div class="flex justify-between items-center text-xs mb-1">
-                                <span class="text-green-400 font-bold">ส่วนลดจากพอยต์</span>
-                                <span class="font-bold text-green-400">-${discountFromPoints}.-</span>
-                            </div>
-                            <div class="flex justify-between items-center text-[10px] text-slate-400">
-                                <span>ใช้พอยต์ไป ${pointsRedeemed} พอยต์</span>
-                                <span>คงเหลือ ${userPoints - pointsRedeemed} พอยต์</span>
-                            </div>
-                        </div>
-                    `;
-                    
-                    // เปลี่ยนปุ่มเป็น "ยกเลิก"
-                    btnToggle.innerHTML = 'ยกเลิก';
-                    btnToggle.className = 'btn-bounce bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded font-bold whitespace-nowrap text-sm min-w-[60px]';
-                    btnToggle.onclick = togglePointsDiscount;
-                    
-                    // Disable input
-                    pointsInput.disabled = true;
-                    isPointsActive = true;
-                } else {
-                    pointsDiscountDisplay.classList.add('hidden');
-                }
-                
-                updateTotalSummary();
-                updatePriceBreakdown();
-                showToast(`ใช้ ${pointsRedeemed} พอยต์ ส่วนลด ${discountFromPoints}.-`, 'success');
+                showToast('เปิดใช้งานพอยต์ส่วนลดแล้ว', 'success');
             } else {
-                // ปิดใช้งานพอยต์
-                pointsRedeemed = 0;
-                const pointsDiscountDisplay = document.getElementById('points-discount-display');
-                if (pointsDiscountDisplay) pointsDiscountDisplay.classList.add('hidden');
-                
-                // เปลี่ยนปุ่มกลับเป็น "ใช้"
-                btnToggle.innerHTML = 'ใช้';
-                btnToggle.className = 'btn-bounce bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded font-bold whitespace-nowrap text-sm min-w-[60px]';
-                btnToggle.onclick = togglePointsDiscount;
-                
-                // Enable input
-                pointsInput.disabled = false;
-                pointsInput.value = '';
+                // Turn OFF points usage
+                stepperContainer.classList.add('hidden');
                 isPointsActive = false;
-                
-                // Re-apply any code discount
-                applyDiscount();
-                
-                showToast('ยกเลิกการใช้พอยต์แล้ว', 'info');
+                pointsRedeemed = 0;
+                updateTotalSummary();
+                showToast('ปิดใช้งานพอยต์ส่วนลดแล้ว', 'info');
             }
+            
+            triggerHaptic();
         }
 
+        // NEW: Adjust points with stepper
+        function adjustPoints(amount) {
+            const pointsInput = document.getElementById('points-input');
+            let currentPoints = parseInt(pointsInput.value) || 100;
+            const userPoints = userStats.points || 0;
+            
+            // Calculate new value
+            let newPoints = currentPoints + amount;
+            
+            // Apply constraints
+            if (newPoints < 100) newPoints = 100;
+            if (newPoints > userPoints) {
+                newPoints = userPoints;
+                showToast(`คุณมีพอยต์เพียง ${userPoints} พอยต์`, 'warning');
+            }
+            
+            // Update input
+            pointsInput.value = newPoints;
+            updatePointsDiscount();
+            triggerHaptic('light');
+        }
+
+        // NEW: Update points discount calculation
+        function updatePointsDiscount() {
+            const pointsInput = document.getElementById('points-input');
+            const pointsAmount = parseInt(pointsInput.value) || 0;
+            const discountAmount = Math.floor(pointsAmount / 100) * 10;
+            
+            // Update display
+            const discountDisplay = document.getElementById('points-discount-amount');
+            if (discountDisplay) {
+                discountDisplay.textContent = `${discountAmount}.-`;
+            }
+            
+            // Update state
+            pointsRedeemed = pointsAmount;
+            discountValue = discountAmount;
+            updateTotalSummary();
+        }
+
+        // NEW: Reset points discount for new UI
         function resetPointsDiscount() {
-            pointsRedeemed = 0;
+            const toggle = document.getElementById('points-toggle');
+            const stepperContainer = document.getElementById('points-stepper-container');
+            
+            toggle.checked = false;
+            stepperContainer.classList.add('hidden');
             isPointsActive = false;
-            const pointsInput = document.getElementById('points-to-use');
-            if (pointsInput) {
-                pointsInput.value = '';
-                pointsInput.disabled = false;
-            }
+            pointsRedeemed = 0;
             
-            const btnToggle = document.getElementById('btn-toggle-points');
-            if (btnToggle) {
-                btnToggle.innerHTML = 'ใช้';
-                btnToggle.className = 'btn-bounce bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded font-bold whitespace-nowrap text-sm min-w-[60px]';
-                btnToggle.onclick = togglePointsDiscount;
-            }
-            
-            const pointsDiscountDisplay = document.getElementById('points-discount-display');
-            if (pointsDiscountDisplay) pointsDiscountDisplay.classList.add('hidden');
-            
-            // Re-apply any code discount
-            applyDiscount();
+            updateTotalSummary();
         }
 
         function openPointsHistory() {
@@ -3209,7 +3327,7 @@
                 const lottoId = generateOrderId(); 
                 bannerContainer.classList.remove('hidden');
                 bannerContainer.innerHTML = `
-                    <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl mb-2 flex justify-between items-center shadow-sm relative overflow-hidden stagger-item">
+                    <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl mb-3 flex justify-between items-center shadow-sm relative overflow-hidden stagger-item">
                         <div class="absolute -right-4 -top-4 bg-indigo-500/20 opacity-50 w-20 h-20 rounded-full"></div>
                         <div class="flex flex-col z-10">
                             <span class="text-[10px] text-slate-400 uppercase tracking-wider">Order ID ของคุณ</span>
@@ -3227,6 +3345,9 @@
             } else {
                 bannerContainer.classList.add('hidden');
             }
+            
+            // Reset points toggle
+            resetPointsDiscount();
             
             const overlay = document.getElementById('checkout-overlay');
             const sheet = document.getElementById('checkout-sheet');
@@ -3289,6 +3410,7 @@
             }
         }
 
+        // UPDATED: Render checkout list for new layout
         function renderCheckoutList() {
             const container = document.getElementById('cart-list-container');
             container.innerHTML = '';
@@ -3327,23 +3449,8 @@
             document.getElementById('discount-code').value = '';
             document.getElementById('discount-msg').innerText = '';
             
-            // Reset points input
-            const pointsInput = document.getElementById('points-to-use');
-            if (pointsInput) {
-                pointsInput.value = '';
-                pointsInput.disabled = false;
-            }
-            
-            // Reset points button
-            const btnToggle = document.getElementById('btn-toggle-points');
-            if (btnToggle) {
-                btnToggle.innerHTML = 'ใช้';
-                btnToggle.className = 'btn-bounce bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded font-bold whitespace-nowrap text-sm min-w-[60px]';
-                btnToggle.onclick = togglePointsDiscount;
-            }
-            
-            const pointsDiscountDisplay = document.getElementById('points-discount-display');
-            if (pointsDiscountDisplay) pointsDiscountDisplay.classList.add('hidden');
+            // Reset points toggle
+            resetPointsDiscount();
             
             saveToLS();
             
@@ -3357,79 +3464,68 @@
             // Hide order ID banner
             const bannerContainer = document.getElementById('order-id-banner');
             if (bannerContainer) bannerContainer.classList.add('hidden');
-            
-            // Hide price breakdown
-            const priceBreakdownContainer = document.getElementById('price-breakdown-container');
-            if (priceBreakdownContainer) priceBreakdownContainer.classList.add('hidden');
         }
 
-        function updatePriceBreakdown() {
-            const container = document.getElementById('price-breakdown-container');
-            const subtotal = cart.reduce((sum, i) => sum + i.price, 0);
+        // UPDATED: Total summary for new layout
+        function updateTotalSummary() {
+            let subtotal = cart.reduce((sum, i) => sum + i.price, 0);
             let discountFromCode = 0;
             let discountFromPoints = 0;
             
-            // คำนวณส่วนลดจากโค้ด
+            // Calculate code discount
             const code = document.getElementById('discount-code').value.trim().toUpperCase();
             const promo = promotions.find(p => p.code === code);
             if (promo && subtotal >= promo.minOrder) {
                 discountFromCode = promo.value;
             }
             
-            // คำนวณส่วนลดจากพอยต์
+            // Calculate points discount
             if (pointsRedeemed > 0) {
                 discountFromPoints = Math.floor(pointsRedeemed / 100) * 10;
             }
             
             const netTotal = Math.max(0, subtotal - discountFromCode - discountFromPoints);
             
-            // แสดงผลเมื่อมีส่วนลด
-            if (discountFromCode > 0 || discountFromPoints > 0) {
-                container.classList.remove('hidden');
-                container.innerHTML = `
-                    <div class="price-breakdown">
-                        <div class="price-line">
-                            <span class="text-slate-300">ราคารวม</span>
-                            <span class="font-bold text-slate-200">${subtotal}.-</span>
-                        </div>
-                        ${discountFromCode > 0 ? `
-                        <div class="price-line discount-line">
-                            <span>ส่วนลดจากโค้ด</span>
-                            <span class="font-bold">-${discountFromCode}.-</span>
-                        </div>` : ''}
-                        ${discountFromPoints > 0 ? `
-                        <div class="price-line points-line">
-                            <span>ส่วนลดจากพอยต์</span>
-                            <span class="font-bold">-${discountFromPoints}.-</span>
-                        </div>` : ''}
-                        <div class="price-line pt-2 border-t border-slate-600">
-                            <span class="font-bold text-indigo-400">ยอดสุทธิ</span>
-                            <span class="font-bold text-xl text-indigo-400">${netTotal}.-</span>
-                        </div>
-                    </div>
-                `;
+            // Update summary displays
+            document.getElementById('summary-subtotal').textContent = `${subtotal}.-`;
+            document.getElementById('summary-grand-total').textContent = `${netTotal}.-`;
+            
+            // Update discount summary
+            const discountSummary = document.getElementById('discount-summary');
+            const pointsSummary = document.getElementById('points-summary');
+            
+            if (discountFromCode > 0) {
+                discountSummary.classList.remove('hidden');
+                discountSummary.querySelector('span:last-child').textContent = `-${discountFromCode}.-`;
             } else {
-                container.classList.add('hidden');
+                discountSummary.classList.add('hidden');
             }
+            
+            if (discountFromPoints > 0) {
+                pointsSummary.classList.remove('hidden');
+                pointsSummary.querySelector('span:last-child').textContent = `-${discountFromPoints}.-`;
+            } else {
+                pointsSummary.classList.add('hidden');
+            }
+            
+            // Update points upsell message
+            updateCheckoutPointsInfo();
         }
 
         function applyDiscount() {
             const code = document.getElementById('discount-code').value.trim().toUpperCase();
             let total = cart.reduce((sum, i) => sum + i.price, 0);
             const msg = document.getElementById('discount-msg');
-            const inputContainer = document.getElementById('code-input-container');
             const btn = document.getElementById('btn-apply-code');
             
             discountValue = 0;
 
             if (code === '') {
                 msg.innerText = '';
-                inputContainer.className = "bg-slate-800 rounded-lg p-2 flex items-center gap-2 border border-slate-700 justify-between";
                 btn.innerHTML = 'ใช้';
-                btn.className = 'btn-bounce bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-3 py-1 rounded transition-colors font-bold whitespace-nowrap active:bg-indigo-700';
+                btn.className = 'btn-bounce bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 rounded-lg transition-colors whitespace-nowrap text-sm';
                 btn.onclick = applyDiscount;
                 updateTotalSummary();
-                updatePriceBreakdown();
                 return;
             }
 
@@ -3438,21 +3534,18 @@
             if (promo && total >= promo.minOrder) {
                 discountValue = promo.value;
                 msg.innerHTML = `<span class="text-green-400"><i class="fas fa-check-circle"></i> ใช้โค้ดลด ${promo.value} บาท</span>`;
-                inputContainer.className = "bg-green-500/20 border-green-300 rounded-lg p-2 pl-4 flex items-center border shadow-sm justify-between transition-colors";
                 btn.innerHTML = '<i class="fas fa-times"></i> ยกเลิก';
-                btn.className = 'btn-bounce bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded transition-colors font-bold whitespace-nowrap';
+                btn.className = 'btn-bounce bg-red-500 hover:bg-red-600 text-white font-bold px-4 rounded-lg transition-colors whitespace-nowrap text-sm';
                 btn.onclick = removeDiscount;
                 playSound('pop');
             }
             else {
                 msg.innerHTML = `<span class="text-red-400">${promo ? 'ต้องสั่งครบ '+promo.minOrder : 'ไม่พบโค้ด'}</span>`;
-                inputContainer.className = "bg-red-500/20 rounded-lg p-2 pl-4 flex items-center border border-red-300 shadow-sm justify-between transition-colors";
                 btn.innerHTML = 'ใช้';
-                btn.className = 'btn-bounce bg-gray-500 hover:bg-gray-600 text-white text-xs px-3 py-1 rounded transition-colors font-bold whitespace-nowrap active:bg-gray-700';
+                btn.className = 'btn-bounce bg-gray-500 hover:bg-gray-600 text-white font-bold px-4 rounded-lg transition-colors whitespace-nowrap text-sm';
                 btn.onclick = applyDiscount;
             }
             updateTotalSummary();
-            updatePriceBreakdown();
         }
 
         function removeDiscount() {
@@ -3460,31 +3553,6 @@
             document.getElementById('discount-msg').innerText = '';
             discountValue = 0;
             applyDiscount();
-            updatePriceBreakdown();
-        }
-
-        function updateTotalSummary() {
-            let total = cart.reduce((sum, i) => sum + i.price, 0);
-            let discountFromCode = 0;
-            let discountFromPoints = 0;
-            
-            // คำนวณส่วนลดจากโค้ด
-            const code = document.getElementById('discount-code').value.trim().toUpperCase();
-            const promo = promotions.find(p => p.code === code);
-            if (promo && total >= promo.minOrder) {
-                discountFromCode = promo.value;
-            }
-            
-            // คำนวณส่วนลดจากพอยต์
-            if (pointsRedeemed > 0) {
-                discountFromPoints = Math.floor(pointsRedeemed / 100) * 10;
-            }
-            
-            const final = Math.max(0, total - discountFromCode - discountFromPoints);
-            document.getElementById('sheet-grand-total').innerText = final + " ฿";
-            
-            // Update points info
-            updateCheckoutPointsInfo();
         }
 
         function openReceiptResult(imgData) {
@@ -3817,7 +3885,7 @@
                 if (_modalContent && _modalScroll) enableSwipeToClose(_modalContent, _modalScroll, closeModal);
 
                 const _checkoutSheet = document.getElementById('checkout-sheet');
-                const _cartList = document.getElementById('cart-list-container');
+                const _cartList = document.getElementById('checkout-scrollable');
                 if (_checkoutSheet && _cartList) enableSwipeToClose(_checkoutSheet, _cartList, closeCheckout);
 
                 const _ticketsSheet = document.getElementById('tickets-sheet');
@@ -3862,11 +3930,6 @@
                 // Apply discount code
                 if (activeElement && activeElement.id === 'discount-code') {
                     applyDiscount();
-                }
-                
-                // Apply points discount
-                if (activeElement && activeElement.id === 'points-to-use') {
-                    togglePointsDiscount();
                 }
             }
             
