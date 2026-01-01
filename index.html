@@ -1079,7 +1079,8 @@
         </div>
     </div>
 
-    <div id="mini-cart-bar" class="fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom))] left-5 right-5 z-40 hidden stagger-item">
+    <!-- FIX 3: Added z-[60] to mini-cart-bar -->
+    <div id="mini-cart-bar" class="fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom))] left-5 right-5 z-[60] hidden stagger-item">
         <div onclick="openCheckout()" class="btn-bounce bg-slate-800/95 text-slate-100 p-4 rounded-full shadow-2xl flex justify-between items-center cursor-pointer border border-slate-700">
             <div class="flex items-center gap-3 pl-2">
                 <div class="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center text-slate-900 font-bold shadow-lg" id="mini-count">0</div>
@@ -1098,7 +1099,8 @@
     <!-- UPDATED CHECKOUT SHEET - REFACTORED LAYOUT -->
     <div id="checkout-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden transition-opacity opacity-0" onclick="closeCheckout()"></div>
     
-    <div id="checkout-sheet" class="fixed bottom-0 w-full h-[90vh] flex flex-col max-w-md mx-auto z-50 transform translate-y-full transition-transform duration-300 bg-slate-900/95 backdrop-blur-xl rounded-t-[2.5rem] overflow-hidden shadow-2xl">
+    <!-- FIX 3: Added z-[70] to checkout-sheet -->
+    <div id="checkout-sheet" class="fixed bottom-0 w-full h-[90vh] flex flex-col max-w-md mx-auto z-[70] transform translate-y-full transition-transform duration-300 bg-slate-900/95 backdrop-blur-xl rounded-t-[2.5rem] overflow-hidden shadow-2xl">
         
         <!-- ZONE A: FIXED HEADER -->
         <div class="flex-none pt-4 pb-2 px-6 border-b border-slate-700/50">
@@ -1142,7 +1144,8 @@
                 <div>
                     <label class="text-xs font-bold text-slate-300 mb-2 block">โค้ดส่วนลด</label>
                     <div class="flex gap-2">
-                        <div class="flex-1 bg-slate-800 rounded-lg p-3 flex items-center gap-2 border border-slate-700">
+                        <!-- FIX 2: Added id="code-input-container" -->
+                        <div id="code-input-container" class="flex-1 bg-slate-800 rounded-lg p-3 flex items-center gap-2 border border-slate-700">
                             <i class="fas fa-ticket-alt text-slate-400 text-sm" id="code-icon"></i>
                             <input type="text" id="discount-code" placeholder="SAVE10, SAVE25, SAVE50" 
                                    class="bg-transparent w-full text-sm outline-none text-slate-200 placeholder:text-slate-500 uppercase">
@@ -1833,6 +1836,7 @@
             updateCheckoutPointsInfo();
         }
 
+        // FIX 1: Removed the circular dependency - updateCheckoutPointsInfo should NOT call updateTotalSummary
         function updateCheckoutPointsInfo() {
             const subtotal = cart.reduce((sum, i) => sum + i.price, 0);
             const netTotal = Math.max(0, subtotal - discountValue);
@@ -1856,8 +1860,8 @@
                 }
             }
             
-            // Update summary
-            updateTotalSummary();
+            // CRITICAL FIX: REMOVED the call to updateTotalSummary() to break the infinite loop
+            // The total summary will be updated separately when needed
         }
 
         // NEW: Toggle points usage
@@ -3313,50 +3317,58 @@
             currentOpenModal = null;
         }
 
+        // FIX 4: Added try-catch wrapper to openCheckout function
         function openCheckout() {
-            pushModalState('checkout'); 
+            try {
+                pushModalState('checkout'); 
 
-            triggerHaptic();
-            playSound('pop');
-            renderCheckoutList();
-            if(document.getElementById('discount-code').value.trim() !== '' && discountValue > 0) applyDiscount();
-            
-            // Show Order ID Banner
-            const bannerContainer = document.getElementById('order-id-banner');
-            if(cart.length > 0) {
-                const lottoId = generateOrderId(); 
-                bannerContainer.classList.remove('hidden');
-                bannerContainer.innerHTML = `
-                    <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl mb-3 flex justify-between items-center shadow-sm relative overflow-hidden stagger-item">
-                        <div class="absolute -right-4 -top-4 bg-indigo-500/20 opacity-50 w-20 h-20 rounded-full"></div>
-                        <div class="flex flex-col z-10">
-                            <span class="text-[10px] text-slate-400 uppercase tracking-wider">Order ID ของคุณ</span>
-                            <div class="flex items-baseline gap-1">
-                                <span class="font-bold text-xl text-slate-200">${lottoId.slice(0, -2)}</span>
-                                <span class="font-black text-3xl text-yellow-500 drop-shadow-sm">${lottoId.slice(-2)}</span>
+                triggerHaptic();
+                playSound('pop');
+                renderCheckoutList();
+                if(document.getElementById('discount-code').value.trim() !== '' && discountValue > 0) applyDiscount();
+                
+                // Show Order ID Banner
+                const bannerContainer = document.getElementById('order-id-banner');
+                if(cart.length > 0) {
+                    const lottoId = generateOrderId(); 
+                    bannerContainer.classList.remove('hidden');
+                    bannerContainer.innerHTML = `
+                        <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl mb-3 flex justify-between items-center shadow-sm relative overflow-hidden stagger-item">
+                            <div class="absolute -right-4 -top-4 bg-indigo-500/20 opacity-50 w-20 h-20 rounded-full"></div>
+                            <div class="flex flex-col z-10">
+                                <span class="text-[10px] text-slate-400 uppercase tracking-wider">Order ID ของคุณ</span>
+                                <div class="flex items-baseline gap-1">
+                                    <span class="font-bold text-xl text-slate-200">${lottoId.slice(0, -2)}</span>
+                                    <span class="font-black text-3xl text-yellow-500 drop-shadow-sm">${lottoId.slice(-2)}</span>
+                                </div>
+                            </div>
+                            <div class="z-10 text-right">
+                                <div class="text-2xl">🎟️</div>
+                                <span class="text-[10px] font-bold text-slate-300">ลุ้นหวยงวดนี้!</span>
                             </div>
                         </div>
-                        <div class="z-10 text-right">
-                            <div class="text-2xl">🎟️</div>
-                            <span class="text-[10px] font-bold text-slate-300">ลุ้นหวยงวดนี้!</span>
-                        </div>
-                    </div>
-                `;
-            } else {
-                bannerContainer.classList.add('hidden');
+                    `;
+                } else {
+                    bannerContainer.classList.add('hidden');
+                }
+                
+                // Reset points toggle
+                resetPointsDiscount();
+                
+                const overlay = document.getElementById('checkout-overlay');
+                const sheet = document.getElementById('checkout-sheet');
+                sheet.style.transform = '';
+                overlay.classList.remove('hidden');
+                setTimeout(() => {
+                    overlay.classList.remove('opacity-0');
+                    sheet.classList.remove('translate-y-full');
+                }, 10);
+            } catch (error) {
+                // FIX 4: Alert error message for debugging
+                alert('Error in openCheckout: ' + error.message);
+                console.error('openCheckout error:', error);
+                throw error;
             }
-            
-            // Reset points toggle
-            resetPointsDiscount();
-            
-            const overlay = document.getElementById('checkout-overlay');
-            const sheet = document.getElementById('checkout-sheet');
-            sheet.style.transform = '';
-            overlay.classList.remove('hidden');
-            setTimeout(() => {
-                overlay.classList.remove('opacity-0');
-                sheet.classList.remove('translate-y-full');
-            }, 10);
         }
 
         function closeCheckout(isBackNav = false) {
@@ -3508,7 +3520,7 @@
                 pointsSummary.classList.add('hidden');
             }
             
-            // Update points upsell message
+            // FIX 1: Call updateCheckoutPointsInfo instead of it calling us (prevents infinite loop)
             updateCheckoutPointsInfo();
         }
 
