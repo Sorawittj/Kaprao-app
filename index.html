@@ -484,7 +484,13 @@
                     <span id="points-count" class="text-3xl font-black text-yellow-500">0</span>
                     <span class="text-sm text-gray-400">พอยต์</span>
                 </div>
-                <p class="text-[10px] text-gray-400 mt-1">100 พอยต์ ใช้แทนเงิน 10 บาท</p>
+                <!-- Refresh Button Added Here -->
+                <div class="flex items-center gap-2 mt-1 text-[10px] text-gray-400">
+                    <span>100 พอยต์ ใช้แทนเงิน 10 บาท</span>
+                    <button id="refresh-points-btn" onclick="manualRefreshPoints()" class="text-indigo-500 hover:text-indigo-700 p-1" aria-label="รีเฟรชพอยต์">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -525,15 +531,32 @@
             </div>
         </div>
         
+        <!-- Corrected Tab Order: Kaprao -> Tray -> Garlic -->
         <div id="tabs-container" class="sticky top-0 z-30 pt-2 pb-4 -mx-5 px-5 flex gap-3 snap-x scroll-smooth overflow-x-auto hide-scroll transition-all">
-            <button onclick="switchCategory('tray')" id="tab-tray" class="category-pill category-pill-tray snap-start"><span class="text-xl tab-icon">🍱</span><span class="text-xs font-bold">ชุดถาด</span></button>
-            <button onclick="switchCategory('kaprao')" id="tab-kaprao" class="category-pill category-pill-inactive snap-start"><span class="text-xl tab-icon">🌶️</span><span class="text-xs">กะเพรา</span></button>
-            <button onclick="switchCategory('garlic')" id="tab-garlic" class="category-pill category-pill-inactive snap-start"><span class="text-xl tab-icon">🧄</span><span class="text-xs">กระเทียม</span></button>
-            <button onclick="switchCategory('noodle')" id="tab-noodle" class="category-pill category-pill-inactive snap-start"><span class="text-xl tab-icon">🍜</span><span class="text-xs">เมนูเส้น</span></button>
-            <button onclick="switchCategory('soup')" id="tab-soup" class="category-pill category-pill-inactive snap-start"><span class="text-xl tab-icon">🍲</span><span class="text-xs">แกง/ต้ม</span></button>
-            <button onclick="switchCategory('others')" id="tab-others" class="category-pill category-pill-inactive snap-start"><span class="text-xl tab-icon">🍳</span><span class="text-xs">อื่นๆ</span></button>
-            <button onclick="switchCategory('dessert')" id="tab-dessert" class="category-pill category-pill-inactive snap-start"><span class="text-xl tab-icon">🍨</span><span class="text-xs">ของหวาน</span></button>
-            <button onclick="switchCategory('promotion')" id="tab-promotion" class="category-pill category-pill-promotion snap-start"><span class="text-xl tab-icon">🧧</span><span class="text-xs font-bold">ส่วนลด</span></button>
+            <button onclick="switchCategory('kaprao')" id="tab-kaprao" class="category-pill category-pill-active snap-start">
+                <span class="text-xl tab-icon">🌶️</span><span class="text-xs">กะเพรา</span>
+            </button>
+            <button onclick="switchCategory('tray')" id="tab-tray" class="category-pill category-pill-inactive snap-start">
+                <span class="text-xl tab-icon">🍱</span><span class="text-xs font-bold">ชุดถาด</span>
+            </button>
+            <button onclick="switchCategory('garlic')" id="tab-garlic" class="category-pill category-pill-inactive snap-start">
+                <span class="text-xl tab-icon">🧄</span><span class="text-xs">กระเทียม</span>
+            </button>
+            <button onclick="switchCategory('noodle')" id="tab-noodle" class="category-pill category-pill-inactive snap-start">
+                <span class="text-xl tab-icon">🍜</span><span class="text-xs">เมนูเส้น</span>
+            </button>
+            <button onclick="switchCategory('soup')" id="tab-soup" class="category-pill category-pill-inactive snap-start">
+                <span class="text-xl tab-icon">🍲</span><span class="text-xs">แกง/ต้ม</span>
+            </button>
+            <button onclick="switchCategory('others')" id="tab-others" class="category-pill category-pill-inactive snap-start">
+                <span class="text-xl tab-icon">🍳</span><span class="text-xs">อื่นๆ</span>
+            </button>
+            <button onclick="switchCategory('dessert')" id="tab-dessert" class="category-pill category-pill-inactive snap-start">
+                <span class="text-xl tab-icon">🍨</span><span class="text-xs">ของหวาน</span>
+            </button>
+            <button onclick="switchCategory('promotion')" id="tab-promotion" class="category-pill category-pill-promotion snap-start">
+                <span class="text-xl tab-icon">🧧</span><span class="text-xs font-bold">ส่วนลด</span>
+            </button>
         </div>
 
         <div class="mb-4 mt-2">
@@ -1425,6 +1448,24 @@
             } catch (error) { isSyncing = false; }
         }
 
+        // --- NEW: Manual Refresh Points ---
+        async function manualRefreshPoints() {
+            const btn = document.getElementById('refresh-points-btn');
+            if(isSyncing) return;
+            
+            // UI Feedback
+            btn.classList.add('animate-spin');
+            
+            if (userAvatar.userId) {
+                await syncUserStatsFromServer(userAvatar.userId);
+                showToast('อัปเดตพอยต์แล้ว! 🪙', 'success');
+            } else {
+                showToast('กรุณาเข้าสู่ระบบก่อนครับ', 'warning');
+            }
+            
+            setTimeout(() => btn.classList.remove('animate-spin'), 1000);
+        }
+
         async function initLIFF() {
             try {
                 await liff.init({ liffId: MY_LIFF_ID });
@@ -1659,11 +1700,19 @@
             grid.classList.add('page-out');
             if(!msg.classList.contains('hidden')) msg.classList.add('page-out');
             
-            const categories = ['tray', 'kaprao', 'garlic', 'noodle', 'soup', 'others', 'dessert', 'promotion'];
+            const categories = ['kaprao', 'tray', 'garlic', 'noodle', 'soup', 'others', 'dessert', 'promotion'];
             categories.forEach(c => {
                 const btn = document.getElementById(`tab-${c}`);
-                if (c === cat) btn.className = `category-pill snap-start category-pill-active ${c==='promotion'?'category-pill-promotion':''} ${c==='tray'?'category-pill-tray':''}`;
-                else btn.className = `category-pill snap-start category-pill-inactive ${c==='promotion'?'category-pill-promotion':''} ${c==='tray'?'category-pill-tray':''}`;
+                if (c === cat) {
+                    let extraClass = '';
+                    if (c === 'promotion') extraClass = 'category-pill-promotion';
+                    else if (c === 'tray') extraClass = 'category-pill-tray';
+                    btn.className = `category-pill snap-start category-pill-active ${extraClass}`;
+                } else {
+                    let extraClass = '';
+                    if (c === 'promotion') extraClass = 'category-pill-promotion opacity-60';
+                    btn.className = `category-pill snap-start category-pill-inactive ${extraClass}`;
+                }
             });
 
             setTimeout(() => {
