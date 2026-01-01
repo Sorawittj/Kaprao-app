@@ -873,9 +873,92 @@
             box-shadow: 0 0 1px #F59E0B;
         }
 
+        /* === NEW: Range Slider Styles === */
+        .points-range-container {
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+        
+        .points-range {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: linear-gradient(to right, #F59E0B, #D97706);
+            border-radius: 10px;
+            outline: none;
+        }
+        
+        .points-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #FFFFFF;
+            border: 3px solid #F59E0B;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .points-range::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .points-range::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #FFFFFF;
+            border: 3px solid #F59E0B;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
+        
+        .points-input-group {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+        
+        .points-input {
+            flex: 1;
+            background: var(--card-bg);
+            border: 1.5px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-align: center;
+            outline: none;
+        }
+        
+        .points-input:focus {
+            border-color: rgba(251, 191, 36, 0.6);
+            box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1);
+        }
+        
+        .points-input-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+        
+        .points-display {
+            font-size: 0.85rem;
+            color: #F59E0B;
+            font-weight: 600;
+            margin-top: 0.25rem;
+            text-align: center;
+        }
+
     </style>
 </head>
-<body class="pb-32 font-sans select-none relative overflow-x-hidden safe-area-pt">
+<body class="pb-40 font-sans select-none relative overflow-x-hidden safe-area-pt">
 
     <div id="bubbles-container"></div>
 
@@ -1079,8 +1162,8 @@
         </div>
     </div>
 
-    <!-- FIX 3: Added z-[60] to mini-cart-bar -->
-    <div id="mini-cart-bar" class="fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom))] left-5 right-5 z-[60] hidden stagger-item">
+    <!-- FIX 3: Added z-[60] to mini-cart-bar and increased bottom spacing -->
+    <div id="mini-cart-bar" class="fixed bottom-[calc(2.5rem+env(safe-area-inset-bottom))] left-5 right-5 z-[60] hidden stagger-item">
         <div onclick="openCheckout()" class="btn-bounce bg-slate-800/95 text-slate-100 p-4 rounded-full shadow-2xl flex justify-between items-center cursor-pointer border border-slate-700">
             <div class="flex items-center gap-3 pl-2">
                 <div class="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center text-slate-900 font-bold shadow-lg" id="mini-count">0</div>
@@ -1111,9 +1194,9 @@
             
             <!-- Title Row -->
             <div class="flex justify-between items-center mb-3">
-                <h2 class="text-xl font-bold text-slate-200">สรุปออเดอร์</h2>
+                <h2 class="text-xl font-bold text-slate-100">สรุปออเดอร์</h2>
                 <button onclick="closeCheckout()" class="btn-bounce w-11 h-11 rounded-full close-button flex items-center justify-center">
-                    <i class="fas fa-times text-sm"></i>
+                    <i class="fas fa-times text-sm text-slate-300"></i>
                 </button>
             </div>
             
@@ -1132,70 +1215,69 @@
             <div class="px-6 py-4 space-y-4">
                 <!-- User Name Input -->
                 <div>
-                    <label class="text-xs font-bold text-slate-300 mb-2 block">ชื่อผู้สั่ง / Note</label>
+                    <label class="text-xs font-bold text-slate-200 mb-2 block">ชื่อผู้สั่ง / Note</label>
                     <div class="bg-slate-800 rounded-lg p-3 flex items-center gap-2 border border-slate-700">
-                        <i class="fas fa-user text-slate-400 text-sm"></i>
+                        <i class="fas fa-user text-slate-300 text-sm"></i>
                         <input type="text" id="user-name" maxlength="20" placeholder="เช่น พี่กะเพรา" 
-                               class="bg-transparent w-full text-sm outline-none text-slate-200 placeholder:text-slate-500">
+                               class="bg-transparent w-full text-sm outline-none text-slate-100 placeholder:text-slate-400">
                     </div>
                 </div>
                 
                 <!-- Discount Code Input -->
                 <div>
-                    <label class="text-xs font-bold text-slate-300 mb-2 block">โค้ดส่วนลด</label>
+                    <label class="text-xs font-bold text-slate-200 mb-2 block">โค้ดส่วนลด</label>
                     <div class="flex gap-2">
                         <!-- FIX 2: Added id="code-input-container" -->
                         <div id="code-input-container" class="flex-1 bg-slate-800 rounded-lg p-3 flex items-center gap-2 border border-slate-700">
-                            <i class="fas fa-ticket-alt text-slate-400 text-sm" id="code-icon"></i>
-                            <input type="text" id="discount-code" placeholder="SAVE10, SAVE25, SAVE50" 
-                                   class="bg-transparent w-full text-sm outline-none text-slate-200 placeholder:text-slate-500 uppercase">
+                            <i class="fas fa-ticket-alt text-slate-300 text-sm" id="code-icon"></i>
+                            <input type="text" id="discount-code" placeholder="กรอกโค้ดส่วนลด" 
+                                   class="bg-transparent w-full text-sm outline-none text-slate-100 placeholder:text-slate-400 uppercase">
                         </div>
                         <button onclick="applyDiscount()" id="btn-apply-code" 
                                 class="btn-bounce bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 rounded-lg transition-colors whitespace-nowrap text-sm">
                             ใช้
                         </button>
                     </div>
-                    <p id="discount-msg" class="text-xs h-4 mt-1 font-medium"></p>
+                    <p id="discount-msg" class="text-xs h-4 mt-1 font-medium text-slate-300"></p>
                 </div>
                 
-                <!-- Points System - Redesigned -->
+                <!-- Points System - UPDATED WITH SLIDER & INPUT -->
                 <div>
-                    <div class="flex items-center justify-between mb-2">
-                        <label class="text-xs font-bold text-slate-300">ใช้พอยต์ส่วนลด</label>
-                        <span id="user-points-balance" class="text-xs font-bold text-yellow-500">มี <span id="available-points">0</span> พอยต์</span>
+                    <div class="flex items-center justify-between mb-3">
+                        <label class="text-xs font-bold text-slate-200">ใช้พอยต์ส่วนลด</label>
+                        <span id="user-points-balance" class="text-xs font-bold text-yellow-400">มี <span id="available-points">0</span> พอยต์</span>
                     </div>
                     
-                    <!-- Toggle Switch + Stepper -->
-                    <div class="space-y-3">
-                        <!-- Toggle Row -->
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-slate-300">ใช้พอยต์</span>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="points-toggle" class="toggle-checkbox" onclick="togglePointsUsage()">
-                                <span class="toggle-slider"></span>
-                            </label>
+                    <!-- NEW: Points Slider & Input -->
+                    <div id="points-controls-container" class="hidden space-y-4">
+                        <!-- Slider -->
+                        <div class="points-range-container">
+                            <input type="range" id="points-range" min="0" max="100" value="0" step="100" class="points-range">
+                            <div class="flex justify-between text-xs text-slate-400 mt-1">
+                                <span>0</span>
+                                <span id="points-max">100</span>
+                            </div>
                         </div>
                         
-                        <!-- Stepper (Hidden by default) -->
-                        <div id="points-stepper-container" class="hidden">
-                            <div class="stepper-container">
-                                <button onclick="adjustPoints(-100)" class="stepper-btn stepper-decrease text-slate-400">
-                                    -
-                                </button>
-                                <input type="text" id="points-input" value="100" 
-                                       class="stepper-input" readonly>
-                                <span class="text-xs text-slate-400 mr-2">พอยต์</span>
-                                <button onclick="adjustPoints(100)" class="stepper-btn stepper-increase text-slate-400">
-                                    +
-                                </button>
-                            </div>
-                            <div class="flex justify-between items-center mt-2">
-                                <span class="text-xs text-slate-400">ส่วนลดจะได้รับ:</span>
-                                <span id="points-discount-amount" class="text-xs font-bold text-green-400">10.-</span>
-                            </div>
-                            <p class="text-xs text-slate-400 mt-1">100 พอยต์ = ส่วนลด 10 บาท</p>
+                        <!-- Input Group -->
+                        <div class="points-input-group">
+                            <input type="number" id="points-input" min="0" max="100" step="100" value="0" class="points-input text-slate-100">
+                            <span class="points-input-label text-slate-300">พอยต์</span>
                         </div>
+                        
+                        <!-- Discount Display -->
+                        <div class="points-display">
+                            ส่วนลด: <span id="points-discount-amount">0</span> บาท
+                        </div>
+                        
+                        <p class="text-xs text-slate-400 mt-1 text-center">100 พอยต์ = ส่วนลด 10 บาท</p>
                     </div>
+                    
+                    <!-- Toggle Button (Replaces old toggle) -->
+                    <button id="points-toggle-btn" onclick="togglePointsUsage()" 
+                            class="btn-bounce w-full mt-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-3 rounded-xl transition-all border border-slate-700">
+                        <i class="fas fa-coins mr-2 text-yellow-400"></i> ใช้พอยต์ส่วนลด
+                    </button>
                 </div>
                 
                 <!-- Price Breakdown (Inside scroll area) -->
@@ -1205,18 +1287,18 @@
             </div>
         </div>
         
-        <!-- ZONE C: STICKY FOOTER -->
+        <!-- ZONE C: STICKY FOOTER - UPDATED FOR VISIBILITY -->
         <div class="flex-none bg-slate-900/95 backdrop-blur-xl border-t border-slate-700/50 px-6 py-4 space-y-3">
             <!-- Upsell Banner -->
-            <div id="points-upsell-msg" class="text-center text-xs p-2 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-yellow-400 font-bold hidden">
+            <div id="points-upsell-msg" class="text-center text-xs p-2 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-yellow-300 font-bold hidden">
                 <!-- Will be populated by JavaScript -->
             </div>
             
             <!-- Order Summary -->
             <div class="space-y-2">
                 <div class="flex justify-between items-center">
-                    <span class="text-sm text-slate-400">ยอดรวม</span>
-                    <span id="summary-subtotal" class="text-sm font-bold text-slate-200">0.-</span>
+                    <span class="text-sm text-slate-300">ยอดรวม</span>
+                    <span id="summary-subtotal" class="text-sm font-bold text-slate-100">0.-</span>
                 </div>
                 <div id="discount-summary" class="flex justify-between items-center text-xs hidden">
                     <span class="text-green-400">ส่วนลดจากโค้ด</span>
@@ -1227,17 +1309,19 @@
                     <span class="font-bold text-yellow-400">-0.-</span>
                 </div>
                 <div class="flex justify-between items-center pt-2 border-t border-slate-700">
-                    <span class="text-lg font-bold text-slate-200">ยอดสุทธิ</span>
-                    <span id="summary-grand-total" class="text-2xl font-black text-indigo-400">0.-</span>
+                    <span class="text-lg font-bold text-slate-100">ยอดสุทธิ</span>
+                    <span id="summary-grand-total" class="text-2xl font-black text-yellow-400">0.-</span>
                 </div>
             </div>
             
-            <!-- Confirm Button -->
-            <button onclick="submitOrderToLine()" id="btn-submit-order" 
-                    class="btn-bounce w-full btn-gradient text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-all flex justify-center items-center gap-2 text-lg mt-2">
-                <span>ยืนยันการสั่ง</span>
-                <i class="fas fa-paper-plane text-sm"></i>
-            </button>
+            <!-- Confirm Button - STICKY AT BOTTOM -->
+            <div class="mt-4 pt-4 border-t border-slate-700/50">
+                <button onclick="submitOrderToLine()" id="btn-submit-order" 
+                        class="btn-bounce w-full btn-gradient text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-all flex justify-center items-center gap-2 text-lg">
+                    <span>ยืนยันการสั่ง</span>
+                    <i class="fas fa-paper-plane text-sm"></i>
+                </button>
+            </div>
             
             <!-- Safe Area Padding -->
             <div class="safe-area-pb"></div>
@@ -1864,34 +1948,46 @@
             // The total summary will be updated separately when needed
         }
 
-        // NEW: Toggle points usage
+        // NEW: Enhanced points system with slider and input
         function togglePointsUsage() {
-            const toggle = document.getElementById('points-toggle');
-            const stepperContainer = document.getElementById('points-stepper-container');
+            const controlsContainer = document.getElementById('points-controls-container');
+            const toggleBtn = document.getElementById('points-toggle-btn');
+            const userPoints = userStats.points || 0;
             
-            if (toggle.checked) {
+            if (controlsContainer.classList.contains('hidden')) {
                 // Turn ON points usage
-                const userPoints = userStats.points || 0;
                 if (userPoints < 100) {
                     showToast(`คุณมีพอยต์เพียง ${userPoints} พอยต์ (ต้องการอย่างน้อย 100 พอยต์)`, 'error');
-                    toggle.checked = false;
                     return;
                 }
                 
-                stepperContainer.classList.remove('hidden');
+                controlsContainer.classList.remove('hidden');
                 isPointsActive = true;
+                toggleBtn.innerHTML = '<i class="fas fa-times mr-2"></i> ปิดใช้งานพอยต์';
+                toggleBtn.classList.remove('bg-slate-800');
+                toggleBtn.classList.add('bg-yellow-600', 'hover:bg-yellow-700');
                 
-                // Set initial points value (100 points minimum)
-                const pointsInput = document.getElementById('points-input');
-                pointsInput.value = '100';
-                updatePointsDiscount();
+                // Initialize slider and input
+                const maxPoints = Math.floor(userPoints / 100) * 100; // Round down to nearest 100
+                document.getElementById('points-range').max = maxPoints;
+                document.getElementById('points-max').textContent = maxPoints;
+                document.getElementById('points-input').max = maxPoints;
                 
+                // Set initial value to 100 or max if less than 100
+                const initialPoints = maxPoints >= 100 ? 100 : maxPoints;
+                document.getElementById('points-range').value = initialPoints;
+                document.getElementById('points-input').value = initialPoints;
+                
+                updatePointsDiscount(initialPoints);
                 showToast('เปิดใช้งานพอยต์ส่วนลดแล้ว', 'success');
             } else {
                 // Turn OFF points usage
-                stepperContainer.classList.add('hidden');
+                controlsContainer.classList.add('hidden');
                 isPointsActive = false;
                 pointsRedeemed = 0;
+                toggleBtn.innerHTML = '<i class="fas fa-coins mr-2 text-yellow-400"></i> ใช้พอยต์ส่วนลด';
+                toggleBtn.classList.remove('bg-yellow-600', 'hover:bg-yellow-700');
+                toggleBtn.classList.add('bg-slate-800', 'hover:bg-slate-700');
                 updateTotalSummary();
                 showToast('ปิดใช้งานพอยต์ส่วนลดแล้ว', 'info');
             }
@@ -1899,38 +1995,34 @@
             triggerHaptic();
         }
 
-        // NEW: Adjust points with stepper
-        function adjustPoints(amount) {
-            const pointsInput = document.getElementById('points-input');
-            let currentPoints = parseInt(pointsInput.value) || 100;
+        // NEW: Update points based on slider or input
+        function updatePointsFromUI(value) {
             const userPoints = userStats.points || 0;
+            let pointsValue = parseInt(value) || 0;
             
-            // Calculate new value
-            let newPoints = currentPoints + amount;
+            // Round to nearest 100
+            pointsValue = Math.round(pointsValue / 100) * 100;
             
             // Apply constraints
-            if (newPoints < 100) newPoints = 100;
-            if (newPoints > userPoints) {
-                newPoints = userPoints;
-                showToast(`คุณมีพอยต์เพียง ${userPoints} พอยต์`, 'warning');
-            }
+            if (pointsValue < 0) pointsValue = 0;
+            if (pointsValue > userPoints) pointsValue = Math.floor(userPoints / 100) * 100;
             
-            // Update input
-            pointsInput.value = newPoints;
-            updatePointsDiscount();
-            triggerHaptic('light');
+            // Update both inputs
+            document.getElementById('points-range').value = pointsValue;
+            document.getElementById('points-input').value = pointsValue;
+            
+            updatePointsDiscount(pointsValue);
         }
 
         // NEW: Update points discount calculation
-        function updatePointsDiscount() {
-            const pointsInput = document.getElementById('points-input');
-            const pointsAmount = parseInt(pointsInput.value) || 0;
+        function updatePointsDiscount(pointsAmount) {
+            pointsAmount = pointsAmount || parseInt(document.getElementById('points-input').value) || 0;
             const discountAmount = Math.floor(pointsAmount / 100) * 10;
             
             // Update display
             const discountDisplay = document.getElementById('points-discount-amount');
             if (discountDisplay) {
-                discountDisplay.textContent = `${discountAmount}.-`;
+                discountDisplay.textContent = `${discountAmount}`;
             }
             
             // Update state
@@ -1941,13 +2033,15 @@
 
         // NEW: Reset points discount for new UI
         function resetPointsDiscount() {
-            const toggle = document.getElementById('points-toggle');
-            const stepperContainer = document.getElementById('points-stepper-container');
+            const controlsContainer = document.getElementById('points-controls-container');
+            const toggleBtn = document.getElementById('points-toggle-btn');
             
-            toggle.checked = false;
-            stepperContainer.classList.add('hidden');
+            controlsContainer.classList.add('hidden');
             isPointsActive = false;
             pointsRedeemed = 0;
+            toggleBtn.innerHTML = '<i class="fas fa-coins mr-2 text-yellow-400"></i> ใช้พอยต์ส่วนลด';
+            toggleBtn.classList.remove('bg-yellow-600', 'hover:bg-yellow-700');
+            toggleBtn.classList.add('bg-slate-800', 'hover:bg-slate-700');
             
             updateTotalSummary();
         }
@@ -2348,6 +2442,26 @@
             renderMenu();
             // Micro-interactions (squash & stretch) setup
             try { setupMicroInteractions(); } catch(e) { /* safe fallback */ }
+
+            // Setup points slider and input events
+            const pointsRange = document.getElementById('points-range');
+            const pointsInput = document.getElementById('points-input');
+            
+            if (pointsRange) {
+                pointsRange.addEventListener('input', function() {
+                    updatePointsFromUI(this.value);
+                });
+            }
+            
+            if (pointsInput) {
+                pointsInput.addEventListener('input', function() {
+                    updatePointsFromUI(this.value);
+                });
+                
+                pointsInput.addEventListener('change', function() {
+                    updatePointsFromUI(this.value);
+                });
+            }
 
             // Ensure ARIA labels exist for buttons/inputs that lack them (friendly fallbacks)
             try {
@@ -3336,10 +3450,10 @@
                         <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl mb-3 flex justify-between items-center shadow-sm relative overflow-hidden stagger-item">
                             <div class="absolute -right-4 -top-4 bg-indigo-500/20 opacity-50 w-20 h-20 rounded-full"></div>
                             <div class="flex flex-col z-10">
-                                <span class="text-[10px] text-slate-400 uppercase tracking-wider">Order ID ของคุณ</span>
+                                <span class="text-[10px] text-slate-300 uppercase tracking-wider">Order ID ของคุณ</span>
                                 <div class="flex items-baseline gap-1">
-                                    <span class="font-bold text-xl text-slate-200">${lottoId.slice(0, -2)}</span>
-                                    <span class="font-black text-3xl text-yellow-500 drop-shadow-sm">${lottoId.slice(-2)}</span>
+                                    <span class="font-bold text-xl text-slate-100">${lottoId.slice(0, -2)}</span>
+                                    <span class="font-black text-3xl text-yellow-400 drop-shadow-sm">${lottoId.slice(-2)}</span>
                                 </div>
                             </div>
                             <div class="z-10 text-right">
@@ -3422,24 +3536,24 @@
             }
         }
 
-        // UPDATED: Render checkout list for new layout
+        // UPDATED: Render checkout list for new layout with improved text visibility
         function renderCheckoutList() {
             const container = document.getElementById('cart-list-container');
             container.innerHTML = '';
             cart.forEach(item => {
                 const el = document.createElement('div');
                 el.className = "bg-slate-800 p-3 rounded-xl border border-slate-700 flex justify-between items-start stagger-item";
-                let detail = item.meat ? `<span class="text-orange-400 text-xs bg-orange-500/20 px-1 rounded">${item.meat}</span> ` : '';
-                if(item.addons.length) detail += `<span class="text-slate-400 text-xs">+${item.addons.join(',')}</span>`;
+                let detail = item.meat ? `<span class="text-orange-300 text-xs bg-orange-500/20 px-1 rounded">${item.meat}</span> ` : '';
+                if(item.addons.length) detail += `<span class="text-slate-300 text-xs">+${item.addons.join(',')}</span>`;
                 el.innerHTML = `
                     <div>
-                        <h4 class="cart-item-title font-bold text-slate-200">${item.name}</h4>
+                        <h4 class="cart-item-title font-bold text-slate-100">${item.name}</h4>
                         <div class="cart-item-details mt-1">${detail}</div>
-                        ${item.note ? `<div class="text-[10px] text-slate-400 mt-1">Note: ${item.note}</div>` : ''}
+                        ${item.note ? `<div class="text-[10px] text-slate-300 mt-1">Note: ${item.note}</div>` : ''}
                     </div>
                     <div class="flex flex-col items-end gap-2">
-                        <span class="font-bold text-slate-200">${item.price}.-</span>
-                        <button onclick="removeFromCart(${item.id})" class="text-xs text-red-400 bg-red-500/20 w-9 h-9 rounded flex items-center justify-center border border-red-500/30 btn-bounce"><i class="fas fa-trash"></i></button>
+                        <span class="font-bold text-slate-100">${item.price}.-</span>
+                        <button onclick="removeFromCart(${item.id})" class="text-xs text-red-300 bg-red-500/20 w-9 h-9 rounded flex items-center justify-center border border-red-500/30 btn-bounce"><i class="fas fa-trash"></i></button>
                     </div>
                 `;
                 container.appendChild(el);
@@ -3478,7 +3592,7 @@
             if (bannerContainer) bannerContainer.classList.add('hidden');
         }
 
-        // UPDATED: Total summary for new layout
+        // UPDATED: Total summary for new layout with improved visibility
         function updateTotalSummary() {
             let subtotal = cart.reduce((sum, i) => sum + i.price, 0);
             let discountFromCode = 0;
@@ -3498,7 +3612,7 @@
             
             const netTotal = Math.max(0, subtotal - discountFromCode - discountFromPoints);
             
-            // Update summary displays
+            // Update summary displays with improved visibility
             document.getElementById('summary-subtotal').textContent = `${subtotal}.-`;
             document.getElementById('summary-grand-total').textContent = `${netTotal}.-`;
             
