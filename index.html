@@ -55,6 +55,13 @@
                     },
                     animation: {
                         'bounce-slow': 'bounce 3s infinite',
+                        'fade-in-down': 'fadeInDown 0.3s ease-out forwards'
+                    },
+                    keyframes: {
+                        fadeInDown: {
+                            '0%': { opacity: '0', transform: 'translateY(-10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
                     }
                 }
             }
@@ -575,89 +582,159 @@
         </div>
     </div>
 
+    <!-- ===== REDESIGNED CHECKOUT SHEET (MODERN CARD LAYOUT) ===== -->
     <div id="checkout-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[70] hidden transition-opacity opacity-0" onclick="closeCheckout()"></div>
-    <div id="checkout-sheet" class="fixed bottom-0 w-full h-[90vh] flex flex-col max-w-md mx-auto z-[70] transform translate-y-full transition-transform duration-300 bg-white backdrop-blur-xl rounded-t-[2.5rem] overflow-hidden shadow-2xl border-t border-gray-200">
-        <div class="flex-none pt-4 pb-2 px-6 border-b border-gray-200">
-            <div class="w-full flex justify-center mb-2"><div class="w-12 h-1.5 bg-gray-300 rounded-full"></div></div>
-            <div class="flex justify-between items-center mb-3">
-                <h2 class="text-xl font-bold text-gray-800">สรุปออเดอร์</h2>
-                <button onclick="closeCheckout()" class="btn-bounce w-11 h-11 rounded-full close-button flex items-center justify-center"><i class="fas fa-times text-sm text-gray-600"></i></button>
-            </div>
-            <div id="order-id-banner" class="hidden mb-3"></div>
-        </div>
-        <div id="checkout-scrollable" class="flex-1 overflow-y-auto hide-scroll bg-gray-50/50">
-            <div id="cart-list-container" class="px-6 py-4 space-y-3 min-h-[100px]"></div>
-        </div>
-        <div class="flex-none bg-white backdrop-blur-xl border-t border-gray-200 px-6 pt-3 pb-4 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] relative z-20 flex flex-col gap-3">
-            <div class="space-y-2 border-b border-gray-100 pb-2">
-                <div class="bg-gray-50 rounded-lg p-2.5 flex items-center gap-2 border border-gray-200">
-                    <i class="fas fa-user text-gray-400 text-sm"></i>
-                    <input type="text" id="user-name" maxlength="20" placeholder="ชื่อผู้สั่ง / Note..." class="bg-transparent w-full text-sm outline-none text-gray-800 placeholder:text-gray-400 font-medium">
+    
+    <div id="checkout-sheet" class="fixed bottom-0 w-full h-[95vh] flex flex-col max-w-md mx-auto z-[70] transform translate-y-full transition-transform duration-300 bg-gray-50/95 backdrop-blur-xl rounded-t-[2rem] overflow-hidden shadow-2xl border-t border-white/20">
+        
+        <!-- 1. Header (Fixed) -->
+        <div class="flex-none pt-5 pb-3 px-6 bg-white border-b border-gray-100 shadow-sm relative z-20">
+            <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-4"></div>
+            <div class="flex justify-between items-end">
+                <div>
+                    <h2 class="text-2xl font-black text-gray-800 leading-none">สรุปรายการ</h2>
+                    <p class="text-xs text-gray-400 mt-1 font-medium">ตรวจสอบความถูกต้องก่อนสั่งนะคร้าบ</p>
                 </div>
-                <div class="flex gap-2">
-                    <div id="code-input-container" class="flex-1 bg-gray-50 rounded-lg p-2.5 flex items-center gap-2 border border-gray-200">
-                        <i class="fas fa-ticket-alt text-gray-400 text-sm" id="code-icon"></i>
-                        <input type="text" id="discount-code" placeholder="โค้ดส่วนลด" class="bg-transparent w-full text-sm outline-none text-gray-800 placeholder:text-gray-400 uppercase font-medium">
-                    </div>
-                    <button onclick="applyDiscount()" id="btn-apply-code" class="btn-bounce bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 rounded-lg transition-colors whitespace-nowrap text-xs shadow-sm">ใช้โค้ด</button>
-                </div>
-                <p id="discount-msg" class="text-[10px] h-3 font-medium text-gray-600 pl-1"></p>
-            </div>
-            <div class="bg-yellow-50/80 rounded-xl p-3 border border-yellow-200/50">
-                 <div class="flex items-center justify-between mb-2">
-                    <div class="flex items-center gap-2">
-                         <div class="w-6 h-6 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600 text-xs"><i class="fas fa-coins"></i></div>
-                         <label class="text-xs font-bold text-gray-700">ใช้พอยต์ส่วนลด</label>
-                    </div>
-                    <span id="user-points-balance" class="text-[10px] font-bold text-gray-500 bg-white px-2 py-0.5 rounded-full border border-gray-200 shadow-sm">มี <span id="available-points" class="text-yellow-600 text-sm">0</span> แต้ม</span>
-                </div>
-                <div id="points-controls-container" class="hidden space-y-3 mb-3 border-b border-yellow-200/50 pb-3 pt-1">
-                    <div class="points-range-container px-1">
-                        <input type="range" id="points-range" min="0" max="100" value="0" step="100" class="points-range w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-yellow-500">
-                        <div class="flex justify-between text-[10px] text-gray-400 mt-1 font-medium"><span>0</span><span id="points-max">100</span></div>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div class="flex-1 relative">
-                            <input type="number" id="points-input" min="0" max="100" step="100" value="0" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-sm font-bold text-center text-gray-800 focus:border-yellow-500 outline-none">
-                            <span class="absolute right-8 top-1.5 text-[10px] text-gray-400">แต้ม</span>
-                        </div>
-                        <div class="text-xs font-bold text-gray-500 whitespace-nowrap">= ลด <span id="points-discount-amount" class="text-red-500 text-sm">0</span> บ.</div>
-                    </div>
-                </div>
-                <button id="points-toggle-btn" onclick="togglePointsUsage()" class="btn-bounce w-full bg-white hover:bg-gray-50 text-gray-600 font-bold py-2 rounded-lg transition-all text-xs flex justify-center items-center border border-gray-200 shadow-sm">
-                    <span class="flex items-center gap-1"><i class="fas fa-power-off text-[10px]"></i> แตะเพื่อใช้พอยต์</span>
+                <button onclick="closeCheckout()" class="btn-bounce w-10 h-10 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center hover:bg-gray-200 transition-colors">
+                    <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
-            <div id="points-upsell-msg" class="text-center text-[10px] py-1.5 bg-indigo-50 border border-indigo-100 rounded-lg text-indigo-600 font-bold hidden"></div>
-            <div class="space-y-1 pt-1">
-                <div id="discount-details-group" class="hidden space-y-1 mb-2 pb-2 border-b border-dashed border-gray-200">
-                    <div class="flex justify-between items-center text-xs">
-                        <span class="text-gray-500">ยอดรวม</span>
-                        <span id="summary-subtotal" class="font-medium text-gray-600">0.-</span>
-                    </div>
-                    <div id="discount-summary" class="flex justify-between items-center text-xs hidden">
-                        <span class="text-green-600 flex items-center gap-1"><i class="fas fa-tag text-[10px]"></i> โค้ดส่วนลด</span>
-                        <span class="font-bold text-green-600">-0.-</span>
-                    </div>
-                    <div id="points-summary" class="flex justify-between items-center text-xs hidden">
-                        <span class="text-yellow-600 flex items-center gap-1"><i class="fas fa-coins text-[10px]"></i> ส่วนลดพอยต์</span>
-                        <span class="font-bold text-yellow-600">-0.-</span>
-                    </div>
-                </div>
-                <div class="flex gap-3 items-center mt-1">
-                    <div class="flex flex-col flex-shrink-0">
-                        <span class="text-[10px] text-gray-500 font-bold">ยอดสุทธิ</span>
-                        <span id="summary-grand-total" class="text-2xl font-black text-indigo-600 leading-none">0.-</span>
-                    </div>
-                    <button onclick="submitOrderToLine()" id="btn-submit-order" class="flex-1 btn-bounce btn-gradient text-white font-bold py-3.5 rounded-xl shadow-lg shadow-orange-500/20 active:scale-95 transition-all flex justify-center items-center gap-2 text-base">
-                        <span>ยืนยันออเดอร์</span>
-                        <i class="fas fa-arrow-right text-sm"></i>
-                    </button>
+        </div>
+
+        <!-- 2. Scrollable Content (Inputs moved here) -->
+        <div id="checkout-scrollable" class="flex-1 overflow-y-auto hide-scroll p-5 space-y-5 pb-32">
+            
+            <!-- Order ID Banner (for Lotto) -->
+            <div id="order-id-banner" class="hidden"></div>
+
+            <!-- Section 1: Food Items -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                <h3 class="text-sm font-bold text-gray-400 mb-3 flex items-center gap-2">
+                    <i class="fas fa-utensils"></i> รายการอาหาร
+                </h3>
+                <div id="cart-list-container" class="space-y-4">
+                    <!-- Items rendered here by JS -->
                 </div>
             </div>
-            <div class="safe-area-pb"></div>
+
+            <!-- Section 2: Customer Info -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                <h3 class="text-sm font-bold text-gray-400 mb-3 flex items-center gap-2">
+                    <i class="fas fa-user"></i> ข้อมูลผู้สั่ง
+                </h3>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-pen text-indigo-400"></i>
+                    </div>
+                    <input type="text" id="user-name" maxlength="20" placeholder="ชื่อเล่น / Note ถึงร้าน..." 
+                           class="block w-full pl-10 pr-3 py-3 border-2 border-gray-100 rounded-xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-0 transition-colors sm:text-sm font-bold text-gray-700">
+                </div>
+            </div>
+
+            <!-- Section 3: Discount & Points -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                <h3 class="text-sm font-bold text-gray-400 mb-3 flex items-center gap-2">
+                    <i class="fas fa-tags"></i> คูปอง & พอยต์
+                </h3>
+                
+                <!-- Discount Code -->
+                <div class="flex gap-2 mb-3">
+                    <div id="code-input-container" class="flex-1 bg-gray-50 rounded-xl px-3 py-2 flex items-center gap-2 border border-gray-100">
+                        <i class="fas fa-ticket-alt text-gray-400" id="code-icon"></i>
+                        <input type="text" id="discount-code" placeholder="ใส่โค้ดลดราคา" 
+                               class="bg-transparent w-full text-sm outline-none text-gray-800 placeholder:text-gray-400 uppercase font-bold">
+                    </div>
+                    <button onclick="applyDiscount()" id="btn-apply-code" 
+                            class="btn-bounce bg-gray-800 text-white font-bold px-4 rounded-xl text-xs shadow-lg hover:bg-gray-700 transition-all">
+                        ใช้โค้ด
+                    </button>
+                </div>
+                <p id="discount-msg" class="text-[10px] font-medium text-gray-500 pl-1 mb-3 min-h-[1.25rem]"></p>
+
+                <!-- Points Card -->
+                <div class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-3 border border-yellow-100 relative overflow-hidden">
+                    <div class="flex justify-between items-center mb-2 relative z-10">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center text-white shadow-sm font-bold text-xs">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div>
+                                <div class="text-[10px] text-yellow-700 font-bold uppercase tracking-wider">Kaprao Points</div>
+                                <!-- Compatible with old ID logic -->
+                                <div class="text-xs font-bold text-gray-800" id="user-points-balance">มี <span id="available-points">0</span> แต้ม</div>
+                            </div>
+                        </div>
+                        <button id="points-toggle-btn" onclick="togglePointsUsage()" 
+                                class="text-[10px] bg-white text-yellow-600 border border-yellow-200 px-3 py-1.5 rounded-lg font-bold shadow-sm active:scale-95 transition-transform">
+                            แลกคะแนน
+                        </button>
+                    </div>
+
+                    <!-- Hidden Points Controls -->
+                    <div id="points-controls-container" class="hidden pt-2 border-t border-yellow-200/50 mt-2 relative z-10 animate-fade-in-down">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[10px] text-yellow-700">ต้องการใช้:</span>
+                            <span class="text-xs font-bold text-yellow-700"><span id="points-discount-amount">0</span> บาท</span>
+                        </div>
+                        <div class="points-range-container mb-2">
+                            <input type="range" id="points-range" min="0" max="100" value="0" step="100" class="points-range w-full h-1.5 bg-yellow-200 rounded-lg appearance-none cursor-pointer accent-yellow-500">
+                            <div class="flex justify-between text-[9px] text-yellow-600 mt-1"><span>0</span><span id="points-max">100</span></div>
+                        </div>
+                        <div class="flex gap-2">
+                            <input type="number" id="points-input" min="0" max="100" step="100" value="0" 
+                                   class="w-20 bg-white border border-yellow-200 rounded px-2 py-1 text-xs font-bold text-center text-yellow-700 focus:outline-none">
+                            <div class="flex-1 text-[9px] text-yellow-600 flex items-center justify-end">
+                                *100 แต้ม = 10 บาท
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="points-upsell-msg" class="mt-2 text-center text-[10px] py-1.5 bg-indigo-50 border border-indigo-100 rounded-lg text-indigo-600 font-bold hidden"></div>
+            </div>
+
+            <!-- Section 4: Summary -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                <h3 class="text-sm font-bold text-gray-400 mb-3">สรุปยอดชำระ</h3>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between text-gray-500">
+                        <span>ยอดรวม (Subtotal)</span>
+                        <span id="summary-subtotal" class="font-medium">0.-</span>
+                    </div>
+                    <div id="discount-summary" class="flex justify-between text-green-500 hidden">
+                        <span><i class="fas fa-ticket-alt mr-1"></i> ส่วนลดโค้ด</span>
+                        <span class="font-bold">-0.-</span>
+                    </div>
+                    <div id="points-summary" class="flex justify-between text-yellow-500 hidden">
+                        <span><i class="fas fa-coins mr-1"></i> ส่วนลดพอยต์</span>
+                        <span class="font-bold">-0.-</span>
+                    </div>
+                    <div class="border-t border-gray-100 my-2 pt-2 flex justify-between items-end">
+                        <span class="font-bold text-gray-800 text-lg">ยอดสุทธิ</span>
+                        <span id="summary-grand-total" class="font-black text-2xl text-indigo-600 leading-none">0.-</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Extra space for scrolling -->
+            <div class="h-10"></div>
+        </div>
+
+        <!-- 3. Fixed Bottom Action (Clean & Simple) -->
+        <div class="absolute bottom-0 left-0 right-0 p-5 bg-white border-t border-gray-100 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] safe-area-pb-plus z-30">
+            <button onclick="submitOrderToLine()" id="btn-submit-order" 
+                    class="btn-bounce w-full bg-gradient-to-r from-gray-900 to-gray-800 text-white font-bold text-lg py-4 rounded-2xl shadow-xl shadow-gray-300 flex justify-between items-center px-6 group hover:shadow-2xl transition-all">
+                <span class="flex items-center gap-2 text-sm font-medium opacity-80">
+                    <i class="fab fa-line text-green-400 text-lg"></i> ยืนยันออเดอร์
+                </span>
+                <div class="flex items-center gap-2 group-active:scale-95 transition-transform">
+                    <span>ส่งเลย</span>
+                    <i class="fas fa-arrow-right bg-white/20 rounded-full w-6 h-6 flex items-center justify-center text-xs"></i>
+                </div>
+            </button>
         </div>
     </div>
+    <!-- ========================================================== -->
 
     <div id="points-history-modal" class="fixed inset-0 z-[130] bg-black/50 backdrop-blur-sm flex items-center justify-center p-6 hidden">
         <div class="bg-slate-800 rounded-[2rem] p-1 w-full max-w-sm shadow-2xl relative overflow-hidden border border-slate-700">
@@ -1110,7 +1187,7 @@
             const subtotal = cart.reduce((sum, i) => sum + i.price, 0);
             const netTotal = Math.max(0, subtotal - discountValue);
             const userPointsBalance = document.getElementById('user-points-balance');
-            if (userPointsBalance) userPointsBalance.innerHTML = `มี <span id="available-points">${userStats.points || 0}</span> พอยต์`;
+            if (userPointsBalance) userPointsBalance.innerHTML = `มี <span id="available-points">${userStats.points || 0}</span> แต้ม`;
             
             const upsellMsg = document.getElementById('points-upsell-msg');
             if (upsellMsg) {
@@ -1133,9 +1210,9 @@
                 if (userPoints < 100) { showToast(`คุณมีพอยต์เพียง ${userPoints} พอยต์ (ต้องการอย่างน้อย 100 พอยต์)`, 'error'); return; }
                 controlsContainer.classList.remove('hidden');
                 isPointsActive = true;
-                toggleBtn.innerHTML = '<i class="fas fa-times mr-2"></i> ปิดใช้งานพอยต์';
-                toggleBtn.classList.remove('bg-slate-800');
-                toggleBtn.classList.add('bg-yellow-600', 'hover:bg-yellow-700');
+                toggleBtn.innerHTML = '<i class="fas fa-times mr-2"></i> ปิด';
+                toggleBtn.classList.remove('bg-white', 'text-yellow-600', 'border-yellow-200');
+                toggleBtn.classList.add('bg-red-500', 'text-white', 'border-red-500');
                 
                 const maxPoints = Math.floor(userPoints / 100) * 100;
                 document.getElementById('points-range').max = maxPoints;
@@ -1150,9 +1227,9 @@
                 controlsContainer.classList.add('hidden');
                 isPointsActive = false;
                 pointsRedeemed = 0;
-                toggleBtn.innerHTML = '<i class="fas fa-coins mr-2 text-yellow-400"></i> ใช้พอยต์ส่วนลด';
-                toggleBtn.classList.remove('bg-yellow-600', 'hover:bg-yellow-700');
-                toggleBtn.classList.add('bg-slate-800', 'hover:bg-slate-700');
+                toggleBtn.innerHTML = 'แลกคะแนน';
+                toggleBtn.classList.remove('bg-red-500', 'text-white', 'border-red-500');
+                toggleBtn.classList.add('bg-white', 'text-yellow-600', 'border-yellow-200');
                 updateTotalSummary();
                 showToast('ปิดใช้งานพอยต์ส่วนลดแล้ว', 'info');
             }
@@ -1183,12 +1260,14 @@
         function resetPointsDiscount() {
             const controlsContainer = document.getElementById('points-controls-container');
             const toggleBtn = document.getElementById('points-toggle-btn');
-            controlsContainer.classList.add('hidden');
+            if (controlsContainer) controlsContainer.classList.add('hidden');
             isPointsActive = false;
             pointsRedeemed = 0;
-            toggleBtn.innerHTML = '<i class="fas fa-coins mr-2 text-yellow-400"></i> ใช้พอยต์ส่วนลด';
-            toggleBtn.classList.remove('bg-yellow-600', 'hover:bg-yellow-700');
-            toggleBtn.classList.add('bg-slate-800', 'hover:bg-slate-700');
+            if (toggleBtn) {
+                toggleBtn.innerHTML = 'แลกคะแนน';
+                toggleBtn.classList.remove('bg-red-500', 'text-white', 'border-red-500');
+                toggleBtn.classList.add('bg-white', 'text-yellow-600', 'border-yellow-200');
+            }
             updateTotalSummary();
         }
 
@@ -1280,7 +1359,8 @@
         }
 
         function saveToLS() {
-            let safeName = escapeHtml(document.getElementById('user-name').value);
+            let safeNameElement = document.getElementById('user-name');
+            let safeName = safeNameElement ? escapeHtml(safeNameElement.value) : '';
             let oldData = {};
             try { oldData = JSON.parse(localStorage.getItem(KEYS.USER)) || {}; } catch (e) {}
             const userState = { ...oldData, cart: cart, name: safeName, avatar: userAvatar };
@@ -1349,7 +1429,8 @@
                     const vip = document.getElementById('vip-badge');
                     if (vip) { vip.classList.remove('hidden'); vip.innerText = 'VIP'; }
                     const profile = await liff.getProfile();
-                    document.getElementById('line-login-btn').classList.add('hidden');
+                    const loginBtn = document.getElementById('line-login-btn');
+                    if(loginBtn) loginBtn.classList.add('hidden');
 
                     let savedUser = {};
                     try { savedUser = JSON.parse(localStorage.getItem(KEYS.USER)) || {}; } catch(e) {}
@@ -1378,7 +1459,8 @@
                     }
                 } else {
                     document.getElementById('vip-badge').classList.add('hidden');
-                    if (!liff.isInClient()) document.getElementById('line-login-btn').classList.remove('hidden');
+                    const loginBtn = document.getElementById('line-login-btn');
+                    if (!liff.isInClient() && loginBtn) loginBtn.classList.remove('hidden');
                     else liff.login();
                 }
             } catch (err) {}
@@ -1456,6 +1538,10 @@
                 pointsInput.addEventListener('input', function() { updatePointsFromUI(this.value); });
                 pointsInput.addEventListener('change', function() { updatePointsFromUI(this.value); });
             }
+            
+            // Add listener to user-name in checkout if it exists initially (though it is inside checkout modal)
+            const userNameInput = document.getElementById('user-name');
+            if(userNameInput) userNameInput.addEventListener('input', saveToLS);
         });
         
         let wheelSpinning = false;
@@ -2012,7 +2098,7 @@
             discountValue = 0;
             if (code === '') {
                 msg.innerText = ''; btn.innerHTML = 'ใช้';
-                btn.className = 'btn-bounce bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 rounded-lg transition-colors whitespace-nowrap text-sm';
+                btn.className = 'btn-bounce bg-gray-800 text-white font-bold px-4 rounded-xl text-xs shadow-lg hover:bg-gray-700 transition-all';
                 btn.onclick = applyDiscount; updateTotalSummary(); return;
             }
             const promo = promotions.find(p => p.code === code);
@@ -2020,12 +2106,12 @@
                 discountValue = promo.value;
                 msg.innerHTML = `<span class="text-green-600"><i class="fas fa-check-circle"></i> ใช้โค้ดลด ${promo.value} บาท</span>`;
                 btn.innerHTML = '<i class="fas fa-times"></i> ยกเลิก';
-                btn.className = 'btn-bounce bg-red-500 hover:bg-red-600 text-white font-bold px-4 rounded-lg transition-colors whitespace-nowrap text-sm';
+                btn.className = 'btn-bounce bg-red-500 hover:bg-red-600 text-white font-bold px-4 rounded-xl text-xs shadow-lg transition-all';
                 btn.onclick = removeDiscount; playSound('pop');
             } else {
                 msg.innerHTML = `<span class="text-red-600">${promo ? 'ต้องสั่งครบ '+promo.minOrder : 'ไม่พบโค้ด'}</span>`;
                 btn.innerHTML = 'ใช้';
-                btn.className = 'btn-bounce bg-gray-500 hover:bg-gray-600 text-white font-bold px-4 rounded-lg transition-colors whitespace-nowrap text-sm';
+                btn.className = 'btn-bounce bg-gray-500 hover:bg-gray-600 text-white font-bold px-4 rounded-xl text-xs shadow-lg transition-all';
                 btn.onclick = applyDiscount;
             }
             updateTotalSummary();
