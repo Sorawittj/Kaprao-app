@@ -1179,24 +1179,25 @@
         </div>
     </div>
 
-    <!-- UPDATED CHECKOUT SHEET - REFACTORED LAYOUT -->
-    <div id="checkout-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden transition-opacity opacity-0" onclick="closeCheckout()"></div>
+    <!-- FIX 1: Increased modal z-index to [70] to be above mini-cart (z-[60]) -->
+    <!-- FIX 2: Updated checkout sheet to use light theme colors -->
+    <div id="checkout-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[70] hidden transition-opacity opacity-0" onclick="closeCheckout()"></div>
     
-    <!-- FIX 3: Added z-[70] to checkout-sheet -->
-    <div id="checkout-sheet" class="fixed bottom-0 w-full h-[90vh] flex flex-col max-w-md mx-auto z-[70] transform translate-y-full transition-transform duration-300 bg-slate-900/95 backdrop-blur-xl rounded-t-[2.5rem] overflow-hidden shadow-2xl">
+    <!-- FIX 2: Updated checkout sheet styling for light theme -->
+    <div id="checkout-sheet" class="fixed bottom-0 w-full h-[90vh] flex flex-col max-w-md mx-auto z-[70] transform translate-y-full transition-transform duration-300 bg-white backdrop-blur-xl rounded-t-[2.5rem] overflow-hidden shadow-2xl border-t border-gray-200">
         
         <!-- ZONE A: FIXED HEADER -->
-        <div class="flex-none pt-4 pb-2 px-6 border-b border-slate-700/50">
+        <div class="flex-none pt-4 pb-2 px-6 border-b border-gray-200">
             <!-- Drag Handle -->
             <div class="w-full flex justify-center mb-2">
-                <div class="w-12 h-1.5 bg-slate-600 rounded-full"></div>
+                <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
             </div>
             
             <!-- Title Row -->
             <div class="flex justify-between items-center mb-3">
-                <h2 class="text-xl font-bold text-slate-100">สรุปออเดอร์</h2>
+                <h2 class="text-xl font-bold text-gray-800">สรุปออเดอร์</h2>
                 <button onclick="closeCheckout()" class="btn-bounce w-11 h-11 rounded-full close-button flex items-center justify-center">
-                    <i class="fas fa-times text-sm text-slate-300"></i>
+                    <i class="fas fa-times text-sm text-gray-600"></i>
                 </button>
             </div>
             
@@ -1215,37 +1216,37 @@
             <div class="px-6 py-4 space-y-4">
                 <!-- User Name Input -->
                 <div>
-                    <label class="text-xs font-bold text-slate-200 mb-2 block">ชื่อผู้สั่ง / Note</label>
-                    <div class="bg-slate-800 rounded-lg p-3 flex items-center gap-2 border border-slate-700">
-                        <i class="fas fa-user text-slate-300 text-sm"></i>
+                    <label class="text-xs font-bold text-gray-700 mb-2 block">ชื่อผู้สั่ง / Note</label>
+                    <div class="bg-gray-50 rounded-lg p-3 flex items-center gap-2 border border-gray-200">
+                        <i class="fas fa-user text-gray-500 text-sm"></i>
                         <input type="text" id="user-name" maxlength="20" placeholder="เช่น พี่กะเพรา" 
-                               class="bg-transparent w-full text-sm outline-none text-slate-100 placeholder:text-slate-400">
+                               class="bg-transparent w-full text-sm outline-none text-gray-800 placeholder:text-gray-400">
                     </div>
                 </div>
                 
                 <!-- Discount Code Input -->
                 <div>
-                    <label class="text-xs font-bold text-slate-200 mb-2 block">โค้ดส่วนลด</label>
+                    <label class="text-xs font-bold text-gray-700 mb-2 block">โค้ดส่วนลด</label>
                     <div class="flex gap-2">
                         <!-- FIX 2: Added id="code-input-container" -->
-                        <div id="code-input-container" class="flex-1 bg-slate-800 rounded-lg p-3 flex items-center gap-2 border border-slate-700">
-                            <i class="fas fa-ticket-alt text-slate-300 text-sm" id="code-icon"></i>
+                        <div id="code-input-container" class="flex-1 bg-gray-50 rounded-lg p-3 flex items-center gap-2 border border-gray-200">
+                            <i class="fas fa-ticket-alt text-gray-500 text-sm" id="code-icon"></i>
                             <input type="text" id="discount-code" placeholder="กรอกโค้ดส่วนลด" 
-                                   class="bg-transparent w-full text-sm outline-none text-slate-100 placeholder:text-slate-400 uppercase">
+                                   class="bg-transparent w-full text-sm outline-none text-gray-800 placeholder:text-gray-400 uppercase">
                         </div>
                         <button onclick="applyDiscount()" id="btn-apply-code" 
                                 class="btn-bounce bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 rounded-lg transition-colors whitespace-nowrap text-sm">
                             ใช้
                         </button>
                     </div>
-                    <p id="discount-msg" class="text-xs h-4 mt-1 font-medium text-slate-300"></p>
+                    <p id="discount-msg" class="text-xs h-4 mt-1 font-medium text-gray-600"></p>
                 </div>
                 
                 <!-- Points System - UPDATED WITH SLIDER & INPUT -->
                 <div>
                     <div class="flex items-center justify-between mb-3">
-                        <label class="text-xs font-bold text-slate-200">ใช้พอยต์ส่วนลด</label>
-                        <span id="user-points-balance" class="text-xs font-bold text-yellow-400">มี <span id="available-points">0</span> พอยต์</span>
+                        <label class="text-xs font-bold text-gray-700">ใช้พอยต์ส่วนลด</label>
+                        <span id="user-points-balance" class="text-xs font-bold text-yellow-600">มี <span id="available-points">0</span> พอยต์</span>
                     </div>
                     
                     <!-- NEW: Points Slider & Input -->
@@ -1253,7 +1254,7 @@
                         <!-- Slider -->
                         <div class="points-range-container">
                             <input type="range" id="points-range" min="0" max="100" value="0" step="100" class="points-range">
-                            <div class="flex justify-between text-xs text-slate-400 mt-1">
+                            <div class="flex justify-between text-xs text-gray-500 mt-1">
                                 <span>0</span>
                                 <span id="points-max">100</span>
                             </div>
@@ -1261,8 +1262,8 @@
                         
                         <!-- Input Group -->
                         <div class="points-input-group">
-                            <input type="number" id="points-input" min="0" max="100" step="100" value="0" class="points-input text-slate-100">
-                            <span class="points-input-label text-slate-300">พอยต์</span>
+                            <input type="number" id="points-input" min="0" max="100" step="100" value="0" class="points-input text-gray-800">
+                            <span class="points-input-label text-gray-600">พอยต์</span>
                         </div>
                         
                         <!-- Discount Display -->
@@ -1270,52 +1271,52 @@
                             ส่วนลด: <span id="points-discount-amount">0</span> บาท
                         </div>
                         
-                        <p class="text-xs text-slate-400 mt-1 text-center">100 พอยต์ = ส่วนลด 10 บาท</p>
+                        <p class="text-xs text-gray-500 mt-1 text-center">100 พอยต์ = ส่วนลด 10 บาท</p>
                     </div>
                     
                     <!-- Toggle Button (Replaces old toggle) -->
                     <button id="points-toggle-btn" onclick="togglePointsUsage()" 
-                            class="btn-bounce w-full mt-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-3 rounded-xl transition-all border border-slate-700">
-                        <i class="fas fa-coins mr-2 text-yellow-400"></i> ใช้พอยต์ส่วนลด
+                            class="btn-bounce w-full mt-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-3 rounded-xl transition-all border border-gray-300">
+                        <i class="fas fa-coins mr-2 text-yellow-600"></i> ใช้พอยต์ส่วนลด
                     </button>
                 </div>
                 
                 <!-- Price Breakdown (Inside scroll area) -->
-                <div id="price-summary" class="mt-4 pt-4 border-t border-slate-700/50">
+                <div id="price-summary" class="mt-4 pt-4 border-t border-gray-200">
                     <!-- Will be populated by JavaScript -->
                 </div>
             </div>
         </div>
         
         <!-- ZONE C: STICKY FOOTER - UPDATED FOR VISIBILITY -->
-        <div class="flex-none bg-slate-900/95 backdrop-blur-xl border-t border-slate-700/50 px-6 py-4 space-y-3">
+        <div class="flex-none bg-white backdrop-blur-xl border-t border-gray-200 px-6 py-4 space-y-3">
             <!-- Upsell Banner -->
-            <div id="points-upsell-msg" class="text-center text-xs p-2 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-yellow-300 font-bold hidden">
+            <div id="points-upsell-msg" class="text-center text-xs p-2 bg-yellow-100 border border-yellow-300 rounded-lg text-yellow-800 font-bold hidden">
                 <!-- Will be populated by JavaScript -->
             </div>
             
             <!-- Order Summary -->
             <div class="space-y-2">
                 <div class="flex justify-between items-center">
-                    <span class="text-sm text-slate-300">ยอดรวม</span>
-                    <span id="summary-subtotal" class="text-sm font-bold text-slate-100">0.-</span>
+                    <span class="text-sm text-gray-600">ยอดรวม</span>
+                    <span id="summary-subtotal" class="text-sm font-bold text-gray-800">0.-</span>
                 </div>
                 <div id="discount-summary" class="flex justify-between items-center text-xs hidden">
-                    <span class="text-green-400">ส่วนลดจากโค้ด</span>
-                    <span class="font-bold text-green-400">-0.-</span>
+                    <span class="text-green-600">ส่วนลดจากโค้ด</span>
+                    <span class="font-bold text-green-600">-0.-</span>
                 </div>
                 <div id="points-summary" class="flex justify-between items-center text-xs hidden">
-                    <span class="text-yellow-400">ส่วนลดจากพอยต์</span>
-                    <span class="font-bold text-yellow-400">-0.-</span>
+                    <span class="text-yellow-600">ส่วนลดจากพอยต์</span>
+                    <span class="font-bold text-yellow-600">-0.-</span>
                 </div>
-                <div class="flex justify-between items-center pt-2 border-t border-slate-700">
-                    <span class="text-lg font-bold text-slate-100">ยอดสุทธิ</span>
-                    <span id="summary-grand-total" class="text-2xl font-black text-yellow-400">0.-</span>
+                <div class="flex justify-between items-center pt-2 border-t border-gray-300">
+                    <span class="text-lg font-bold text-gray-800">ยอดสุทธิ</span>
+                    <span id="summary-grand-total" class="text-2xl font-black text-yellow-600">0.-</span>
                 </div>
             </div>
             
             <!-- Confirm Button - STICKY AT BOTTOM -->
-            <div class="mt-4 pt-4 border-t border-slate-700/50">
+            <div class="mt-4 pt-4 border-t border-gray-200">
                 <button onclick="submitOrderToLine()" id="btn-submit-order" 
                         class="btn-bounce w-full btn-gradient text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-all flex justify-center items-center gap-2 text-lg">
                     <span>ยืนยันการสั่ง</span>
@@ -1351,8 +1352,9 @@
         </div>
     </div>
 
-    <div id="modal-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden transition-opacity opacity-0" onclick="closeModal()"></div>
-    <div id="modal-content" class="fixed bottom-0 left-0 right-0 glass-heavy rounded-t-[2.5rem] z-50 transform translate-y-full transition-transform duration-300 shadow-2xl max-w-md mx-auto h-[85vh] flex flex-col touch-pan-y safe-area-pb">
+    <!-- FIX 1: Increased modal z-index to [70] to be above mini-cart (z-[60]) -->
+    <div id="modal-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[70] hidden transition-opacity opacity-0" onclick="closeModal()"></div>
+    <div id="modal-content" class="fixed bottom-0 left-0 right-0 glass-heavy rounded-t-[2.5rem] z-[70] transform translate-y-full transition-transform duration-300 shadow-2xl max-w-md mx-auto h-[85vh] flex flex-col touch-pan-y safe-area-pb">
         
         <div id="modal-drag-handle" class="w-full flex justify-center pt-4 pb-2 cursor-grab active:cursor-grabbing z-50">
             <div class="w-12 h-1.5 bg-slate-600 rounded-full"></div>
@@ -3447,18 +3449,18 @@
                     const lottoId = generateOrderId(); 
                     bannerContainer.classList.remove('hidden');
                     bannerContainer.innerHTML = `
-                        <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl mb-3 flex justify-between items-center shadow-sm relative overflow-hidden stagger-item">
-                            <div class="absolute -right-4 -top-4 bg-indigo-500/20 opacity-50 w-20 h-20 rounded-full"></div>
+                        <div class="bg-gray-100 border border-gray-300 p-4 rounded-xl mb-3 flex justify-between items-center shadow-sm relative overflow-hidden stagger-item">
+                            <div class="absolute -right-4 -top-4 bg-indigo-100 opacity-50 w-20 h-20 rounded-full"></div>
                             <div class="flex flex-col z-10">
-                                <span class="text-[10px] text-slate-300 uppercase tracking-wider">Order ID ของคุณ</span>
+                                <span class="text-[10px] text-gray-600 uppercase tracking-wider">Order ID ของคุณ</span>
                                 <div class="flex items-baseline gap-1">
-                                    <span class="font-bold text-xl text-slate-100">${lottoId.slice(0, -2)}</span>
-                                    <span class="font-black text-3xl text-yellow-400 drop-shadow-sm">${lottoId.slice(-2)}</span>
+                                    <span class="font-bold text-xl text-gray-800">${lottoId.slice(0, -2)}</span>
+                                    <span class="font-black text-3xl text-yellow-600 drop-shadow-sm">${lottoId.slice(-2)}</span>
                                 </div>
                             </div>
                             <div class="z-10 text-right">
                                 <div class="text-2xl">🎟️</div>
-                                <span class="text-[10px] font-bold text-slate-300">ลุ้นหวยงวดนี้!</span>
+                                <span class="text-[10px] font-bold text-gray-600">ลุ้นหวยงวดนี้!</span>
                             </div>
                         </div>
                     `;
@@ -3542,18 +3544,18 @@
             container.innerHTML = '';
             cart.forEach(item => {
                 const el = document.createElement('div');
-                el.className = "bg-slate-800 p-3 rounded-xl border border-slate-700 flex justify-between items-start stagger-item";
-                let detail = item.meat ? `<span class="text-orange-300 text-xs bg-orange-500/20 px-1 rounded">${item.meat}</span> ` : '';
-                if(item.addons.length) detail += `<span class="text-slate-300 text-xs">+${item.addons.join(',')}</span>`;
+                el.className = "bg-gray-50 p-3 rounded-xl border border-gray-200 flex justify-between items-start stagger-item";
+                let detail = item.meat ? `<span class="text-orange-600 text-xs bg-orange-100 px-1 rounded">${item.meat}</span> ` : '';
+                if(item.addons.length) detail += `<span class="text-gray-600 text-xs">+${item.addons.join(',')}</span>`;
                 el.innerHTML = `
                     <div>
-                        <h4 class="cart-item-title font-bold text-slate-100">${item.name}</h4>
+                        <h4 class="cart-item-title font-bold text-gray-800">${item.name}</h4>
                         <div class="cart-item-details mt-1">${detail}</div>
-                        ${item.note ? `<div class="text-[10px] text-slate-300 mt-1">Note: ${item.note}</div>` : ''}
+                        ${item.note ? `<div class="text-[10px] text-gray-500 mt-1">Note: ${item.note}</div>` : ''}
                     </div>
                     <div class="flex flex-col items-end gap-2">
-                        <span class="font-bold text-slate-100">${item.price}.-</span>
-                        <button onclick="removeFromCart(${item.id})" class="text-xs text-red-300 bg-red-500/20 w-9 h-9 rounded flex items-center justify-center border border-red-500/30 btn-bounce"><i class="fas fa-trash"></i></button>
+                        <span class="font-bold text-gray-800">${item.price}.-</span>
+                        <button onclick="removeFromCart(${item.id})" class="text-xs text-red-600 bg-red-100 w-9 h-9 rounded flex items-center justify-center border border-red-200 btn-bounce"><i class="fas fa-trash"></i></button>
                     </div>
                 `;
                 container.appendChild(el);
@@ -3659,14 +3661,14 @@
 
             if (promo && total >= promo.minOrder) {
                 discountValue = promo.value;
-                msg.innerHTML = `<span class="text-green-400"><i class="fas fa-check-circle"></i> ใช้โค้ดลด ${promo.value} บาท</span>`;
+                msg.innerHTML = `<span class="text-green-600"><i class="fas fa-check-circle"></i> ใช้โค้ดลด ${promo.value} บาท</span>`;
                 btn.innerHTML = '<i class="fas fa-times"></i> ยกเลิก';
                 btn.className = 'btn-bounce bg-red-500 hover:bg-red-600 text-white font-bold px-4 rounded-lg transition-colors whitespace-nowrap text-sm';
                 btn.onclick = removeDiscount;
                 playSound('pop');
             }
             else {
-                msg.innerHTML = `<span class="text-red-400">${promo ? 'ต้องสั่งครบ '+promo.minOrder : 'ไม่พบโค้ด'}</span>`;
+                msg.innerHTML = `<span class="text-red-600">${promo ? 'ต้องสั่งครบ '+promo.minOrder : 'ไม่พบโค้ด'}</span>`;
                 btn.innerHTML = 'ใช้';
                 btn.className = 'btn-bounce bg-gray-500 hover:bg-gray-600 text-white font-bold px-4 rounded-lg transition-colors whitespace-nowrap text-sm';
                 btn.onclick = applyDiscount;
