@@ -245,48 +245,33 @@
             gap: 0.25rem;
             position: relative;
         }
-        
-        .category-pill:hover { 
-            transform: translateY(-3px); 
-        }
+        .category-pill:hover { transform: translateY(-3px); }
 
-        /* Active State: Gradient Gold/Orange with Glow */
         .category-pill-active {
             background: linear-gradient(135deg, #FFB02E 0%, #F59E0B 100%);
-            color: white; 
-            border: none;
+            color: white; border: none;
             box-shadow: 0 8px 20px -6px rgba(245, 158, 11, 0.5);
             transform: scale(1.05);
         }
 
-        /* Inactive State: Clean White with border */
         .category-pill-inactive {
-            background: #FFFFFF; 
-            color: #4B5563; 
-            border-color: #E5E7EB;
+            background: #FFFFFF; color: #4B5563; border-color: #E5E7EB;
             box-shadow: 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
-        
-        .category-pill-inactive:hover { 
-            border-color: #FCD34D;
-            background: #FFFEF5;
-        }
+        .category-pill-inactive:hover { border-color: #FCD34D; background: #FFFEF5; }
 
-        /* Promotion Specific */
         .category-pill-promotion.category-pill-active {
             background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
             box-shadow: 0 8px 20px -6px rgba(239, 68, 68, 0.4);
         }
 
-        /* Tray Specific */
         .category-pill-tray.category-pill-active {
             background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
             box-shadow: 0 8px 20px -6px rgba(99, 102, 241, 0.4);
         }
-
+        
         .tab-icon {
-            font-size: 1.8rem;
-            margin-bottom: 2px;
+            font-size: 1.8rem; margin-bottom: 2px;
             filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
         }
 
@@ -737,24 +722,15 @@
                     <!-- Hidden Points Controls -->
                     <div id="points-controls-container" class="hidden pt-2 border-t border-yellow-200/50 mt-2 relative z-10 animate-fade-in-down">
                         <div class="flex items-center justify-between mb-2">
-                            <span class="text-[10px] text-yellow-700">ต้องการใช้:</span>
-                            <span class="text-xs font-bold text-yellow-700"><span id="points-discount-amount">0</span> บาท</span>
+                            <span class="text-[10px] text-yellow-700">ใช้: <span id="points-used-display" class="font-bold text-indigo-600">0</span> พอยต์</span>
+                            <span class="text-xs font-bold text-red-500">ลด <span id="points-discount-display">0</span> บาท</span>
                         </div>
                         <div class="points-range-container mb-2">
-                            <input type="range" id="points-range" min="0" max="100" value="0" step="100" class="points-range w-full h-1.5 bg-yellow-200 rounded-lg appearance-none cursor-pointer accent-yellow-500">
-                            <div class="flex justify-between text-[9px] text-yellow-600 mt-1"><span>0</span><span id="points-max">100</span></div>
+                            <input type="range" id="points-range" min="0" max="100" value="0" step="10" class="points-range w-full h-1.5 bg-yellow-200 rounded-lg appearance-none cursor-pointer accent-yellow-500">
                         </div>
-                        <div class="flex gap-2">
-                            <input type="number" id="points-input" min="0" max="100" step="100" value="0" 
-                                   class="w-20 bg-white border border-yellow-200 rounded px-2 py-1 text-xs font-bold text-center text-yellow-700 focus:outline-none">
-                            <div class="flex-1 text-[9px] text-yellow-600 flex items-center justify-end">
-                                *100 แต้ม = 10 บาท
-                            </div>
-                        </div>
+                        <!-- Removed number input box as requested -->
                     </div>
                 </div>
-                
-                <!-- Upsell Message Removed Here -->
             </div>
 
             <!-- Section 4: Summary -->
@@ -1326,6 +1302,11 @@
             const discountAmount = Math.floor(pointsAmount / 100) * 10;
             const discountDisplay = document.getElementById('points-discount-amount');
             if (discountDisplay) discountDisplay.textContent = `${discountAmount}`;
+            
+            // NEW: Update used points display
+            const usedDisplay = document.getElementById('points-used-display');
+            if (usedDisplay) usedDisplay.textContent = `${pointsAmount}`;
+
             pointsRedeemed = pointsAmount;
             discountValue = discountAmount;
             updateTotalSummary();
@@ -1641,7 +1622,7 @@
                 pointsInput.addEventListener('change', function() { updatePointsFromUI(this.value); });
             }
             
-            // Add listener to user-name in checkout if it exists initially (though it is inside checkout modal)
+            // Add listener to user-name with DEBOUNCE
             const userNameInput = document.getElementById('user-name');
             if(userNameInput) userNameInput.addEventListener('input', saveToLS);
         });
