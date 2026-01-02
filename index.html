@@ -245,15 +245,13 @@
             gap: 0.25rem;
             position: relative;
         }
-        .category-pill:hover { transform: translateY(-3px); }
-
+        .category-pill:hover { transform: translateY(-3px); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
         .category-pill-active {
             background: linear-gradient(135deg, #FFB02E 0%, #F59E0B 100%);
             color: white; border: none;
-            box-shadow: 0 8px 20px -6px rgba(245, 158, 11, 0.5);
+            box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
             transform: scale(1.05);
         }
-
         .category-pill-inactive {
             background: #FFFFFF; color: #4B5563; border-color: #E5E7EB;
             box-shadow: 0 4px 6px -2px rgba(0, 0, 0, 0.05);
@@ -269,7 +267,7 @@
             background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
             box-shadow: 0 8px 20px -6px rgba(99, 102, 241, 0.4);
         }
-        
+
         .tab-icon {
             font-size: 1.8rem; margin-bottom: 2px;
             filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
@@ -727,10 +725,18 @@
                         </div>
                         <div class="points-range-container mb-2">
                             <input type="range" id="points-range" min="0" max="100" value="0" step="10" class="points-range w-full h-1.5 bg-yellow-200 rounded-lg appearance-none cursor-pointer accent-yellow-500">
+                            <div class="flex justify-between text-[9px] text-yellow-600 mt-1"><span>0</span><span id="points-max">100</span></div>
                         </div>
-                        <!-- Removed number input box as requested -->
+                        <div class="flex gap-2">
+                            <input type="hidden" id="points-input" value="0">
+                            <div class="flex-1 text-[9px] text-yellow-600 flex items-center justify-end">
+                                *100 แต้ม = 10 บาท
+                            </div>
+                        </div>
                     </div>
                 </div>
+                
+                <!-- Upsell Message Removed Here -->
             </div>
 
             <!-- Section 4: Summary -->
@@ -1239,15 +1245,10 @@
             const userPointsBalance = document.getElementById('user-points-balance');
             if (userPointsBalance) userPointsBalance.innerHTML = `มี <span id="available-points">${userStats.points || 0}</span> แต้ม`;
             
+            // Upsell Removed
             const upsellMsg = document.getElementById('points-upsell-msg');
             if (upsellMsg) {
-                const nextTier = getNextTierInfo(netTotal);
-                if (nextTier && nextTier.needed > 0 && nextTier.needed <= 50) {
-                    upsellMsg.classList.remove('hidden');
-                    upsellMsg.innerHTML = `เพิ่มอีก ${nextTier.needed}.- เพื่อรับ +${nextTier.points} พอยต์!`;
-                } else {
-                    upsellMsg.classList.add('hidden');
-                }
+                upsellMsg.classList.add('hidden');
             }
         }
 
@@ -1256,19 +1257,37 @@
             const toggleBtn = document.getElementById('points-toggle-btn');
             const userPoints = userStats.points || 0;
             
+            // Recalculate based on current cart
+            let subtotal = cart.reduce((sum, i) => sum + i.price, 0);
+            // Apply code discount if any
+            const code = document.getElementById('discount-code').value.trim().toUpperCase();
+            const promo = promotions.find(p => p.code === code);
+            let discountFromCode = 0;
+            if (promo && subtotal >= promo.minOrder) discountFromCode = promo.value;
+            
+            let netTotalBeforePoints = Math.max(0, subtotal - discountFromCode);
+
             if (controlsContainer.classList.contains('hidden')) {
                 if (userPoints < 100) { showToast(`คุณมีพอยต์เพียง ${userPoints} พอยต์ (ต้องการอย่างน้อย 100 พอยต์)`, 'error'); return; }
+                
                 controlsContainer.classList.remove('hidden');
                 isPointsActive = true;
                 toggleBtn.innerHTML = '<i class="fas fa-times mr-2"></i> ปิด';
                 toggleBtn.classList.remove('bg-white', 'text-yellow-600', 'border-yellow-200');
                 toggleBtn.classList.add('bg-red-500', 'text-white', 'border-red-500');
                 
-                const maxPoints = Math.floor(userPoints / 100) * 100;
-                document.getElementById('points-range').max = maxPoints;
-                document.getElementById('points-max').textContent = maxPoints;
-                document.getElementById('points-input').max = maxPoints;
-                const initialPoints = maxPoints >= 100 ? 100 : maxPoints;
+                // Calculate Max Points based on Price (10 pts = 1 baht)
+                const maxPointsByPrice = netTotalBeforePoints * 10;
+                const maxPoints = Math.min(userPoints, maxPointsByPrice);
+                
+                // Round down to nearest 100
+                const finalMaxPoints = Math.floor(maxPoints / 100) * 100;
+                
+                document.getElementById('points-range').max = finalMaxPoints;
+                document.getElementById('points-max').textContent = finalMaxPoints;
+                document.getElementById('points-input').max = finalMaxPoints;
+                
+                const initialPoints = finalMaxPoints;
                 document.getElementById('points-range').value = initialPoints;
                 document.getElementById('points-input').value = initialPoints;
                 updatePointsDiscount(initialPoints);
@@ -1291,7 +1310,20 @@
             let pointsValue = parseInt(value) || 0;
             pointsValue = Math.round(pointsValue / 100) * 100;
             if (pointsValue < 0) pointsValue = 0;
-            if (pointsValue > userPoints) pointsValue = Math.floor(userPoints / 100) * 100;
+            
+            // Double check max limit against price again
+            let subtotal = cart.reduce((sum, i) => sum + i.price, 0);
+            const code = document.getElementById('discount-code').value.trim().toUpperCase();
+            const promo = promotions.find(p => p.code === code);
+            let discountFromCode = 0;
+            if (promo && subtotal >= promo.minOrder) discountFromCode = promo.value;
+            let netTotalBeforePoints = Math.max(0, subtotal - discountFromCode);
+            
+            const maxPointsByPrice = netTotalBeforePoints * 10;
+            const finalMax = Math.min(userPoints, maxPointsByPrice);
+            
+            if (pointsValue > finalMax) pointsValue = Math.floor(finalMax / 100) * 100;
+            
             document.getElementById('points-range').value = pointsValue;
             document.getElementById('points-input').value = pointsValue;
             updatePointsDiscount(pointsValue);
@@ -1303,7 +1335,6 @@
             const discountDisplay = document.getElementById('points-discount-amount');
             if (discountDisplay) discountDisplay.textContent = `${discountAmount}`;
             
-            // NEW: Update used points display
             const usedDisplay = document.getElementById('points-used-display');
             if (usedDisplay) usedDisplay.textContent = `${pointsAmount}`;
 
@@ -1622,7 +1653,7 @@
                 pointsInput.addEventListener('change', function() { updatePointsFromUI(this.value); });
             }
             
-            // Add listener to user-name with DEBOUNCE
+            // Add listener to user-name in checkout if it exists initially (though it is inside checkout modal)
             const userNameInput = document.getElementById('user-name');
             if(userNameInput) userNameInput.addEventListener('input', saveToLS);
         });
