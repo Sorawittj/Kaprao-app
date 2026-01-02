@@ -1073,7 +1073,6 @@
         const sfxTrash = new Audio('https://www.soundjay.com/misc/sounds/crumple-paper-1.mp3'); 
         const sfxWin = new Audio('https://www.soundjay.com/misc/sounds/magic-chime-01.mp3');
         const sfxSwitch = new Audio('https://www.soundjay.com/buttons/sounds/button-20.mp3'); 
-        
         sfxPop.volume = 0.4; sfxSwitch.volume = 0.2; sfxTrash.volume = 0.8;
 
         function playSound(type) {
@@ -2077,13 +2076,15 @@
             lottoHistory.forEach(t => {
                 const winningNum = getWinningNumberForDate(t.drawDate);
                 
-                // Logic to revert state if winning number is gone (e.g. was testing)
-                if (winningNum === "NotSet" && t.status !== 'pending') {
-                     t.status = 'pending';
-                     updated = true;
+                // CASE 1: ถ้ายังไม่มีผลรางวัล (หรือผลรางวัลถูกลบออกแล้ว) ให้กลับเป็น pending
+                if (winningNum === "NotSet") {
+                     if (t.status !== 'pending') {
+                         t.status = 'pending';
+                         updated = true;
+                     }
                 }
-                // Logic to check result if available
-                else if (winningNum !== "NotSet") {
+                // CASE 2: มีผลรางวัล (ไม่ว่าจะจริงหรือเทส) ให้เช็คใหม่เสมอ
+                else {
                      if (t.number === winningNum) {
                          if (t.status !== 'won') {
                              t.status = 'won';
@@ -2102,7 +2103,7 @@
     
             if (updated) {
                 localStorage.setItem(KEYS.HISTORY, JSON.stringify(lottoHistory));
-                updateTicketBadge(); // Update UI
+                updateTicketBadge();
             }
         }
         function updateTicketBadge() {
