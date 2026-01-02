@@ -71,7 +71,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <script defer src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     
     <style>
         /* === THEME VARIABLES (PURE LIGHT THEME) === */
@@ -329,7 +329,7 @@
         .wheel-pointer { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 18px solid transparent; border-right: 18px solid transparent; border-top: 40px solid #F59E0B; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); z-index: 20; }
         .wheel-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: linear-gradient(135deg, #FFFFFF, #FEF3C7); border-radius: 50%; z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; font-size: 24px; transition: all 0.5s ease; border: 2px solid #FCD34D; }
 
-        #receipt-capture { position: fixed; top: -9999px; left: -9999px; width: 400px; background: #FFFFFF; padding: 0; border-radius: 0; font-family: 'Kanit', sans-serif; color: #1F2937; }
+        #receipt-capture { position: absolute; top: 0; left: 0; width: 400px; z-index: -100; visibility: hidden; background: #FFFFFF; padding: 0; border-radius: 0; font-family: 'Kanit', sans-serif; color: #1F2937; }
         
         .ticket-stub {
             background-image: radial-gradient(circle at 0 50%, transparent 8px, #FFFFFF 8.5px), radial-gradient(circle at 100% 50%, transparent 8px, #FFFFFF 8.5px);
@@ -1463,10 +1463,14 @@
                 }
                 const savedHistory = localStorage.getItem(KEYS.HISTORY);
                 if (savedHistory) lottoHistory = JSON.parse(savedHistory) || [];
+                // CRITICAL FIX: Ensure array
+                if (!Array.isArray(lottoHistory)) lottoHistory = [];
+                
                 const savedStats = localStorage.getItem(KEYS.STATS);
                 if (savedStats) userStats = JSON.parse(savedStats) || { points: 0 };
             } catch (error) {
                 userStats = { points: 0 };
+                lottoHistory = []; // Reset on error
             }
         }
 
@@ -2122,7 +2126,8 @@
         }
 
         function autoCheckLottery() {
-            if(lottoHistory.length === 0) return;
+            if (!lottoHistory || !Array.isArray(lottoHistory)) return; // Safety check
+            if (lottoHistory.length === 0) return;
             
             let updated = false;
             const now = new Date();
@@ -2130,27 +2135,16 @@
     
             lottoHistory.forEach(t => {
                 const winningNum = getWinningNumberForDate(t.drawDate);
-                
-                // CASE 1: ถ้ายังไม่มีผลรางวัล (หรือผลรางวัลถูกลบออกแล้ว) ให้กลับเป็น pending
                 if (winningNum === "NotSet") {
-                     if (t.status !== 'pending') {
-                         t.status = 'pending';
-                         updated = true;
-                     }
-                }
-                // CASE 2: มีผลรางวัล (ไม่ว่าจะจริงหรือเทส) ให้เช็คใหม่เสมอ
-                else {
+                     if (t.status !== 'pending') { t.status = 'pending'; updated = true; }
+                } else {
                      if (t.number === winningNum) {
                          if (t.status !== 'won') {
-                             t.status = 'won';
-                             updated = true;
+                             t.status = 'won'; updated = true;
                              if (Notification.permission === "granted") new Notification("เศรษฐีใหม่มาแล้ว! 🤑", { body: `งวด ${t.drawDate}: Order ${t.id} ถูกรางวัลกินฟรี!`, icon: 'https://cdn-icons-png.flaticon.com/512/3170/3170733.png' });
                          }
                      } else {
-                         if (t.status !== 'lost') {
-                             t.status = 'lost';
-                             updated = true;
-                         }
+                         if (t.status !== 'lost') { t.status = 'lost'; updated = true; }
                      }
                      t.checkedDate = getStandardDate(new Date());
                 }
@@ -2162,9 +2156,59 @@
             }
         }
         function updateTicketBadge() {
+            if (!lottoHistory) return;
             const pending = lottoHistory.filter(t => t.status === 'pending').length;
             const dot = document.getElementById('unread-ticket-dot');
             if(pending > 0) dot.classList.remove('hidden'); else dot.classList.add('hidden');
+        }
+
+        function openMyTickets() {
+            try {
+                pushModalState('tickets'); triggerHaptic(); playSound('pop');
+                
+                // CRITICAL FIX: Ensure history is initialized
+                if (!lottoHistory || !Array.isArray(lottoHistory)) {
+                    lottoHistory = [];
+                    // Try reload if empty
+                    try { lottoHistory = JSON.parse(localStorage.getItem(KEYS.HISTORY)) || []; } catch(e) {}
+                }
+
+                const list = document.getElementById('tickets-list'); list.innerHTML = '';
+                
+                if(lottoHistory.length === 0) {
+                    list.innerHTML = `<div class="text-center text-gray-400 mt-10"><div class="text-4xl mb-2 opacity-30">🎟️</div><p class="text-sm">ยังไม่มีประวัติการสั่งซื้อ</p></div>`;
+                } else {
+                    lottoHistory.forEach((t, index) => {
+                        let statusHtml = ''; let statusClass = '';
+                        if(t.status === 'pending') { statusHtml = `<span class="text-indigo-600 font-bold"><i class="far fa-clock"></i> รอลุ้นงวด ${t.drawDate || 'เร็วๆนี้'}</span>`; statusClass = 'border-l-4 border-indigo-500 bg-indigo-50/50'; } 
+                        else if(t.status === 'won') { statusHtml = '<span class="text-yellow-500 font-bold"><i class="fas fa-trophy"></i> ถูกรางวัล!</span>'; statusClass = 'border-l-4 border-yellow-500 bg-yellow-500/20'; } 
+                        else { statusHtml = '<span class="text-gray-400 font-bold"><i class="fas fa-times-circle"></i> ไม่ถูกรางวัล</span>'; statusClass = 'border-l-4 border-gray-400 bg-gray-100 opacity-70 grayscale'; }
+                        
+                        const item = document.createElement('div');
+                        item.className = `ticket-stub p-4 rounded-lg shadow-sm border border-gray-200 mb-3 flex justify-between items-center relative overflow-hidden cursor-pointer active:scale-95 transition-transform btn-bounce ${statusClass}`;
+                        
+                        // FIX: Explicit binding
+                        item.onclick = function() { reprintReceipt(index); };
+                        
+                        item.innerHTML = `<div><div class="text-[10px] text-gray-500">Order ID: ${t.id}</div><div class="flex items-baseline gap-2 mt-1"><span class="text-xs text-gray-400">เลขลุ้น:</span><span class="text-2xl font-black text-indigo-500 tracking-widest">${t.number}</span></div><div class="text-[10px] text-gray-500 mt-1">ซื้อเมื่อ: ${t.date}</div><div class="text-[10px] text-indigo-500 font-bold mt-2"><i class="fas fa-print"></i> กดเพื่อพิมพ์ใบเสร็จ</div></div><div class="text-right flex flex-col items-end"><div class="text-xs mb-1 bg-white px-2 py-1 rounded-full shadow-sm whitespace-nowrap border border-gray-100">${statusHtml}</div>${t.status === 'won' ? '<button class="text-[10px] bg-yellow-500 text-white font-bold px-2 py-1 rounded shadow-sm mt-1 animate-pulse">แคปจอรับสิทธิ์</button>' : ''}</div>`;
+                        list.appendChild(item);
+                    });
+                }
+                const overlay = document.getElementById('tickets-modal-overlay'); const sheet = document.getElementById('tickets-sheet');
+                sheet.style.transform = ''; overlay.classList.remove('hidden');
+                setTimeout(() => { overlay.classList.remove('opacity-0'); sheet.classList.remove('translate-y-full'); }, 10);
+            } catch(e) {
+                console.error(e);
+                showToast("เกิดข้อผิดพลาดในการโหลดตั๋ว");
+            }
+        }
+
+        function closeMyTickets(isBackNav = false) {
+            if (!isBackNav && currentOpenModal === 'tickets') { history.back(); return; }
+            const overlay = document.getElementById('tickets-modal-overlay'); const sheet = document.getElementById('tickets-sheet');
+            overlay.classList.add('opacity-0'); sheet.classList.add('translate-y-full');
+            setTimeout(() => { overlay.classList.add('hidden'); sheet.style.transform = ''; }, 300);
+            currentOpenModal = null;
         }
 
         function openCheckout() {
@@ -2288,38 +2332,75 @@
 
         function reprintReceipt(ticketIndex) {
             triggerHaptic(); playSound('pop');
+            
+            // Check if libraries loaded
+            if (typeof html2canvas === 'undefined') {
+                showToast("ระบบกำลังโหลดโปรแกรมวาดภาพ กรุณาลองใหม่ใน 2 วินาที", "error");
+                return;
+            }
+
+            if (!lottoHistory || !lottoHistory[ticketIndex]) { 
+                showToast("ไม่พบข้อมูลรายการอาหารของบิลเก่า 😢"); return; 
+            }
             const ticket = lottoHistory[ticketIndex];
-            if (!ticket.items || ticket.items.length === 0) { showToast("ไม่พบข้อมูลรายการอาหารของบิลเก่า 😢"); return; }
+            
             showGlobalLoader("กำลังโหลดใบเสร็จเก่า...");
+            
+            // Populate data
             const name = ticket.customerName || 'ลูกค้า';
-            const subtotal = ticket.items.reduce((sum, i) => sum + i.price, 0);
+            const subtotal = ticket.items ? ticket.items.reduce((sum, i) => sum + i.price, 0) : ticket.price;
             const netTotal = ticket.price; const discount = subtotal - netTotal; 
             const tDate = new Date(ticket.timestamp); const dateStr = `${getStandardDate(tDate)} ${formatTime(tDate)}`;
+            
             document.querySelector('.receipt-id').innerText = ticket.id;
             document.querySelector('.receipt-date').innerText = dateStr;
             document.querySelector('.receipt-name').innerText = escapeHtml(name);
             document.querySelector('.receipt-subtotal').innerText = subtotal + '.-';
             document.querySelector('.receipt-discount').innerText = '-' + discount + '.-';
             document.querySelector('.receipt-total').innerText = netTotal + '.-';
+            
+            // Handle Image - Use simple placeholder to avoid CORS and load times
             const receiptAvatar = document.getElementById('receipt-avatar-img');
-            // 5. FIX CORS: Use Placeholder to prevent Tainted Canvas
+            receiptAvatar.crossOrigin = "Anonymous";
+            // Use base64 or trusted CDN
             receiptAvatar.src = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+            
             const itemsContainer = document.querySelector('.receipt-items'); itemsContainer.innerHTML = '';
-            ticket.items.forEach((i, index) => {
-                let detail = `${i.name}`; if(i.meat) detail += ` (${i.meat})`; if(i.addons.length) detail += ` +${i.addons.join(',')}`;
-                const row = document.createElement('div'); row.className = "flex justify-between text-xs";
-                row.innerHTML = `<div class="flex gap-1 text-gray-400"><span class="w-4">${index+1}.</span><span>${detail}</span></div><span class="font-bold text-gray-700">${i.price}.-</span>`;
-                itemsContainer.appendChild(row);
-            });
-            setTimeout(() => {
-                const div = document.getElementById('receipt-capture');
-                html2canvas(div, { scale: 2, useCORS: true, backgroundColor: null }).then(canvas => {
-                    hideGlobalLoader(); openReceiptResult(canvas.toDataURL()); showToast('เสร็จแล้ว! กดบันทึกรูปได้เลย');
-                }).catch((e) => { 
-                    console.error(e);
-                    hideGlobalLoader(); showToast('เกิดข้อผิดพลาดในการบันทึกภาพ'); 
+            
+            if (ticket.items) {
+                ticket.items.forEach((i, index) => {
+                    let detail = `${i.name}`; if(i.meat) detail += ` (${i.meat})`; if(i.addons.length) detail += ` +${i.addons.join(',')}`;
+                    const row = document.createElement('div'); row.className = "flex justify-between text-xs";
+                    row.innerHTML = `<div class="flex gap-1 text-gray-400"><span class="w-4">${index+1}.</span><span>${detail}</span></div><span class="font-bold text-gray-700">${i.price}.-</span>`;
+                    itemsContainer.appendChild(row);
                 });
-            }, 500);
+            }
+
+            // Capture logic
+            const div = document.getElementById('receipt-capture');
+            // Ensure visibility for capture (but hidden from user)
+            div.style.visibility = 'visible';
+            div.style.zIndex = '-100'; // Behind everything but visible to renderer
+
+            // Wait for DOM update
+            setTimeout(() => {
+                html2canvas(div, { 
+                    scale: 2, 
+                    useCORS: true, 
+                    backgroundColor: '#ffffff',
+                    logging: false 
+                }).then(canvas => {
+                    div.style.visibility = 'hidden'; // Hide again
+                    hideGlobalLoader(); 
+                    openReceiptResult(canvas.toDataURL('image/png')); 
+                    showToast('เสร็จแล้ว! กดบันทึกรูปได้เลย');
+                }).catch((e) => { 
+                    div.style.visibility = 'hidden';
+                    console.error(e);
+                    hideGlobalLoader(); 
+                    showToast('เกิดข้อผิดพลาดในการบันทึกภาพ'); 
+                });
+            }, 800); // Increased timeout to ensure image loading
         }
 
         async function submitOrderToLine() {
