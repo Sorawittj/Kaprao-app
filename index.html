@@ -145,16 +145,16 @@
         /* === Feature 3: Layered Depth Card Design === */
         .fast-card {
             background: var(--card-bg);
-            border: 1px solid white; /* White border for pop */
+            border: 1px solid white; 
             box-shadow: 0 10px 20px -5px rgba(0,0,0,0.05), 0 5px 10px -5px rgba(0,0,0,0.02);
             border-radius: 1.5rem;
-            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
             position: relative;
             z-index: 1;
             display: flex;
             flex-direction: column;
-            overflow: visible !important; /* Allow pop-out */
-            margin-top: 10px; /* Space for pop-out */
+            overflow: visible !important;
+            margin-top: 15px; /* Added space for pop-out */
         }
         .fast-card:hover {
             transform: translateY(-4px);
@@ -164,12 +164,12 @@
             transform: scale(0.96);
         }
         .pop-out-image {
-            transform: translateY(-20px) scale(1.1);
+            transform: translateY(-20px) scale(1.05); /* Slightly smaller default scale */
             filter: drop-shadow(0 8px 12px rgba(0,0,0,0.1));
             transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .fast-card:hover .pop-out-image {
-            transform: translateY(-25px) scale(1.2) rotate(2deg);
+            transform: translateY(-25px) scale(1.15) rotate(2deg);
         }
 
         .line-clamp-2 {
@@ -230,7 +230,7 @@
         @keyframes pageOut { to { opacity: 0; transform: scale(0.98); } }
         @keyframes pageIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
 
-        /* Category Pills (Squircle) */
+        /* Category Pills */
         .category-pill {
             min-width: 85px; height: 85px;
             border-radius: 24px;
@@ -301,16 +301,15 @@
         /* === Feature 4: Skeuomorphic Ticket === */
         .ticket-stub {
             background-color: #FFFFFF;
-            /* Perforated edge effect using radial gradient mask */
             background-image: radial-gradient(circle at 0 50%, transparent 8px, #FFFFFF 8.5px), radial-gradient(circle at 100% 50%, transparent 8px, #FFFFFF 8.5px);
             background-position: 0 0, 0 0; background-size: 100% 100%;
             transition: transform 0.2s, box-shadow 0.2s;
             border: 1px solid #E5E7EB;
-            border-left: none; border-right: none; /* Let holes breathe */
+            border-left: none; border-right: none;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             position: relative;
         }
-        .ticket-stub::before { /* Paper Texture */
+        .ticket-stub::before { 
             content: ""; position: absolute; inset: 0; opacity: 0.05;
             background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.4' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
             z-index: 0; pointer-events: none;
@@ -402,6 +401,9 @@
 
         .cart-item-title { font-size: 0.85rem !important; line-height: 1.2 !important; margin-bottom: 0.25rem !important; }
         .cart-item-details { font-size: 0.75rem !important; }
+        
+        /* Toast Z-Index Fix */
+        #toast { z-index: 200 !important; }
     </style>
 </head>
 <body class="pb-40 font-sans select-none relative overflow-x-hidden safe-area-pt">
@@ -594,7 +596,7 @@
         </div>
     </div>
     
-    <!-- Tickets Sheet (Skeuomorphic Design) -->
+    <!-- Tickets Sheet -->
     <div id="tickets-modal-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[110] hidden transition-opacity opacity-0" onclick="closeMyTickets()"></div>
     <div id="tickets-sheet" class="fixed bottom-0 left-0 right-0 glass-heavy rounded-t-[2.5rem] z-[111] transform translate-y-full transition-transform duration-300 shadow-2xl max-w-md mx-auto h-[70vh] flex flex-col safe-area-pb">
         <div class="w-full flex justify-center pt-4 pb-2"><div class="w-12 h-1.5 bg-gray-300 rounded-full"></div></div>
@@ -622,7 +624,7 @@
         </div>
     </div>
 
-    <!-- Checkout Sheet (Card Layout) -->
+    <!-- Checkout Sheet -->
     <div id="checkout-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[70] hidden transition-opacity opacity-0" onclick="closeCheckout()"></div>
     
     <div id="checkout-sheet" class="fixed bottom-0 w-full h-[95vh] flex flex-col max-w-md mx-auto z-[70] transform translate-y-full transition-transform duration-300 bg-gray-50/95 backdrop-blur-xl rounded-t-[2rem] overflow-hidden shadow-2xl border-t border-white/20">
@@ -771,7 +773,7 @@
         </div>
     </div>
 
-    <!-- Product Modal (Morphing Animation Logic) -->
+    <!-- Product Modal -->
     <div id="modal-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[70] hidden transition-opacity opacity-0" onclick="closeModal()"></div>
     <div id="modal-content" class="fixed bottom-0 left-0 right-0 glass-heavy rounded-t-[2.5rem] z-[70] transform translate-y-full transition-transform duration-300 shadow-2xl max-w-md mx-auto h-[85vh] flex flex-col touch-pan-y safe-area-pb">
         <div id="modal-drag-handle" class="w-full flex justify-center pt-4 pb-2 cursor-grab active:cursor-grabbing z-50"><div class="w-12 h-1.5 bg-gray-300 rounded-full"></div></div>
@@ -1238,19 +1240,33 @@
             const toggleBtn = document.getElementById('points-toggle-btn');
             const userPoints = userStats.points || 0;
             
+            // Recalculate based on current cart
+            let subtotal = cart.reduce((sum, i) => sum + i.price, 0);
+            const code = document.getElementById('discount-code').value.trim().toUpperCase();
+            const promo = promotions.find(p => p.code === code);
+            let discountFromCode = 0;
+            if (promo && subtotal >= promo.minOrder) discountFromCode = promo.value;
+            
+            let netTotalBeforePoints = Math.max(0, subtotal - discountFromCode);
+
             if (controlsContainer.classList.contains('hidden')) {
                 if (userPoints < 100) { showToast(`คุณมีพอยต์เพียง ${userPoints} พอยต์ (ต้องการอย่างน้อย 100 พอยต์)`, 'error'); return; }
+                
                 controlsContainer.classList.remove('hidden');
                 isPointsActive = true;
                 toggleBtn.innerHTML = '<i class="fas fa-times mr-2"></i> ปิด';
                 toggleBtn.classList.remove('bg-white', 'text-yellow-600', 'border-yellow-200');
                 toggleBtn.classList.add('bg-red-500', 'text-white', 'border-red-500');
                 
-                const maxPoints = Math.floor(userPoints / 100) * 100;
-                document.getElementById('points-range').max = maxPoints;
-                document.getElementById('points-max').textContent = maxPoints;
-                document.getElementById('points-input').max = maxPoints;
-                const initialPoints = maxPoints >= 100 ? 100 : maxPoints;
+                const maxPointsByPrice = netTotalBeforePoints * 10;
+                const maxPoints = Math.min(userPoints, maxPointsByPrice);
+                const finalMaxPoints = Math.floor(maxPoints / 100) * 100;
+                
+                document.getElementById('points-range').max = finalMaxPoints;
+                document.getElementById('points-max').textContent = finalMaxPoints;
+                document.getElementById('points-input').max = finalMaxPoints;
+                
+                const initialPoints = finalMaxPoints;
                 document.getElementById('points-range').value = initialPoints;
                 document.getElementById('points-input').value = initialPoints;
                 updatePointsDiscount(initialPoints);
@@ -1273,7 +1289,19 @@
             let pointsValue = parseInt(value) || 0;
             pointsValue = Math.round(pointsValue / 100) * 100;
             if (pointsValue < 0) pointsValue = 0;
-            if (pointsValue > userPoints) pointsValue = Math.floor(userPoints / 100) * 100;
+            
+            let subtotal = cart.reduce((sum, i) => sum + i.price, 0);
+            const code = document.getElementById('discount-code').value.trim().toUpperCase();
+            const promo = promotions.find(p => p.code === code);
+            let discountFromCode = 0;
+            if (promo && subtotal >= promo.minOrder) discountFromCode = promo.value;
+            let netTotalBeforePoints = Math.max(0, subtotal - discountFromCode);
+            
+            const maxPointsByPrice = netTotalBeforePoints * 10;
+            const finalMax = Math.min(userPoints, maxPointsByPrice);
+            
+            if (pointsValue > finalMax) pointsValue = Math.floor(finalMax / 100) * 100;
+            
             document.getElementById('points-range').value = pointsValue;
             document.getElementById('points-input').value = pointsValue;
             updatePointsDiscount(pointsValue);
@@ -1284,6 +1312,10 @@
             const discountAmount = Math.floor(pointsAmount / 100) * 10;
             const discountDisplay = document.getElementById('points-discount-amount');
             if (discountDisplay) discountDisplay.textContent = `${discountAmount}`;
+            
+            const usedDisplay = document.getElementById('points-used-display');
+            if (usedDisplay) usedDisplay.textContent = `${pointsAmount}`;
+
             pointsRedeemed = pointsAmount;
             discountValue = discountAmount;
             updateTotalSummary();
@@ -2469,4 +2501,4 @@
         }, true);
     </script>
 </body>
-</html>
+</html>    
