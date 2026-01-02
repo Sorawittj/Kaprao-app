@@ -2036,13 +2036,8 @@
                 const data = await response.json(); OFFICIAL_RESULTS = data; autoCheckLottery(); 
             } catch (error) {}
         }
-function getWinningNumberForDate(dateStr) { 
-    // ดักจับตั๋วที่ระบุวันที่ 1 มกราคม 2026
-    if (dateStr === "01/01/2026") {
-        return "xx"; // <--- เปลี่ยน "xx" เป็นเลขที่ออกจริงวันนี้ เช่น "52"
-    }
-    return OFFICIAL_RESULTS[dateStr] || "NotSet"; 
-}
+        function getWinningNumberForDate(dateStr) { return OFFICIAL_RESULTS[dateStr] || "NotSet"; }
+
         let currentOrderId = "";
         function generateOrderId() {
             const now = Date.now().toString(); const timePart = now.slice(-2); 
