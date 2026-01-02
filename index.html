@@ -13,6 +13,44 @@
     <link rel="preconnect" href="https://cdn.tailwindcss.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
 
+    <!-- 1. TAILWIND CONFIG (MUST BE BEFORE LOADING TAILWIND) -->
+    <script>
+        window.tailwind = {
+            config: {
+                theme: {
+                    extend: {
+                        colors: {
+                            brand: {
+                                purple: '#8B5CF6', 
+                                yellow: '#FBBF24',
+                                text: '#1F2937',        
+                            }
+                        },
+                        fontFamily: {
+                            sans: ['Kanit', 'sans-serif'],
+                            round: ['Kanit', 'sans-serif'] 
+                        },
+                        borderRadius: {
+                            '4xl': '2.5rem',
+                        },
+                        animation: {
+                            'bounce-slow': 'bounce 3s infinite',
+                            'fade-in-down': 'fadeInDown 0.3s ease-out forwards',
+                            'spin-fast': 'spin 0.8s linear infinite',
+                        },
+                        keyframes: {
+                            fadeInDown: {
+                                '0%': { opacity: '0', transform: 'translateY(-10px)' },
+                                '100%': { opacity: '1', transform: 'translateY(0)' },
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-4FR74WPRNY"></script>
@@ -29,46 +67,12 @@
     <link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
     
     <title>Kaprao52 - APP</title> 
-    <script src="https://cdn.tailwindcss.com"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script defer src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            purple: '#8B5CF6', 
-                            yellow: '#FBBF24',
-                            text: '#1F2937',        
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Kanit', 'sans-serif'],
-                        round: ['Kanit', 'sans-serif'] 
-                    },
-                    borderRadius: {
-                        '4xl': '2.5rem',
-                    },
-                    animation: {
-                        'bounce-slow': 'bounce 3s infinite',
-                        'fade-in-down': 'fadeInDown 0.3s ease-out forwards',
-                        'spin-fast': 'spin 0.8s linear infinite',
-                    },
-                    keyframes: {
-                        fadeInDown: {
-                            '0%': { opacity: '0', transform: 'translateY(-10px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-
     <style>
         /* === THEME VARIABLES (PURE LIGHT THEME) === */
         :root {
@@ -124,6 +128,13 @@
         ::selection {
             background-color: rgba(251, 191, 36, 0.3);
             color: var(--text-primary);
+        }
+        
+        /* 4. FIX IOS ZOOM ON INPUTS */
+        @media screen and (max-width: 768px) {
+            input, textarea, select {
+                font-size: 16px !important;
+            }
         }
 
         /* --- BACKGROUND ANIMATION (Canvas) --- */
@@ -933,7 +944,7 @@
             return total;
         }
 
-        // --- NEW: Canvas Background (Performance) ---
+        // --- NEW: Canvas Background (Performance Optimized) ---
         function initCanvasBackground() {
             const canvas = document.getElementById('bg-canvas');
             if (!canvas) return;
@@ -942,6 +953,12 @@
             let width, height;
             const bubbles = [];
             const icons = ['🍃', '🌶️', '🍳', '🧄', '🥓'];
+
+            // 3. PERFORMANCE: Check Tab Activity
+            let isTabActive = true;
+            document.addEventListener('visibilitychange', () => {
+                isTabActive = !document.hidden;
+            });
 
             function resize() {
                 width = window.innerWidth;
@@ -989,6 +1006,12 @@
             for (let i = 0; i < 10; i++) bubbles.push(new Bubble());
 
             function animate() {
+                // Stop animation if tab is hidden to save battery
+                if (!isTabActive) {
+                    requestAnimationFrame(animate);
+                    return;
+                }
+
                 ctx.clearRect(0, 0, width, height);
                 bubbles.forEach(b => b.update());
                 requestAnimationFrame(animate);
@@ -1477,7 +1500,9 @@
 
         async function syncTicketHistory(userId) {
             try {
+                // 2. FETCH FIX: Removed mode: 'no-cors'
                 const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getHistory&userId=' + userId);
+                if (!response.ok) throw new Error('Network response was not ok');
                 const serverTickets = await response.json();
                 if (!Array.isArray(serverTickets) || serverTickets.length === 0) return;
                 let updated = false;
@@ -1500,22 +1525,29 @@
                     localStorage.setItem(KEYS.HISTORY, JSON.stringify(lottoHistory));
                     updateTicketBadge(); autoCheckLottery(); 
                 }
-            } catch (e) {}
+            } catch (e) {
+                console.error("Sync History Error:", e);
+            }
         }
 
         async function syncUserStatsFromServer(userId) {
             if(!userId) return;
             isSyncing = true; 
             try {
+                // 2. FETCH FIX: Removed mode: 'no-cors'
                 const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getUserStats&userId=' + userId);
+                if (!response.ok) throw new Error('Network response was not ok');
                 const serverData = await response.json();
                 if(serverData && serverData.points !== undefined) {
                     userStats.points = serverData.points;
                     localStorage.setItem(KEYS.STATS, JSON.stringify(userStats));
                     updatePointsDisplay();
                 }
+            } catch (error) { 
+                console.error("Sync Stats Error:", error);
+            } finally {
                 isSyncing = false;
-            } catch (error) { isSyncing = false; }
+            }
         }
 
         // --- NEW: Manual Refresh Points ---
@@ -2044,9 +2076,16 @@
         let OFFICIAL_RESULTS = {};
         async function fetchLottoResults() {
             try {
+                // 2. FETCH FIX: Removed mode: 'no-cors'
                 const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getLotto');
-                const data = await response.json(); OFFICIAL_RESULTS = data; autoCheckLottery(); 
-            } catch (error) {}
+                if (response.ok) {
+                    const data = await response.json(); 
+                    OFFICIAL_RESULTS = data; 
+                    autoCheckLottery(); 
+                }
+            } catch (error) {
+                console.error("Lotto Error:", error);
+            }
         }
         function getWinningNumberForDate(dateStr) { return OFFICIAL_RESULTS[dateStr] || "NotSet"; }
 
@@ -2290,6 +2329,7 @@
             document.querySelector('.receipt-discount').innerText = '-' + discount + '.-';
             document.querySelector('.receipt-total').innerText = netTotal + '.-';
             const receiptAvatar = document.getElementById('receipt-avatar-img');
+            // 5. FIX CORS: Use Placeholder to prevent Tainted Canvas
             receiptAvatar.src = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
             const itemsContainer = document.querySelector('.receipt-items'); itemsContainer.innerHTML = '';
             ticket.items.forEach((i, index) => {
@@ -2302,7 +2342,10 @@
                 const div = document.getElementById('receipt-capture');
                 html2canvas(div, { scale: 2, useCORS: true, backgroundColor: null }).then(canvas => {
                     hideGlobalLoader(); openReceiptResult(canvas.toDataURL()); showToast('เสร็จแล้ว! กดบันทึกรูปได้เลย');
-                }).catch(() => { hideGlobalLoader(); showToast('เกิดข้อผิดพลาดในการบันทึกภาพ'); });
+                }).catch((e) => { 
+                    console.error(e);
+                    hideGlobalLoader(); showToast('เกิดข้อผิดพลาดในการบันทึกภาพ'); 
+                });
             }, 500);
         }
 
