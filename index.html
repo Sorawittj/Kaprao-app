@@ -78,7 +78,7 @@
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     
     <style>
-        /* === THEME VARIABLES (PURE LIGHT THEME) === */
+        /* === THEME VARIABLES === */
         :root {
             --bg-primary: #FEF9F3;
             --bg-secondary: #FFFFFF;
@@ -114,7 +114,6 @@
             background: var(--bg-primary);
             transition: background-color 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
-        /* Lock Scroll Class */
         body.scroll-locked { overflow: hidden; height: 100vh; }
 
         .hide-scroll::-webkit-scrollbar { display: none; }
@@ -136,7 +135,6 @@
             color: var(--text-primary);
         }
         
-        /* 4. FIX IOS ZOOM ON INPUTS */
         @media screen and (max-width: 768px) {
             input, textarea, select { font-size: 16px !important; }
         }
@@ -497,35 +495,17 @@
                 </h1>
             </div>
             <div class="flex flex-col items-center">
-                 <div class="flex gap-2">
-                     <!-- Search Toggle Button -->
-                     <button onclick="toggleSearch()" class="btn-bounce w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center text-gray-500 hover:text-indigo-500 transition-colors">
-                        <i class="fas fa-search text-sm"></i>
-                     </button>
-                     <div id="header-avatar-btn" onclick="openAvatarModal()" class="btn-bounce w-24 h-24 rounded-full bg-white border-2 border-gray-100 shadow-md flex items-center justify-center relative cursor-pointer overflow-hidden hover:border-yellow-400 transition-colors">
-                          <img id="avatar-img" src="" class="w-full h-full object-cover">
-                          <div class="absolute bottom-0 right-0 bg-indigo-500 rounded-full w-7 h-7 flex items-center justify-center shadow-md border-2 border-white z-30" style="bottom: 5px; right: 5px;">
-                              <i class="fas fa-pen text-xs text-white"></i>
-                          </div>
-                    </div>
-                 </div>
-                <p id="avatar-name-display" class="text-xs font-round font-bold text-indigo-500 mt-3 tracking-wide bg-white px-4 py-1 rounded-full shadow-sm border border-gray-100 text-gray-700">ลูกค้า</p>
-                <div id="vip-badge" class="hidden mt-2 text-[10px] font-bold text-yellow-600 bg-yellow-50 px-2 py-0.5 rounded-full border border-yellow-200">VIP</div>
-            </div>
-        </div>
-
-        <!-- Smart Search Bar (Hidden by default) -->
-        <div id="search-container" class="hidden mb-4 animate-fade-in-down">
-            <div class="relative">
-                <input type="text" id="search-input" placeholder="🔍 ค้นหาเมนู (เช่น หมู, กะเพรา, ไข่)" 
-                       class="w-full bg-white border-2 border-indigo-100 rounded-2xl py-3 pl-12 pr-4 text-sm font-bold text-gray-700 focus:border-indigo-500 focus:ring-0 shadow-sm"
-                       onkeyup="handleSearch(this.value)">
-                <div class="absolute left-4 top-3.5 text-gray-400">
-                    <i class="fas fa-search"></i>
+                 <div id="header-avatar-btn" onclick="openAvatarModal()" class="btn-bounce w-24 h-24 rounded-full bg-white border-2 border-gray-100 shadow-md flex items-center justify-center relative cursor-pointer overflow-hidden hover:border-yellow-400 transition-colors">
+                      <img id="avatar-img" src="" class="w-full h-full object-cover">
+                      <div class="absolute bottom-0 right-0 bg-indigo-500 rounded-full w-7 h-7 flex items-center justify-center shadow-md border-2 border-white z-30" style="bottom: 5px; right: 5px;">
+                          <i class="fas fa-pen text-xs text-white"></i>
+                      </div>
                 </div>
-                <button onclick="toggleSearch()" class="absolute right-3 top-2 bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-200">
-                    <i class="fas fa-times text-xs"></i>
-                </button>
+                <!-- 3. FIX VIP BADGE: Moved to right of name -->
+                <div class="flex items-center gap-2 mt-3">
+                    <p id="avatar-name-display" class="text-xs font-round font-bold text-indigo-500 tracking-wide bg-white px-4 py-1 rounded-full shadow-sm border border-gray-100 text-gray-700">ลูกค้า</p>
+                    <div id="vip-badge" class="hidden text-[10px] font-bold text-yellow-600 bg-yellow-50 px-2 py-0.5 rounded-full border border-yellow-200">VIP</div>
+                </div>
             </div>
         </div>
 
@@ -580,11 +560,34 @@
             </button>
         </div>
 
-        <div class="mb-3 flex items-center justify-between">
-            <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2">หมวดหมู่</h3>
-            <div class="flex gap-2">
-                <button onclick="scrollTabs(-100)" class="btn-bounce bg-white w-10 h-10 rounded-full flex items-center justify-center text-gray-400 hover:text-indigo-500 transition-all border border-gray-200 shadow-sm"><i class="fas fa-chevron-left text-xs"></i></button>
-                <button onclick="scrollTabs(100)" class="btn-bounce bg-white w-10 h-10 rounded-full flex items-center justify-center text-gray-400 hover:text-indigo-500 transition-all border border-gray-200 shadow-sm"><i class="fas fa-chevron-right text-xs"></i></button>
+        <!-- 2. FIX SEARCH: Moved Search Button here -->
+        <div class="mb-3">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-3">
+                    <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2">หมวดหมู่</h3>
+                     <button onclick="toggleSearch()" class="btn-bounce w-9 h-9 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center text-gray-500 hover:text-indigo-500 transition-colors">
+                        <i class="fas fa-search text-xs"></i>
+                     </button>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="scrollTabs(-100)" class="btn-bounce bg-white w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:text-indigo-500 transition-all border border-gray-200 shadow-sm"><i class="fas fa-chevron-left text-xs"></i></button>
+                    <button onclick="scrollTabs(100)" class="btn-bounce bg-white w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:text-indigo-500 transition-all border border-gray-200 shadow-sm"><i class="fas fa-chevron-right text-xs"></i></button>
+                </div>
+            </div>
+            
+            <!-- Smart Search Bar (Hidden by default, appears here) -->
+            <div id="search-container" class="hidden mb-4 animate-fade-in-down">
+                <div class="relative">
+                    <input type="text" id="search-input" placeholder="🔍 ค้นหาเมนู (เช่น หมู, กะเพรา, ไข่)" 
+                           class="w-full bg-white border-2 border-indigo-100 rounded-2xl py-3 pl-12 pr-10 text-sm font-bold text-gray-700 focus:border-indigo-500 focus:ring-0 shadow-sm transition-all"
+                           onkeyup="handleSearch(this.value)">
+                    <div class="absolute left-4 top-3.5 text-gray-400">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <button onclick="toggleSearch()" class="absolute right-3 top-2 bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-200">
+                        <i class="fas fa-times text-xs"></i>
+                    </button>
+                </div>
             </div>
         </div>
         
@@ -925,7 +928,7 @@
             animate();
         }
 
-        // 🎉 Confetti Function (No external lib dependency)
+        // 🎉 Confetti Function
         function confetti() {
             const canvas = document.getElementById('confetti-canvas');
             const ctx = canvas.getContext('2d');
@@ -1005,11 +1008,13 @@
             { id: 20, name: "เฉาก๊วยนมสด", price: 30, icon: "🧊", category: "dessert", reqMeat: false, kcal: 150 },
             { id: 21, name: "กล้วยเชื่อม", price: 25, icon: "🍌", category: "dessert", reqMeat: false, kcal: 220 },
         ];
+        // 1. FIX COUPON: Added SORRY30
         const promotions = [
             { code: "SAVE10", title: "Set อิ่มคุ้ม (Value) 🥉", desc: "ครบ 150.- ลด 10 บาท", minOrder: 150, type: "discount", value: 10, color: "bg-orange-400", icon: "🥡" },
             { code: "SAVE25", title: "Set ยกแก๊ง (Gang) 🥈", desc: "ครบ 300.- ลด 25 บาท", minOrder: 300, type: "discount", value: 25, color: "bg-blue-500", icon: "🛵" },
             { code: "SAVE50", title: "Set จัดเต็ม (Grand) 🥇", desc: "ครบ 500.- ลด 50 บาท", minOrder: 500, type: "discount", value: 50, color: "bg-brand-purple", icon: "🏢" },
             { code: "SORRY20", title: "ขออภัยในความไม่สะดวก", desc: "ส่วนลดพิเศษ", minOrder: 0, type: "discount", value: 20, isHidden: true },
+            { code: "SORRY30", title: "ขออภัยในความไม่สะดวก", desc: "ส่วนลดพิเศษ", minOrder: 0, type: "discount", value: 30, isHidden: true },
         ];
 
         let isSyncing = false;
@@ -1240,17 +1245,33 @@
             setTimeout(() => btn.classList.remove('animate-spin-fast'), 1000);
         }
 
+        // 4. FIX LINE SYNC: Overwrite name on login
         async function initLIFF() {
             try {
                 await liff.init({ liffId: MY_LIFF_ID });
                 if (liff.isLoggedIn()) {
                     const vip = document.getElementById('vip-badge'); if (vip) { vip.classList.remove('hidden'); vip.innerText = 'VIP'; }
-                    const profile = await liff.getProfile(); const loginBtn = document.getElementById('line-login-btn'); if(loginBtn) loginBtn.classList.add('hidden');
+                    const profile = await liff.getProfile(); 
+                    const loginBtn = document.getElementById('line-login-btn'); if(loginBtn) loginBtn.classList.add('hidden');
+                    
                     let savedUser = {}; try { savedUser = JSON.parse(localStorage.getItem(KEYS.USER)) || {}; } catch(e) {}
-                    savedUser.userId = profile.userId; userAvatar.userId = profile.userId; 
-                    const nameInput = document.getElementById('user-name'); if(nameInput && (!nameInput.value || nameInput.value.trim() === '')) { nameInput.value = profile.displayName; savedUser.name = profile.displayName; }
-                    if(profile.pictureUrl && (avatarOptions.includes(userAvatar.image) || !userAvatar.image)) { userAvatar.image = profile.pictureUrl; userAvatar.name = profile.displayName; savedUser.avatar = userAvatar; updateAvatarDisplay(); }
+                    savedUser.userId = profile.userId; 
+                    userAvatar.userId = profile.userId;
+                    
+                    // --- FORCE UPDATE NAME FROM LINE ---
+                    savedUser.name = profile.displayName;
+                    userAvatar.name = profile.displayName;
+                    const nameInput = document.getElementById('user-name'); 
+                    if(nameInput) nameInput.value = profile.displayName;
+                    // -----------------------------------
+                    
+                    if(profile.pictureUrl && (avatarOptions.includes(userAvatar.image) || !userAvatar.image)) { 
+                        userAvatar.image = profile.pictureUrl; 
+                    }
+                    savedUser.avatar = userAvatar;
+                    updateAvatarDisplay(); 
                     localStorage.setItem(KEYS.USER, JSON.stringify(savedUser));
+                    
                     if (cart.length === 0 && savedUser.cart && savedUser.cart.length > 0) { cart = savedUser.cart; updateMiniCart(); renderCheckoutList(); }
                     const localHistoryIds = lottoHistory.map(t => t.id);
                     if (localHistoryIds.length > 0) { fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'claim_orders', userId: profile.userId, orderIds: localHistoryIds }) }).then(() => { syncUserStatsFromServer(profile.userId); syncTicketHistory(profile.userId); }); } 
@@ -1351,10 +1372,9 @@
             if (favoriteItems.has(id)) { favoriteItems.delete(id); showToast('ลบจากรายการโปรดแล้ว'); } 
             else { favoriteItems.add(id); showToast('เพิ่มในรายการโปรดแล้ว ❤️', 'success'); }
             saveToLS();
-            // Pulse Animation on button
             const btn = e.currentTarget; btn.classList.add('active');
             setTimeout(() => btn.classList.remove('active'), 500);
-            renderMenu(); // Re-render to update UI or list
+            renderMenu(); 
             triggerHaptic();
         }
 
@@ -1430,22 +1450,15 @@
         function renderMenu() {
             const grid = document.getElementById('menu-grid'); grid.innerHTML = '';
             let filteredItems = [];
-
-            // 1. Search Logic
             if (searchQuery.length > 0) {
-                // Search across all items
                 filteredItems = menuItems.filter(i => i.name.toLowerCase().includes(searchQuery));
                 document.getElementById('section-title').innerText = `ค้นหา: "${searchQuery}" (${filteredItems.length})`;
             } 
-            // 2. Favorites Logic
             else if (activeCategory === 'favorites') {
                 filteredItems = menuItems.filter(i => favoriteItems.has(i.id));
                 if (filteredItems.length === 0) { grid.innerHTML = `<div class="col-span-2 text-center text-gray-400 mt-10"><div class="text-4xl mb-2">💔</div><p>ยังไม่มีเมนูโปรด กดหัวใจที่เมนูได้เลยครับ</p></div>`; return; }
             } 
-            // 3. Normal Category Logic
-            else {
-                filteredItems = menuItems.filter(i => i.category === activeCategory);
-            }
+            else { filteredItems = menuItems.filter(i => i.category === activeCategory); }
             
             if(filteredItems.length === 0 && searchQuery.length > 0) { grid.innerHTML = `<div class="col-span-2 text-center text-gray-400 mt-10">ไม่พบเมนูที่ค้นหาครับ 😅</div>`; return; }
 
@@ -1468,7 +1481,6 @@
                 else if (isSoldOut) statusBadge = `<div class="absolute top-2 right-2 bg-red-500/90 backdrop-blur-sm text-white text-[9px] font-bold px-2 py-1 rounded-full shadow-lg z-20">หมด</div>`;
                 else if (isDessert) statusBadge = `<div class="absolute top-2 right-2 bg-gray-600/90 backdrop-blur-sm text-white text-[9px] font-bold px-2 py-1 rounded-full shadow-lg z-20">เร็วๆ นี้</div>`;
                 
-                // Favorite Button Logic
                 const isFav = favoriteItems.has(item.id);
                 const heartIcon = `<button onclick="toggleFavorite(event, ${item.id})" class="absolute top-2 right-2 z-30 heart-btn w-8 h-8 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow-sm hover:scale-110 active:scale-90 ${isFav ? 'text-red-500' : 'text-gray-300'}"><i class="fas fa-heart text-lg"></i></button>`;
 
@@ -1476,7 +1488,6 @@
                 const newBadge = item.isNew && !isSoldOut ? `<div class="absolute top-2 left-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-[8px] font-black px-2 py-1 rounded-full shadow-lg z-20 animate-pulse border border-white/30">NEW</div>` : '';
                 const actionButton = (!isDessert && !isSoldOut && !isTrayWait) ? `<button onclick="event.stopPropagation(); const item = menuItems.find(i => i.id === ${item.id}); if(item) openModal(item);" class="mt-3 w-full btn-gradient text-white font-bold py-2.5 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 text-sm group-hover:scale-105"><i class="fas fa-plus text-xs"></i><span>เพิ่มลงตะกร้า</span></button>` : `<div class="mt-3 w-full bg-gray-100 text-gray-400 font-medium py-2.5 rounded-xl text-center text-sm">ไม่พร้อมขาย</div>`;
                 
-                // Lazy Loading Added
                 el.innerHTML = `${newBadge}${isTrayWait || isSoldOut || isDessert ? statusBadge : heartIcon}<div class="flex flex-col items-center mb-3 ${(isDessert||isSoldOut||isTrayWait)?'opacity-60 grayscale-[50%]':''}"><div class="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center text-4xl mb-3 shadow-sm border border-gray-100 group-hover:scale-110 transition-transform"><span class="menu-icon" aria-hidden="true" loading="lazy">${item.icon}</span></div><h3 class="font-bold text-gray-700 text-sm text-center leading-tight group-hover:text-indigo-500 transition-colors mb-2 line-clamp-2 min-h-[2.5rem]">${item.name}</h3><div class="flex flex-wrap items-center justify-center gap-1.5 mb-2"><span class="text-[10px] text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200">${item.kcal} kcal</span>${item.reqMeat ? '<span class="text-[9px] text-yellow-600 border border-yellow-200 bg-yellow-50 px-1.5 py-0.5 rounded-full">เลือกเนื้อสัตว์</span>' : ''}</div></div><div class="mt-auto pt-3 border-t border-gray-100"><div class="flex items-center justify-between mb-2"><span class="text-xs text-gray-400">ราคา</span>${priceDisplay}</div>${actionButton}</div>`;
                 grid.appendChild(el);
             });
