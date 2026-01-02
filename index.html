@@ -228,7 +228,7 @@
         @keyframes pageOut { to { opacity: 0; transform: scale(0.96) translateY(10px); } }
         @keyframes pageIn { from { opacity: 0; transform: scale(0.96) translateY(-10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 
-        /* === NEW CATEGORY PILLS (SQUIRCLE DESIGN) === */
+        /* Category Pills */
         .category-pill {
             min-width: 85px; 
             height: 85px;
@@ -283,7 +283,7 @@
             background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
             box-shadow: 0 8px 20px -6px rgba(99, 102, 241, 0.4);
         }
-        
+
         .tab-icon {
             font-size: 1.8rem;
             margin-bottom: 2px;
@@ -1073,6 +1073,7 @@
         const sfxTrash = new Audio('https://www.soundjay.com/misc/sounds/crumple-paper-1.mp3'); 
         const sfxWin = new Audio('https://www.soundjay.com/misc/sounds/magic-chime-01.mp3');
         const sfxSwitch = new Audio('https://www.soundjay.com/buttons/sounds/button-20.mp3'); 
+        
         sfxPop.volume = 0.4; sfxSwitch.volume = 0.2; sfxTrash.volume = 0.8;
 
         function playSound(type) {
@@ -2067,24 +2068,41 @@
         }
 
         function autoCheckLottery() {
-            const pendingTickets = lottoHistory.filter(t => t.status === 'pending');
-            if(pendingTickets.length === 0) return;
-            const now = new Date(); now.setHours(0, 0, 0, 0); 
-            let winCount = 0; let updated = false;
-            pendingTickets.forEach(t => {
-                let targetDate = t.drawDateTimestamp || 0;
-                if (now.getTime() < targetDate) return; 
-                const winningNum = getWinningNumberForDate(t.drawDate || getStandardDate(new Date()));
-                if (t.number === winningNum) {
-                    t.status = 'won'; winCount++;
-                    if (Notification.permission === "granted") new Notification("เศรษฐีใหม่มาแล้ว! 🤑", { body: `งวด ${t.drawDate}: Order ${t.id} ถูกรางวัลกินฟรี!`, icon: 'https://cdn-icons-png.flaticon.com/512/3170/3170733.png' });
-                } else if (winningNum !== "NotSet") t.status = 'lost';
-                if (winningNum !== "NotSet") { t.checkedDate = getStandardDate(new Date()); updated = true; }
+            if(lottoHistory.length === 0) return;
+            
+            let updated = false;
+            const now = new Date();
+            now.setHours(0, 0, 0, 0); 
+    
+            lottoHistory.forEach(t => {
+                const winningNum = getWinningNumberForDate(t.drawDate);
+                
+                // Logic to revert state if winning number is gone (e.g. was testing)
+                if (winningNum === "NotSet" && t.status !== 'pending') {
+                     t.status = 'pending';
+                     updated = true;
+                }
+                // Logic to check result if available
+                else if (winningNum !== "NotSet") {
+                     if (t.number === winningNum) {
+                         if (t.status !== 'won') {
+                             t.status = 'won';
+                             updated = true;
+                             if (Notification.permission === "granted") new Notification("เศรษฐีใหม่มาแล้ว! 🤑", { body: `งวด ${t.drawDate}: Order ${t.id} ถูกรางวัลกินฟรี!`, icon: 'https://cdn-icons-png.flaticon.com/512/3170/3170733.png' });
+                         }
+                     } else {
+                         if (t.status !== 'lost') {
+                             t.status = 'lost';
+                             updated = true;
+                         }
+                     }
+                     t.checkedDate = getStandardDate(new Date());
+                }
             });
+    
             if (updated) {
                 localStorage.setItem(KEYS.HISTORY, JSON.stringify(lottoHistory));
-                if(winCount > 0) { sfxWin.play(); showToast(`🎉 ยินดีด้วย! คุณถูกรางวัล ${winCount} ใบ!`); }
-                updateTicketBadge();
+                updateTicketBadge(); // Update UI
             }
         }
         function updateTicketBadge() {
