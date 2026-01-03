@@ -501,7 +501,7 @@
                           <i class="fas fa-pen text-xs text-white"></i>
                       </div>
                 </div>
-                <!-- 3. FIX VIP BADGE: Moved to right of name -->
+                <!-- VIP BADGE -->
                 <div class="flex items-center gap-2 mt-3">
                     <p id="avatar-name-display" class="text-xs font-round font-bold text-indigo-500 tracking-wide bg-white px-4 py-1 rounded-full shadow-sm border border-gray-100 text-gray-700">ลูกค้า</p>
                     <div id="vip-badge" class="hidden text-[10px] font-bold text-yellow-600 bg-yellow-50 px-2 py-0.5 rounded-full border border-yellow-200">VIP</div>
@@ -560,7 +560,7 @@
             </button>
         </div>
 
-        <!-- 2. FIX SEARCH: Moved Search Button here -->
+        <!-- Search Button -->
         <div class="mb-3">
             <div class="flex items-center justify-between mb-3">
                 <div class="flex items-center gap-3">
@@ -575,7 +575,7 @@
                 </div>
             </div>
             
-            <!-- Smart Search Bar (Hidden by default, appears here) -->
+            <!-- Smart Search Bar -->
             <div id="search-container" class="hidden mb-4 animate-fade-in-down">
                 <div class="relative">
                     <input type="text" id="search-input" placeholder="🔍 ค้นหาเมนู (เช่น หมู, กะเพรา, ไข่)" 
@@ -591,7 +591,7 @@
             </div>
         </div>
         
-        <!-- Updated Tab Container -->
+        <!-- Updated Tab Container with Curry Category -->
         <div id="tabs-container" class="sticky top-0 z-30 pt-2 pb-4 -mx-5 px-5 flex gap-3 snap-x scroll-smooth overflow-x-auto hide-scroll transition-all">
             <button onclick="switchCategory('favorites')" id="tab-favorites" class="category-pill category-pill-favorites category-pill-inactive snap-start">
                 <span class="text-xl tab-icon">❤️</span><span class="text-xs font-bold">ที่ชอบ</span>
@@ -604,6 +604,9 @@
             </button>
             <button onclick="switchCategory('garlic')" id="tab-garlic" class="category-pill category-pill-inactive snap-start">
                 <span class="text-xl tab-icon">🧄</span><span class="text-xs">กระเทียม</span>
+            </button>
+             <button onclick="switchCategory('curry')" id="tab-curry" class="category-pill category-pill-inactive snap-start">
+                <span class="text-xl tab-icon">🥘</span><span class="text-xs">พริกแกง</span>
             </button>
             <button onclick="switchCategory('noodle')" id="tab-noodle" class="category-pill category-pill-inactive snap-start">
                 <span class="text-xl tab-icon">🍜</span><span class="text-xs">เมนูเส้น</span>
@@ -637,7 +640,7 @@
         <div id="menu-grid" class="grid grid-cols-2 gap-4 mb-20" role="grid" aria-label="เมนูอาหาร"></div>
         
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ | Version 22.0.0</p>
         </div>
     </div>
     
@@ -903,7 +906,9 @@
         const addonIds = ['special', 'kaikhon', 'kaidao', 'kaijiao', 'kaitom', 'kaiyiewma'];
         const addonCalories = { 'special': 80, 'kaikhon': 150, 'kaidao': 120, 'kaijiao': 200, 'kaitom': 75, 'kaiyiewma': 100 };
         const KEYS = { USER: 'kaprao52_user', HISTORY: 'kaprao_lotto_history', STATS: 'kaprao_stats', VERSION: 'kaprao_ver', FAVORITES: 'kaprao_favorites' };
-        const CURRENT_VERSION = '21.0.1'; 
+        
+        // 1. UPDATED VERSION
+        const CURRENT_VERSION = '22.0.0'; 
 
         // --- CANVAS BACKGROUND & CONFETTI ---
         function initCanvasBackground() {
@@ -990,6 +995,15 @@
             { id: 102, name: "กะเพรากุ้ง", price: 60, icon: "🦐", category: "kaprao", reqMeat: false, kcal: 450, isNew: true },
             { id: 105, name: "กะเพราไก่", price: 50, icon: "🐔", category: "kaprao", reqMeat: false, kcal: 450, isNew: true }, 
             { id: 108, name: "กะเพราปลาหมึก", price: 60, icon: "🦑", category: "kaprao", reqMeat: false, kcal: 480, isNew: true }, 
+            
+            // 2. NEW CURRY ITEMS
+            { id: 301, name: "พริกแกงหมูชิ้น(สันคอ)", price: 50, icon: "🥩", category: "curry", reqMeat: false, kcal: 550, isNew: true },
+            { id: 302, name: "พริกแกงหมูสับ", price: 50, icon: "🐷", category: "curry", reqMeat: false, kcal: 520, isNew: true },
+            { id: 303, name: "พริกแกงหมูเด้ง", price: 50, icon: "🥓", category: "curry", reqMeat: false, kcal: 540, isNew: true },
+            { id: 304, name: "พริกแกงกุ้ง", price: 60, icon: "🦐", category: "curry", reqMeat: false, kcal: 480, isNew: true },
+            { id: 305, name: "พริกแกงปลาหมึก", price: 60, icon: "🦑", category: "curry", reqMeat: false, kcal: 470, isNew: true },
+            { id: 306, name: "พริกแกงไก่", price: 50, icon: "🐔", category: "curry", reqMeat: false, kcal: 450, isNew: true },
+
             { id: 10, name: "มาม่าผัดกะเพรา", price: 50, icon: "🍜", category: "noodle", reqMeat: true, kcal: 450 },
             { id: 1, name: "กะเพราวุ้นเส้น", price: 55, icon: "🍝", category: "noodle", reqMeat: true, kcal: 400 },
             { id: 7, name: "หมูสับกระเทียม", price: 50, icon: "🧄", category: "garlic", reqMeat: false, kcal: 500 },
@@ -1008,7 +1022,7 @@
             { id: 20, name: "เฉาก๊วยนมสด", price: 30, icon: "🧊", category: "dessert", reqMeat: false, kcal: 150 },
             { id: 21, name: "กล้วยเชื่อม", price: 25, icon: "🍌", category: "dessert", reqMeat: false, kcal: 220 },
         ];
-        // 1. FIX COUPON: Added SORRY30
+        
         const promotions = [
             { code: "SAVE10", title: "Set อิ่มคุ้ม (Value) 🥉", desc: "ครบ 150.- ลด 10 บาท", minOrder: 150, type: "discount", value: 10, color: "bg-orange-400", icon: "🥡" },
             { code: "SAVE25", title: "Set ยกแก๊ง (Gang) 🥈", desc: "ครบ 300.- ลด 25 บาท", minOrder: 300, type: "discount", value: 25, color: "bg-blue-500", icon: "🛵" },
@@ -1245,7 +1259,6 @@
             setTimeout(() => btn.classList.remove('animate-spin-fast'), 1000);
         }
 
-        // 4. FIX LINE SYNC: Overwrite name on login
         async function initLIFF() {
             try {
                 await liff.init({ liffId: MY_LIFF_ID });
@@ -1258,12 +1271,10 @@
                     savedUser.userId = profile.userId; 
                     userAvatar.userId = profile.userId;
                     
-                    // --- FORCE UPDATE NAME FROM LINE ---
                     savedUser.name = profile.displayName;
                     userAvatar.name = profile.displayName;
                     const nameInput = document.getElementById('user-name'); 
                     if(nameInput) nameInput.value = profile.displayName;
-                    // -----------------------------------
                     
                     if(profile.pictureUrl && (avatarOptions.includes(userAvatar.image) || !userAvatar.image)) { 
                         userAvatar.image = profile.pictureUrl; 
@@ -1417,7 +1428,7 @@
             const grid = document.getElementById('menu-grid'); const msg = document.getElementById('dessert-msg');
             grid.classList.add('page-out'); if(!msg.classList.contains('hidden')) msg.classList.add('page-out');
             
-            const categories = ['favorites', 'kaprao', 'tray', 'garlic', 'noodle', 'soup', 'others', 'dessert', 'promotion'];
+            const categories = ['favorites', 'kaprao', 'tray', 'garlic', 'curry', 'noodle', 'soup', 'others', 'dessert', 'promotion'];
             categories.forEach(c => {
                 const btn = document.getElementById(`tab-${c}`);
                 let extraClass = '';
@@ -1439,6 +1450,7 @@
                     else if (cat === 'soup') { title.innerText = "เมนูแกง/ต้ม"; renderMenu(); } 
                     else if (cat === 'tray') { title.innerText = "ชุดถาดสุดคุ้ม"; renderMenu(); } 
                     else if (cat === 'favorites') { title.innerText = "เมนูที่ชอบ ❤️"; renderMenu(); }
+                    else if (cat === 'curry') { title.innerText = "เมนูพริกแกง"; renderMenu(); }
                     else { title.innerText = "รายการแนะนำ"; renderMenu(); }
                     document.getElementById('section-title').scrollIntoView({ behavior: 'smooth', block: 'start' });
                     grid.classList.add('page-in'); setTimeout(() => grid.classList.remove('page-in'), 300);
