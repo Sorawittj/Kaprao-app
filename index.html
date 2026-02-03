@@ -306,7 +306,7 @@
         #tabs-container button:hover .tab-icon { transform: rotate(15deg) scale(1.1); }
         #tabs-container button:active { transform: scale(0.94); }
 
-        /* Loader */
+        /* Loader - IMPROVED */
         #global-loader { 
             position: fixed; inset: 0; z-index: 9999; 
             background: var(--bg-primary); display: flex; flex-direction: column; 
@@ -314,15 +314,63 @@
             transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.5s; 
         }
         .loader-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-        .cooking-pan { 
-            font-size: 5rem; animation: panFlipSmooth 2s infinite cubic-bezier(0.3, 0.7, 0.3, 1); 
-            transform-origin: center bottom; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+        
+        /* New smooth cooking animation */
+        .cooking-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
         }
-        @keyframes panFlipSmooth { 
-            0%, 100% { transform: rotate(0deg); } 
-            25% { transform: rotate(-12deg); } 
-            50% { transform: rotate(0deg); }
-            75% { transform: rotate(12deg); } 
+        .cooking-pan { 
+            font-size: 4rem; 
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: panCookSmooth 2.5s infinite ease-in-out;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+        }
+        .steam-particle {
+            position: absolute;
+            font-size: 1.5rem;
+            opacity: 0;
+            animation: steamRise 2s infinite ease-out;
+        }
+        .steam-1 { top: 10%; left: 30%; animation-delay: 0s; }
+        .steam-2 { top: 5%; left: 50%; animation-delay: 0.6s; }
+        .steam-3 { top: 15%; left: 70%; animation-delay: 1.2s; }
+        
+        @keyframes panCookSmooth { 
+            0%, 100% { transform: translate(-50%, -50%) rotate(-5deg) translateY(0); } 
+            25% { transform: translate(-50%, -50%) rotate(5deg) translateY(-3px); } 
+            50% { transform: translate(-50%, -50%) rotate(-3deg) translateY(0); }
+            75% { transform: translate(-50%, -50%) rotate(3deg) translateY(-2px); } 
+        }
+        @keyframes steamRise {
+            0% { opacity: 0; transform: translateY(0) scale(0.5); }
+            30% { opacity: 0.6; }
+            100% { opacity: 0; transform: translateY(-40px) scale(1.2); }
+        }
+        
+        /* Loading dots */
+        .loading-dots {
+            display: flex;
+            gap: 6px;
+            margin-top: 16px;
+        }
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            background: #F59E0B;
+            border-radius: 50%;
+            animation: dotBounce 1.4s infinite ease-in-out both;
+        }
+        .loading-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dot:nth-child(2) { animation-delay: -0.16s; }
+        .loading-dot:nth-child(3) { animation-delay: 0s; }
+        @keyframes dotBounce {
+            0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
         }
 
         /* Wheel */
@@ -416,7 +464,79 @@
 
         .cart-item-title { font-size: 0.85rem !important; line-height: 1.2 !important; margin-bottom: 0.25rem !important; }
         .cart-item-details { font-size: 0.75rem !important; }
+        
+        /* IMPROVED: Toast notification */
+        #toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            padding: 14px 24px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            opacity: 0;
+            z-index: 9999;
+            pointer-events: none;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            max-width: 90vw;
+            min-width: 280px;
+        }
+        #toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        #toast-icon {
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+        #toast-msg {
+            font-weight: 500;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        /* Toast types */
+        .toast-success { background: linear-gradient(135deg, rgba(16, 185, 129, 0.95), rgba(5, 150, 105, 0.95)); color: white; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .toast-error { background: linear-gradient(135deg, rgba(239, 68, 68, 0.95), rgba(220, 38, 38, 0.95)); color: white; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .toast-warning { background: linear-gradient(135deg, rgba(245, 158, 11, 0.95), rgba(217, 119, 6, 0.95)); color: white; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .toast-info { background: linear-gradient(135deg, rgba(59, 130, 246, 0.95), rgba(37, 99, 235, 0.95)); color: white; border: 1px solid rgba(59, 130, 246, 0.3); }
+        
+        /* Price pop animation */
+        .price-pop {
+            animation: pricePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes pricePop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Shake animation for error */
+        .animate-shake {
+            animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        
+        /* Pulse glow for VIP */
+        .vip-glow {
+            animation: vipGlow 2s ease-in-out infinite;
+        }
+        @keyframes vipGlow {
+            0%, 100% { box-shadow: 0 0 5px rgba(245, 158, 11, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.6); }
+        }
     </style>
+<base target="_blank">
 </head>
 <body class="pb-40 font-sans select-none relative overflow-x-hidden safe-area-pt">
 
@@ -424,13 +544,22 @@
     <canvas id="bg-canvas"></canvas>
     <canvas id="confetti-canvas"></canvas>
 
+    <!-- IMPROVED LOADER -->
     <div id="global-loader">
-        <div class="relative mb-4">
-            <div class="absolute inset-0 bg-yellow-200 rounded-full blur-xl opacity-50 animate-pulse"></div>
-            <div class="cooking-pan relative z-10">🍳</div>
+        <div class="cooking-container mb-4">
+            <div class="steam-particle steam-1">💨</div>
+            <div class="steam-particle steam-2">💨</div>
+            <div class="steam-particle steam-3">💨</div>
+            <div class="absolute inset-0 bg-yellow-200 rounded-full blur-xl opacity-40 animate-pulse"></div>
+            <div class="cooking-pan">🍳</div>
         </div>
-        <h2 class="text-xl font-bold text-gray-800 tracking-wider">KAPRAO<span class="text-yellow-500">52</span></h2>
-        <p id="loader-text" class="text-xs text-gray-500 mt-2 font-medium">กำลังเตรียมร้าน...</p>
+        <h2 class="text-2xl font-black text-gray-800 tracking-wider">KAPRAO<span class="text-yellow-500">52</span></h2>
+        <p id="loader-text" class="text-sm text-gray-500 mt-2 font-medium">กำลังเตรียมร้าน...</p>
+        <div class="loading-dots">
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+        </div>
     </div>
 
     <!-- Welcome Modal -->
@@ -504,7 +633,7 @@
                 <!-- VIP BADGE -->
                 <div class="flex items-center gap-2 mt-3">
                     <p id="avatar-name-display" class="text-xs font-round font-bold text-indigo-500 tracking-wide bg-white px-4 py-1 rounded-full shadow-sm border border-gray-100 text-gray-700">ลูกค้า</p>
-                    <div id="vip-badge" class="hidden text-[10px] font-bold text-yellow-600 bg-yellow-50 px-2 py-0.5 rounded-full border border-yellow-200">VIP</div>
+                    <div id="vip-badge" class="hidden text-[10px] font-bold text-yellow-600 bg-yellow-50 px-2 py-0.5 rounded-full border border-yellow-200 vip-glow">VIP</div>
                 </div>
             </div>
         </div>
@@ -640,7 +769,7 @@
         <div id="menu-grid" class="grid grid-cols-2 gap-4 mb-20" role="grid" aria-label="เมนูอาหาร"></div>
         
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ | Version 22.0.0</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ | Version 23.0.0</p>
         </div>
     </div>
     
@@ -829,9 +958,10 @@
         </div>
     </div>
 
-    <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 transition-all duration-300 opacity-0 -translate-y-10 z-[120] pointer-events-none">
-        <i id="toast-icon" class="fas fa-info-circle text-yellow-400"></i>
-        <span class="font-medium text-sm" id="toast-msg">Notification</span>
+    <!-- IMPROVED TOAST -->
+    <div id="toast">
+        <i id="toast-icon" class="fas fa-info-circle"></i>
+        <span id="toast-msg">Notification</span>
     </div>
 
     <div id="receipt-result-modal" class="fixed inset-0 z-[140] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 hidden">
@@ -898,17 +1028,15 @@
         let isSubmitting = false; 
         let pointsRedeemed = 0;
         let isPointsActive = false; 
-        // 🔍 Search State
         let searchQuery = "";
-        // ❤️ Favorites State (Set of IDs)
         let favoriteItems = new Set();
         
         const addonIds = ['special', 'kaikhon', 'kaidao', 'kaijiao', 'kaitom', 'kaiyiewma'];
         const addonCalories = { 'special': 80, 'kaikhon': 150, 'kaidao': 120, 'kaijiao': 200, 'kaitom': 75, 'kaiyiewma': 100 };
         const KEYS = { USER: 'kaprao52_user', HISTORY: 'kaprao_lotto_history', STATS: 'kaprao_stats', VERSION: 'kaprao_ver', FAVORITES: 'kaprao_favorites' };
         
-        // 1. UPDATED VERSION
-        const CURRENT_VERSION = '22.0.0'; 
+        // UPDATED VERSION
+        const CURRENT_VERSION = '23.0.0'; 
 
         // --- CANVAS BACKGROUND & CONFETTI ---
         function initCanvasBackground() {
@@ -933,7 +1061,7 @@
             animate();
         }
 
-        // 🎉 Confetti Function
+        // Confetti Function
         function confetti() {
             const canvas = document.getElementById('confetti-canvas');
             const ctx = canvas.getContext('2d');
@@ -954,7 +1082,7 @@
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 let active = false;
                 pieces.forEach(p => {
-                    p.x += p.vx; p.y += p.vy; p.vy += 0.5; p.rot += p.rotSpeed; // gravity
+                    p.x += p.vx; p.y += p.vy; p.vy += 0.5; p.rot += p.rotSpeed;
                     if(p.y < canvas.height) active = true;
                     ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot * Math.PI / 180);
                     ctx.fillStyle = p.color; ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h); ctx.restore();
@@ -996,7 +1124,6 @@
             { id: 105, name: "กะเพราไก่", price: 50, icon: "🐔", category: "kaprao", reqMeat: false, kcal: 450, isNew: true }, 
             { id: 108, name: "กะเพราปลาหมึก", price: 60, icon: "🦑", category: "kaprao", reqMeat: false, kcal: 480, isNew: true }, 
             
-            // 2. NEW CURRY ITEMS
             { id: 301, name: "พริกแกงหมูชิ้น(สันคอ)", price: 50, icon: "🥩", category: "curry", reqMeat: false, kcal: 550, isNew: true },
             { id: 302, name: "พริกแกงหมูสับ", price: 50, icon: "🐷", category: "curry", reqMeat: false, kcal: 520, isNew: true },
             { id: 303, name: "พริกแกงหมูเด้ง", price: 50, icon: "🥓", category: "curry", reqMeat: false, kcal: 540, isNew: true },
@@ -1034,7 +1161,6 @@
         let isSyncing = false;
         let currentOpenModal = null;
         function pushModalState(modalId) { currentOpenModal = modalId; window.history.pushState({ modal: modalId }, null, ""); lockScroll(); }
-        // Scroll Lock Helper
         function lockScroll() { document.body.classList.add('scroll-locked'); }
         function unlockScroll() { document.body.classList.remove('scroll-locked'); }
 
@@ -1050,32 +1176,76 @@
             }
         });
 
-        const sfxPop = new Audio('https://www.soundjay.com/buttons/sounds/button-16.mp3'); 
-        const sfxSwitch = new Audio('https://www.soundjay.com/buttons/sounds/button-20.mp3'); 
-        sfxPop.volume = 0.4; sfxSwitch.volume = 0.2;
-        function playSound(type) { if(type === 'pop') { sfxPop.currentTime = 0; sfxPop.play(); } else if(type === 'switch') { sfxSwitch.currentTime = 0; sfxSwitch.play(); } }
-        document.addEventListener('click', (e) => { if(e.target.closest('.btn-bounce')) playSound('pop'); });
-        function triggerHaptic(intensity = 'light') { if (navigator.vibrate) navigator.vibrate(intensity === 'heavy' ? [100, 50] : 10); }
+        // SOUND EFFECTS - DISABLED (No more annoying sounds!)
+        // The previous version had loud sound effects from soundjay.com
+        // Now we only use haptic feedback for better UX
+        
+        function playSound(type) {
+            // Sound effects disabled - no more annoying noises!
+            // Only haptic feedback is used
+        }
+        
+        function triggerHaptic(intensity = 'light') { 
+            if (navigator.vibrate) navigator.vibrate(intensity === 'heavy' ? [80, 40, 80] : 15); 
+        }
 
-        function showGlobalLoader(text = "กำลังโหลด...") { document.getElementById('loader-text').innerText = text; document.getElementById('global-loader').classList.remove('loader-hidden'); }
-        function hideGlobalLoader() { document.getElementById('global-loader').classList.add('loader-hidden'); }
+        function showGlobalLoader(text = "กำลังโหลด...") { 
+            document.getElementById('loader-text').innerText = text; 
+            document.getElementById('global-loader').classList.remove('loader-hidden'); 
+        }
+        function hideGlobalLoader() { 
+            document.getElementById('global-loader').classList.add('loader-hidden'); 
+        }
+        
         function requestNotifPermission() {
-            if (!("Notification" in window)) { showToast("Browser นี้ไม่รองรับการแจ้งเตือน"); return; }
-            Notification.requestPermission().then(permission => { if (permission === "granted") showToast("เปิดแจ้งเตือนแล้ว! 🔔"); });
+            if (!("Notification" in window)) { showToast("Browser นี้ไม่รองรับการแจ้งเตือน", 'warning'); return; }
+            Notification.requestPermission().then(permission => { 
+                if (permission === "granted") showToast("เปิดแจ้งเตือนแล้ว! 🔔", 'success'); 
+            });
         }
+        
+        // IMPROVED TOAST NOTIFICATION
+        let toastTimeout;
         function showToast(message, type = 'info') {
-            const toast = document.getElementById('toast'); const msg = document.getElementById('toast-msg'); const icon = document.getElementById('toast-icon');
-            icon.className = 'fas ';
+            const toast = document.getElementById('toast'); 
+            const msg = document.getElementById('toast-msg'); 
+            const icon = document.getElementById('toast-icon');
+            
+            // Clear existing timeout
+            if (toastTimeout) clearTimeout(toastTimeout);
+            
+            // Remove all type classes
+            toast.className = '';
+            
+            // Set icon and type
             switch(type) {
-                case 'success': icon.className += 'fa-check-circle text-green-400'; toast.style.background = 'linear-gradient(135deg, #10b981, #059669)'; break;
-                case 'error': icon.className += 'fa-exclamation-circle text-red-400'; toast.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)'; break;
-                case 'warning': icon.className += 'fa-exclamation-triangle text-orange-400'; toast.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)'; break;
-                default: icon.className += 'fa-info-circle text-blue-400'; toast.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
+                case 'success': 
+                    icon.className = 'fas fa-check-circle'; 
+                    toast.classList.add('toast-success');
+                    break;
+                case 'error': 
+                    icon.className = 'fas fa-exclamation-circle'; 
+                    toast.classList.add('toast-error');
+                    break;
+                case 'warning': 
+                    icon.className = 'fas fa-exclamation-triangle'; 
+                    toast.classList.add('toast-warning');
+                    break;
+                default: 
+                    icon.className = 'fas fa-info-circle'; 
+                    toast.classList.add('toast-info');
             }
-            msg.innerText = message; toast.classList.remove('-translate-y-10', 'opacity-0'); toast.classList.add('translate-y-0', 'opacity-100');
-            triggerHaptic(); setTimeout(() => { toast.classList.remove('translate-y-0', 'opacity-100'); toast.classList.add('-translate-y-10', 'opacity-0'); }, 3000);
+            
+            msg.innerText = message; 
+            toast.classList.add('show');
+            triggerHaptic(type === 'error' ? 'heavy' : 'light'); 
+            
+            toastTimeout = setTimeout(() => { 
+                toast.classList.remove('show'); 
+            }, 3500);
         }
-        setTimeout(() => hideGlobalLoader(), 4000);
+        
+        setTimeout(() => hideGlobalLoader(), 3000);
 
         const avatarOptions = ['https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Dog%20face/3D/dog_face_3d.png', 'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Cat%20face/3D/cat_face_3d.png', 'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Tiger%20face/3D/tiger_face_3d.png', 'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Lion/3D/lion_3d.png', 'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Monkey%20face/3D/monkey_face_3d.png', 'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Elephant/3D/elephant_3d.png', 'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Pig%20face/3D/pig_face_3d.png', 'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Chicken/3D/chicken_3d.png', 'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Panda/3D/panda_3d.png', 'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Frog/3D/frog_3d.png'];
         let userAvatar = { image: avatarOptions[0], hat: false, name: 'น้องฝึกหัด', userId: null };
@@ -1100,7 +1270,7 @@
         function selectAvatar(imgSrc) {
             userAvatar.image = imgSrc;
             document.querySelectorAll('.avatar-option').forEach(opt => { const img = opt.querySelector('img'); if (img && img.src === imgSrc) opt.classList.add('avatar-selected'); else opt.classList.remove('avatar-selected'); });
-            triggerHaptic(); playSound('pop');
+            triggerHaptic();
         }
         function updateAvatarDisplay() {
             document.getElementById('avatar-img').src = userAvatar.image;
@@ -1220,7 +1390,7 @@
         async function checkForUpdate() {
             try {
                 const response = await fetch(window.location.href + '?t=' + new Date().getTime()); const text = await response.text();
-                const serverVerMatch = text.match(/const CURRENT_VERSION = '([\d.]+)';/);
+                const serverVerMatch = text.match(/const CURRENT_VERSION = '([\d.]+)'/);
                 if (serverVerMatch && serverVerMatch[1]) { const serverVer = serverVerMatch[1]; if (serverVer !== CURRENT_VERSION) window.location.reload(); }
             } catch (err) {}
         }
@@ -1300,7 +1470,7 @@
                 const input = document.createElement('input'); input.type = 'radio'; input.name = 'modal-meat'; input.value = meat.value; input.className = 'peer sr-only'; if (index === 0) input.checked = true;
                 const optionDiv = document.createElement('div'); optionDiv.className = 'meat-option'; optionDiv.textContent = meat.label;
                 label.appendChild(input); label.appendChild(optionDiv); container.appendChild(label);
-                input.addEventListener('change', function() { document.querySelectorAll('.meat-option').forEach(opt => opt.classList.remove('selected')); if (this.checked) { this.nextElementSibling.classList.add('selected'); triggerHaptic(); playSound('pop'); } });
+                input.addEventListener('change', function() { document.querySelectorAll('.meat-option').forEach(opt => opt.classList.remove('selected')); if (this.checked) { this.nextElementSibling.classList.add('selected'); triggerHaptic(); } });
             });
             if (container.firstChild) { container.firstChild.querySelector('input').checked = true; container.firstChild.querySelector('.meat-option').classList.add('selected'); }
         }
@@ -1340,12 +1510,12 @@
             if (lastDate !== today) { count = 0; localStorage.setItem('kaprao_spin_date', today); }
             if (count >= 3) { showToast("⛔ ครบโควตา 3 ครั้งต่อวันแล้ว พรุ่งนี้มาใหม่นะ!", 'warning'); return; }
             localStorage.setItem('kaprao_spin_count', count + 1);
-            wheelSpinning = true; triggerHaptic(); sfxPop.play();
+            wheelSpinning = true; triggerHaptic('heavy');
             const box = document.getElementById('wheel-canvas'); const fullSpins = 360 * 8; const targetDegree = 150; const randomVariance = Math.floor(Math.random() * 40) - 20; const nextRotation = fullSpins + targetDegree + randomVariance;
             box.style.transform = `rotate(${nextRotation}deg)`;
             setTimeout(() => {
                 wheelSpinning = false; box.style.transform = `rotate(${targetDegree}deg)`; box.style.transition = 'none';
-                handleReward(wheelSegments[3]); confetti(); // FIRE CONFETTI
+                handleReward(wheelSegments[3]); confetti();
                 setTimeout(() => box.style.transition = 'transform 8s cubic-bezier(0.1, 0.99, 0.1, 0.99)', 50);
             }, 8000); 
         }
@@ -1362,7 +1532,6 @@
             }
         }
 
-        // --- SEARCH & FAVORITES LOGIC ---
         function toggleSearch() {
             const container = document.getElementById('search-container');
             if (container.classList.contains('hidden')) {
@@ -1424,7 +1593,7 @@
 
         function switchCategory(cat) {
             if(activeCategory === cat) return;
-            activeCategory = cat; triggerHaptic(); playSound('switch');
+            activeCategory = cat; triggerHaptic();
             const grid = document.getElementById('menu-grid'); const msg = document.getElementById('dessert-msg');
             grid.classList.add('page-out'); if(!msg.classList.contains('hidden')) msg.classList.add('page-out');
             
@@ -1458,7 +1627,6 @@
             }, 150);
         }
                 
-        // --- UPDATED RENDER MENU (SUPPORT SEARCH & FAVORITES) ---
         function renderMenu() {
             const grid = document.getElementById('menu-grid'); grid.innerHTML = '';
             let filteredItems = [];
@@ -1483,7 +1651,7 @@
                 
                 el.onclick = () => {
                     if (isTrayWait) { showToast('⚠️ เมนูนี้พร้อมขายหลังปีใหม่ครับ', 'warning'); triggerHaptic('medium'); return; }
-                    if (isSoldOut) { showToast('⛔ เมนูนี้หมดชั่วคราวครับ', 'error'); triggerHaptic('error'); }
+                    if (isSoldOut) { showToast('⛔ เมนูนี้หมดชั่วคราวครับ', 'error'); triggerHaptic('heavy'); }
                     else if (isDessert) { showToast('⏳ เมนูนี้จะพร้อมขายเร็วๆ นี้ครับ', 'info'); triggerHaptic(); }
                     else openModal(item);
                 };
@@ -1513,7 +1681,7 @@
                 el.onclick = () => {
                     const input = document.getElementById('discount-code'); if(input) { input.value = promo.code; applyDiscount(); }
                     if(navigator.clipboard) navigator.clipboard.writeText(promo.code);
-                    showToast(`ใช้โค้ด ${promo.code} เรียบร้อย!`, 'success'); playSound('pop'); triggerHaptic();
+                    showToast(`ใช้โค้ด ${promo.code} เรียบร้อย!`, 'success'); triggerHaptic();
                 };
                 el.innerHTML = `<div class="flex items-center gap-4"><div class="w-16 h-16 ${promo.color} rounded-2xl flex items-center justify-center text-3xl shadow-lg">${promo.icon}</div><div class="flex-1"><h3 class="font-bold text-gray-800 text-base mb-1">${promo.title}</h3><p class="text-xs text-gray-500 mb-2">${promo.desc}</p><div class="bg-gray-100 inline-block px-3 py-1.5 rounded-lg text-xs font-bold text-gray-600 tracking-wider border border-gray-200 shadow-sm">${promo.code}</div></div><div class="text-gray-400 text-xs">แตะเพื่อใช้</div></div>`;
                 grid.appendChild(el);
@@ -1546,7 +1714,7 @@
         addonIds.forEach(id => { const el = document.getElementById(`modal-opt-${id}`); if (el) el.addEventListener('change', updateModalPrice); });
 
         function openModal(item) {
-            pushModalState('menu'); triggerHaptic(); playSound('pop');
+            pushModalState('menu'); triggerHaptic();
             currentItem = item; modalQty = 1; 
             document.getElementById('modal-qty').innerText = modalQty; document.getElementById('modal-title').innerText = item.name; document.getElementById('modal-icon').innerText = item.icon; document.getElementById('modal-note').value = '';
             document.querySelectorAll('input[name="modal-meat"]').forEach(el => el.checked = false); addonIds.forEach(id => document.getElementById(`modal-opt-${id}`).checked = false);
@@ -1597,7 +1765,7 @@
             if (!currentItem) return;
             let meat = null; let noteExtra = "";
             if (currentItem.isTray) { const meatOpt = document.querySelector('input[name="tray-meat"]:checked'); const eggOpt = document.querySelector('input[name="tray-egg"]:checked'); meat = meatOpt ? meatOpt.value : 'หมูสับ'; noteExtra = `[${eggOpt ? eggOpt.value : ''}]`; } 
-            else if (currentItem.reqMeat) { const r = document.querySelector('input[name="modal-meat"]:checked'); if(!r) { const meatContainer = document.getElementById('meat-options-container'); meatContainer.classList.remove('animate-shake'); void meatContainer.offsetWidth; meatContainer.classList.add('animate-shake', 'border', 'border-red-500', 'rounded-xl'); triggerHaptic(); showToast('กรุณาเลือกเนื้อสัตว์', 'warning'); return; } meat = r.value; }
+            else if (currentItem.reqMeat) { const r = document.querySelector('input[name="modal-meat"]:checked'); if(!r) { const meatContainer = document.getElementById('meat-options-container'); meatContainer.classList.remove('animate-shake'); void meatContainer.offsetWidth; meatContainer.classList.add('animate-shake', 'border', 'border-red-500', 'rounded-xl'); triggerHaptic('heavy'); showToast('กรุณาเลือกเนื้อสัตว์', 'warning'); return; } meat = r.value; }
             const addonNames = {special:'พิเศษ', kaikhon:'ไข่ข้น', kaidao:'ไข่ดาว', kaijiao:'ไข่เจียว', kaitom:'ไข่ต้ม', kaiyiewma:'ไข่เยี่ยวม้า'};
             const selectedAddonIds = []; const selectedAddonNames = [];
             addonIds.forEach(id => { if(document.getElementById(`modal-opt-${id}`).checked) { selectedAddonIds.push(id); selectedAddonNames.push(addonNames[id]); } });
@@ -1606,7 +1774,7 @@
             const unitPrice = calculateItemUnitPrice(currentItem, options);
             let noteSafe = escapeHtml(document.getElementById('modal-note').value.trim()); if(noteExtra) noteSafe = (noteSafe ? noteSafe + " " : "") + noteExtra;
             for(let i=0; i<modalQty; i++){ cart.push({ id: Date.now() + i, name: currentItem.name, price: unitPrice, meat: meat, addons: selectedAddonNames, note: noteSafe }); }
-            playSound('pop'); triggerHaptic();
+            triggerHaptic();
             try { const modalIconEl = document.getElementById('modal-icon'); const srcEl = modalIconEl ? modalIconEl.parentElement : null; animateFlyToCart(srcEl, currentItem.icon || (modalIconEl ? modalIconEl.innerText : '🍱')); } catch (e) {}
             const cartBtn = document.getElementById('mini-cart-bar'); if(cartBtn) { cartBtn.classList.remove('hidden'); cartBtn.style.animation = 'bounce 0.5s ease-out'; setTimeout(() => cartBtn.style.animation = '', 500); }
             closeModal(); updateMiniCart(); saveToLS(); showToast(`เพิ่ม ${modalQty} รายการแล้ว!`, 'success');
@@ -1633,7 +1801,7 @@
 
         function openMyTickets() {
             try {
-                pushModalState('tickets'); triggerHaptic(); playSound('pop');
+                pushModalState('tickets'); triggerHaptic();
                 if (!lottoHistory || !Array.isArray(lottoHistory)) { lottoHistory = []; try { lottoHistory = JSON.parse(localStorage.getItem(KEYS.HISTORY)) || []; } catch(e) {} }
                 const list = document.getElementById('tickets-list'); list.innerHTML = '';
                 if(lottoHistory.length === 0) { list.innerHTML = `<div class="text-center text-gray-400 mt-10"><div class="text-4xl mb-2 opacity-30">🎟️</div><p class="text-sm">ยังไม่มีประวัติการสั่งซื้อ</p></div>`; } 
@@ -1650,7 +1818,7 @@
                     });
                 }
                 const overlay = document.getElementById('tickets-modal-overlay'); const sheet = document.getElementById('tickets-sheet'); sheet.style.transform = ''; overlay.classList.remove('hidden'); setTimeout(() => { overlay.classList.remove('opacity-0'); sheet.classList.remove('translate-y-full'); }, 10);
-            } catch(e) { console.error(e); showToast("เกิดข้อผิดพลาดในการโหลดตั๋ว"); }
+            } catch(e) { console.error(e); showToast("เกิดข้อผิดพลาดในการโหลดตั๋ว", 'error'); }
         }
         function closeMyTickets(isBackNav = false) {
             if (!isBackNav && currentOpenModal === 'tickets') { history.back(); return; }
@@ -1659,7 +1827,7 @@
 
         function openCheckout() {
             try {
-                pushModalState('checkout'); triggerHaptic(); playSound('pop'); renderCheckoutList();
+                pushModalState('checkout'); triggerHaptic(); renderCheckoutList();
                 if(document.getElementById('discount-code').value.trim() !== '' && discountValue > 0) applyDiscount();
                 const bannerContainer = document.getElementById('order-id-banner');
                 if(cart.length > 0) {
@@ -1713,19 +1881,19 @@
             const code = document.getElementById('discount-code').value.trim().toUpperCase(); let total = cart.reduce((sum, i) => sum + i.price, 0); const msg = document.getElementById('discount-msg'); const btn = document.getElementById('btn-apply-code'); discountValue = 0;
             if (code === '') { msg.innerText = ''; btn.innerHTML = 'ใช้'; btn.className = 'btn-bounce bg-gray-800 text-white font-bold px-4 rounded-xl text-xs shadow-lg hover:bg-gray-700 transition-all'; btn.onclick = applyDiscount; updateTotalSummary(); return; }
             const promo = promotions.find(p => p.code === code);
-            if (promo && total >= promo.minOrder) { discountValue = promo.value; msg.innerHTML = `<span class="text-green-600"><i class="fas fa-check-circle"></i> ใช้โค้ดลด ${promo.value} บาท</span>`; btn.innerHTML = '<i class="fas fa-times"></i> ยกเลิก'; btn.className = 'btn-bounce bg-red-500 hover:bg-red-600 text-white font-bold px-4 rounded-xl text-xs shadow-lg transition-all'; btn.onclick = removeDiscount; playSound('pop'); } 
+            if (promo && total >= promo.minOrder) { discountValue = promo.value; msg.innerHTML = `<span class="text-green-600"><i class="fas fa-check-circle"></i> ใช้โค้ดลด ${promo.value} บาท</span>`; btn.innerHTML = '<i class="fas fa-times"></i> ยกเลิก'; btn.className = 'btn-bounce bg-red-500 hover:bg-red-600 text-white font-bold px-4 rounded-xl text-xs shadow-lg transition-all'; btn.onclick = removeDiscount; } 
             else { msg.innerHTML = `<span class="text-red-500">${promo ? 'ต้องสั่งครบ '+promo.minOrder : 'ไม่พบโค้ด'}</span>`; btn.innerHTML = 'ใช้'; btn.className = 'btn-bounce bg-gray-500 hover:bg-gray-600 text-white font-bold px-4 rounded-xl text-xs shadow-lg transition-all'; btn.onclick = applyDiscount; }
             updateTotalSummary();
         }
         function removeDiscount() { document.getElementById('discount-code').value = ''; document.getElementById('discount-msg').innerText = ''; discountValue = 0; applyDiscount(); }
 
         function openReceiptResult(imgData) { const modal = document.getElementById('receipt-result-modal'); const img = document.getElementById('receipt-result-img'); img.src = imgData; modal.classList.remove('hidden'); }
-        function downloadReceiptImage() { const img = document.getElementById('receipt-result-img'); const link = document.createElement('a'); link.href = img.src; link.download = 'kaprao52-receipt-' + Date.now() + '.png'; document.body.appendChild(link); link.click(); document.body.removeChild(link); showToast('กำลังดาวน์โหลด...'); }
+        function downloadReceiptImage() { const img = document.getElementById('receipt-result-img'); const link = document.createElement('a'); link.href = img.src; link.download = 'kaprao52-receipt-' + Date.now() + '.png'; document.body.appendChild(link); link.click(); document.body.removeChild(link); showToast('กำลังดาวน์โหลด...', 'info'); }
 
         function reprintReceipt(ticketIndex) {
-            triggerHaptic(); playSound('pop');
+            triggerHaptic();
             if (typeof html2canvas === 'undefined') { showToast("ระบบกำลังโหลดโปรแกรมวาดภาพ กรุณาลองใหม่ใน 2 วินาที", "error"); return; }
-            if (!lottoHistory || !lottoHistory[ticketIndex]) { showToast("ไม่พบข้อมูลรายการอาหารของบิลเก่า 😢"); return; }
+            if (!lottoHistory || !lottoHistory[ticketIndex]) { showToast("ไม่พบข้อมูลรายการอาหารของบิลเก่า 😢", 'error'); return; }
             const ticket = lottoHistory[ticketIndex];
             showGlobalLoader("กำลังโหลดใบเสร็จเก่า...");
             const name = ticket.customerName || 'ลูกค้า'; const subtotal = ticket.items ? ticket.items.reduce((sum, i) => sum + i.price, 0) : ticket.price; const netTotal = ticket.price; const discount = subtotal - netTotal; const tDate = new Date(ticket.timestamp); const dateStr = `${getStandardDate(tDate)} ${formatTime(tDate)}`;
@@ -1734,13 +1902,13 @@
             const itemsContainer = document.querySelector('.receipt-items'); itemsContainer.innerHTML = '';
             if (ticket.items) { ticket.items.forEach((i, index) => { let detail = `${i.name}`; if(i.meat) detail += ` (${i.meat})`; if(i.addons.length) detail += ` +${i.addons.join(',')}`; const row = document.createElement('div'); row.className = "flex justify-between text-xs"; row.innerHTML = `<div class="flex gap-1 text-gray-400"><span class="w-4">${index+1}.</span><span>${detail}</span></div><span class="font-bold text-gray-700">${i.price}.-</span>`; itemsContainer.appendChild(row); }); }
             const div = document.getElementById('receipt-capture'); div.style.visibility = 'visible'; div.style.zIndex = '-100';
-            setTimeout(() => { html2canvas(div, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(canvas => { div.style.visibility = 'hidden'; hideGlobalLoader(); openReceiptResult(canvas.toDataURL('image/png')); showToast('เสร็จแล้ว! กดบันทึกรูปได้เลย'); }).catch((e) => { div.style.visibility = 'hidden'; console.error(e); hideGlobalLoader(); showToast('เกิดข้อผิดพลาดในการบันทึกภาพ'); }); }, 800);
+            setTimeout(() => { html2canvas(div, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(canvas => { div.style.visibility = 'hidden'; hideGlobalLoader(); openReceiptResult(canvas.toDataURL('image/png')); showToast('เสร็จแล้ว! กดบันทึกรูปได้เลย', 'success'); }).catch((e) => { div.style.visibility = 'hidden'; console.error(e); hideGlobalLoader(); showToast('เกิดข้อผิดพลาดในการบันทึกภาพ', 'error'); }); }, 800);
         }
 
         async function submitOrderToLine() {
-            if (isSyncing) { showToast("⏳ กำลังอัปเดตข้อมูลล่าสุด กรุณารอสักครู่..."); return; }
+            if (isSyncing) { showToast("⏳ กำลังอัปเดตข้อมูลล่าสุด กรุณารอสักครู่...", 'info'); return; }
             if (isSubmitting) return;
-            const name = document.getElementById('user-name').value.trim(); if (!name) return showToast('กรุณาใส่ชื่อผู้สั่ง');
+            const name = document.getElementById('user-name').value.trim(); if (!name) return showToast('กรุณาใส่ชื่อผู้สั่ง', 'warning');
             isSubmitting = true;
             const btn = document.getElementById('btn-submit-order'); const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> กำลังส่ง...'; btn.classList.add('opacity-50', 'cursor-not-allowed');
@@ -1768,7 +1936,7 @@
                 if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) { fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(sheetData), keepalive: true }).catch(err => console.error("Sheet Error:", err)); }
 
                 saveTicketToHistory(currentOrderId, netTotal); const lineOAId = "@772ysswn"; const encodedMsg = encodeURIComponent(msg);
-                confetti(); // FIRE CONFETTI!
+                confetti();
                 
                 setTimeout(() => {
                     cart = []; discountValue = 0; pointsRedeemed = 0; isPointsActive = false; currentOrderId = "";
@@ -1777,7 +1945,7 @@
                     isSubmitting = false; btn.innerHTML = originalText; btn.classList.remove('opacity-50', 'cursor-not-allowed');
                 }, 1000);
             } catch (error) {
-                hideGlobalLoader(); showToast("เกิดข้อผิดพลาด กรุณาลองใหม่"); isSubmitting = false; btn.innerHTML = originalText; btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                hideGlobalLoader(); showToast("เกิดข้อผิดพลาด กรุณาลองใหม่", 'error'); isSubmitting = false; btn.innerHTML = originalText; btn.classList.remove('opacity-50', 'cursor-not-allowed');
             }
         }
 
@@ -1787,7 +1955,7 @@
             showGlobalLoader("กำลังเสี่ยงทายความอร่อย...");
             setTimeout(() => {
                 hideGlobalLoader(); const randomIndex = Math.floor(Math.random() * mainDishes.length); const selectedItem = mainDishes[randomIndex];
-                openModal(selectedItem); showToast(`🎉 ดวงของคุณวันนี้คือ... ${selectedItem.name}!`, "success"); playSound('pop'); triggerHaptic('heavy');
+                openModal(selectedItem); showToast(`🎉 ดวงของคุณวันนี้คือ... ${selectedItem.name}!`, "success"); triggerHaptic('heavy');
             }, 1500);
         }
 
