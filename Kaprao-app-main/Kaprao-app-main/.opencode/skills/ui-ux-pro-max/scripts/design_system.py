@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Design System Generator - Aggregates search results and applies reasoning
-to generate comprehensive design system recommendations.
+Design System Generator v2.0 - Aggregates search results and applies reasoning
+to generate comprehensive design system recommendations with icon integration,
+animation recommendations, dark mode support, and A/B test suggestions.
 
 Usage:
     from design_system import generate_design_system
@@ -11,6 +12,9 @@ Usage:
     # With persistence (Master + Overrides pattern)
     result = generate_design_system("SaaS dashboard", "My Project", persist=True)
     result = generate_design_system("SaaS dashboard", "My Project", persist=True, page="dashboard")
+    
+    # With A/B test suggestions
+    result = generate_design_system("SaaS dashboard", "My Project", ab_test=True)
 """
 
 import csv
@@ -29,7 +33,35 @@ SEARCH_CONFIG = {
     "style": {"max_results": 3},
     "color": {"max_results": 2},
     "landing": {"max_results": 2},
-    "typography": {"max_results": 2}
+    "typography": {"max_results": 2},
+    "icons": {"max_results": 3},
+    "animations": {"max_results": 2}
+}
+
+# A/B Test variant strategies
+AB_TEST_VARIANTS = {
+    "color": [
+        {"name": "Warm CTA", "description": "Use warm orange/red CTA for urgency", "change": "cta"},
+        {"name": "Cool CTA", "description": "Use cool blue/green CTA for trust", "change": "cta"},
+        {"name": "High Contrast", "description": "Increase contrast between bg and text", "change": "contrast"},
+        {"name": "Muted Palette", "description": "Use softer, muted color palette", "change": "saturation"},
+    ],
+    "layout": [
+        {"name": "Hero-First", "description": "Large hero with single CTA above fold"},
+        {"name": "Feature-First", "description": "Lead with feature grid, CTA after"},
+        {"name": "Social-Proof-First", "description": "Lead with testimonials/logos"},
+        {"name": "Video-Hero", "description": "Background video hero section"},
+    ],
+    "typography": [
+        {"name": "Large Headlines", "description": "48-64px headlines for impact"},
+        {"name": "Compact Text", "description": "Smaller headlines, more content visible"},
+        {"name": "Serif Headlines", "description": "Serif headings for editorial feel"},
+    ],
+    "cta": [
+        {"name": "Single CTA", "description": "One prominent call-to-action"},
+        {"name": "Dual CTA", "description": "Primary + secondary CTA options"},
+        {"name": "Sticky CTA", "description": "Fixed CTA bar on scroll"},
+    ]
 }
 
 
@@ -160,7 +192,7 @@ class DesignSystemGenerator:
         """Extract results list from search result dict."""
         return search_result.get("results", [])
 
-    def generate(self, query: str, project_name: str = None) -> dict:
+    def generate(self, query: str, project_name: str = None, ab_test: bool = False) -> dict:
         """Generate complete design system recommendation."""
         # Step 1: First search product to get category
         product_result = search(query, "product", 1)
@@ -182,6 +214,8 @@ class DesignSystemGenerator:
         color_results = self._extract_results(search_results.get("color", {}))
         typography_results = self._extract_results(search_results.get("typography", {}))
         landing_results = self._extract_results(search_results.get("landing", {}))
+        icon_results = self._extract_results(search_results.get("icons", {}))
+        animation_results = self._extract_results(search_results.get("animations", {}))
 
         best_style = self._select_best_match(style_results, reasoning.get("style_priority", []))
         best_color = color_results[0] if color_results else {}
@@ -194,7 +228,7 @@ class DesignSystemGenerator:
         reasoning_effects = reasoning.get("key_effects", "")
         combined_effects = style_effects if style_effects else reasoning_effects
 
-        return {
+        result = {
             "project_name": project_name or query.upper(),
             "category": category,
             "pattern": {
@@ -229,11 +263,52 @@ class DesignSystemGenerator:
                 "google_fonts_url": best_typography.get("Google Fonts URL", ""),
                 "css_import": best_typography.get("CSS Import", "")
             },
+            "icons": [
+                {
+                    "name": icon.get("Icon Name", ""),
+                    "library": icon.get("Library", "Lucide"),
+                    "import": icon.get("Import Code", ""),
+                    "usage": icon.get("Usage", ""),
+                    "category": icon.get("Category", "")
+                }
+                for icon in icon_results
+            ] if icon_results else [{"name": "Use Lucide or Heroicons", "library": "Lucide", "import": "npm install lucide-react", "usage": "import { Icon } from 'lucide-react'", "category": "General"}],
+            "animations": [
+                {
+                    "name": anim.get("Animation Name", ""),
+                    "css": anim.get("CSS Code", ""),
+                    "framer_motion": anim.get("Framer Motion", ""),
+                    "duration": anim.get("Duration", "200ms"),
+                    "easing": anim.get("Easing", "ease"),
+                }
+                for anim in animation_results
+            ] if animation_results else [],
             "key_effects": combined_effects,
             "anti_patterns": reasoning.get("anti_patterns", ""),
             "decision_rules": reasoning.get("decision_rules", {}),
             "severity": reasoning.get("severity", "MEDIUM")
         }
+        
+        # Add A/B test suggestions if requested
+        if ab_test:
+            result["ab_test_variants"] = self._generate_ab_variants(result)
+        
+        return result
+    
+    def _generate_ab_variants(self, design_system: dict) -> list:
+        """Generate A/B test variant suggestions."""
+        variants = []
+        
+        for category, options in AB_TEST_VARIANTS.items():
+            for option in options[:2]:  # Top 2 per category
+                variants.append({
+                    "category": category,
+                    "variant": option["name"],
+                    "description": option["description"],
+                    "hypothesis": f"Changing {category} to '{option['name']}' may improve conversion"
+                })
+        
+        return variants
 
 
 # ============ OUTPUT FORMATTERS ============
@@ -459,8 +534,9 @@ def format_markdown(design_system: dict) -> str:
 
 
 # ============ MAIN ENTRY POINT ============
-def generate_design_system(query: str, project_name: str = None, output_format: str = "ascii", 
-                           persist: bool = False, page: str = None, output_dir: str = None) -> str:
+def generate_design_system(query: str, project_name: str = None, output_format: str = "ascii",
+                           persist: bool = False, page: str = None, output_dir: str = None,
+                           ab_test: bool = False) -> str:
     """
     Main entry point for design system generation.
 
@@ -471,12 +547,13 @@ def generate_design_system(query: str, project_name: str = None, output_format: 
         persist: If True, save design system to design-system/ folder
         page: Optional page name for page-specific override file
         output_dir: Optional output directory (defaults to current working directory)
+        ab_test: If True, include A/B test variant suggestions
 
     Returns:
         Formatted design system string
     """
     generator = DesignSystemGenerator()
-    design_system = generator.generate(query, project_name)
+    design_system = generator.generate(query, project_name, ab_test=ab_test)
     
     # Persist to files if requested
     if persist:

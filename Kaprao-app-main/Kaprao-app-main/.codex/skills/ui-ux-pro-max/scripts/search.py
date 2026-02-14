@@ -1,24 +1,25 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-UI/UX Pro Max Search - BM25 search engine for UI/UX style guides
+UI/UX Pro Max Search v2.0 - Enhanced search with exports, review mode, and more.
+
 Usage: python search.py "<query>" [--domain <domain>] [--stack <stack>] [--max-results 3]
        python search.py "<query>" --design-system [-p "Project Name"]
        python search.py "<query>" --design-system --persist [-p "Project Name"] [--page "dashboard"]
+       python search.py "<query>" --design-system --export tailwind|css|tokens [-p "Project Name"]
+       python search.py --review <file_or_dir>
+       python search.py --detect-stack [<project_dir>]
 
-Domains: style, prompt, color, chart, landing, product, ux, typography
-Stacks: html-tailwind, react, nextjs
-
-Persistence (Master + Overrides pattern):
-  --persist    Save design system to design-system/MASTER.md
-  --page       Also create a page-specific override file in design-system/pages/
+Domains: style, color, chart, landing, product, ux, typography, icons, components, animations
+Stacks: html-tailwind, react, nextjs, vue, svelte, swiftui, react-native, flutter, shadcn, jetpack-compose
 """
 
 import argparse
 import sys
 import io
-from core import CSV_CONFIG, AVAILABLE_STACKS, MAX_RESULTS, search, search_stack
-from design_system import generate_design_system, persist_design_system
+import json
+from pathlib import Path
+from core import CSV_CONFIG, AVAILABLE_STACKS, MAX_RESULTS, search, search_stack, detect_tech_stack
 
 # Force UTF-8 for stdout/stderr to handle emojis on Windows (cp1252 default)
 if sys.stdout.encoding and sys.stdout.encoding.lower() != 'utf-8':
@@ -54,22 +55,57 @@ def format_output(result):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="UI Pro Max Search")
-    parser.add_argument("query", help="Search query")
+    parser = argparse.ArgumentParser(description="UI Pro Max Search v2.0")
+    parser.add_argument("query", nargs="?", help="Search query")
     parser.add_argument("--domain", "-d", choices=list(CSV_CONFIG.keys()), help="Search domain")
-    parser.add_argument("--stack", "-s", choices=AVAILABLE_STACKS, help="Stack-specific search (html-tailwind, react, nextjs)")
+    parser.add_argument("--stack", "-s", choices=AVAILABLE_STACKS, help="Stack-specific search")
     parser.add_argument("--max-results", "-n", type=int, default=MAX_RESULTS, help="Max results (default: 3)")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
+    
     # Design system generation
-    parser.add_argument("--design-system", "-ds", action="store_true", help="Generate complete design system recommendation")
-    parser.add_argument("--project-name", "-p", type=str, default=None, help="Project name for design system output")
-    parser.add_argument("--format", "-f", choices=["ascii", "markdown"], default="ascii", help="Output format for design system")
-    # Persistence (Master + Overrides pattern)
-    parser.add_argument("--persist", action="store_true", help="Save design system to design-system/MASTER.md (creates hierarchical structure)")
-    parser.add_argument("--page", type=str, default=None, help="Create page-specific override file in design-system/pages/")
-    parser.add_argument("--output-dir", "-o", type=str, default=None, help="Output directory for persisted files (default: current directory)")
+    parser.add_argument("--design-system", "-ds", action="store_true", help="Generate complete design system")
+    parser.add_argument("--project-name", "-p", type=str, default=None, help="Project name")
+    parser.add_argument("--format", "-f", choices=["ascii", "markdown"], default="ascii", help="Output format")
+    
+    # Persistence
+    parser.add_argument("--persist", action="store_true", help="Save design system to files")
+    parser.add_argument("--page", type=str, default=None, help="Create page-specific override")
+    parser.add_argument("--output-dir", "-o", type=str, default=None, help="Output directory")
+    
+    # Export (Phase 1)
+    parser.add_argument("--export", "-e", choices=["tailwind", "css", "tokens", "all"], help="Export design system as code")
+    
+    # Review mode (Phase 4)
+    parser.add_argument("--review", type=str, default=None, help="Review existing UI code file/directory")
+    
+    # Auto-detect stack (Phase 2)
+    parser.add_argument("--detect-stack", action="store_true", help="Auto-detect tech stack from project")
+    
+    # A/B test suggestions (Phase 4)
+    parser.add_argument("--ab-test", action="store_true", help="Generate A/B test design variants")
 
     args = parser.parse_args()
+
+    # Import design system module
+    from design_system import generate_design_system
+    from export import export_design_system
+    from review import review_code
+    
+    # Auto-detect stack
+    if args.detect_stack:
+        stack = detect_tech_stack(args.output_dir)
+        print(f"Detected stack: {stack}")
+        sys.exit(0)
+    
+    # Review mode
+    if args.review:
+        result = review_code(args.review)
+        print(result)
+        sys.exit(0)
+
+    # Require query for other operations
+    if not args.query:
+        parser.error("query is required (except for --review and --detect-stack)")
 
     # Design system takes priority
     if args.design_system:
@@ -79,36 +115,47 @@ if __name__ == "__main__":
             args.format,
             persist=args.persist,
             page=args.page,
-            output_dir=args.output_dir
+            output_dir=args.output_dir,
+            ab_test=args.ab_test
         )
         print(result)
+        
+        # Export if requested
+        if args.export:
+            export_result = export_design_system(
+                args.query,
+                args.project_name,
+                args.export,
+                args.output_dir
+            )
+            print(export_result)
         
         # Print persistence confirmation
         if args.persist:
             project_slug = args.project_name.lower().replace(' ', '-') if args.project_name else "default"
             print("\n" + "=" * 60)
-            print(f"✅ Design system persisted to design-system/{project_slug}/")
-            print(f"   📄 design-system/{project_slug}/MASTER.md (Global Source of Truth)")
+            print(f"Design system persisted to design-system/{project_slug}/")
+            print(f"   design-system/{project_slug}/MASTER.md (Global Source of Truth)")
             if args.page:
                 page_filename = args.page.lower().replace(' ', '-')
-                print(f"   📄 design-system/{project_slug}/pages/{page_filename}.md (Page Overrides)")
+                print(f"   design-system/{project_slug}/pages/{page_filename}.md (Page Overrides)")
             print("")
-            print(f"📖 Usage: When building a page, check design-system/{project_slug}/pages/[page].md first.")
+            print(f"Usage: When building a page, check design-system/{project_slug}/pages/[page].md first.")
             print(f"   If exists, its rules override MASTER.md. Otherwise, use MASTER.md.")
             print("=" * 60)
+    
     # Stack search
     elif args.stack:
         result = search_stack(args.query, args.stack, args.max_results)
         if args.json:
-            import json
             print(json.dumps(result, indent=2, ensure_ascii=False))
         else:
             print(format_output(result))
+    
     # Domain search
     else:
         result = search(args.query, args.domain, args.max_results)
         if args.json:
-            import json
             print(json.dumps(result, indent=2, ensure_ascii=False))
         else:
             print(format_output(result))

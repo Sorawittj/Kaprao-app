@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI/UX Pro Max — Design System Preview</title>
+    <style>
+        :root {
+            --bg: #0F172A;
+            --surface: #1E293B;
+            --border: #334155;
+            --text: #F1F5F9;
+            --text-muted: #94A3B8;
+            --primary: #6366F1;
+            --primary-light: #818CF8;
+            --accent: #F97316;
+            --success: #22C55E;
+            --error: #EF4444;
+            --radius: 12px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+        
+        header {
+            padding: 32px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 32px;
+        }
+        
+        h1 { font-size: 2rem; font-weight: 700; }
+        h1 span { color: var(--primary-light); }
+        .subtitle { color: var(--text-muted); margin-top: 8px; }
+        
+        .search-section {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+        
+        .search-input {
+            flex: 1;
+            min-width: 300px;
+            padding: 14px 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-size: 16px;
+            outline: none;
+            transition: border-color 200ms;
+        }
+        
+        .search-input:focus { border-color: var(--primary); }
+        .search-input::placeholder { color: var(--text-muted); }
+        
+        .btn {
+            padding: 14px 24px;
+            border-radius: var(--radius);
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 200ms;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover { background: var(--primary-light); transform: translateY(-1px); }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary-light);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover { border-color: var(--primary); }
+        
+        select {
+            padding: 14px 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .results { display: grid; gap: 24px; }
+        
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            transition: all 200ms;
+        }
+        
+        .card:hover { border-color: var(--primary); transform: translateY(-2px); }
+        
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--primary-light);
+        }
+        
+        .color-swatches {
+            display: flex;
+            gap: 8px;
+            margin: 16px 0;
+            flex-wrap: wrap;
+        }
+        
+        .swatch {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 4px;
+            font-size: 10px;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            cursor: pointer;
+            transition: transform 200ms;
+        }
+        
+        .swatch:hover { transform: scale(1.1); }
+        
+        .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--primary-light);
+            border-radius: 20px;
+            font-size: 13px;
+            margin: 2px;
+        }
+        
+        .section-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .info-label { color: var(--text-muted); font-size: 14px; }
+        .info-value { font-weight: 500; }
+        
+        .font-preview {
+            padding: 16px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            margin: 8px 0;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 48px;
+            color: var(--text-muted);
+        }
+        
+        .loading .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .empty-state {
+            text-align: center;
+            padding: 64px 24px;
+            color: var(--text-muted);
+        }
+        
+        .empty-state h2 { font-size: 1.5rem; margin-bottom: 8px; color: var(--text); }
+        
+        .examples {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 16px;
+        }
+        
+        .example-btn {
+            padding: 8px 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 200ms;
+        }
+        
+        .example-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary-light);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 32px 0;
+            margin-top: 48px;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .search-section { flex-direction: column; }
+            .search-input { min-width: auto; }
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>UI/UX <span>Pro Max</span></h1>
+            <p class="subtitle">Design Intelligence — 67 styles, 96 palettes, 57 fonts, 25 charts, 13 stacks</p>
+        </header>
+        
+        <div class="search-section">
+            <input type="text" class="search-input" id="searchInput" 
+                   placeholder="Describe your project (e.g., 'SaaS dashboard', 'beauty spa elegant')" 
+                   autocomplete="off">
+            <select id="domainSelect">
+                <option value="">Auto-detect domain</option>
+                <option value="product">Product Type</option>
+                <option value="style">Style</option>
+                <option value="color">Color Palette</option>
+                <option value="typography">Typography</option>
+                <option value="landing">Landing Pattern</option>
+                <option value="ux">UX Guidelines</option>
+                <option value="chart">Charts</option>
+                <option value="icons">Icons</option>
+                <option value="components">Components</option>
+                <option value="animations">Animations</option>
+            </select>
+            <button class="btn btn-primary" id="searchBtn" onclick="doSearch()">Search</button>
+            <button class="btn btn-secondary" id="designBtn" onclick="doDesignSystem()">Design System</button>
+        </div>
+        
+        <div id="results">
+            <div class="empty-state">
+                <h2>Start Designing</h2>
+                <p>Enter a product description or style keywords to get recommendations</p>
+                <div class="examples">
+                    <button class="example-btn" onclick="setQuery('SaaS dashboard')">SaaS Dashboard</button>
+                    <button class="example-btn" onclick="setQuery('beauty spa elegant')">Beauty Spa</button>
+                    <button class="example-btn" onclick="setQuery('e-commerce luxury')">Luxury E-commerce</button>
+                    <button class="example-btn" onclick="setQuery('fintech crypto dark')">Fintech/Crypto</button>
+                    <button class="example-btn" onclick="setQuery('healthcare medical')">Healthcare</button>
+                    <button class="example-btn" onclick="setQuery('portfolio creative')">Creative Portfolio</button>
+                    <button class="example-btn" onclick="setQuery('gaming esports')">Gaming</button>
+                    <button class="example-btn" onclick="setQuery('restaurant food')">Restaurant</button>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            UI/UX Pro Max v2.0 — Open Source Design Intelligence<br>
+            <small>Run locally: <code>python src/scripts/search.py "your query" --design-system</code></small>
+        </footer>
+    </div>
+    
+    <script>
+        // Note: This is a static preview. For full functionality, 
+        // run the Python backend or use the MCP server.
+        
+        const searchInput = document.getElementById('searchInput');
+        const resultsDiv = document.getElementById('results');
+        
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') doDesignSystem();
+        });
+        
+        function setQuery(query) {
+            searchInput.value = query;
+            doDesignSystem();
+        }
+        
+        function doSearch() {
+            const query = searchInput.value.trim();
+            if (!query) return;
+            
+            resultsDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Searching...</div>';
+            
+            // Simulate search results (in production, call Python backend)
+            setTimeout(() => {
+                resultsDiv.innerHTML = `
+                    <div class="card">
+                        <div class="card-title">Search: "${query}"</div>
+                        <p style="color: var(--text-muted)">
+                            This is a static preview. For live search results, run the Python backend:
+                        </p>
+                        <pre style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 8px; margin-top: 12px; overflow-x: auto; color: var(--primary-light);">python src/scripts/search.py "${query}" --domain ${document.getElementById('domainSelect').value || 'auto'}</pre>
+                    </div>
+                `;
+            }, 500);
+        }
+        
+        function doDesignSystem() {
+            const query = searchInput.value.trim();
+            if (!query) return;
+            
+            resultsDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Generating design system...</div>';
+            
+            // Generate preview design system (static demo)
+            setTimeout(() => {
+                const ds = generatePreviewDS(query);
+                renderDesignSystem(ds);
+            }, 800);
+        }
+        
+        function generatePreviewDS(query) {
+            const q = query.toLowerCase();
+            
+            // Simple keyword matching for demo
+            let primary = '#6366F1', secondary = '#818CF8', cta = '#F97316', bg = '#F8FAFC', text = '#1E293B';
+            let style = 'Minimalism', heading = 'Inter', body = 'Inter';
+            let pattern = 'Hero + Features + CTA';
+            
+            if (q.includes('saas') || q.includes('dashboard')) {
+                primary = '#2563EB'; secondary = '#3B82F6'; cta = '#F97316';
+                style = 'Glassmorphism + Flat Design'; heading = 'Inter'; body = 'Inter';
+                pattern = 'Hero + Features + CTA';
+            } else if (q.includes('beauty') || q.includes('spa')) {
+                primary = '#DB2777'; secondary = '#EC4899'; cta = '#F59E0B'; bg = '#FFF7ED';
+                style = 'Neumorphism + Soft UI'; heading = 'Playfair Display'; body = 'Lato';
+                pattern = 'Hero-Centric + Social Proof';
+            } else if (q.includes('luxury') || q.includes('premium')) {
+                primary = '#1C1917'; secondary = '#78716C'; cta = '#D4A574'; bg = '#FAFAF9';
+                style = 'Liquid Glass + Glassmorphism'; heading = 'Cormorant Garamond'; body = 'Montserrat';
+                pattern = 'Feature-Rich Showcase';
+            } else if (q.includes('fintech') || q.includes('crypto')) {
+                primary = '#6366F1'; secondary = '#8B5CF6'; cta = '#22C55E'; bg = '#0F172A'; text = '#F1F5F9';
+                style = 'Glassmorphism + Dark Mode'; heading = 'Space Grotesk'; body = 'Inter';
+                pattern = 'Conversion-Optimized';
+            } else if (q.includes('health')) {
+                primary = '#0EA5E9'; secondary = '#38BDF8'; cta = '#22C55E'; bg = '#F0F9FF';
+                style = 'Neumorphism + Accessible'; heading = 'Nunito'; body = 'Open Sans';
+                pattern = 'Social Proof-Focused';
+            } else if (q.includes('gaming') || q.includes('esport')) {
+                primary = '#EF4444'; secondary = '#F97316'; cta = '#FACC15'; bg = '#0C0A09'; text = '#FAFAF9';
+                style = '3D & Hyperrealism + Retro-Futurism'; heading = 'Orbitron'; body = 'Rajdhani';
+                pattern = 'Feature-Rich Showcase';
+            } else if (q.includes('restaurant') || q.includes('food')) {
+                primary = '#DC2626'; secondary = '#EA580C'; cta = '#F59E0B'; bg = '#FFFBEB';
+                style = 'Vibrant & Block-based'; heading = 'Playfair Display'; body = 'Source Sans Pro';
+                pattern = 'Hero-Centric + Conversion';
+            } else if (q.includes('portfolio') || q.includes('creative')) {
+                primary = '#7C3AED'; secondary = '#A78BFA'; cta = '#F97316'; bg = '#FAFAF9';
+                style = 'Motion-Driven + Minimalism'; heading = 'Sora'; body = 'Inter';
+                pattern = 'Storytelling-Driven';
+            }
+            
+            return { query, primary, secondary, cta, bg, text, style, heading, body, pattern };
+        }
+        
+        function renderDesignSystem(ds) {
+            const darkBg = '#0F172A';
+            const darkText = '#F1F5F9';
+            
+            resultsDiv.innerHTML = `
+                <div class="card">
+                    <div class="card-title">Design System: ${ds.query.toUpperCase()}</div>
+                    
+                    <div class="section-grid">
+                        <div>
+                            <h3 style="margin-bottom: 12px;">Pattern</h3>
+                            <div class="info-row">
+                                <span class="info-label">Layout</span>
+                                <span class="info-value">${ds.pattern}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 style="margin-bottom: 12px;">Style</h3>
+                            <div class="info-row">
+                                <span class="info-label">Recommended</span>
+                                <span class="info-value">${ds.style}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">Color Palette</div>
+                    <h4 style="color: var(--text-muted); margin-bottom: 8px;">Light Mode</h4>
+                    <div class="color-swatches">
+                        <div class="swatch" style="background: ${ds.primary}" onclick="copyColor('${ds.primary}')" title="Click to copy">
+                            Primary<br>${ds.primary}
+                        </div>
+                        <div class="swatch" style="background: ${ds.secondary}" onclick="copyColor('${ds.secondary}')" title="Click to copy">
+                            Secondary<br>${ds.secondary}
+                        </div>
+                        <div class="swatch" style="background: ${ds.cta}" onclick="copyColor('${ds.cta}')" title="Click to copy">
+                            CTA<br>${ds.cta}
+                        </div>
+                        <div class="swatch" style="background: ${ds.bg}; color: ${ds.text}; border-color: #ccc;" onclick="copyColor('${ds.bg}')" title="Click to copy">
+                            BG<br>${ds.bg}
+                        </div>
+                        <div class="swatch" style="background: ${ds.text}" onclick="copyColor('${ds.text}')" title="Click to copy">
+                            Text<br>${ds.text}
+                        </div>
+                    </div>
+                    <h4 style="color: var(--text-muted); margin: 16px 0 8px;">Dark Mode</h4>
+                    <div class="color-swatches">
+                        <div class="swatch" style="background: ${lighten(ds.primary, 0.2)}" title="Primary (dark)">
+                            Primary<br>${lighten(ds.primary, 0.2)}
+                        </div>
+                        <div class="swatch" style="background: ${lighten(ds.secondary, 0.2)}" title="Secondary (dark)">
+                            Secondary
+                        </div>
+                        <div class="swatch" style="background: ${lighten(ds.cta, 0.15)}" title="CTA (dark)">
+                            CTA
+                        </div>
+                        <div class="swatch" style="background: ${darkBg}; border-color: #555;" title="Background (dark)">
+                            BG<br>${darkBg}
+                        </div>
+                        <div class="swatch" style="background: ${darkText}; color: #333;" title="Text (dark)">
+                            Text<br>${darkText}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">Typography</div>
+                    <div class="section-grid">
+                        <div>
+                            <div class="info-row">
+                                <span class="info-label">Heading</span>
+                                <span class="info-value">${ds.heading}</span>
+                            </div>
+                            <div class="font-preview" style="font-family: '${ds.heading}', sans-serif; font-size: 28px; font-weight: 700;">
+                                The quick brown fox
+                            </div>
+                        </div>
+                        <div>
+                            <div class="info-row">
+                                <span class="info-label">Body</span>
+                                <span class="info-value">${ds.body}</span>
+                            </div>
+                            <div class="font-preview" style="font-family: '${ds.body}', sans-serif; font-size: 16px;">
+                                The quick brown fox jumps over the lazy dog. Pack my box with five dozen liquor jugs.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">Component Preview</div>
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;">
+                        <button style="background: ${ds.cta}; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 16px;">
+                            Primary CTA
+                        </button>
+                        <button style="background: transparent; color: ${ds.primary}; padding: 12px 24px; border: 2px solid ${ds.primary}; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 16px;">
+                            Secondary
+                        </button>
+                        <button style="background: transparent; color: ${ds.primary}; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 16px;">
+                            Ghost
+                        </button>
+                    </div>
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <span class="tag">Tag One</span>
+                        <span class="tag">Tag Two</span>
+                        <span class="tag">Tag Three</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">Export Commands</div>
+                    <pre style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 8px; overflow-x: auto; color: var(--primary-light); font-size: 13px; line-height: 1.8;">
+# Generate design system
+python src/scripts/search.py "${ds.query}" --design-system -p "MyProject"
+
+# Export Tailwind config
+python src/scripts/search.py "${ds.query}" --design-system --export tailwind
+
+# Export CSS variables
+python src/scripts/search.py "${ds.query}" --design-system --export css
+
+# Export Design Tokens
+python src/scripts/search.py "${ds.query}" --design-system --export tokens
+
+# Save to files
+python src/scripts/search.py "${ds.query}" --design-system --persist -p "MyProject"</pre>
+                </div>
+            `;
+        }
+        
+        function copyColor(hex) {
+            navigator.clipboard.writeText(hex).then(() => {
+                // Brief visual feedback
+                const btn = event.target;
+                const orig = btn.textContent;
+                btn.textContent = 'Copied!';
+                setTimeout(() => btn.textContent = orig, 1000);
+            });
+        }
+        
+        function lighten(hex, amount) {
+            hex = hex.replace('#', '');
+            const r = Math.min(255, parseInt(hex.substr(0,2), 16) + Math.round(255 * amount));
+            const g = Math.min(255, parseInt(hex.substr(2,2), 16) + Math.round(255 * amount));
+            const b = Math.min(255, parseInt(hex.substr(4,2), 16) + Math.round(255 * amount));
+            return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+        }
+    </script>
+</body>
+</html>
