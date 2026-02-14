@@ -873,7 +873,7 @@
         /* Mini Cart positioned above bottom nav */
         #mini-cart-bar {
             z-index: 40;
-            bottom: calc(85px + env(safe-area-inset-bottom));
+            bottom: calc(70px + env(safe-area-inset-bottom));
             transition: bottom 0.3s ease, transform 0.3s ease;
         }
         
@@ -895,13 +895,17 @@
             -webkit-backdrop-filter: blur(20px);
             border-top: 1px solid rgba(255, 255, 255, 0.5);
             z-index: 50;
-            padding-bottom: env(safe-area-inset-bottom);
-            box-shadow: 
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+            padding-top: 10px;
+            box-shadow:
                 0 -8px 32px rgba(0, 0, 0, 0.08),
                 0 -1px 3px rgba(0, 0, 0, 0.05);
             transform: translateZ(0);
             will-change: transform;
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+            /* iOS specific fix for home indicator */
+            padding-left: env(safe-area-inset-left, 0px);
+            padding-right: env(safe-area-inset-right, 0px);
         }
         
         /* Hide bottom nav initially */
@@ -924,8 +928,9 @@
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 10px 16px;
+            padding: 0 16px;
             gap: 8px;
+            min-height: 60px;
         }
         
         .bottom-nav-item {
@@ -933,14 +938,17 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 8px 20px;
+            padding: 6px 16px;
             border-radius: 20px;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             min-width: 72px;
+            min-height: 50px;
             -webkit-tap-highlight-color: transparent;
             background: transparent;
+            /* iOS safe area for touch targets */
+            padding-bottom: max(6px, env(safe-area-inset-bottom, 0px));
         }
         
         .bottom-nav-item:active {
@@ -997,14 +1005,31 @@
             height: 20px;
             border-radius: 10px;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 6px;
-            box-shadow: 
-                0 2px 8px rgba(239, 68, 68, 0.4),
-                0 0 0 2px rgba(255, 255, 255, 0.8);
-            animation: badgePop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 2;
+        }
+        
+        /* iOS Safe Area Support */
+        @supports (padding: max(0px)) {
+            .bottom-nav {
+                padding-bottom: max(0px, env(safe-area-inset-bottom));
+            }
+            
+            .bottom-nav-container {
+                padding-bottom: max(0px, env(safe-area-inset-bottom));
+            }
+        }
+        
+        /* iPhone X and later with notch */
+        @media screen and (min-width: 375px) and (min-height: 812px) {
+            .bottom-nav {
+                padding-bottom: 34px; /* Standard home indicator height */
+            }
+        }
+        
+        /* iPhone 14 Pro Max and larger */
+        @media screen and (min-width: 430px) and (min-height: 932px) {
+            .bottom-nav {
+                padding-bottom: 34px;
+            }
         }
         
         @keyframes badgePop {
@@ -1036,18 +1061,18 @@
         
         /* Hide mini cart when bottom nav is present */
         body:has(.bottom-nav) #mini-cart-bar {
-            bottom: calc(85px + env(safe-area-inset-bottom));
+            bottom: calc(70px + env(safe-area-inset-bottom));
         }
         
         /* Add extra padding to main content for bottom nav */
         .max-w-md.mx-auto.px-5.relative.z-10:last-of-type {
-            padding-bottom: calc(100px + env(safe-area-inset-bottom));
+            padding-bottom: calc(90px + env(safe-area-inset-bottom));
         }
     </style>
 <base target="_blank">
 <base target="_blank">
 </head>
-<body class="pb-40 font-sans select-none relative overflow-x-hidden safe-area-pt">
+<body class="pb-32 font-sans select-none relative overflow-x-hidden safe-area-pt">
 
     <canvas id="bg-canvas"></canvas>
     <canvas id="confetti-canvas"></canvas>
