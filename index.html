@@ -1776,8 +1776,21 @@
                 draw() { ctx.save(); ctx.globalAlpha = this.opacity; ctx.font = `${this.size}px sans-serif`; ctx.translate(this.x, this.y); ctx.rotate(this.rotation); ctx.fillText(this.icon, -this.size/2, this.size/2); ctx.restore(); }
                 update() { this.y -= this.speed; this.swingCounter += 0.02; this.x += Math.sin(this.swingCounter) * 0.5; this.rotation += this.rotationSpeed; if (this.y < -this.size) this.init(); this.draw(); }
             }
-            for (let i = 0; i < 10; i++) bubbles.push(new Bubble());
-            function animate() { if (!isTabActive) { requestAnimationFrame(animate); return; } ctx.clearRect(0, 0, width, height); bubbles.forEach(b => b.update()); requestAnimationFrame(animate); }
+            for (let i = 0; i < 5; i++) bubbles.push(new Bubble());
+            let frameCount = 0;
+            function animate() { 
+                if (!isTabActive) { 
+                    requestAnimationFrame(animate); 
+                    return; 
+                }
+                // Skip every other frame for 30fps instead of 60fps
+                frameCount++;
+                if (frameCount % 2 === 0) {
+                    ctx.clearRect(0, 0, width, height); 
+                    bubbles.forEach(b => b.update()); 
+                }
+                requestAnimationFrame(animate); 
+            }
             animate();
         }
 
@@ -4332,46 +4345,44 @@
 
         // ===== GALAXY-LEVEL COSMIC FEATURES =====
         
-        // --- Food Particles Animation System ---
+        // --- Food Particles Animation System --- OPTIMIZED for performance ---
         const foodEmojis = ['🍳', '🌶️', '🧄', '🥓', '🍚', '🥘', '🍜', '🍤', '🥩'];
         let particlesEnabled = true;
+        let activeParticles = 0;
+        const maxParticles = 5; // Limit concurrent particles
         
-        function initFoodParticles() {
-            if (!particlesEnabled) return;
-            const container = document.getElementById('food-particles-container');
-            if (!container) return;
+        function createFoodParticle(x, y) {
+            if (!particlesEnabled || activeParticles >= maxParticles) return;
             
-            // Create initial particles
-            for (let i = 0; i < 6; i++) {
-                setTimeout(() => createFoodParticle(), i * 3000);
-            }
-            
-            // Continue creating particles
-            setInterval(() => {
-                if (particlesEnabled && document.visibilityState === 'visible') {
-                    createFoodParticle();
-                }
-            }, 5000);
-        }
-        
-        function createFoodParticle() {
-            const container = document.getElementById('food-particles-container');
-            if (!container) return;
-            
+            activeParticles++;
             const particle = document.createElement('div');
-            particle.className = 'food-particle';
             particle.textContent = foodEmojis[Math.floor(Math.random() * foodEmojis.length)];
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.animationDuration = (15 + Math.random() * 10) + 's';
-            particle.style.animationDelay = Math.random() * 2 + 's';
+            particle.style.cssText = `
+                position: fixed;
+                left: ${x}px;
+                top: ${y}px;
+                font-size: 20px;
+                pointer-events: none;
+                z-index: 9998;
+                animation: floatUp 1.5s ease-out forwards;
+            `;
+            document.body.appendChild(particle);
             
-            container.appendChild(particle);
-            
-            // Remove after animation
             setTimeout(() => {
-                if (particle.parentNode) particle.remove();
-            }, 25000);
+                particle.remove();
+                activeParticles--;
+            }, 1500);
         }
+        
+        // Create particles occasionally (every 2 seconds instead of 300ms)
+        setInterval(() => {
+            if (!particlesEnabled) return;
+            const btn = document.querySelector('.add-to-cart-btn');
+            if (btn) {
+                const rect = btn.getBoundingClientRect();
+                createFoodParticle(rect.left + rect.width / 2, rect.top);
+            }
+        }, 2000);
         
         // --- Gamification System ---
         const GAMIFICATION_KEY = 'kaprao_gamification';
@@ -4757,23 +4768,30 @@
             }
         }
         
-        // --- 3D Tilt Effect ---
+        // --- 3D Tilt Effect --- OPTIMIZED with throttling ---
         function initTiltEffect() {
             const tiltCards = document.querySelectorAll('.tilt-card');
             
             tiltCards.forEach(card => {
+                let ticking = false;
                 card.addEventListener('mousemove', (e) => {
-                    const rect = card.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
+                    if (ticking) return;
+                    ticking = true;
                     
-                    const centerX = rect.width / 2;
-                    const centerY = rect.height / 2;
-                    
-                    const rotateX = (y - centerY) / 10;
-                    const rotateY = (centerX - x) / 10;
-                    
-                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                    requestAnimationFrame(() => {
+                        const rect = card.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+                        
+                        const centerX = rect.width / 2;
+                        const centerY = rect.height / 2;
+                        
+                        const rotateX = (y - centerY) / 10;
+                        const rotateY = (centerX - x) / 10;
+                        
+                        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                        ticking = false;
+                    });
                 });
                 
                 card.addEventListener('mouseleave', () => {
@@ -4782,17 +4800,24 @@
             });
         }
         
-        // --- Magnetic Button Effect ---
+        // --- Magnetic Button Effect --- OPTIMIZED with throttling ---
         function initMagneticButtons() {
             const magneticBtns = document.querySelectorAll('.magnetic-btn');
             
             magneticBtns.forEach(btn => {
+                let ticking = false;
                 btn.addEventListener('mousemove', (e) => {
-                    const rect = btn.getBoundingClientRect();
-                    const x = e.clientX - rect.left - rect.width / 2;
-                    const y = e.clientY - rect.top - rect.height / 2;
+                    if (ticking) return;
+                    ticking = true;
                     
-                    btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+                    requestAnimationFrame(() => {
+                        const rect = btn.getBoundingClientRect();
+                        const x = e.clientX - rect.left - rect.width / 2;
+                        const y = e.clientY - rect.top - rect.height / 2;
+                        
+                        btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+                        ticking = false;
+                    });
                 });
                 
                 btn.addEventListener('mouseleave', () => {
@@ -4868,61 +4893,34 @@
         // --- Parallax Effect on Scroll ---
         function initParallax() {
             const parallaxElements = document.querySelectorAll('.parallax');
+            if (!parallaxElements.length) return;
             
+            let ticking = false;
             window.addEventListener('scroll', () => {
-                const scrolled = window.pageYOffset;
-                
-                parallaxElements.forEach(el => {
-                    const speed = el.dataset.speed || 0.5;
-                    el.style.transform = `translateY(${scrolled * speed}px)`;
-                });
-            });
+                if (!ticking) {
+                    window.requestAnimationFrame(() => {
+                        const scrolled = window.pageYOffset;
+                        parallaxElements.forEach(el => {
+                            const speed = el.dataset.speed || 0.5;
+                            el.style.transform = `translateY(${scrolled * speed}px)`;
+                        });
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            }, { passive: true });
         }
         
-        // --- Mouse Trail Effect ---
+        // --- Mouse Trail Effect --- DISABLED for performance ---
         function initMouseTrail() {
-            const trail = [];
-            const trailLength = 20;
-            
-            for (let i = 0; i < trailLength; i++) {
-                const dot = document.createElement('div');
-                dot.className = 'fixed w-2 h-2 rounded-full bg-yellow-400 pointer-events-none z-50 opacity-0 transition-opacity';
-                document.body.appendChild(dot);
-                trail.push(dot);
-            }
-            
-            let mouseX = 0, mouseY = 0;
-            let trailIndex = 0;
-            
-            document.addEventListener('mousemove', (e) => {
-                mouseX = e.clientX;
-                mouseY = e.clientY;
-                
-                const dot = trail[trailIndex];
-                dot.style.left = mouseX - 4 + 'px';
-                dot.style.top = mouseY - 4 + 'px';
-                dot.style.opacity = '0.6';
-                
-                setTimeout(() => {
-                    dot.style.opacity = '0';
-                }, 500);
-                
-                trailIndex = (trailIndex + 1) % trailLength;
-            });
+            // DISABLED: Too heavy for mobile performance
+            return;
         }
         
-        // --- Interactive Spotlight Effect ---
+        // --- Interactive Spotlight Effect --- DISABLED for performance ---
         function initSpotlight() {
-            const spotlight = document.createElement('div');
-            spotlight.className = 'fixed inset-0 pointer-events-none z-40';
-            spotlight.style.background = 'radial-gradient(circle at 50% 50%, transparent 0%, rgba(0,0,0,0.05) 100%)';
-            document.body.appendChild(spotlight);
-            
-            document.addEventListener('mousemove', (e) => {
-                const x = (e.clientX / window.innerWidth) * 100;
-                const y = (e.clientY / window.innerHeight) * 100;
-                spotlight.style.background = `radial-gradient(circle at ${x}% ${y}%, transparent 0%, rgba(0,0,0,0.03) 50%, rgba(0,0,0,0.08) 100%)`;
-            });
+            // DISABLED: Too heavy for mobile performance
+            return;
         }
         
         // --- Floating Elements Randomizer ---
