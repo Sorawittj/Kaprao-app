@@ -1,7 +1,7 @@
 // sw.js - Enhanced Service Worker for Kaprao52 PWA
-const CACHE_NAME = 'kaprao52-v24-cache-v1';
-const STATIC_CACHE = 'kaprao52-static-v1';
-const IMAGE_CACHE = 'kaprao52-images-v1';
+const CACHE_NAME = 'kaprao52-v25-cache-v1';
+const STATIC_CACHE = 'kaprao52-static-v2';
+const IMAGE_CACHE = 'kaprao52-images-v2';
 const API_CACHE = 'kaprao52-api-v1';
 
 // URLs to cache immediately on install
@@ -9,6 +9,23 @@ const urlsToCache = [
   './',
   './index.html',
   './manifest.json'
+];
+
+// Image files to cache
+const imageFiles = [
+  './images/kaprao-kai-yiao-ma.jpg',
+  './images/kaprao-kung.jpg',
+  './images/kaprao-moo-krob.jpg',
+  './images/kaprao-moo-sap.jpg',
+  './images/kaprao-nor-mai.jpg',
+  './images/kaprao-san-ko.jpg',
+  './images/khai-dao-rod-sot-makham.jpg',
+  './images/khao-pad-moo-chin.jpg',
+  './images/kung-kra-thiam.jpg',
+  './images/kung-rod-sot-makham.jpg',
+  './images/mama-pad-kaprao.jpg',
+  './images/prik-kang-moo-chin.jpg',
+  './images/san-ko-kra-thiam.jpg'
 ];
 
 // External resources with versioning
@@ -33,6 +50,13 @@ self.addEventListener('install', (event) => {
       caches.open(STATIC_CACHE).then((cache) => {
         console.log('[SW] Caching static resources');
         return cache.addAll(externalResources);
+      }),
+      // Cache local images
+      caches.open(IMAGE_CACHE).then((cache) => {
+        console.log('[SW] Caching local images');
+        return cache.addAll(imageFiles.map(img => img)).catch(err => {
+          console.log('[SW] Some images failed to cache:', err);
+        });
       })
     ]).then(() => {
       console.log('[SW] Install completed');
@@ -81,10 +105,18 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Strategy 2: Cache First for images (with compression and network fallback)
-  if (request.destination === 'image' || 
+  // Strategy 2: Network First for local images (to always get new images)
+  if ((request.destination === 'image' ||
+      url.pathname.match(/\.(png|jpg|jpeg|gif|webp|svg)$/)) &&
+      url.origin === self.location.origin) {
+    event.respondWith(networkFirstStrategy(request, IMAGE_CACHE));
+    return;
+  }
+
+  // Strategy 2b: Cache First for external images
+  if (request.destination === 'image' ||
       url.pathname.match(/\.(png|jpg|jpeg|gif|webp|svg)$/)) {
-    event.respondWith(cacheFirstWithCompression(request, IMAGE_CACHE));
+    event.respondWith(cacheFirstStrategy(request, IMAGE_CACHE));
     return;
   }
 

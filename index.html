@@ -1503,7 +1503,10 @@
 
         <div id="modal-scroll-area" class="flex-1 overflow-y-auto hide-scroll px-6 pb-24 pt-4">
             <div class="flex justify-center mb-6">
-                <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center text-6xl shadow-sm border-4 border-gray-100"><span id="modal-icon">🍜</span></div>
+                <div class="w-24 h-24 bg-white rounded-full overflow-hidden flex items-center justify-center text-6xl shadow-sm border-4 border-gray-100">
+                    <img id="modal-image" src="" alt="" class="w-full h-full object-cover hidden">
+                    <span id="modal-icon">🍜</span>
+                </div>
             </div>
             <div class="text-center mb-8">
                 <h3 id="modal-title" class="text-2xl font-bold text-gray-800 mb-1 font-round">ชื่อเมนู</h3>
@@ -2051,7 +2054,8 @@
                         price: item.price,
                         meat: item.meat || null,
                         addons: item.addons || [],
-                        note: item.note || ''
+                        note: item.note || '',
+                        image: item.image
                     });
                 });
                 saveToLS();
@@ -3515,8 +3519,19 @@
             currentItem = item; 
             modalQty = 1; 
             document.getElementById('modal-qty').innerText = modalQty; 
-            document.getElementById('modal-title').innerText = item.name; 
-            document.getElementById('modal-icon').innerText = item.icon; 
+            document.getElementById('modal-title').innerText = item.name;
+            document.getElementById('modal-icon').innerText = item.icon;
+            const modalImage = document.getElementById('modal-image');
+            const modalIcon = document.getElementById('modal-icon');
+            if (item.image) {
+                modalImage.src = item.image;
+                modalImage.alt = item.name;
+                modalImage.classList.remove('hidden');
+                modalIcon.classList.add('hidden');
+            } else {
+                modalImage.classList.add('hidden');
+                modalIcon.classList.remove('hidden');
+            }
             document.getElementById('modal-note').value = '';
             document.querySelectorAll('input[name="modal-meat"]').forEach(el => el.checked = false); 
             addonIds.forEach(id => document.getElementById(`modal-opt-${id}`).checked = false);
@@ -3642,15 +3657,16 @@
             const unitPrice = calculateItemUnitPrice(currentItem, options);
             let noteSafe = escapeHtml(document.getElementById('modal-note').value.trim()); 
             if(noteExtra) noteSafe = (noteSafe ? noteSafe + " " : "") + noteExtra;
-            for(let i=0; i<modalQty; i++){ 
-                cart.push({ 
-                    id: Date.now() + i, 
-                    name: currentItem.name, 
-                    price: unitPrice, 
-                    meat: meat, 
-                    addons: selectedAddonNames, 
-                    note: noteSafe 
-                }); 
+            for(let i=0; i<modalQty; i++){
+                cart.push({
+                    id: Date.now() + i,
+                    name: currentItem.name,
+                    price: unitPrice,
+                    meat: meat,
+                    addons: selectedAddonNames,
+                    note: noteSafe,
+                    image: currentItem.image
+                });
             }
             triggerHaptic();
             try { 
@@ -3956,11 +3972,27 @@
             const container = document.getElementById('cart-list-container'); 
             container.innerHTML = '';
             cart.forEach(item => {
-                const el = document.createElement('div'); 
+                const el = document.createElement('div');
                 el.className = "bg-gray-50 p-3 rounded-xl border border-gray-100 flex justify-between items-start stagger-item";
-                let detail = item.meat ? `<span class="text-orange-600 text-xs bg-orange-100 px-1 rounded">${item.meat}</span> ` : ''; 
+                let detail = item.meat ? `<span class="text-orange-600 text-xs bg-orange-100 px-1 rounded">${item.meat}</span> ` : '';
                 if(item.addons.length) detail += `<span class="text-gray-500 text-xs">+${item.addons.join(',')}</span>`;
-                el.innerHTML = `<div><h4 class="cart-item-title font-bold text-gray-800">${item.name}</h4><div class="cart-item-details mt-1">${detail}</div>${item.note ? `<div class="text-[10px] text-gray-400 mt-1">Note: ${item.note}</div>` : ''}</div><div class="flex flex-col items-end gap-2"><span class="font-bold text-gray-800">${item.price}.-</span><button onclick="removeFromCart(${item.id})" class="text-xs text-red-500 bg-red-50 w-9 h-9 rounded flex items-center justify-center border border-red-100 btn-bounce"><i class="fas fa-trash"></i></button></div>`;
+                el.innerHTML = `
+    <div class="flex items-start gap-3">
+        <img src="${item.image || ''}" alt="${item.name}"
+             class="w-16 h-16 rounded-xl object-cover flex-shrink-0"
+             onerror="this.style.display='none'">
+        <div>
+            <h4 class="cart-item-title font-bold text-gray-800">${item.name}</h4>
+            <div class="cart-item-details mt-1">${detail}</div>
+            ${item.note ? `<div class="text-[10px] text-gray-400 mt-1">Note: ${item.note}</div>` : ''}
+        </div>
+    </div>
+    <div class="flex flex-col items-end gap-2">
+        <span class="font-bold text-gray-800">${item.price}.-</span>
+        <button onclick="removeFromCart(${item.id})" class="text-xs text-red-500 bg-red-50 w-9 h-9 rounded flex items-center justify-center border border-red-100 btn-bounce">
+            <i class="fas fa-trash"></i>
+        </button>
+    </div>`;
                 container.appendChild(el);
             });
             updateTotalSummary();
