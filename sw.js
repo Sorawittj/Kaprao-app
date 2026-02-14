@@ -81,10 +81,10 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Strategy 2: Cache First for images (with network fallback)
+  // Strategy 2: Cache First for images (with compression and network fallback)
   if (request.destination === 'image' || 
       url.pathname.match(/\.(png|jpg|jpeg|gif|webp|svg)$/)) {
-    event.respondWith(cacheFirstStrategy(request, IMAGE_CACHE));
+    event.respondWith(cacheFirstWithCompression(request, IMAGE_CACHE));
     return;
   }
 
@@ -266,4 +266,93 @@ async function getCacheStats() {
   }
   
   return stats;
+}
+
+// Image compression and resize using Canvas API
+async function compressImage(imageBlob, maxWidth = 400, maxHeight = 400, quality = 0.8) {
+  try {
+    // Create bitmap from blob
+    const bitmap = await createImageBitmap(imageBlob);
+    
+    // Calculate new dimensions maintaining aspect ratio
+    let { width, height } = bitmap;
+    if (width > maxWidth || height > maxHeight) {
+      const ratio = Math.min(maxWidth / width, maxHeight / height);
+      width = Math.round(width * ratio);
+      height = Math.round(height * ratio);
+    }
+    
+    // Create canvas and draw resized image
+    const canvas = new OffscreenCanvas(width, height);
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(bitmap, 0, 0, width, height);
+    bitmap.close();
+    
+    // Convert to blob with compression
+    const compressedBlob = await canvas.convertToBlob({
+      type: 'image/jpeg',
+      quality: quality
+    });
+    
+    return compressedBlob;
+  } catch (error) {
+    console.error('[SW] Image compression failed:', error);
+    return imageBlob; // Return original if compression fails
+  }
+}
+
+// Create thumbnail version for menu display
+async function createThumbnail(imageBlob, size = 150) {
+  return compressImage(imageBlob, size, size, 0.7);
+}
+
+// Enhanced cache first strategy for images with compression
+async function cacheFirstWithCompression(request, cacheName) {
+  const cache = await caches.open(cacheName);
+  const cached = await cache.match(request);
+  
+  if (cached) {
+    // Update cache in background
+    fetch(request).then(async (response) => {
+      if (response.ok) {
+        const imageBlob = await response.blob();
+        const compressedBlob = await compressImage(imageBlob, 400, 400, 0.85);
+        const compressedResponse = new Response(compressedBlob, {
+          headers: {
+            'Content-Type': 'image/jpeg',
+            'X-Compressed': 'true'
+          }
+        });
+        cache.put(request, compressedResponse);
+      }
+    }).catch(() => {});
+    return cached;
+  }
+  
+  try {
+    const response = await fetch(request);
+    if (!response.ok) return response;
+    
+    // Compress image before caching
+    const imageBlob = await response.blob();
+    const originalSize = imageBlob.size;
+    const compressedBlob = await compressImage(imageBlob, 400, 400, 0.85);
+    const compressedSize = compressedBlob.size;
+    
+    console.log(`[SW] Image compressed: ${(originalSize/1024).toFixed(1)}KB → ${(compressedSize/1024).toFixed(1)}KB (${((1-compressedSize/originalSize)*100).toFixed(0)}% reduction)`);
+    
+    const compressedResponse = new Response(compressedBlob, {
+      headers: {
+        'Content-Type': 'image/jpeg',
+        'X-Compressed': 'true',
+        'X-Original-Size': originalSize.toString()
+      }
+    });
+    
+    cache.put(request, compressedResponse.clone());
+    return compressedResponse;
+  } catch (error) {
+    console.error('[SW] Fetch failed:', error);
+    return new Response('Offline - Resource unavailable', { status: 503 });
+  }
 }
