@@ -236,6 +236,813 @@
         /* NEW: Floating Promo Badge */
         .promo-float { position: fixed; top: 80px; right: 10px; z-index: 100; animation: floatPromo 3s ease-in-out infinite; }
         @keyframes floatPromo { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        
+        /* ===== GALAXY-LEVEL COSMIC FEATURES ===== */
+        
+        /* 3D Parallax Background Layers */
+        .cosmic-bg-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -2;
+        }
+        
+        .stars-layer {
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #FCD34D, transparent),
+                radial-gradient(2px 2px at 40px 70px, #F59E0B, transparent),
+                radial-gradient(1px 1px at 90px 40px, #FBBF24, transparent),
+                radial-gradient(2px 2px at 130px 80px, #FCD34D, transparent),
+                radial-gradient(1px 1px at 160px 20px, #F59E0B, transparent);
+            background-size: 200px 100px;
+            animation: twinkle 4s ease-in-out infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+        
+        /* Floating Food Particles */
+        .food-particle {
+            position: fixed;
+            font-size: 2rem;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.15;
+            animation: floatParticle 20s linear infinite;
+        }
+        
+        @keyframes floatParticle {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.15; }
+            90% { opacity: 0.15; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+        
+        /* Holographic Card Effect */
+        .holographic-card {
+            background: linear-gradient(
+                135deg,
+                rgba(255,255,255,0.9) 0%,
+                rgba(255,255,255,0.95) 25%,
+                rgba(254,243,199,0.9) 50%,
+                rgba(255,255,255,0.95) 75%,
+                rgba(255,255,255,0.9) 100%
+            );
+            background-size: 400% 400%;
+            animation: holographicShift 8s ease infinite;
+            border: 1px solid rgba(251,191,36,0.3);
+        }
+        
+        @keyframes holographicShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* 3D Flip Card Effect */
+        .flip-card {
+            perspective: 1000px;
+            transform-style: preserve-3d;
+        }
+        
+        .flip-card-inner {
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+        }
+        
+        .flip-card:hover .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        
+        /* Glow Effects */
+        .cosmic-glow {
+            box-shadow: 
+                0 0 20px rgba(251,191,36,0.3),
+                0 0 40px rgba(251,191,36,0.2),
+                0 0 60px rgba(251,191,36,0.1);
+        }
+        
+        .neon-glow {
+            text-shadow: 
+                0 0 5px currentColor,
+                0 0 10px currentColor,
+                0 0 20px currentColor,
+                0 0 40px rgba(251,191,36,0.5);
+        }
+        
+        /* Achievement Badges */
+        .achievement-badge {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FCD34D, #F59E0B);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(245,158,11,0.4);
+            position: relative;
+            animation: badgePulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 4px 15px rgba(245,158,11,0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 6px 25px rgba(245,158,11,0.6); }
+        }
+        
+        /* Streak Counter */
+        .streak-flame {
+            animation: flameFlicker 0.5s ease-in-out infinite alternate;
+        }
+        
+        @keyframes flameFlicker {
+            0% { transform: scale(1) rotate(-2deg); }
+            100% { transform: scale(1.1) rotate(2deg); }
+        }
+        
+        /* Level Progress Ring */
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.5s ease;
+        }
+        
+        /* Particle Burst Animation */
+        .particle-burst {
+            position: absolute;
+            pointer-events: none;
+        }
+        
+        .burst-particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: burstOut 1s ease-out forwards;
+        }
+        
+        @keyframes burstOut {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+        
+        /* Voice Wave Animation */
+        .voice-wave {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            height: 30px;
+        }
+        
+        .voice-wave-bar {
+            width: 4px;
+            background: linear-gradient(to top, #F59E0B, #FCD34D);
+            border-radius: 2px;
+            animation: waveBar 0.5s ease-in-out infinite alternate;
+        }
+        
+        @keyframes waveBar {
+            0% { height: 10%; }
+            100% { height: 100%; }
+        }
+        
+        /* AR Preview Container */
+        .ar-preview {
+            perspective: 1000px;
+            transform-style: preserve-3d;
+        }
+        
+        .ar-card {
+            transform: rotateX(10deg) rotateY(-10deg);
+            transition: transform 0.5s ease;
+            box-shadow: 
+                20px 20px 60px rgba(0,0,0,0.1),
+                -5px -5px 20px rgba(255,255,255,0.5);
+        }
+        
+        .ar-card:hover {
+            transform: rotateX(0) rotateY(0) scale(1.05);
+        }
+        
+        /* Seasonal Theme Transitions */
+        .seasonal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+        
+        /* Morphing Blob Background */
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: blobMorph 20s ease-in-out infinite;
+        }
+        
+        @keyframes blobMorph {
+            0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: translate(0, 0) scale(1); }
+            25% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; transform: translate(50px, -30px) scale(1.1); }
+            50% { border-radius: 50% 60% 30% 60% / 30% 60% 70% 40%; transform: translate(-30px, 50px) scale(0.9); }
+            75% { border-radius: 60% 40% 60% 30% / 70% 30% 50% 60%; transform: translate(-50px, -20px) scale(1.05); }
+        }
+        
+        /* 3D Tilt Effect */
+        .tilt-card {
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
+        }
+        
+        .tilt-content {
+            transform: translateZ(20px);
+        }
+        
+        /* Magnetic Button Effect */
+        .magnetic-btn {
+            transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        
+        /* Text Scramble Effect */
+        .scramble-text {
+            font-family: monospace;
+        }
+        
+        /* Liquid Button Effect */
+        .liquid-btn {
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .liquid-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+            z-index: -1;
+        }
+        
+        .liquid-btn:hover::before {
+            width: 300%;
+            height: 300%;
+        }
+        
+        /* Shimmer Text Effect */
+        .shimmer-text {
+            background: linear-gradient(90deg, #1F2937 0%, #F59E0B 50%, #1F2937 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmerText 3s linear infinite;
+        }
+        
+        @keyframes shimmerText {
+            0% { background-position: 200% center; }
+            100% { background-position: -200% center; }
+        }
+        
+        /* Aurora Background Effect */
+        .aurora {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                120deg,
+                rgba(252,211,77,0) 0%,
+                rgba(252,211,77,0.3) 25%,
+                rgba(245,158,11,0.3) 50%,
+                rgba(252,211,77,0) 75%
+            );
+            filter: blur(60px);
+            animation: auroraMove 15s ease-in-out infinite;
+        }
+        
+        @keyframes auroraMove {
+            0%, 100% { transform: translateX(-50%) rotate(0deg); opacity: 0.5; }
+            50% { transform: translateX(50%) rotate(5deg); opacity: 0.8; }
+        }
+        
+        /* Floating Animation Variants */
+        .float-slow { animation: floatSlow 6s ease-in-out infinite; }
+        .float-medium { animation: floatMedium 4s ease-in-out infinite; }
+        .float-fast { animation: floatFast 2s ease-in-out infinite; }
+        
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+        }
+        
+        @keyframes floatMedium {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(-2deg); }
+        }
+        
+        @keyframes floatFast {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(1deg); }
+        }
+        
+        /* Glitch Effect */
+        .glitch {
+            position: relative;
+        }
+        
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .glitch::before {
+            animation: glitch-1 0.3s infinite linear alternate-reverse;
+            color: #F59E0B;
+            z-index: -1;
+        }
+        
+        .glitch::after {
+            animation: glitch-2 0.3s infinite linear alternate-reverse;
+            color: #8B5CF6;
+            z-index: -2;
+        }
+        
+        @keyframes glitch-1 {
+            0%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); }
+            20% { clip-path: inset(20% 0 60% 0); transform: translate(-2px, 2px); }
+            40% { clip-path: inset(40% 0 40% 0); transform: translate(2px, -2px); }
+            60% { clip-path: inset(60% 0 20% 0); transform: translate(-2px, -2px); }
+            80% { clip-path: inset(80% 0 0 0); transform: translate(2px, 2px); }
+        }
+        
+        @keyframes glitch-2 {
+            0%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); }
+            20% { clip-path: inset(60% 0 20% 0); transform: translate(2px, -2px); }
+            40% { clip-path: inset(40% 0 40% 0); transform: translate(-2px, 2px); }
+            60% { clip-path: inset(20% 0 60% 0); transform: translate(2px, 2px); }
+            80% { clip-path: inset(0 0 80% 0); transform: translate(-2px, -2px); }
+        }
+        
+        /* Pulse Ring Animation */
+        .pulse-ring {
+            position: relative;
+        }
+        
+        .pulse-ring::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: inherit;
+            border: 2px solid rgba(245,158,11,0.5);
+            animation: pulseRing 2s ease-out infinite;
+        }
+        
+        @keyframes pulseRing {
+        0% { transform: scale(1); opacity: 1; }
+        100% { transform: scale(1.2); opacity: 0; }
+        }
+        
+        /* Gradient Border Animation */
+        .gradient-border {
+            position: relative;
+            background: white;
+            border-radius: 1rem;
+            z-index: 1;
+        }
+        
+        .gradient-border::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: inherit;
+            background: linear-gradient(45deg, #F59E0B, #8B5CF6, #F59E0B);
+            background-size: 200% 200%;
+            animation: gradientRotate 3s linear infinite;
+            z-index: -1;
+        }
+        
+        @keyframes gradientRotate {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* Ripple Effect */
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ripple::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            background-image: radial-gradient(circle, rgba(255,255,255,0.3) 10%, transparent 10.01%);
+            background-repeat: no-repeat;
+            background-position: 50%;
+            transform: scale(10, 10);
+            opacity: 0;
+            transition: transform 0.5s, opacity 0.5s;
+        }
+        
+        .ripple:active::after {
+            transform: scale(0, 0);
+            opacity: 0.3;
+            transition: 0s;
+        }
+        
+        /* Scan Lines Effect */
+        .scan-lines {
+            position: relative;
+        }
+        
+        .scan-lines::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(255,255,255,0),
+                rgba(255,255,255,0) 50%,
+                rgba(0,0,0,0.02) 50%,
+                rgba(0,0,0,0.02)
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        /* Neon Border Animation */
+        .neon-border {
+            position: relative;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+        }
+        
+        .neon-border::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #F59E0B, #8B5CF6, #EC4899, #F59E0B);
+            background-size: 400% 400%;
+            border-radius: inherit;
+            z-index: -1;
+            animation: neonBorder 3s ease infinite;
+        }
+        
+        @keyframes neonBorder {
+            0%, 100% { background-position: 0% 50%; box-shadow: 0 0 5px #F59E0B, 0 0 10px #F59E0B; }
+            50% { background-position: 100% 50%; box-shadow: 0 0 20px #8B5CF6, 0 0 30px #8B5CF6; }
+        }
+        
+        /* Floating Label Animation */
+        .floating-label {
+            position: relative;
+        }
+        
+        .floating-label input:focus ~ label,
+        .floating-label input:not(:placeholder-shown) ~ label {
+            transform: translateY(-100%) scale(0.85);
+            color: #F59E0B;
+        }
+        
+        /* Glowing Text */
+        .glow-text {
+            text-shadow: 0 0 10px rgba(245,158,11,0.5), 0 0 20px rgba(245,158,11,0.3), 0 0 30px rgba(245,158,11,0.1);
+            animation: glowPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes glowPulse {
+            0%, 100% { text-shadow: 0 0 10px rgba(245,158,11,0.5), 0 0 20px rgba(245,158,11,0.3); }
+            50% { text-shadow: 0 0 20px rgba(245,158,11,0.8), 0 0 40px rgba(245,158,11,0.5), 0 0 60px rgba(245,158,11,0.3); }
+        }
+        
+        /* Matrix Rain Effect */
+        .matrix-bg {
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 14px;
+            color: rgba(245,158,11,0.15);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        /* Heat Wave Effect */
+        .heat-wave {
+            animation: heatWave 0.5s ease-in-out infinite;
+        }
+        
+        @keyframes heatWave {
+            0%, 100% { transform: translateY(0); filter: blur(0); }
+            25% { transform: translateY(-2px); filter: blur(0.5px); }
+            75% { transform: translateY(2px); filter: blur(0.5px); }
+        }
+        
+        /* Vignette Effect */
+        .vignette {
+            position: relative;
+        }
+        
+        .vignette::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.1) 100%);
+            pointer-events: none;
+        }
+        
+        /* Dust Particles */
+        .dust-particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(251,191,36,0.3);
+            border-radius: 50%;
+            animation: dustFloat 10s ease-in-out infinite;
+        }
+        
+        @keyframes dustFloat {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100px) translateX(50px); opacity: 0; }
+        }
+        
+        /* Smooth Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Stagger Children Animation */
+        .stagger-children > * {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .stagger-children.active > * {
+            animation: staggerIn 0.5s ease forwards;
+        }
+        
+        .stagger-children.active > *:nth-child(1) { animation-delay: 0s; }
+        .stagger-children.active > *:nth-child(2) { animation-delay: 0.1s; }
+        .stagger-children.active > *:nth-child(3) { animation-delay: 0.2s; }
+        .stagger-children.active > *:nth-child(4) { animation-delay: 0.3s; }
+        .stagger-children.active > *:nth-child(5) { animation-delay: 0.4s; }
+        
+        @keyframes staggerIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Elastic Bounce Animation */
+        .elastic-bounce {
+            animation: elasticBounce 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        @keyframes elasticBounce {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Wobble Animation */
+        .wobble {
+            animation: wobble 1s ease-in-out;
+        }
+        
+        @keyframes wobble {
+            0%, 100% { transform: translateX(0) rotate(0); }
+            15% { transform: translateX(-25px) rotate(-5deg); }
+            30% { transform: translateX(20px) rotate(3deg); }
+            45% { transform: translateX(-15px) rotate(-3deg); }
+            60% { transform: translateX(10px) rotate(2deg); }
+            75% { transform: translateX(-5px) rotate(-1deg); }
+        }
+        
+        /* Mini Cart positioned above bottom nav */
+        #mini-cart-bar {
+            z-index: 40;
+            bottom: calc(85px + env(safe-area-inset-bottom));
+            transition: bottom 0.3s ease, transform 0.3s ease;
+        }
+        
+        /* When cart is empty and hidden, no extra space needed */
+        #mini-cart-bar.hidden {
+            transform: translateY(100px);
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        /* Bottom Nav with Glassmorphism */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.5);
+            z-index: 50;
+            padding-bottom: env(safe-area-inset-bottom);
+            box-shadow: 
+                0 -8px 32px rgba(0, 0, 0, 0.08),
+                0 -1px 3px rgba(0, 0, 0, 0.05);
+            transform: translateZ(0);
+            will-change: transform;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+        }
+        
+        /* Hide bottom nav initially */
+        .bottom-nav.hidden {
+            transform: translateY(100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        /* Show bottom nav with slide-up animation */
+        .bottom-nav.show {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .bottom-nav-container {
+            max-width: 480px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+            gap: 8px;
+        }
+        
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            min-width: 72px;
+            -webkit-tap-highlight-color: transparent;
+            background: transparent;
+        }
+        
+        .bottom-nav-item:active {
+            transform: scale(0.92);
+        }
+        
+        .bottom-nav-item:hover {
+            background: rgba(245, 158, 11, 0.08);
+        }
+        
+        .bottom-nav-item.active {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(251, 191, 36, 0.15) 100%);
+            box-shadow: 
+                0 2px 8px rgba(245, 158, 11, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5);
+        }
+        
+        .bottom-nav-item.active .bottom-nav-icon {
+            color: #F59E0B;
+            transform: translateY(-3px) scale(1.1);
+            filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.3));
+        }
+        
+        .bottom-nav-item.active .bottom-nav-label {
+            color: #F59E0B;
+            font-weight: 700;
+            transform: translateY(-1px);
+        }
+        
+        .bottom-nav-icon {
+            font-size: 22px;
+            color: #9CA3AF;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 4px;
+        }
+        
+        .bottom-nav-label {
+            font-size: 11px;
+            color: #6B7280;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .bottom-nav-badge {
+            position: absolute;
+            top: 2px;
+            right: 12px;
+            background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            min-width: 20px;
+            height: 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 6px;
+            box-shadow: 
+                0 2px 8px rgba(239, 68, 68, 0.4),
+                0 0 0 2px rgba(255, 255, 255, 0.8);
+            animation: badgePop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 2;
+        }
+        
+        @keyframes badgePop {
+            0% { transform: scale(0); }
+            70% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Ripple effect for nav items */
+        .bottom-nav-item::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            border-radius: 20px;
+            background: radial-gradient(circle, rgba(245, 158, 11, 0.2) 0%, transparent 70%);
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .bottom-nav-item:active::after {
+            opacity: 1;
+            transform: scale(1);
+            transition: 0s;
+        }
+        
+        /* Hide mini cart when bottom nav is present */
+        body:has(.bottom-nav) #mini-cart-bar {
+            bottom: calc(85px + env(safe-area-inset-bottom));
+        }
+        
+        /* Add extra padding to main content for bottom nav */
+        .max-w-md.mx-auto.px-5.relative.z-10:last-of-type {
+            padding-bottom: calc(100px + env(safe-area-inset-bottom));
+        }
     </style>
 <base target="_blank">
 <base target="_blank">
@@ -244,6 +1051,15 @@
 
     <canvas id="bg-canvas"></canvas>
     <canvas id="confetti-canvas"></canvas>
+    
+    <!-- COSMIC BACKGROUND LAYERS -->
+    <div class="cosmic-bg-layer stars-layer"></div>
+    <div id="food-particles-container"></div>
+    <div id="blob-container" class="cosmic-bg-layer">
+        <div class="blob" style="width: 400px; height: 400px; background: #FCD34D; top: 10%; left: -10%;"></div>
+        <div class="blob" style="width: 300px; height: 300px; background: #F59E0B; bottom: 20%; right: -5%; animation-delay: -5s;"></div>
+        <div class="blob" style="width: 250px; height: 250px; background: #FBBF24; top: 50%; left: 60%; animation-delay: -10s;"></div>
+    </div>
 
     <!-- LOADER -->
     <div id="global-loader">
@@ -352,7 +1168,7 @@
             </div>
             <div class="flex flex-col items-center">
                  <div id="header-avatar-btn" onclick="openAvatarModal()" class="btn-bounce w-24 h-24 rounded-full bg-white border-2 border-gray-100 shadow-md flex items-center justify-center relative cursor-pointer overflow-hidden hover:border-yellow-400 transition-colors">
-                      <img id="avatar-img" src="" class="w-full h-full object-cover">
+                      <img id="avatar-img" src="" class="w-full h-full object-cover" alt="รูปโปรไฟล์">
                       <div class="absolute bottom-0 right-0 bg-indigo-500 rounded-full w-7 h-7 flex items-center justify-center shadow-md border-2 border-white z-30" style="bottom: 5px; right: 5px;">
                           <i class="fas fa-pen text-xs text-white"></i>
                       </div>
@@ -362,6 +1178,25 @@
                     <div id="vip-badge" class="hidden text-[10px] font-bold text-yellow-600 bg-yellow-50 px-2 py-0.5 rounded-full border border-yellow-200 vip-glow">VIP</div>
                 </div>
             </div>
+        </div>
+
+        <!-- NEW: Active Orders Button -->
+        <div id="active-orders-container" class="hidden mb-3">
+            <button onclick="showActiveOrdersList()" class="w-full btn-bounce bg-gradient-to-r from-green-500 to-emerald-600 text-white p-3 rounded-xl shadow-lg flex items-center justify-between group">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-fire animate-pulse"></i>
+                    </div>
+                    <div class="text-left">
+                        <p class="text-sm font-bold">ออเดอร์กำลังดำเนินการ</p>
+                        <p class="text-xs opacity-80" id="active-order-count">1 รายการ</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs">ดูสถานะ</span>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </button>
         </div>
 
         <!-- Points Card -->
@@ -453,11 +1288,11 @@
                 <div class="relative">
                     <input type="text" id="search-input" placeholder="🔍 ค้นหาเมนู (เช่น หมู, กะเพรา, ไข่)" 
                            class="w-full bg-white border-2 border-indigo-100 rounded-2xl py-3 pl-12 pr-10 text-sm font-bold text-gray-700 focus:border-indigo-500 focus:ring-0 shadow-sm transition-all"
-                           onkeyup="handleSearch(this.value)">
+                           onkeyup="handleSearch(this.value)" autocomplete="off" aria-label="ค้นหาเมนู">
                     <div class="absolute left-4 top-3.5 text-gray-400">
                         <i class="fas fa-search"></i>
                     </div>
-                    <button onclick="toggleSearch()" class="absolute right-3 top-2 bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-200">
+                    <button onclick="toggleSearch()" class="absolute right-3 top-2 bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-200" aria-label="ปิดการค้นหา">
                         <i class="fas fa-times text-xs"></i>
                     </button>
                 </div>
@@ -513,7 +1348,7 @@
         <div id="menu-grid" class="grid grid-cols-2 gap-4 mb-20" role="grid" aria-label="เมนูอาหาร"></div>
         
         <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ | Version 24.0.0</p>
+            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ | Version 24.2.0 COSMIC EDITION</p>
         </div>
     </div>
     
@@ -632,7 +1467,7 @@
                     <div class="flex justify-between text-gray-500"><span>ยอดรวม (Subtotal)</span><span id="summary-subtotal" class="font-medium">0.-</span></div>
                     <div id="discount-summary" class="flex justify-between text-green-500 hidden"><span><i class="fas fa-ticket-alt mr-1"></i> ส่วนลดโค้ด</span><span class="font-bold">-0.-</span></div>
                     <div id="points-summary" class="flex justify-between text-yellow-500 hidden"><span><i class="fas fa-coins mr-1"></i> ส่วนลดพอยต์</span><span class="font-bold">-0.-</span></div>
-                    <div class="border-t border-gray-100 my-2 pt-2 flex justify-between items-end">span class="font-bold text-gray-800 text-lg">ยอดสุทธิ</span><span id="summary-grand-total" class="font-black text-2xl text-indigo-600 leading-none">0.-</span></div>
+                    <div class="border-t border-gray-100 my-2 pt-2 flex justify-between items-end"><span class="font-bold text-gray-800 text-lg">ยอดสุทธิ</span><span id="summary-grand-total" class="font-black text-2xl text-indigo-600 leading-none">0.-</span></div>
                 </div>
             </div>
             <div class="h-10"></div>
@@ -796,7 +1631,7 @@
         const addonCalories = { 'special': 80, 'kaikhon': 150, 'kaidao': 120, 'kaijiao': 200, 'kaitom': 75, 'kaiyiewma': 100 };
         const KEYS = { USER: 'kaprao52_user', HISTORY: 'kaprao_lotto_history', STATS: 'kaprao_stats', VERSION: 'kaprao_ver', FAVORITES: 'kaprao_favorites' };
         
-        const CURRENT_VERSION = '24.0.0'; 
+        const CURRENT_VERSION = '24.2.0'; 
 
         // --- THAI LOTTERY SYSTEM (CORRECTED) ---
         // หวยรัฐบาลไทยออกวันที่ 1 และ 16 ของทุกเดือน
@@ -1124,6 +1959,13 @@
         function closeWelcome() {
             const modal = document.getElementById('welcome-modal'); modal.style.opacity = '0'; modal.style.transition = 'opacity 0.5s ease';
             setTimeout(() => modal.classList.add('hidden'), 500); triggerHaptic();
+            
+            // Show bottom nav after welcome modal closes
+            const bottomNav = document.getElementById('bottom-nav');
+            if (bottomNav) {
+                bottomNav.classList.remove('hidden');
+                bottomNav.classList.add('show');
+            }
         }
 
         // --- NEW: Quick Order Modal ---
@@ -1388,7 +2230,83 @@
             unlockScroll();
         }
 
-        function escapeHtml(text) { if (!text) return text; return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
+        function escapeHtml(text) { 
+            if (!text) return text; 
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+        
+        // --- ENHANCED SECURITY UTILITIES ---
+        function sanitizeInput(input, options = {}) {
+            const { 
+                maxLength = 200, 
+                allowHTML = false, 
+                allowedTags = [],
+                trim = true 
+            } = options;
+            
+            if (typeof input !== 'string') return '';
+            
+            let sanitized = input;
+            
+            // Trim whitespace
+            if (trim) {
+                sanitized = sanitized.trim();
+            }
+            
+            // Limit length
+            if (sanitized.length > maxLength) {
+                sanitized = sanitized.substring(0, maxLength);
+            }
+            
+            // Remove or escape HTML
+            if (!allowHTML) {
+                sanitized = sanitized
+                    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+                    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
+                
+                // If no allowed tags, escape all HTML
+                if (allowedTags.length === 0) {
+                    sanitized = escapeHtml(sanitized);
+                }
+            }
+            
+            // Remove potential SQL injection patterns
+            const sqlPattern = /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|UNION|SCRIPT)\b)|(--)|(\/\*)|(\*\/)/gi;
+            sanitized = sanitized.replace(sqlPattern, '');
+            
+            // Remove null bytes
+            sanitized = sanitized.replace(/\0/g, '');
+            
+            return sanitized;
+        }
+        
+        function validateOrderId(orderId) {
+            // Order ID format: KP-XXXXXX (must match pattern)
+            const pattern = /^KP-[A-Z0-9]{6}$/;
+            return pattern.test(orderId);
+        }
+        
+        function validatePrice(price) {
+            // Price must be a positive number, max 10,000
+            const num = parseFloat(price);
+            return !isNaN(num) && num >= 0 && num <= 10000;
+        }
+        
+        function sanitizeJSON(data) {
+            try {
+                // Parse and stringify to remove any non-serializable data
+                return JSON.parse(JSON.stringify(data));
+            } catch (e) {
+                console.error('JSON sanitization failed:', e);
+                return null;
+            }
+        }
+        
         function getStandardDate(dateObj) { if(!dateObj) dateObj = new Date(); const d = dateObj.getDate().toString().padStart(2, '0'); const m = (dateObj.getMonth() + 1).toString().padStart(2, '0'); const y = dateObj.getFullYear(); return `${d}/${m}/${y}`; }
         function formatTime(dateObj) { if(!dateObj) dateObj = new Date(); const h = dateObj.getHours().toString().padStart(2, '0'); const m = dateObj.getMinutes().toString().padStart(2, '0'); return `${h}:${m}`; }
 
@@ -1595,6 +2513,10 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             initCanvasBackground();
+            initPullToRefresh();
+            initAccessibility();
+            loadActiveOrders();
+            
             const savedVer = localStorage.getItem(KEYS.VERSION); 
             if(savedVer !== CURRENT_VERSION) localStorage.setItem(KEYS.VERSION, CURRENT_VERSION);
             loadUserDataSafe(); 
@@ -1612,13 +2534,14 @@
             updateMiniCart(); 
             renderCheckoutList(); 
             updateGreeting();
-            updateRecommendations(); // NEW
+            updateRecommendations();
             
             setTimeout(checkForUpdate, 2000); 
             document.addEventListener('visibilitychange', () => { 
                 if (document.visibilityState === 'visible') {
                     checkForUpdate();
                     updateLotteryCountdown();
+                    loadActiveOrders(); // Check for order updates
                 }
             });
             
@@ -1728,9 +2651,227 @@
             triggerHaptic();
         }
         
+        // --- OPTIMIZED SEARCH WITH DEBOUNCING ---
+        let searchTimeout = null;
+        let searchAbortController = null;
+        const searchDebounceMs = 150;
+        
         function handleSearch(val) {
-            searchQuery = val.toLowerCase().trim();
-            renderMenu();
+            // Cancel any pending search
+            if (searchTimeout) {
+                clearTimeout(searchTimeout);
+                searchTimeout = null;
+            }
+            if (searchAbortController) {
+                searchAbortController.abort();
+            }
+            
+            const query = val.toLowerCase().trim();
+            
+            // Immediate update for empty query
+            if (query === '') {
+                searchQuery = '';
+                renderMenu();
+                return;
+            }
+            
+            // Debounced search for non-empty queries
+            searchAbortController = new AbortController();
+            searchTimeout = setTimeout(() => {
+                if (!searchAbortController.signal.aborted) {
+                    searchQuery = query;
+                    renderMenu();
+                    
+                    // Track search analytics (non-blocking)
+                    if (typeof gtag !== 'undefined') {
+                        gtag('event', 'search', {
+                            search_term: query,
+                            category: activeCategory
+                        });
+                    }
+                }
+            }, searchDebounceMs);
+        }
+        
+        // --- PULL TO REFRESH FUNCTIONALITY ---
+        let pullStartY = 0;
+        let pullCurrentY = 0;
+        let isPulling = false;
+        let pullThreshold = 80;
+        let refreshIndicator = null;
+        
+        function initPullToRefresh() {
+            const mainContent = document.querySelector('.max-w-md.mx-auto');
+            if (!mainContent) return;
+            
+            // Create refresh indicator
+            refreshIndicator = document.createElement('div');
+            refreshIndicator.id = 'pull-refresh-indicator';
+            refreshIndicator.className = 'fixed top-0 left-0 right-0 z-40 flex items-center justify-center pointer-events-none transition-all duration-300';
+            refreshIndicator.style.height = '0px';
+            refreshIndicator.style.opacity = '0';
+            refreshIndicator.innerHTML = `
+                <div class="bg-white/90 backdrop-blur-md rounded-full px-4 py-2 shadow-lg border border-gray-200 flex items-center gap-2">
+                    <i class="fas fa-sync-alt text-indigo-500 transition-transform duration-300" id="refresh-icon"></i>
+                    <span class="text-sm font-medium text-gray-700" id="refresh-text">ปล่อยเพื่อรีเฟรช</span>
+                </div>
+            `;
+            document.body.appendChild(refreshIndicator);
+            
+            // Touch events
+            document.addEventListener('touchstart', handlePullStart, { passive: true });
+            document.addEventListener('touchmove', handlePullMove, { passive: false });
+            document.addEventListener('touchend', handlePullEnd, { passive: true });
+        }
+        
+        function handlePullStart(e) {
+            // Only trigger if at top of page
+            if (window.scrollY > 10) return;
+            if (document.body.classList.contains('scroll-locked')) return;
+            
+            pullStartY = e.touches[0].clientY;
+            isPulling = true;
+        }
+        
+        function handlePullMove(e) {
+            if (!isPulling) return;
+            if (window.scrollY > 10) {
+                isPulling = false;
+                return;
+            }
+            
+            pullCurrentY = e.touches[0].clientY;
+            const diff = pullCurrentY - pullStartY;
+            
+            if (diff > 0 && diff < pullThreshold * 2) {
+                e.preventDefault();
+                const progress = Math.min(diff / pullThreshold, 1);
+                
+                refreshIndicator.style.height = `${diff}px`;
+                refreshIndicator.style.opacity = progress;
+                
+                const icon = document.getElementById('refresh-icon');
+                const text = document.getElementById('refresh-text');
+                
+                if (icon) {
+                    icon.style.transform = `rotate(${progress * 360}deg)`;
+                }
+                if (text) {
+                    text.textContent = progress >= 1 ? 'ปล่อยเพื่อรีเฟรช' : 'ดึงลงเพื่อรีเฟรช';
+                }
+            }
+        }
+        
+        function handlePullEnd() {
+            if (!isPulling) return;
+            isPulling = false;
+            
+            const diff = pullCurrentY - pullStartY;
+            
+            if (diff >= pullThreshold) {
+                // Trigger refresh
+                refreshIndicator.style.height = '60px';
+                document.getElementById('refresh-text').textContent = 'กำลังรีเฟรช...';
+                document.getElementById('refresh-icon').classList.add('animate-spin');
+                
+                performRefresh();
+            } else {
+                // Cancel refresh
+                refreshIndicator.style.height = '0px';
+                refreshIndicator.style.opacity = '0';
+            }
+            
+            pullStartY = 0;
+            pullCurrentY = 0;
+        }
+        
+        async function performRefresh() {
+            try {
+                // Sync data
+                if (userAvatar.userId) {
+                    await Promise.all([
+                        syncUserStatsFromServer(userAvatar.userId),
+                        syncTicketHistory(userAvatar.userId),
+                        fetchLottoResults()
+                    ]);
+                } else {
+                    await fetchLottoResults();
+                }
+                
+                // Update UI
+                updatePointsDisplay();
+                updateTicketBadge();
+                renderMenu();
+                updateRecommendations();
+                
+                showToast('รีเฟรชข้อมูลเรียบร้อย! 🔄', 'success');
+            } catch (error) {
+                showToast('รีเฟรชไม่สำเร็จ กรุณาลองใหม่', 'error');
+            } finally {
+                // Reset indicator
+                refreshIndicator.style.height = '0px';
+                refreshIndicator.style.opacity = '0';
+                const icon = document.getElementById('refresh-icon');
+                if (icon) icon.classList.remove('animate-spin');
+            }
+        }
+
+        // --- DATA EXPORT/IMPORT FUNCTIONALITY ---
+        function exportUserData() {
+            try {
+                const exportData = {
+                    version: CURRENT_VERSION,
+                    exportDate: new Date().toISOString(),
+                    user: JSON.parse(localStorage.getItem(KEYS.USER) || '{}'),
+                    stats: JSON.parse(localStorage.getItem(KEYS.STATS) || '{}'),
+                    history: JSON.parse(localStorage.getItem(KEYS.HISTORY) || '[]'),
+                    favorites: JSON.parse(localStorage.getItem(KEYS.FAVORITES) || '[]')
+                };
+                
+                const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `kaprao52-backup-${getStandardDate(new Date()).replace(/\//g, '-')}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showToast('สำรองข้อมูลสำเร็จ! 💾', 'success');
+            } catch (error) {
+                showToast('สำรองข้อมูลไม่สำเร็จ', 'error');
+                console.error('Export error:', error);
+            }
+        }
+        
+        function importUserData(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    // Validate data structure
+                    if (!data.version || !data.exportDate) {
+                        throw new Error('Invalid backup file');
+                    }
+                    
+                    // Confirm import
+                    if (confirm(`คุณต้องการนำเข้าข้อมูลจาก ${data.exportDate} ใช่หรือไม่?\nข้อมูลปัจจุบันจะถูกแทนที่`)) {
+                        if (data.user) localStorage.setItem(KEYS.USER, JSON.stringify(data.user));
+                        if (data.stats) localStorage.setItem(KEYS.STATS, JSON.stringify(data.stats));
+                        if (data.history) localStorage.setItem(KEYS.HISTORY, JSON.stringify(data.history));
+                        if (data.favorites) localStorage.setItem(KEYS.FAVORITES, JSON.stringify(data.favorites));
+                        
+                        // Reload page to apply changes
+                        showToast('นำเข้าข้อมูลสำเร็จ! กำลังโหลด...', 'success');
+                        setTimeout(() => location.reload(), 1500);
+                    }
+                } catch (error) {
+                    showToast('ไฟล์สำรองไม่ถูกต้อง', 'error');
+                }
+            };
+            reader.readAsText(file);
         }
 
         function toggleFavorite(e, id) {
@@ -1749,6 +2890,352 @@
             renderMenu(); 
             triggerHaptic();
         }
+
+        // --- ORDER TRACKING SYSTEM ---
+        const ORDER_STATUS = {
+            PENDING: { code: 'pending', label: 'รอรับออเดอร์', icon: 'fa-clock', color: 'text-yellow-600', bgColor: 'bg-yellow-50' },
+            CONFIRMED: { code: 'confirmed', label: 'รับออเดอร์แล้ว', icon: 'fa-check-circle', color: 'text-blue-600', bgColor: 'bg-blue-50' },
+            PREPARING: { code: 'preparing', label: 'กำลังเตรียมอาหาร', icon: 'fa-fire', color: 'text-orange-600', bgColor: 'bg-orange-50' },
+            READY: { code: 'ready', label: 'อาหารพร้อมแล้ว', icon: 'fa-utensils', color: 'text-green-600', bgColor: 'bg-green-50' },
+            COMPLETED: { code: 'completed', label: 'เสร็จสิ้น', icon: 'fa-star', color: 'text-gray-600', bgColor: 'bg-gray-50' }
+        };
+        
+        let activeOrders = new Map();
+        
+        function startOrderTracking(orderId, items) {
+            const order = {
+                id: orderId,
+                items: items,
+                status: ORDER_STATUS.PENDING,
+                startTime: Date.now(),
+                estimatedTime: items.length * 3 + 5, // ~3 mins per item + 5 base
+                updates: []
+            };
+            
+            activeOrders.set(orderId, order);
+            saveActiveOrders();
+            
+            // Simulate status progression
+            simulateOrderProgress(orderId);
+            
+            // Show order status modal
+            showOrderStatusModal(orderId);
+        }
+        
+        function simulateOrderProgress(orderId) {
+            const order = activeOrders.get(orderId);
+            if (!order) return;
+            
+            const transitions = [
+                { status: ORDER_STATUS.CONFIRMED, delay: 30000 },     // 30s
+                { status: ORDER_STATUS.PREPARING, delay: 60000 },      // 1min
+                { status: ORDER_STATUS.READY, delay: order.estimatedTime * 60000 * 0.8 }, // 80% of estimated
+                { status: ORDER_STATUS.COMPLETED, delay: (order.estimatedTime * 60000) + 300000 } // +5min
+            ];
+            
+            transitions.forEach(({ status, delay }) => {
+                setTimeout(() => {
+                    if (activeOrders.has(orderId)) {
+                        const order = activeOrders.get(orderId);
+                        order.status = status;
+                        order.updates.push({
+                            status: status,
+                            time: Date.now()
+                        });
+                        
+                        saveActiveOrders();
+                        updateOrderStatusModal(orderId);
+                        
+                        // Send notification if permitted
+                        if (status === ORDER_STATUS.READY && Notification.permission === 'granted') {
+                            new Notification('อาหารพร้อมแล้ว! 🍽️', {
+                                body: `Order ${orderId} พร้อมรับแล้วครับ`,
+                                icon: 'https://cdn-icons-png.flaticon.com/512/3448/3448609.png'
+                            });
+                        }
+                    }
+                }, delay);
+            });
+        }
+        
+        function saveActiveOrders() {
+            const ordersArray = Array.from(activeOrders.entries());
+            localStorage.setItem('kaprao_active_orders', JSON.stringify(ordersArray));
+        }
+        
+        function loadActiveOrders() {
+            try {
+                const saved = localStorage.getItem('kaprao_active_orders');
+                if (saved) {
+                    const ordersArray = JSON.parse(saved);
+                    activeOrders = new Map(ordersArray);
+                    
+                    // Clean up completed orders older than 24h
+                    const now = Date.now();
+                    for (const [id, order] of activeOrders) {
+                        if (order.status.code === 'completed' && (now - order.startTime) > 86400000) {
+                            activeOrders.delete(id);
+                        }
+                    }
+                }
+            } catch (e) {
+                activeOrders = new Map();
+            }
+        }
+        
+        function showOrderStatusModal(orderId) {
+            const order = activeOrders.get(orderId);
+            if (!order) return;
+            
+            // Create modal if not exists
+            let modal = document.getElementById('order-status-modal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'order-status-modal';
+                modal.className = 'fixed inset-0 z-[150] bg-black/40 backdrop-blur-sm flex items-center justify-center p-6 hidden';
+                document.body.appendChild(modal);
+            }
+            
+            updateOrderStatusModal(orderId);
+            modal.classList.remove('hidden');
+        }
+        
+        function updateOrderStatusModal(orderId) {
+            const order = activeOrders.get(orderId);
+            if (!order) return;
+            
+            const modal = document.getElementById('order-status-modal');
+            const progress = calculateOrderProgress(order);
+            const elapsed = Math.floor((Date.now() - order.startTime) / 60000);
+            const remaining = Math.max(0, order.estimatedTime - elapsed);
+            
+            modal.innerHTML = `
+                <div class="bg-white rounded-[2rem] p-6 w-full max-w-sm shadow-2xl relative overflow-hidden">
+                    <button onclick="closeOrderStatusModal()" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center hover:bg-gray-200 transition-all">
+                        <i class="fas fa-times text-sm"></i>
+                    </button>
+                    
+                    <div class="text-center mb-6">
+                        <div class="w-20 h-20 ${order.status.bgColor} rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas ${order.status.icon} text-3xl ${order.status.color}"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-1">${order.status.label}</h2>
+                        <p class="text-sm text-gray-500">Order ID: ${order.id}</p>
+                    </div>
+                    
+                    <!-- Progress Bar -->
+                    <div class="mb-6">
+                        <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-yellow-400 to-orange-500 transition-all duration-1000" style="width: ${progress}%"></div>
+                        </div>
+                        <div class="flex justify-between mt-2 text-xs text-gray-500">
+                            <span>เวลาที่ผ่านไป: ${elapsed} นาที</span>
+                            <span>เหลือประมาณ: ${remaining} นาที</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Status Timeline -->
+                    <div class="space-y-3 mb-6">
+                        ${Object.values(ORDER_STATUS).map(status => {
+                            const isActive = order.status.code === status.code;
+                            const isPast = Object.values(ORDER_STATUS).indexOf(status) <= Object.values(ORDER_STATUS).indexOf(order.status);
+                            return `
+                                <div class="flex items-center gap-3 ${isPast ? '' : 'opacity-40'}">
+                                    <div class="w-8 h-8 rounded-full ${isActive ? status.bgColor : isPast ? 'bg-gray-100' : 'bg-gray-50'} flex items-center justify-center">
+                                        <i class="fas ${status.icon} text-sm ${isActive ? status.color : isPast ? 'text-gray-600' : 'text-gray-400'}"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-bold ${isActive ? 'text-gray-800' : 'text-gray-600'}">${status.label}</p>
+                                    </div>
+                                    ${isActive ? '<div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>' : ''}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    
+                    <!-- Items Summary -->
+                    <div class="bg-gray-50 rounded-xl p-4 mb-4">
+                        <p class="text-xs text-gray-500 mb-2">รายการอาหาร</p>
+                        <div class="space-y-1">
+                            ${order.items.map(item => `
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-700">${item.name}</span>
+                                    <span class="text-gray-500">x1</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <button onclick="closeOrderStatusModal()" class="w-full btn-gradient text-white font-bold py-3 rounded-xl shadow-lg">
+                        ปิด
+                    </button>
+                </div>
+            `;
+        }
+        
+        function calculateOrderProgress(order) {
+            const statuses = Object.values(ORDER_STATUS);
+            const currentIndex = statuses.findIndex(s => s.code === order.status.code);
+            return ((currentIndex + 1) / statuses.length) * 100;
+        }
+        
+        function closeOrderStatusModal() {
+            const modal = document.getElementById('order-status-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+        
+        function showActiveOrdersList() {
+            const nonCompletedOrders = Array.from(activeOrders.values())
+                .filter(o => o.status.code !== 'completed')
+                .sort((a, b) => b.startTime - a.startTime);
+            
+            if (nonCompletedOrders.length === 0) {
+                showToast('ไม่มีออเดอร์ที่กำลังดำเนินการ', 'info');
+                return;
+            }
+            
+            // Show the most recent active order
+            showOrderStatusModal(nonCompletedOrders[0].id);
+        }
+        
+        function updateActiveOrdersButton() {
+            const container = document.getElementById('active-orders-container');
+            const countEl = document.getElementById('active-order-count');
+            
+            const nonCompletedOrders = Array.from(activeOrders.values())
+                .filter(o => o.status.code !== 'completed');
+            
+            if (nonCompletedOrders.length > 0) {
+                container.classList.remove('hidden');
+                countEl.textContent = `${nonCompletedOrders.length} รายการ`;
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
+        // --- ACCESSIBILITY ENHANCEMENTS ---
+        function initAccessibility() {
+            // Add skip to main content link
+            const skipLink = document.createElement('a');
+            skipLink.href = '#main-content';
+            skipLink.className = 'sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:bg-white focus:text-gray-800 focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg';
+            skipLink.textContent = 'ข้ามไปยังเนื้อหาหลัก';
+            document.body.insertBefore(skipLink, document.body.firstChild);
+            
+            // Add aria-live region for toast announcements
+            const liveRegion = document.createElement('div');
+            liveRegion.id = 'aria-live-region';
+            liveRegion.setAttribute('aria-live', 'polite');
+            liveRegion.setAttribute('aria-atomic', 'true');
+            liveRegion.className = 'sr-only';
+            document.body.appendChild(liveRegion);
+            
+            // Enhance focus management
+            document.querySelectorAll('button, a, input, textarea, [tabindex]:not([tabindex="-1"])').forEach(el => {
+                if (!el.hasAttribute('aria-label') && !el.textContent.trim()) {
+                    const icon = el.querySelector('i');
+                    if (icon) {
+                        // Derive label from icon classes
+                        const iconClass = Array.from(icon.classList).find(c => c.startsWith('fa-') && c !== 'fas' && c !== 'far' && c !== 'fab');
+                        if (iconClass) {
+                            el.setAttribute('aria-label', iconClass.replace('fa-', '').replace(/-/g, ' '));
+                        }
+                    }
+                }
+            });
+            
+            // Add role attributes to main sections
+            const menuGrid = document.getElementById('menu-grid');
+            if (menuGrid) {
+                menuGrid.setAttribute('role', 'list');
+                menuGrid.setAttribute('aria-label', 'รายการเมนูอาหาร');
+            }
+            
+            // Add keyboard shortcuts help
+            document.addEventListener('keydown', (e) => {
+                // ? key for help
+                if (e.key === '?' && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                    e.preventDefault();
+                    showKeyboardShortcuts();
+                }
+                
+                // / key for search
+                if (e.key === '/' && !document.body.classList.contains('scroll-locked')) {
+                    e.preventDefault();
+                    const searchContainer = document.getElementById('search-container');
+                    if (searchContainer.classList.contains('hidden')) {
+                        toggleSearch();
+                    }
+                    document.getElementById('search-input')?.focus();
+                }
+                
+                // ESC to close any open modal
+                if (e.key === 'Escape') {
+                    const modals = ['modal-content', 'checkout-sheet', 'tickets-sheet', 'avatar-modal', 'points-history-modal'];
+                    const anyOpen = modals.some(id => {
+                        const el = document.getElementById(id);
+                        return el && !el.classList.contains('hidden') && !el.classList.contains('translate-y-full');
+                    });
+                    if (anyOpen) {
+                        e.preventDefault();
+                        // Close the topmost modal
+                        if (currentOpenModal) {
+                            if (currentOpenModal === 'menu') closeModal();
+                            else if (currentOpenModal === 'checkout') closeCheckout();
+                            else if (currentOpenModal === 'tickets') closeMyTickets();
+                            else if (currentOpenModal === 'avatar') closeAvatarModal();
+                            else if (currentOpenModal === 'points-history') closePointsHistory();
+                        }
+                    }
+                }
+            });
+        }
+        
+        function showKeyboardShortcuts() {
+            const shortcuts = [
+                { key: '?', action: 'แสดงคีย์ลัด' },
+                { key: '/', action: 'เปิดช่องค้นหา' },
+                { key: 'ESC', action: 'ปิดหน้าต่าง' },
+                { key: '↑/↓', action: 'เพิ่ม/ลดจำนวน (ในเมนู)' },
+                { key: 'Enter', action: 'ยืนยัน/สั่งซื้อ' }
+            ];
+            
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 z-[200] bg-black/50 backdrop-blur-sm flex items-center justify-center p-6';
+            modal.innerHTML = `
+                <div class="bg-white rounded-[2rem] p-6 w-full max-w-sm shadow-2xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-gray-800">⌨️ คีย์ลัด</h2>
+                        <button onclick="this.closest('.fixed').remove()" class="w-10 h-10 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center hover:bg-gray-200">
+                            <i class="fas fa-times text-sm"></i>
+                        </button>
+                    </div>
+                    <div class="space-y-2">
+                        ${shortcuts.map(s => `
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+                                <span class="text-sm text-gray-600">${s.action}</span>
+                                <kbd class="px-3 py-1 bg-white rounded-lg text-sm font-bold text-gray-800 border border-gray-200 shadow-sm">${s.key}</kbd>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        // Override showToast to announce to screen readers
+        const originalShowToast = showToast;
+        showToast = function(message, type = 'info') {
+            // Call original
+            originalShowToast(message, type);
+            
+            // Announce to screen readers
+            const liveRegion = document.getElementById('aria-live-region');
+            if (liveRegion) {
+                liveRegion.textContent = message;
+                setTimeout(() => { liveRegion.textContent = ''; }, 1000);
+            }
+        };
 
         function renderTrayOptions(type) {
             const container = document.getElementById('tray-options-container');
@@ -1830,6 +3317,74 @@
             }, 150);
         }
                 
+        let menuObserver = null;
+        let lazyImageObserver = null;
+        
+        function initLazyLoading() {
+            // Lazy load menu items with Intersection Observer
+            const grid = document.getElementById('menu-grid');
+            if (!grid) return;
+            
+            // Disconnect existing observer
+            if (menuObserver) menuObserver.disconnect();
+            
+            menuObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                        menuObserver.unobserve(entry.target);
+                    }
+                });
+            }, {
+                root: null,
+                rootMargin: '50px',
+                threshold: 0.1
+            });
+            
+            // Observe all menu cards
+            const cards = grid.querySelectorAll('.fast-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = `opacity 0.4s ease ${index * 0.03}s, transform 0.4s ease ${index * 0.03}s`;
+                menuObserver.observe(card);
+            });
+        }
+        
+        function initImageLazyLoading() {
+            // Lazy load images
+            if (lazyImageObserver) lazyImageObserver.disconnect();
+            
+            lazyImageObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        if (img.dataset.src) {
+                            img.src = img.dataset.src;
+                            img.removeAttribute('data-src');
+                        }
+                        img.classList.add('loaded');
+                        lazyImageObserver.unobserve(img);
+                    }
+                });
+            }, {
+                rootMargin: '100px'
+            });
+            
+            document.querySelectorAll('img[data-src]').forEach(img => {
+                lazyImageObserver.observe(img);
+            });
+        }
+
+        // --- VIRTUAL SCROLLING FOR LARGE LISTS ---
+        let virtualScrollState = {
+            itemHeight: 120,
+            visibleCount: 10,
+            startIndex: 0,
+            endIndex: 10
+        };
+
         function renderMenu() {
             const grid = document.getElementById('menu-grid'); 
             grid.innerHTML = '';
@@ -1881,8 +3436,13 @@
                 const newBadge = item.isNew && !isSoldOut ? `<div class="absolute top-2 left-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-[8px] font-black px-2 py-1 rounded-full shadow-lg z-20 animate-pulse border border-white/30">NEW</div>` : '';
                 const actionButton = (!isDessert && !isSoldOut && !isTrayWait) ? `<button onclick="event.stopPropagation(); const item = menuItems.find(i => i.id === ${item.id}); if(item) openModal(item);" class="mt-3 w-full btn-gradient text-white font-bold py-2.5 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 text-sm group-hover:scale-105"><i class="fas fa-plus text-xs"></i><span>เพิ่มลงตะกร้า</span></button>` : `<div class="mt-3 w-full bg-gray-100 text-gray-400 font-medium py-2.5 rounded-xl text-center text-sm">ไม่พร้อมขาย</div>`;
                 
-                el.innerHTML = `${newBadge}${isTrayWait || isSoldOut || isDessert ? statusBadge : heartIcon}<div class="flex flex-col items-center mb-3 ${(isDessert||isSoldOut||isTrayWait)?'opacity-60 grayscale-[50%]':''}"><div class="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center text-4xl mb-3 shadow-sm border border-gray-100 group-hover:scale-110 transition-transform"><span class="menu-icon" aria-hidden="true" loading="lazy">${item.icon}</span></div><h3 class="font-bold text-gray-700 text-sm text-center leading-tight group-hover:text-indigo-500 transition-colors mb-2 line-clamp-2 min-h-[2.5rem]">${item.name}</h3><div class="flex flex-wrap items-center justify-center gap-1.5 mb-2"><span class="text-[10px] text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200">${item.kcal} kcal</span>${item.reqMeat ? '<span class="text-[9px] text-yellow-600 border border-yellow-200 bg-yellow-50 px-1.5 py-0.5 rounded-full">เลือกเนื้อสัตว์</span>' : ''}</div></div><div class="mt-auto pt-3 border-t border-gray-100"><div class="flex items-center justify-between mb-2"><span class="text-xs text-gray-400">ราคา</span>${priceDisplay}</div>${actionButton}</div>`;
+                el.innerHTML = `${newBadge}${isTrayWait || isSoldOut || isDessert ? statusBadge : heartIcon}<div class="flex flex-col items-center mb-3 ${(isDessert||isSoldOut||isTrayWait)?'opacity-60 grayscale-[50%]':''}"><div class="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center text-4xl mb-3 shadow-sm border border-gray-100 group-hover:scale-110 transition-transform"><span class="menu-icon" aria-hidden="true" loading="lazy">${item.icon}</span></div><h3 class="font-bold text-gray-700 text-sm text-center leading-tight group-hover:text-indigo-500 transition-colors mb-2 line-clamp-2 min-h-[2.5rem]" title="${item.name}">${item.name}</h3><div class="flex flex-wrap items-center justify-center gap-1.5 mb-2"><span class="text-[10px] text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200">${item.kcal} kcal</span>${item.reqMeat ? '<span class="text-[9px] text-yellow-600 border border-yellow-200 bg-yellow-50 px-1.5 py-0.5 rounded-full">เลือกเนื้อสัตว์</span>' : ''}</div></div><div class="mt-auto pt-3 border-t border-gray-100"><div class="flex items-center justify-between mb-2"><span class="text-xs text-gray-400">ราคา</span>${priceDisplay}</div>${actionButton}</div>`;
                 grid.appendChild(el);
+            });
+            
+            // Initialize lazy loading for new menu items
+            requestAnimationFrame(() => {
+                initLazyLoading();
             });
         }
         
@@ -2647,6 +4207,10 @@
                 const encodedMsg = encodeURIComponent(msg);
                 confetti();
                 
+                // Start order tracking
+                startOrderTracking(currentOrderId, cart);
+                updateActiveOrdersButton();
+                
                 setTimeout(() => {
                     cart = []; 
                     discountValue = 0; 
@@ -2765,6 +4329,903 @@
                 e.target.classList.add('opacity-50'); 
             } 
         }, true);
+
+        // ===== GALAXY-LEVEL COSMIC FEATURES =====
+        
+        // --- Food Particles Animation System ---
+        const foodEmojis = ['🍳', '🌶️', '🧄', '🥓', '🍚', '🥘', '🍜', '🍤', '🥩'];
+        let particlesEnabled = true;
+        
+        function initFoodParticles() {
+            if (!particlesEnabled) return;
+            const container = document.getElementById('food-particles-container');
+            if (!container) return;
+            
+            // Create initial particles
+            for (let i = 0; i < 6; i++) {
+                setTimeout(() => createFoodParticle(), i * 3000);
+            }
+            
+            // Continue creating particles
+            setInterval(() => {
+                if (particlesEnabled && document.visibilityState === 'visible') {
+                    createFoodParticle();
+                }
+            }, 5000);
+        }
+        
+        function createFoodParticle() {
+            const container = document.getElementById('food-particles-container');
+            if (!container) return;
+            
+            const particle = document.createElement('div');
+            particle.className = 'food-particle';
+            particle.textContent = foodEmojis[Math.floor(Math.random() * foodEmojis.length)];
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+            particle.style.animationDelay = Math.random() * 2 + 's';
+            
+            container.appendChild(particle);
+            
+            // Remove after animation
+            setTimeout(() => {
+                if (particle.parentNode) particle.remove();
+            }, 25000);
+        }
+        
+        // --- Gamification System ---
+        const GAMIFICATION_KEY = 'kaprao_gamification';
+        
+        const ACHIEVEMENTS = {
+            FIRST_ORDER: { id: 'first_order', name: 'นักชิมมือใหม่', desc: 'สั่งอาหารครั้งแรก', icon: '🍽️', points: 10 },
+            REGULAR: { id: 'regular', name: 'ขาประจำ', desc: 'สั่งครบ 5 ครั้ง', icon: '⭐', points: 25 },
+            VIP: { id: 'vip', name: 'VIP กะเพรา', desc: 'สั่งครบ 20 ครั้ง', icon: '👑', points: 50 },
+            BIG_SPENDER: { id: 'big_spender', name: 'เศรษฐีกะเพรา', desc: 'ใช้จ่ายเกิน 1,000 บาท', icon: '💰', points: 30 },
+            SAVER: { id: 'saver', name: 'นักสะสมพอยต์', desc: 'มีพอยต์สะสม 500+', icon: '🪙', points: 40 },
+            EARLY_BIRD: { id: 'early_bird', name: 'นกเช้า', desc: 'สั่งก่อน 8 โมง', icon: '🌅', points: 15 },
+            NIGHT_OWL: { id: 'night_owl', name: 'นกฮูกดึก', desc: 'สั่งหลัง 5 ทุ่ม', icon: '🌙', points: 15 },
+            WEEKEND_WARRIOR: { id: 'weekend', name: 'สุดสัปดาห์สุดฟิน', desc: 'สั่งวันเสาร์-อาทิตย์', icon: '🎉', points: 20 },
+            TRAY_MASTER: { id: 'tray', name: 'เจ้าแห่งชุดถาด', desc: 'สั่งชุดถาด 3 ครั้ง', icon: '🍱', points: 35 },
+            LUCKY_WINNER: { id: 'lucky', name: 'เซียนหวย', desc: 'ถูกหวยกินฟรี', icon: '🎰', points: 100 }
+        };
+        
+        let gamificationData = {
+            level: 1,
+            xp: 0,
+            streak: 0,
+            lastOrderDate: null,
+            achievements: [],
+            totalOrders: 0,
+            totalSpent: 0
+        };
+        
+        function loadGamificationData() {
+            try {
+                const saved = localStorage.getItem(GAMIFICATION_KEY);
+                if (saved) {
+                    gamificationData = { ...gamificationData, ...JSON.parse(saved) };
+                }
+            } catch (e) {
+                console.error('Failed to load gamification data:', e);
+            }
+        }
+        
+        function saveGamificationData() {
+            localStorage.setItem(GAMIFICATION_KEY, JSON.stringify(gamificationData));
+        }
+        
+        function checkAndAwardAchievements(orderData) {
+            const newAchievements = [];
+            const now = new Date();
+            const hour = now.getHours();
+            const day = now.getDay(); // 0 = Sunday, 6 = Saturday
+            
+            // Check each achievement
+            if (!hasAchievement('FIRST_ORDER') && gamificationData.totalOrders === 0) {
+                awardAchievement('FIRST_ORDER');
+                newAchievements.push(ACHIEVEMENTS.FIRST_ORDER);
+            }
+            
+            if (!hasAchievement('REGULAR') && gamificationData.totalOrders >= 4) {
+                awardAchievement('REGULAR');
+                newAchievements.push(ACHIEVEMENTS.REGULAR);
+            }
+            
+            if (!hasAchievement('VIP') && gamificationData.totalOrders >= 19) {
+                awardAchievement('VIP');
+                newAchievements.push(ACHIEVEMENTS.VIP);
+            }
+            
+            if (!hasAchievement('BIG_SPENDER') && gamificationData.totalSpent + orderData.total >= 1000) {
+                awardAchievement('BIG_SPENDER');
+                newAchievements.push(ACHIEVEMENTS.BIG_SPENDER);
+            }
+            
+            if (!hasAchievement('EARLY_BIRD') && hour < 8) {
+                awardAchievement('EARLY_BIRD');
+                newAchievements.push(ACHIEVEMENTS.EARLY_BIRD);
+            }
+            
+            if (!hasAchievement('NIGHT_OWL') && hour >= 23) {
+                awardAchievement('NIGHT_OWL');
+                newAchievements.push(ACHIEVEMENTS.NIGHT_OWL);
+            }
+            
+            if (!hasAchievement('WEEKEND') && (day === 0 || day === 6)) {
+                awardAchievement('WEEKEND');
+                newAchievements.push(ACHIEVEMENTS.WEEKEND);
+            }
+            
+            // Show notifications for new achievements
+            newAchievements.forEach((ach, index) => {
+                setTimeout(() => {
+                    showAchievementNotification(ach);
+                    triggerConfettiBurst();
+                }, index * 1500);
+            });
+            
+            return newAchievements;
+        }
+        
+        function hasAchievement(id) {
+            return gamificationData.achievements.includes(id);
+        }
+        
+        function awardAchievement(id) {
+            if (!hasAchievement(id)) {
+                gamificationData.achievements.push(id);
+                gamificationData.xp += ACHIEVEMENTS[id].points;
+                checkLevelUp();
+                saveGamificationData();
+            }
+        }
+        
+        function checkLevelUp() {
+            const newLevel = Math.floor(gamificationData.xp / 100) + 1;
+            if (newLevel > gamificationData.level) {
+                gamificationData.level = newLevel;
+                showToast(`🎉 Level Up! คุณถึงระดับ ${newLevel} แล้ว!`, 'success');
+            }
+        }
+        
+        function updateStreak() {
+            const today = new Date().toDateString();
+            const lastOrder = gamificationData.lastOrderDate;
+            
+            if (lastOrder) {
+                const lastDate = new Date(lastOrder);
+                const todayDate = new Date();
+                const diffDays = Math.floor((todayDate - lastDate) / (1000 * 60 * 60 * 24));
+                
+                if (diffDays === 1) {
+                    gamificationData.streak++;
+                    if (gamificationData.streak >= 3) {
+                        showToast(`🔥 Streak ${gamificationData.streak} วัน! รักษาความต่อเนื่องไว้!`, 'success');
+                    }
+                } else if (diffDays > 1) {
+                    gamificationData.streak = 1;
+                }
+            } else {
+                gamificationData.streak = 1;
+            }
+            
+            gamificationData.lastOrderDate = today;
+        }
+        
+        function showAchievementNotification(achievement) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 z-[9999] animate-fade-in-down';
+            toast.innerHTML = `
+                <div class="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4">
+                    <div class="text-4xl">${achievement.icon}</div>
+                    <div>
+                        <p class="font-bold text-lg">🏆 ได้รับรางวัล!</p>
+                        <p class="font-bold">${achievement.name}</p>
+                        <p class="text-sm opacity-90">${achievement.desc} +${achievement.points} XP</p>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.5s';
+                setTimeout(() => toast.remove(), 500);
+            }, 4000);
+        }
+        
+        function triggerConfettiBurst() {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#FCD34D', '#F59E0B', '#FBBF24', '#FFFFFF']
+            });
+        }
+        
+        // --- Particle Burst Effect ---
+        function createParticleBurst(x, y, colors = ['#FCD34D', '#F59E0B', '#FBBF24']) {
+            const burst = document.createElement('div');
+            burst.className = 'particle-burst';
+            burst.style.left = x + 'px';
+            burst.style.top = y + 'px';
+            document.body.appendChild(burst);
+            
+            for (let i = 0; i < 12; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'burst-particle';
+                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                const angle = (i / 12) * Math.PI * 2;
+                const distance = 50 + Math.random() * 50;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+                
+                particle.style.setProperty('--tx', tx + 'px');
+                particle.style.setProperty('--ty', ty + 'px');
+                
+                burst.appendChild(particle);
+            }
+            
+            setTimeout(() => burst.remove(), 1000);
+        }
+        
+        // --- Voice Ordering Simulation ---
+        let voiceRecognitionActive = false;
+        
+        function toggleVoiceOrder() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                showToast('เบราว์เซอร์นี้ไม่รองรับการสั่งด้วยเสียง', 'warning');
+                return;
+            }
+            
+            if (voiceRecognitionActive) {
+                stopVoiceRecognition();
+            } else {
+                startVoiceRecognition();
+            }
+        }
+        
+        function startVoiceRecognition() {
+            voiceRecognitionActive = true;
+            showVoiceModal();
+            
+            // Simulate voice recognition with animation
+            setTimeout(() => {
+                // Mock recognition result
+                processVoiceCommand('กะเพราหมูสับไข่ดาวพิเศษ');
+            }, 3000);
+        }
+        
+        function stopVoiceRecognition() {
+            voiceRecognitionActive = false;
+            const modal = document.getElementById('voice-modal');
+            if (modal) modal.remove();
+        }
+        
+        function showVoiceModal() {
+            const modal = document.createElement('div');
+            modal.id = 'voice-modal';
+            modal.className = 'fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-center justify-center';
+            modal.innerHTML = `
+                <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full text-center">
+                    <div class="voice-wave justify-center mb-6">
+                        ${Array(8).fill(0).map((_, i) => `
+                            <div class="voice-wave-bar" style="height: 100%; animation-delay: ${i * 0.1}s"></div>
+                        `).join('')}
+                    </div>
+                    <p class="text-xl font-bold text-gray-800 mb-2">🎤 กำลังฟัง...</p>
+                    <p class="text-gray-500 text-sm">พูดเมนูที่ต้องการ เช่น "กะเพราหมูสับไข่ดาว"</p>
+                    <button onclick="stopVoiceRecognition()" class="mt-6 w-full py-3 bg-gray-100 rounded-xl text-gray-600 font-bold">
+                        ยกเลิก
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        function processVoiceCommand(command) {
+            stopVoiceRecognition();
+            
+            // Simple matching logic
+            const match = menuItems.find(item => 
+                command.toLowerCase().includes(item.name.toLowerCase()) ||
+                command.toLowerCase().includes(item.name.replace('กะเพรา', '').toLowerCase())
+            );
+            
+            if (match) {
+                showToast(`🎤 พบเมนู: ${match.name}`, 'success');
+                openModal(match);
+                
+                // Auto-add options based on command
+                if (command.includes('ไข่ดาว')) {
+                    setTimeout(() => {
+                        const eggCheckbox = document.getElementById('modal-opt-kaidao');
+                        if (eggCheckbox) eggCheckbox.checked = true;
+                    }, 500);
+                }
+                if (command.includes('พิเศษ')) {
+                    setTimeout(() => {
+                        const specialCheckbox = document.getElementById('modal-opt-special');
+                        if (specialCheckbox) specialCheckbox.checked = true;
+                    }, 500);
+                }
+            } else {
+                showToast('ไม่พบเมนูที่ตรงกับเสียง กรุณาลองใหม่', 'warning');
+            }
+        }
+        
+        // --- AR Preview Feature ---
+        function showARPreview(item) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 z-[200] bg-black/70 backdrop-blur-md flex items-center justify-center p-6';
+            modal.innerHTML = `
+                <div class="ar-preview relative">
+                    <div class="ar-card bg-white rounded-[2rem] p-6 w-80 text-center relative overflow-hidden">
+                        <button onclick="this.closest('.fixed').remove()" class="absolute top-4 right-4 w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center z-10">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        
+                        <div class="text-8xl mb-4 animate-bounce-slow">${item.icon}</div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">${item.name}</h3>
+                        <p class="text-3xl font-black text-yellow-500 mb-4">${item.price} ฿</p>
+                        
+                        <div class="space-y-2 mb-4">
+                            <div class="flex items-center gap-2 text-sm text-gray-600">
+                                <i class="fas fa-fire text-orange-500"></i>
+                                <span>${item.kcal} kcal</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-gray-600">
+                                <i class="fas fa-clock text-blue-500"></i>
+                                <span>พร้อมใน 5-10 นาที</span>
+                            </div>
+                        </div>
+                        
+                        <button onclick="this.closest('.fixed').remove(); openModal(menuItems.find(i => i.id === ${item.id}));" 
+                                class="w-full btn-gradient text-white font-bold py-3 rounded-xl">
+                            สั่งเลย!
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        // --- Social Share Features ---
+        function shareOrder(orderData) {
+            const shareText = `🍳 เพิ่งสั่ง ${orderData.items.length} เมนูจาก Kaprao52!\n💰 ยอดรวม ${orderData.total} บาท\n🔥 สะสมแล้ว ${gamificationData.totalOrders} ครั้ง!\n\nมากินด้วยกัน! 👇`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Kaprao52 Order',
+                    text: shareText,
+                    url: window.location.href
+                });
+            } else {
+                // Copy to clipboard
+                navigator.clipboard.writeText(shareText).then(() => {
+                    showToast('คัดลอกข้อความแชร์แล้ว!', 'success');
+                });
+            }
+        }
+        
+        // --- Seasonal Themes ---
+        const SEASONAL_THEMES = {
+            SONGKRAN: { month: 3, colors: ['#60A5FA', '#93C5FD'], emoji: '💦' },
+            LOYKRATHONG: { month: 10, colors: ['#F472B6', '#FBBF24'], emoji: '🕯️' },
+            CHRISTMAS: { month: 11, colors: ['#EF4444', '#10B981'], emoji: '🎄' },
+            NEWYEAR: { month: 0, colors: ['#FCD34D', '#F59E0B'], emoji: '🎉' }
+        };
+        
+        function checkSeasonalTheme() {
+            const month = new Date().getMonth();
+            for (const [name, theme] of Object.entries(SEASONAL_THEMES)) {
+                if (theme.month === month) {
+                    applySeasonalTheme(theme);
+                    return;
+                }
+            }
+        }
+        
+        function applySeasonalTheme(theme) {
+            const blob1 = document.querySelector('#blob-container .blob:nth-child(1)');
+            const blob2 = document.querySelector('#blob-container .blob:nth-child(2)');
+            if (blob1) blob1.style.background = theme.colors[0];
+            if (blob2) blob2.style.background = theme.colors[1];
+            
+            // Show seasonal greeting
+            setTimeout(() => {
+                showToast(`🎊 ${theme.emoji} เทศกาลพิเศษ! ธีมเฉพาะกาลถูกเปิดใช้แล้ว`);
+            }, 2000);
+        }
+        
+        // --- Smart Notifications ---
+        function scheduleSmartNotifications() {
+            // Lunch reminder at 11:30
+            const lunchTime = new Date();
+            lunchTime.setHours(11, 30, 0);
+            
+            // Dinner reminder at 17:30
+            const dinnerTime = new Date();
+            dinnerTime.setHours(17, 30, 0);
+            
+            // Check if user hasn't ordered today
+            const today = new Date().toDateString();
+            if (gamificationData.lastOrderDate !== today) {
+                // Would schedule notifications here if permissions granted
+                console.log('Smart notifications scheduled');
+            }
+        }
+        
+        // --- 3D Tilt Effect ---
+        function initTiltEffect() {
+            const tiltCards = document.querySelectorAll('.tilt-card');
+            
+            tiltCards.forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    const rotateX = (y - centerY) / 10;
+                    const rotateY = (centerX - x) / 10;
+                    
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+                });
+            });
+        }
+        
+        // --- Magnetic Button Effect ---
+        function initMagneticButtons() {
+            const magneticBtns = document.querySelectorAll('.magnetic-btn');
+            
+            magneticBtns.forEach(btn => {
+                btn.addEventListener('mousemove', (e) => {
+                    const rect = btn.getBoundingClientRect();
+                    const x = e.clientX - rect.left - rect.width / 2;
+                    const y = e.clientY - rect.top - rect.height / 2;
+                    
+                    btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+                });
+                
+                btn.addEventListener('mouseleave', () => {
+                    btn.style.transform = 'translate(0, 0)';
+                });
+            });
+        }
+        
+        // --- Text Scramble Effect ---
+        class TextScramble {
+            constructor(el) {
+                this.el = el;
+                this.chars = '!<>-_\\/[]{}—=+*^?#________';
+                this.update = this.update.bind(this);
+            }
+            
+            setText(newText) {
+                const oldText = this.el.innerText;
+                const length = Math.max(oldText.length, newText.length);
+                const promise = new Promise(resolve => this.resolve = resolve);
+                this.queue = [];
+                
+                for (let i = 0; i < length; i++) {
+                    const from = oldText[i] || '';
+                    const to = newText[i] || '';
+                    const start = Math.floor(Math.random() * 40);
+                    const end = start + Math.floor(Math.random() * 40);
+                    this.queue.push({ from, to, start, end });
+                }
+                
+                cancelAnimationFrame(this.frameRequest);
+                this.frame = 0;
+                this.update();
+                return promise;
+            }
+            
+            update() {
+                let output = '';
+                let complete = 0;
+                
+                for (let i = 0, n = this.queue.length; i < n; i++) {
+                    let { from, to, start, end, char } = this.queue[i];
+                    
+                    if (this.frame >= end) {
+                        complete++;
+                        output += to;
+                    } else if (this.frame >= start) {
+                        if (!char || Math.random() < 0.28) {
+                            char = this.randomChar();
+                            this.queue[i].char = char;
+                        }
+                        output += `<span class="opacity-50">${char}</span>`;
+                    } else {
+                        output += from;
+                    }
+                }
+                
+                this.el.innerHTML = output;
+                
+                if (complete === this.queue.length) {
+                    this.resolve();
+                } else {
+                    this.frameRequest = requestAnimationFrame(this.update);
+                    this.frame++;
+                }
+            }
+            
+            randomChar() {
+                return this.chars[Math.floor(Math.random() * this.chars.length)];
+            }
+        }
+        
+        // --- Parallax Effect on Scroll ---
+        function initParallax() {
+            const parallaxElements = document.querySelectorAll('.parallax');
+            
+            window.addEventListener('scroll', () => {
+                const scrolled = window.pageYOffset;
+                
+                parallaxElements.forEach(el => {
+                    const speed = el.dataset.speed || 0.5;
+                    el.style.transform = `translateY(${scrolled * speed}px)`;
+                });
+            });
+        }
+        
+        // --- Mouse Trail Effect ---
+        function initMouseTrail() {
+            const trail = [];
+            const trailLength = 20;
+            
+            for (let i = 0; i < trailLength; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'fixed w-2 h-2 rounded-full bg-yellow-400 pointer-events-none z-50 opacity-0 transition-opacity';
+                document.body.appendChild(dot);
+                trail.push(dot);
+            }
+            
+            let mouseX = 0, mouseY = 0;
+            let trailIndex = 0;
+            
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                
+                const dot = trail[trailIndex];
+                dot.style.left = mouseX - 4 + 'px';
+                dot.style.top = mouseY - 4 + 'px';
+                dot.style.opacity = '0.6';
+                
+                setTimeout(() => {
+                    dot.style.opacity = '0';
+                }, 500);
+                
+                trailIndex = (trailIndex + 1) % trailLength;
+            });
+        }
+        
+        // --- Interactive Spotlight Effect ---
+        function initSpotlight() {
+            const spotlight = document.createElement('div');
+            spotlight.className = 'fixed inset-0 pointer-events-none z-40';
+            spotlight.style.background = 'radial-gradient(circle at 50% 50%, transparent 0%, rgba(0,0,0,0.05) 100%)';
+            document.body.appendChild(spotlight);
+            
+            document.addEventListener('mousemove', (e) => {
+                const x = (e.clientX / window.innerWidth) * 100;
+                const y = (e.clientY / window.innerHeight) * 100;
+                spotlight.style.background = `radial-gradient(circle at ${x}% ${y}%, transparent 0%, rgba(0,0,0,0.03) 50%, rgba(0,0,0,0.08) 100%)`;
+            });
+        }
+        
+        // --- Floating Elements Randomizer ---
+        function initFloatingElements() {
+            const floats = document.querySelectorAll('.float-random');
+            floats.forEach((el, i) => {
+                el.style.animationDelay = `${Math.random() * 5}s`;
+                el.style.animationDuration = `${3 + Math.random() * 4}s`;
+            });
+        }
+        
+        // --- Enhanced Confetti with Shapes ---
+        function enhancedConfetti(options = {}) {
+            const shapes = ['square', 'circle', 'triangle'];
+            const colors = options.colors || ['#FCD34D', '#F59E0B', '#FBBF24', '#8B5CF6', '#EC4899'];
+            
+            for (let i = 0; i < (options.count || 50); i++) {
+                const particle = document.createElement('div');
+                const shape = shapes[Math.floor(Math.random() * shapes.length)];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                
+                particle.style.cssText = `
+                    position: fixed;
+                    width: ${8 + Math.random() * 8}px;
+                    height: ${8 + Math.random() * 8}px;
+                    background: ${color};
+                    left: ${options.origin ? options.origin.x * 100 : 50}%;
+                    top: ${options.origin ? options.origin.y * 100 : 50}%;
+                    pointer-events: none;
+                    z-index: 9999;
+                    border-radius: ${shape === 'circle' ? '50%' : shape === 'triangle' ? '0' : '2px'};
+                `;
+                
+                if (shape === 'triangle') {
+                    particle.style.background = 'transparent';
+                    particle.style.borderLeft = '6px solid transparent';
+                    particle.style.borderRight = '6px solid transparent';
+                    particle.style.borderBottom = `10px solid ${color}`;
+                    particle.style.width = '0';
+                    particle.style.height = '0';
+                }
+                
+                document.body.appendChild(particle);
+                
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = 200 + Math.random() * 300;
+                const vx = Math.cos(angle) * velocity;
+                const vy = Math.sin(angle) * velocity - 200;
+                
+                particle.animate([
+                    { transform: 'translate(0, 0) rotate(0deg)', opacity: 1 },
+                    { transform: `translate(${vx}px, ${window.innerHeight}px) rotate(${Math.random() * 720}deg)`, opacity: 0 }
+                ], {
+                    duration: 1500 + Math.random() * 1000,
+                    easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                    fill: 'forwards'
+                }).onfinish = () => particle.remove();
+            }
+        }
+        
+        // --- Typewriter Effect ---
+        function typewriterEffect(element, text, speed = 50) {
+            let i = 0;
+            element.innerHTML = '';
+            element.classList.add('border-r-2', 'border-yellow-500', 'animate-pulse');
+            
+            return new Promise(resolve => {
+                function type() {
+                    if (i < text.length) {
+                        element.innerHTML += text.charAt(i);
+                        i++;
+                        setTimeout(type, speed);
+                    } else {
+                        element.classList.remove('border-r-2', 'border-yellow-500', 'animate-pulse');
+                        resolve();
+                    }
+                }
+                type();
+            });
+        }
+        
+        // --- Breathing Animation for Cards ---
+        function initBreathingAnimation() {
+            const cards = document.querySelectorAll('.breathing-card');
+            
+            cards.forEach((card, index) => {
+                card.style.animation = `breathe 4s ease-in-out ${index * 0.5}s infinite`;
+            });
+        }
+        
+        // Initialize all cosmic effects
+        document.addEventListener('DOMContentLoaded', () => {
+            loadGamificationData();
+            initFoodParticles();
+            checkSeasonalTheme();
+            scheduleSmartNotifications();
+            initTiltEffect();
+            initMagneticButtons();
+            initParallax();
+            initFloatingElements();
+            initBreathingAnimation();
+            updateBottomNavBadge();
+            
+            // Show bottom nav if welcome modal is already hidden (returning users)
+            const welcomeModal = document.getElementById('welcome-modal');
+            const bottomNav = document.getElementById('bottom-nav');
+            if (welcomeModal && welcomeModal.classList.contains('hidden') && bottomNav) {
+                bottomNav.classList.remove('hidden');
+                bottomNav.classList.add('show');
+            }
+            
+            // initMouseTrail(); // Optional - uncomment if desired
+            // initSpotlight(); // Optional - uncomment if desired
+        });
+        
+        // --- BOTTOM NAVIGATION FUNCTIONS ---
+        let currentPage = 'home';
+        
+        function setActiveNav(page) {
+            currentPage = page;
+            document.querySelectorAll('.bottom-nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.page === page) {
+                    item.classList.add('active');
+                }
+            });
+        }
+        
+        function navigateTo(page) {
+            setActiveNav(page);
+            
+            switch(page) {
+                case 'home':
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    closeAllModals();
+                    break;
+                case 'orders':
+                    if (cart.length > 0) {
+                        openCheckout();
+                    } else {
+                        showToast('ตะกร้าว่างเปล่า กรุณาเพิ่มรายการอาหารก่อน', 'info');
+                        // Show active orders if any
+                        if (activeOrders.size > 0) {
+                            showActiveOrdersList();
+                        }
+                    }
+                    break;
+                case 'more':
+                    openMoreModal();
+                    break;
+            }
+        }
+        
+        function updateBottomNavBadge() {
+            const badge = document.getElementById('nav-cart-badge');
+            if (badge) {
+                const count = cart.reduce((sum, item) => sum + item.qty, 0);
+                if (count > 0) {
+                    badge.textContent = count > 99 ? '99+' : count;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            }
+        }
+        
+        function closeAllModals() {
+            closeModal(true);
+            closeCheckout(true);
+            closeMyTickets(true);
+            closeAvatarModal(true);
+            closePointsHistory(true);
+            closeQuickOrderModal(true);
+        }
+        
+        function openMoreModal() {
+            const modal = document.createElement('div');
+            modal.id = 'more-modal';
+            modal.className = 'fixed inset-0 z-[200] bg-black/50 backdrop-blur-sm flex items-end justify-center';
+            modal.innerHTML = `
+                <div class="bg-white rounded-t-[2rem] w-full max-w-md p-6 animate-slide-up" onclick="event.stopPropagation()">
+                    <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6"></div>
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">เมนูอื่นๆ</h2>
+                    
+                    <div class="space-y-3">
+                        <button onclick="openWheelOfFortune(); closeMoreModal();" class="w-full flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-pink-50 to-purple-50 border border-pink-100 hover:shadow-md transition-all">
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center text-white text-xl">🎡</div>
+                            <div class="text-left">
+                                <p class="font-bold text-gray-800">วงล้อเสี่ยงโชค</p>
+                                <p class="text-xs text-gray-500">ลุ้นรับส่วนลดพิเศษ</p>
+                            </div>
+                            <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
+                        </button>
+                        
+                        <button onclick="openMyTickets(); closeMoreModal();" class="w-full flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-100 hover:shadow-md transition-all">
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-400 to-blue-500 flex items-center justify-center text-white text-xl">🎫</div>
+                            <div class="text-left">
+                                <p class="font-bold text-gray-800">ตั๋วหวยของฉัน</p>
+                                <p class="text-xs text-gray-500">ดูเลขลุ้นรางวัล</p>
+                            </div>
+                            <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
+                        </button>
+                        
+                        <button onclick="openPointsHistory(); closeMoreModal();" class="w-full flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-100 hover:shadow-md transition-all">
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white text-xl">🪙</div>
+                            <div class="text-left">
+                                <p class="font-bold text-gray-800">ประวัติพอยต์</p>
+                                <p class="text-xs text-gray-500">ดูยอดพอยต์สะสม</p>
+                            </div>
+                            <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
+                        </button>
+                        
+                        <button onclick="openQuickOrderModal(); closeMoreModal();" class="w-full flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 border border-green-100 hover:shadow-md transition-all">
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center text-white text-xl">🔄</div>
+                            <div class="text-left">
+                                <p class="font-bold text-gray-800">สั่งซ้ำ</p>
+                                <p class="text-xs text-gray-500">สั่งเมนูเดิมได้เลย</p>
+                            </div>
+                            <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
+                        </button>
+                    </div>
+                    
+                    <button onclick="closeMoreModal()" class="w-full mt-6 py-3 bg-gray-100 rounded-xl font-bold text-gray-600 hover:bg-gray-200 transition-all">
+                        ปิด
+                    </button>
+                </div>
+            `;
+            modal.onclick = () => closeMoreModal();
+            document.body.appendChild(modal);
+        }
+        
+        function closeMoreModal() {
+            const modal = document.getElementById('more-modal');
+            if (modal) {
+                modal.style.opacity = '0';
+                setTimeout(() => modal.remove(), 300);
+            }
+        }
+        
+        // Override addToCart to update badge
+        const originalAddToCart = addToCart;
+        addToCart = function() {
+            originalAddToCart.apply(this, arguments);
+            updateBottomNavBadge();
+        };
+        
+        // Override removeFromCart to update badge
+        const originalRemoveFromCart = removeFromCart;
+        removeFromCart = function(index) {
+            originalRemoveFromCart(index);
+            updateBottomNavBadge();
+        };
+        
+        // Override updateMiniCart to also update badge
+        const originalUpdateMiniCart = updateMiniCart;
+        updateMiniCart = function() {
+            originalUpdateMiniCart.apply(this, arguments);
+            updateBottomNavBadge();
+        };
+        
+        // Override submitOrderToLine to include gamification
+        const originalSubmitOrder = submitOrderToLine;
+        submitOrderToLine = async function() {
+            const result = await originalSubmitOrder.apply(this, arguments);
+            
+            // Update gamification after successful order
+            gamificationData.totalOrders++;
+            gamificationData.totalSpent += cart.reduce((sum, i) => sum + i.price, 0);
+            updateStreak();
+            
+            const orderData = {
+                total: cart.reduce((sum, i) => sum + i.price, 0),
+                items: cart,
+                date: new Date()
+            };
+            
+            checkAndAwardAchievements(orderData);
+            saveGamificationData();
+            updateBottomNavBadge(); // Reset badge after order
+            
+            return result;
+        };
     </script>
+
+    <!-- BOTTOM NAVIGATION BAR -->
+    <nav class="bottom-nav hidden" id="bottom-nav">
+        <div class="bottom-nav-container">
+            <div class="bottom-nav-item active" data-page="home" onclick="navigateTo('home')">
+                <i class="fas fa-home bottom-nav-icon"></i>
+                <span class="bottom-nav-label">หน้าแรก</span>
+            </div>
+            
+            <div class="bottom-nav-item" data-page="orders" onclick="navigateTo('orders')">
+                <i class="fas fa-shopping-bag bottom-nav-icon"></i>
+                <span class="bottom-nav-badge hidden" id="nav-cart-badge">0</span>
+                <span class="bottom-nav-label">คำสั่งซื้อ</span>
+            </div>
+            
+            <div class="bottom-nav-item" data-page="more" onclick="navigateTo('more')">
+                <i class="fas fa-th-large bottom-nav-icon"></i>
+                <span class="bottom-nav-label">อื่นๆ</span>
+            </div>
+        </div>
+    </nav>
 </body>
 </html>

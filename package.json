@@ -1,0 +1,24 @@
+{
+  "name": "kaprao-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "sw.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sorawittj/Kaprao-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Sorawittj/Kaprao-app/issues"
+  },
+  "homepage": "https://github.com/Sorawittj/Kaprao-app#readme",
+  "devDependencies": {
+    "htmlhint": "^1.9.1"
+  }
+}
