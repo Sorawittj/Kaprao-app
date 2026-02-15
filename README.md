@@ -1,244 +1,107 @@
-# UI/UX Pro Max v2.0
+# 🍛 Kaprao52 (กะเพรา 52)
 
-> **AI-Powered Design Intelligence** — 67 styles, 96 color palettes, 57 font pairings, 25 chart types, 25 component patterns, 20 animation presets across 13 technology stacks.
+> **สุดยอดแอพสั่งอาหารสตรีทฟู้ด** ที่มาพร้อมกับความทันสมัย กราฟิกจัดเต็ม และระบบสมาชิกสุดล้ำ!
 
-[![CI](https://github.com/Kaprao52/Kaprao-app/actions/workflows/ci.yml/badge.svg)](https://github.com/Kaprao52/Kaprao-app/actions)
+![Kaprao52 Banner](images/logo.png)
 
-## What is UI/UX Pro Max?
+## 📱 เกี่ยวกับโปรเจกต์ (About)
+**Kaprao52** คือเว็บแอพพลิเคชันสำหรับสั่งอาหาร (Web App) ที่เน้นประสบการณ์การใช้งานที่สนุกและตื่นเต้น (Gamification) ออกแบบมาเพื่อร้านอาหารตามสั่งยุคใหม่ โดยเฉพาะเมนู "กะเพรา" ที่เป็นเมนูยอดฮิต
 
-UI/UX Pro Max is a design intelligence tool that generates comprehensive design system recommendations for any product type. It uses BM25 search with synonym expansion and fuzzy matching across curated CSV databases to recommend styles, colors, typography, layouts, icons, and animations.
+แอพนี้ไม่ได้มีแค่หน้าสั่งอาหารธรรมดา แต่ยังมีระบบ **สุ่มอาหาร**, **วงล้อเสี่ยงโชค**, **สะสมแต้ม**, และ **ลุ้นหวยจากเลข Order ID** เพื่อให้ลูกค้ากลับมาใช้งานซ้ำ!
 
-**Works with:** Claude Code, Cursor, Windsurf, GitHub Copilot, Roo, and 10+ AI code editors.
+---
 
-## Quick Start
+## ✨ ฟีเจอร์เด่น (Key Features)
 
-```bash
-# Generate a design system
-python src/scripts/search.py "SaaS dashboard" --design-system -p "MyApp"
+### 🛍️ ระบบสั่งอาหาร (Ordering System)
+- **Smart Menu**: เมนูแยกหมวดหมู่ชัดเจน (กะเพรา, ของทอด, เส้น, แกง)
+- **Customization**: เลือกระดับความเผ็ด, เนื้อสัตว์, และท็อปปิ้ง (ไข่ดาว, ไข่เจียว, ไข่เยี่ยวม้า) ได้อย่างละเอียด
+- **Cart & Checkout**: ตะกร้าสินค้าและระบบคิดเงินที่คำนวณส่วนลดและพอยต์อัตโนมัติ
 
-# Search specific domain
-python src/scripts/search.py "glassmorphism dark" --domain style
+### 🛵 ติดตามสถานะ (Order Tracking)
+- **Real-time Status**: แสดงสถานะตั้งแต่ 📝 รับออเดอร์ -> 🔥 กำลังปรุง -> 🛵 กำลังส่ง -> ✅ ถึงแล้ว
+- **Visual Timeline**: ไทม์ไลน์สวยงาม เข้าใจง่าย
 
-# Export as Tailwind config
-python src/scripts/search.py "SaaS dashboard" --design-system --export tailwind
+### 👨‍🍳 โหมดเจ้าของร้าน (Admin Mode)
+- **Secure Access**: เข้าใช้งานผ่านเมนู "เพิ่มเติม" -> "โหมดเจ้าของร้าน" (รหัสผ่าน: `5252`)
+- **Order Management**: อัพเดทสถานะออเดอร์ได้ทันที (เช่น กดเปลี่ยนจาก "กำลังปรุง" เป็น "กำลังส่ง")
+- **Google Sheets Sync**: รองรับการดึงข้อมูลออเดอร์จาก Google Sheets (Backend)
 
-# Export as CSS variables
-python src/scripts/search.py "SaaS dashboard" --design-system --export css
+### 🎰 เกมและสิทธิพิเศษ (Gamification & Loyalty)
+- **Kaprao Points**: ทุกการสั่งซื้อได้รับพอยต์ สะสมเพื่อแลกส่วนลด
+- **Wheel of Fortune**: วงล้อเสี่ยงโชค ลุ้นรางวัลพิเศษ
+- **Lotto Ticket**: เลขท้าย Order ID ลุ้นหวยรัฐบาล งวดวันที่ 1 และ 16
+- **Randomizer**: "คิดไม่ออก?" ให้ระบบสุ่มเมนูให้!
 
-# Export as Design Tokens (JSON)
-python src/scripts/search.py "SaaS dashboard" --design-system --export tokens
+### 💬 การเชื่อมต่อ (Integration)
+- **LINE LIFF Support**: รองรับการทำเป็น LINE Mini App ดึงรูปโปรไฟล์และชื่อจาก LINE ได้ทันที
 
-# Auto-detect tech stack
-python src/scripts/search.py --detect-stack
+---
 
-# Review existing UI code
-python src/scripts/search.py --review src/components/
+## 🛠️ เทคโนโลยี (Tech Stack)
 
-# Generate with A/B test suggestions
-python src/scripts/search.py "SaaS dashboard" --design-system --ab-test
-```
+- **Frontend**: HTML5, CSS3 (Modern CSS Variables, Animations), JavaScript (Vanilla ES6+)
+- **Styling**: Creative CSS Design System (Glassmorphism, Neon Effects)
+- **Backend (Mockup/Connectable)**: Google Sheets API (Script App) integration ready.
+- **Iconography**: FontAwesome
 
-## Features
+---
 
-### Core
-- 🔍 **BM25 Search** with synonym expansion and fuzzy matching
-- 🎨 **Design System Generator** with reasoning engine
-- 📁 **Master + Overrides** persistence pattern
-- 🌍 **Multi-language** queries (Thai, Chinese, Japanese, English)
+## 🚀 วิธีเริ่มต้นใช้งาน (Getting Started)
 
-### v2.0 New
-- 🌙 **Dark Mode** auto-generated color palettes
-- 📦 **Export** to Tailwind, CSS variables, Design Tokens JSON
-- 🧩 **Component Patterns** database (25 common UI patterns)
-- ✨ **Animation Presets** with CSS, Framer Motion, and GSAP code
-- 🔌 **MCP Server** for direct AI tool integration
-- 🌐 **Web UI** preview at `web/index.html`
-- 🔍 **Code Review** mode for accessibility and UX issues
-- 🧪 **A/B Test** variant suggestions
-- 🔧 **Auto-detect** tech stack from project files
-- ✅ **Test Suite** and CSV validation
-- 🔄 **Build Script** for syncing across all editor directories
+### 1. การติดตั้งและรัน (Installation)
 
-## Architecture
-
-```
-ui-ux-pro-max/
-├── src/                          # Single Source of Truth
-│   ├── data/                     # CSV databases
-│   │   ├── styles.csv            # 67 UI styles
-│   │   ├── colors.csv            # 96 color palettes
-│   │   ├── typography.csv        # 57 font pairings
-│   │   ├── products.csv          # 35+ product types
-│   │   ├── landing.csv           # Landing page patterns
-│   │   ├── ux-guidelines.csv     # 99 UX guidelines
-│   │   ├── charts.csv            # 25 chart types
-│   │   ├── icons.csv             # Icon recommendations
-│   │   ├── components.csv        # 25 component patterns (NEW)
-│   │   ├── animations.csv        # 20 animation presets (NEW)
-│   │   ├── ui-reasoning.csv      # Reasoning rules
-│   │   └── stacks/               # 13 tech stack guidelines
-│   ├── scripts/                  # Python scripts
-│   │   ├── core.py               # BM25 engine + synonyms + fuzzy
-│   │   ├── search.py             # CLI search interface
-│   │   ├── design_system.py      # Design system generator
-│   │   ├── export.py             # Tailwind/CSS/Tokens export (NEW)
-│   │   └── review.py             # Code review mode (NEW)
-│   └── mcp/                      # MCP Server (NEW)
-│       └── server.py
-├── web/                          # Web UI preview (NEW)
-│   └── index.html
-├── scripts/                      # Build tools
-│   ├── build.py                  # Sync to all editors
-│   └── validate.py               # CSV validation
-├── tests/                        # Test suite (NEW)
-│   └── test_search.py
-├── .claude/skills/               # Claude Code integration
-├── .cursor/skills/               # Cursor integration
-├── .github/prompts/              # GitHub Copilot integration
-├── .windsurf/skills/             # Windsurf integration
-├── .roo/skills/                  # Roo integration
-├── version.txt                   # Version number
-├── CHANGELOG.md                  # Release notes
-└── README.md                     # This file
-```
-
-## Search Domains
-
-| Domain | Content | Example Query |
-|--------|---------|---------------|
-| `product` | 35+ product type recommendations | `"SaaS dashboard"`, `"e-commerce luxury"` |
-| `style` | 67 UI styles with effects | `"glassmorphism dark"`, `"minimalism clean"` |
-| `color` | 96 color palettes | `"fintech trust"`, `"beauty spa"` |
-| `typography` | 57 font pairings | `"elegant serif"`, `"modern sans"` |
-| `landing` | Landing page patterns | `"hero social-proof"`, `"conversion"` |
-| `ux` | 99 UX guidelines | `"accessibility animation"` |
-| `chart` | 25 chart types | `"trend comparison"`, `"funnel"` |
-| `icons` | Icon recommendations | `"navigation menu"`, `"social media"` |
-| `components` | 25 component patterns | `"modal form"`, `"navbar sidebar"` |
-| `animations` | 20 animation presets | `"hover entrance"`, `"loading shimmer"` |
-| `react` | React performance | `"suspense memo"`, `"rerender"` |
-| `web` | Web interface guidelines | `"aria focus"`, `"semantic"` |
-
-## Technology Stacks
-
-| Stack | Focus |
-|-------|-------|
-| `html-tailwind` | Tailwind CSS utilities (DEFAULT) |
-| `react` | React hooks, state, performance |
-| `nextjs` | Next.js SSR, routing, images |
-| `vue` | Vue 3 Composition API, Pinia |
-| `nuxtjs` | Nuxt 3, auto-imports |
-| `nuxt-ui` | Nuxt UI components |
-| `svelte` | Svelte 5 runes, SvelteKit |
-| `astro` | Astro islands, content |
-| `swiftui` | SwiftUI views, state |
-| `react-native` | React Native components |
-| `flutter` | Flutter widgets, state |
-| `shadcn` | shadcn/ui components |
-| `jetpack-compose` | Jetpack Compose |
-
-## Export Formats
-
-### Tailwind Config
-```bash
-python src/scripts/search.py "SaaS" --design-system --export tailwind
-# Generates tailwind.config.js with colors, fonts, spacing, shadows
-```
-
-### CSS Variables
-```bash
-python src/scripts/search.py "SaaS" --design-system --export css
-# Generates design-system.css with :root variables + dark mode
-```
-
-### Design Tokens (JSON)
-```bash
-python src/scripts/search.py "SaaS" --design-system --export tokens
-# Generates design-tokens.json in Style Dictionary format
-```
-
-## MCP Server
-
-Add to your MCP settings:
-
-```json
-{
-    "mcpServers": {
-        "ui-ux-pro-max": {
-            "command": "python",
-            "args": ["src/mcp/server.py"],
-            "cwd": "/path/to/ui-ux-pro-max"
-        }
-    }
-}
-```
-
-Available tools: `search`, `search_stack`, `design_system`, `export`, `review`, `detect_stack`
-
-## Code Review
-
-Analyze existing UI code for accessibility, UX, and design issues:
+โปรเจกต์นี้เป็น Static Web App สามารถรันได้ทันทีโดยไม่ต้องตั้งค่า Server ซับซ้อน
 
 ```bash
-python src/scripts/search.py --review src/components/Button.tsx
-python src/scripts/search.py --review src/pages/
+# Clone โปรเจกต์
+git clone https://github.com/Sorawittj/Kaprao-app.git
+
+# เข้าไปที่โฟลเดอร์
+cd Kaprao-app
+
+# ติดตั้ง Dependencies (สำหรับ Development Tools เท่านั้น)
+npm install
+
+# รัน Server จำลอง
+npm run dev
+# หรือ
+npx serve
 ```
 
-Checks for:
-- Emoji icons (should use SVG)
-- Missing alt text
-- Missing aria-labels
-- No cursor-pointer on clickable elements
-- Missing hover states
-- No lazy loading on images
-- Small text (< 14px)
-- Hardcoded colors
-- Fixed widths causing mobile overflow
-- Animations without prefers-reduced-motion
-- Light backgrounds without dark mode variants
+### 2. การใช้งานโหมดเจ้าของร้าน (Admin Access)
+1. ไปที่เมนู **"เพิ่มเติม" (More)** ที่แถบด้านล่าง
+2. กดปุ่ม **"โหมดเจ้าของร้าน" (Shop Owner Mode)**
+3. กรอกรหัสผ่าน: **`5252`**
+4. จะเข้าสู่หน้า **Order Tracking** ที่มีปุ่มควบคุมสถานะสินค้าเพิ่มขึ้นมา
 
-## Development
+---
 
-```bash
-# Validate all CSV data
-python scripts/validate.py
+## 📂 โครงสร้างไฟล์ (Project Structure)
 
-# Run tests
-python tests/test_search.py
-
-# Sync src/ to all editor directories
-python scripts/build.py
-
-# Check what would change (dry run)
-python scripts/build.py --check
-
-# Clean and rebuild
-python scripts/build.py --clean
+```
+Kaprao-app/
+├── constants/       # ค่าคงที่ต่างๆ
+├── css/            # ไฟล์ Style (animations.css, cosmic.css)
+├── images/         # รูปภาพประกอบ
+├── js/
+│   ├── app.js           # Logic หลักของแอพ
+│   ├── data/menu.js     # ข้อมูลเมนูอาหาร
+│   ├── orderTracking.js # ระบบติดตามออเดอร์
+│   ├── state.js         # ตัวแปร Global State
+│   ├── gamification.js  # ระบบเกม (ล้อหมุน)
+│   ├── liff.js          # การเชื่อมต่อ LINE
+│   └── ...
+├── index.html      # หน้าหลัก
+└── sw.js           # Service Worker (PWA offline support)
 ```
 
-## Multi-Language Support
+---
 
-Search in Thai, Chinese, or Japanese:
+## 🔒 Security Note
+*Admin Mode ในเวอร์ชันปัจจุบันทำงานแบบ Client-side logic เพื่อการสาธิต (Demo) เท่านั้น สำหรับการใช้งานจริงควรเชื่อมต่อกับระบบ Authentication ฝั่ง Server*
 
-```bash
-# Thai
-python src/scripts/search.py "ทันสมัย หรู" --design-system
+---
 
-# Chinese
-python src/scripts/search.py "简约 现代" --design-system
-
-# Japanese
-python src/scripts/search.py "モダン シンプル" --design-system
-```
-
-## Contributing
-
-1. Edit data in `src/data/` (single source of truth)
-2. Edit scripts in `src/scripts/`
-3. Run `python scripts/validate.py` to check data integrity
-4. Run `python tests/test_search.py` to verify search accuracy
-5. Run `python scripts/build.py` to sync to all editor directories
-
-## License
-
-MIT
+**Developed with ❤️ by Sorawittj**
+*Version 24.2.0 COSMIC EDITION*
