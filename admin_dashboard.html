@@ -261,8 +261,8 @@
 
         // --- Fetch Data ---
         async function fetchOrders() {
-            // Fetch Orders (Status != 'cart' and != 'cancelled')
-            const { data, error } = await supabaseClient
+            // Primary Attempt: Fetch Orders + Customer Profile
+            let { data, error } = await supabaseClient
                 .from('orders')
                 .select(`
                     id, created_at, status, total_price, items, user_id,
@@ -272,8 +272,24 @@
                 .order('created_at', { ascending: false })
                 .limit(50);
 
+            // Fallback: If foreign key missing (PGRST200), fetch orders ONLY
+            if (error && error.code === 'PGRST200') {
+                console.warn("⚠️ Relation 'profiles' not found. Fetching orders without customer data...");
+                const res = await supabaseClient
+                    .from('orders')
+                    .select('*') // No join
+                    .neq('status', 'cart')
+                    .order('created_at', { ascending: false })
+                    .limit(50);
+
+                data = res.data;
+                error = res.error;
+            }
+
             if (error) {
                 console.error('Fetch Error:', error);
+                document.getElementById('orders-list').innerHTML =
+                    `<tr><td colspan="7" class="p-8 text-center text-red-500">Error: ${error.message}</td></tr>`;
                 return;
             }
 
