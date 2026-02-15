@@ -29,13 +29,30 @@ function selectAvatar(imgSrc) {
 
 function updateAvatarDisplay() {
     const img = document.getElementById('avatar-img');
-    if (img) img.src = userAvatar.image;
+    const defaultIcon = document.getElementById('default-avatar-icon');
+
+    if (userAvatar.image) {
+        if (img) {
+            img.src = userAvatar.image;
+            img.classList.remove('hidden');
+        }
+        if (defaultIcon) defaultIcon.classList.add('hidden');
+    } else {
+        if (img) img.classList.add('hidden');
+        if (defaultIcon) defaultIcon.classList.remove('hidden');
+    }
 
     const receiptImg = document.getElementById('receipt-avatar-img');
-    if (receiptImg) receiptImg.src = userAvatar.image;
+    if (receiptImg) receiptImg.src = userAvatar.image || '';
 
     const nameDisplay = document.getElementById('avatar-name-display');
     if (nameDisplay) nameDisplay.innerText = userAvatar.name || 'ลูกค้า';
+
+    // Also update greeting if it exists
+    const greetingText = document.getElementById('greeting-text');
+    if (greetingText) {
+        greetingText.innerText = userAvatar.name ? `สวัสดี, ${userAvatar.name}` : 'สวัสดีครับ';
+    }
 }
 
 function closeWelcome() {

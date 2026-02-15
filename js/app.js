@@ -570,6 +570,24 @@ document.addEventListener('DOMContentLoaded', () => {
         bottomNav.classList.remove('hidden');
         bottomNav.classList.add('show');
     }
+
+    // Hide Loader
+    setTimeout(hideLoader, 800); // Small delay for smooth transition
+});
+
+function hideLoader() {
+    const loader = document.getElementById('global-loader');
+    if (loader) {
+        loader.classList.add('loader-hidden');
+        setTimeout(() => {
+            loader.style.display = 'none';
+        }, 500);
+    }
+}
+
+// Fallback to ensure loader is hidden
+window.addEventListener('load', () => {
+    setTimeout(hideLoader, 1000);
 });
 
 // --- SERVICE WORKER ---

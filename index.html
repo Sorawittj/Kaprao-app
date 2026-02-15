@@ -15,6 +15,7 @@
     <link rel="preconnect" href="https://static.line-scdn.net">
     <link rel="preconnect" href="https://cdn.tailwindcss.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     <script>
         window.tailwind = {
@@ -22,21 +23,28 @@
                 theme: {
                     extend: {
                         colors: {
-                            brand: { purple: '#4A403A', yellow: '#9C836E', text: '#3E3835' }
+                            brand: {
+                                primary: '#FF6B00',
+                                accent: '#22C55E',
+                                text: '#111827',
+                                orange: '#FF6B00',
+                                green: '#22C55E'
+                            }
                         },
-                        fontFamily: { sans: ['Kanit', 'sans-serif'], round: ['Kanit', 'sans-serif'] },
+                        fontFamily: {
+                            sans: ['Sarabun', 'sans-serif'],
+                            heading: ['Kanit', 'sans-serif'],
+                            round: ['Kanit', 'sans-serif']
+                        },
                         borderRadius: { '4xl': '2.5rem' },
                         animation: {
                             'bounce-slow': 'bounce 3s infinite',
-                            'fade-in-down': 'fadeInDown 0.3s ease-out forwards',
-                            'spin-fast': 'spin 0.8s linear infinite',
-                            'heart-beat': 'heartBeat 0.3s ease-in-out',
-                            'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+                            'enter-up': 'enterUp 0.6s cubic-bezier(0.19, 1, 0.22, 1) forwards',
+                            'pop-in': 'popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
                         },
                         keyframes: {
-                            fadeInDown: { '0%': { opacity: '0', transform: 'translateY(-10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
-                            heartBeat: { '0%': { transform: 'scale(1)' }, '50%': { transform: 'scale(1.3)' }, '100%': { transform: 'scale(1)' } },
-                            pulseGlow: { '0%, 100%': { boxShadow: '0 0 5px rgba(245, 158, 11, 0.3)' }, '50%': { boxShadow: '0 0 20px rgba(245, 158, 11, 0.6)' } }
+                            enterUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+                            popIn: { '0%': { opacity: '0', transform: 'scale(0.95)' }, '100%': { opacity: '1', transform: 'scale(1)' } }
                         }
                     }
                 }
@@ -58,7 +66,8 @@
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3448/3448609.png">
     <title>Kaprao52 - APP</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&family=Sarabun:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>

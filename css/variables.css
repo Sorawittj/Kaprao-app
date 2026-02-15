@@ -1,99 +1,78 @@
-/* ===== KAPRAO MINIMAL CREAM SYSTEM (Refined Balance) ===== */
+/* ===== KAPRAO VIBRANT & BALANCED SYSTEM ===== */
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@400;500;600&display=swap');
+
 :root {
-    /* --- Brand Identity --- */
-    /* Primary: Warm, Rich Earthy Gold/Brown (Balanced, not too muddy) */
-    --primary: #B58D67;
-    --primary-focus: #967050;
-    --primary-light: #F6F1EB;
-    /* Very light cream for backgrounds */
-    --primary-fade: rgba(181, 141, 103, 0.15);
+    /* --- Brand Identity: Fresh & Spicy --- */
+    /* Primary: Spicy Orange (Appetizing, Energetic) */
+    --primary: #FF6B00;
+    --primary-focus: #E65100;
+    --primary-light: #FFF0E0;
+    --primary-fade: rgba(255, 107, 0, 0.1);
 
-    /* Accent: Soft Natural Green (For "Vegetable/Fresh" feel) */
-    --accent: #8FA78C;
-    --accent-focus: #738A70;
-    --accent-light: #F1F5F0;
-    --accent-fade: rgba(143, 167, 140, 0.15);
+    /* Accent: Fresh Basil Green (Natural, Balanced) */
+    --accent: #22C55E;
+    --accent-focus: #16A34A;
+    --accent-light: #DCFCE7;
+    --accent-fade: rgba(34, 197, 94, 0.1);
 
-    /* Secondary Text Strong: For replacing indigo/purple text */
-    --secondary-text-strong: #6B5E55;
+    /* Secondary Gradient (For special buttons/banners) */
+    --gradient-primary: linear-gradient(135deg, #FF6B00 0%, #FF9E00 100%);
+    --gradient-accent: linear-gradient(135deg, #22C55E 0%, #4ADE80 100%);
+    --gradient-premium: linear-gradient(135deg, #1F2937 0%, #4B5563 100%);
 
-    /* Functional Colors (Softened) */
-    --success: #8FB592;
-    /* Muted Sage */
-    --error: #D98C8C;
-    /* Muted Rose */
-    --warning: #EBCB8B;
-    /* Muted Gold */
-
-    /* --- Surfaces --- */
-    /* Backgrounds: Lighter, Cleaner */
-    --bg-app: #FAFAF9;
-    /* Almost White Stone (Cleaner than previous Cream) */
+    /* --- Surfaces: Clean & airy --- */
+    --bg-app: #FAFAFA;
     --bg-card: #FFFFFF;
-    /* Pure White */
     --bg-modal: #FFFFFF;
-    --bg-input: #F5F5F4;
-    /* Light Stone */
+    --bg-input: #F3F4F6;
+    --glass-bg: rgba(255, 255, 255, 0.9);
+    --glass-border: rgba(255, 255, 255, 0.5);
 
-    /* --- Typography --- */
-    --text-main: #3F3733;
-    /* Deep Coffee Brown (High Contrast) */
-    --text-secondary: #78716C;
-    /* Stone Gray */
-    --text-muted: #A8A29E;
-    /* Light Stone */
+    /* --- Typography: Modern & Readable --- */
+    --font-heading: 'Kanit', sans-serif;
+    --font-body: 'Sarabun', sans-serif;
+
+    --text-main: #111827;
+    /* Near black for readability */
+    --text-secondary: #4B5563;
+    /* Cool gray */
+    --text-muted: #9CA3AF;
     --text-on-primary: #FFFFFF;
 
-    /* --- Borders & Outlines --- */
-    --border-light: #F0EFEA;
-    --border-medium: #E7E5E0;
+    /* --- Borders & Shadows --- */
+    --border-light: #F3F4F6;
+    --border-medium: #E5E7EB;
 
-    /* --- Effects --- */
-    /* Refined Shadows: Soft, diffused, premium */
-    --shadow-sm: 0 1px 3px rgba(63, 55, 51, 0.05);
-    --shadow-md: 0 4px 12px rgba(63, 55, 51, 0.08);
-    --shadow-lg: 0 12px 24px rgba(63, 55, 51, 0.1);
-    --shadow-float: 0 20px 40px rgba(63, 55, 51, 0.12);
+    /* Framer Motion-like Shadows */
+    --shadow-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
+    --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 
-    /* Solid Glass Substitutes */
-    --glass-bg: #FFFFFF;
-    --glass-heavy-bg: #FFFFFF;
-    --glass-border: var(--border-light);
-    --blur-backdrop: 0px;
+    /* Effects */
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --radius-full: 9999px;
+}
 
-    /* Legacy Map */
-    --bg-primary: var(--bg-app);
-    --bg-secondary: var(--bg-card);
-    --text-primary: var(--text-main);
-    --card-hover: var(--primary-light);
-    --meat-option-selected-border: var(--primary);
+/* Base Reset & Typography Application */
+html {
+    font-family: var(--font-body);
+}
 
-    /* Specific overrides for color balance */
-    --meat-option-bg: var(--bg-input);
-    --meat-option-border: var(--border-medium);
-    --meat-option-text: var(--text-main);
-
-    --meat-option-hover-bg: var(--primary-light);
-
-    --meat-option-selected-bg: #FFFFFF;
-    --meat-option-selected-text: var(--primary-focus);
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-heading {
+    font-family: var(--font-heading);
 }
 
 /* Safe Area Variables */
 :root {
     --sat: env(safe-area-inset-top);
     --sab: env(safe-area-inset-bottom);
-}
-
-/* Base scroll behavior */
-html {
-    scroll-behavior: smooth;
-    -webkit-tap-highlight-color: transparent;
-    background-color: var(--bg-app);
-    color: var(--text-main);
-}
-
-/* Typography refinements */
-body {
-    -webkit-font-smoothing: antialiased;
 }
