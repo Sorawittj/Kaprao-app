@@ -2,58 +2,163 @@
     --bottom-nav-height: 90px;
 }
 
-/* Bottom Navigation */
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: var(--bottom-nav-height);
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    border-top: 1px solid var(--glass-border);
-    z-index: 50;
-    padding-bottom: env(safe-area-inset-bottom);
-    box-shadow: var(--shadow-hover);
+/* Bottom Navigation - Floating Modern Design */
+:root {
+    --bottom-nav-height: 96px;
+    /* Includes margin for spacing other elements */
 }
 
-.nav-item {
+.bottom-nav {
+    position: fixed;
+    bottom: 24px;
+    left: 0;
+    right: 0;
+    height: 72px;
+    /* Explicit height for the bar */
+    background: transparent;
+    /* Reset */
+    backdrop-filter: none;
+    /* Reset */
+    -webkit-backdrop-filter: none;
+    border-top: none;
+    /* Reset */
+    box-shadow: none;
+    /* Reset */
+    z-index: 90;
+    pointer-events: none;
+    /* Allow clicks through empty space */
+    display: flex;
+    justify-content: center;
+    padding: 0 20px;
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.bottom-nav-container {
+    pointer-events: auto;
+    width: 100%;
+    max-width: 380px;
+    /* Optimal width for thumb reach */
+    height: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 28px;
+    box-shadow:
+        0 10px 25px -5px rgba(0, 0, 0, 0.1),
+        0 4px 10px -6px rgba(0, 0, 0, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    transition: all 0.3s ease;
+}
+
+/* Item Styles */
+.bottom-nav-item {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    color: var(--text-muted);
-    transition: all 0.3s var(--ease-spring);
     width: 60px;
-    background: none;
-    border: none;
+    height: 100%;
+    color: #9CA3AF;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
     cursor: pointer;
+    border-radius: 16px;
+    background: transparent !important;
+    /* Override navigation.css */
+    box-shadow: none !important;
+    /* Override navigation.css */
     padding: 0;
 }
 
-.nav-item.active {
+/* Hover/Touch Feedback */
+.bottom-nav-item:active {
+    transform: scale(0.9);
+}
+
+/* Active State */
+.bottom-nav-item.active {
     color: var(--primary);
-    transform: translateY(-2px);
+    background: transparent !important;
+    box-shadow: none !important;
 }
 
-.nav-item i {
-    font-size: 1.5rem;
-    transition: transform 0.3s var(--ease-spring);
+/* Animated Active Indicator background (optional pill shape behind) */
+/* Alternatively, using icon transformation */
+
+.bottom-nav-item i {
+    font-size: 1.6rem;
+    margin-bottom: 0;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.3s ease;
+    z-index: 2;
+    position: relative;
+    transform-origin: center;
 }
 
-.nav-item.active i {
-    filter: drop-shadow(0 4px 6px var(--primary-fade));
+.bottom-nav-item.active i {
+    transform: translateY(-6px);
+    filter: drop-shadow(0 4px 6px rgba(255, 107, 0, 0.25));
 }
 
-.nav-item span {
+.bottom-nav-label {
     font-size: 0.65rem;
     font-weight: 600;
+    transition: all 0.3s ease;
+    opacity: 0.6;
     font-family: var(--font-heading);
+    transform-origin: center;
+    position: absolute;
+    bottom: 8px;
+    /* Fixed position */
+    transform: scale(0.9);
+}
+
+.bottom-nav-item.active .bottom-nav-label {
+    font-weight: 700;
+    opacity: 1;
+    color: var(--text-main);
+    transform: translateY(2px) scale(1);
+}
+
+/* Active Indicator Dot */
+.bottom-nav-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--primary);
+    box-shadow: 0 0 8px var(--primary);
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    opacity: 1;
+}
+
+/* Badges */
+.bottom-nav-badge {
+    position: absolute;
+    top: 8px;
+    /* Adjusted for container */
+    right: 12px;
+    background: #EF4444;
+    color: white;
+    font-size: 0.6rem;
+    font-weight: 800;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+    z-index: 10;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 /* Modern Header */
