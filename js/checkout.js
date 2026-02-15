@@ -147,7 +147,7 @@ function reprintReceipt(ticketIndex) {
 
     const receiptAvatar = document.getElementById('receipt-avatar-img');
     receiptAvatar.crossOrigin = "Anonymous";
-    receiptAvatar.src = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+    receiptAvatar.src = userAvatar.image || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
 
     const itemsContainer = document.querySelector('.receipt-items');
     itemsContainer.innerHTML = '';

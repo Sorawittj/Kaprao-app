@@ -13,8 +13,21 @@ async function initLIFF() {
 
                 const profile = await liff.getProfile();
                 userAvatar.userId = profile.userId;
-                userAvatar.displayName = profile.displayName;
-                userAvatar.pictureUrl = profile.pictureUrl;
+
+                // LINE Profile integration
+                if (profile.pictureUrl) {
+                    userAvatar.image = profile.pictureUrl;
+                }
+                if (profile.displayName) {
+                    userAvatar.name = profile.displayName;
+                    // Also update the name input in checkout if it exists
+                    const nameInput = document.getElementById('user-name');
+                    if (nameInput) nameInput.value = profile.displayName;
+                }
+
+                // Update UI and Save
+                if (typeof updateAvatarDisplay === 'function') updateAvatarDisplay();
+                if (typeof saveToLS === 'function') saveToLS();
 
                 // Sync data from server
                 if (typeof syncUserStatsFromServer === 'function') syncUserStatsFromServer(profile.userId);

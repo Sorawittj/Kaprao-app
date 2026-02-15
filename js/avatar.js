@@ -28,8 +28,14 @@ function selectAvatar(imgSrc) {
 }
 
 function updateAvatarDisplay() {
-    document.getElementById('avatar-img').src = userAvatar.image;
-    document.getElementById('avatar-name-display').innerText = userAvatar.name || 'ลูกค้า';
+    const img = document.getElementById('avatar-img');
+    if (img) img.src = userAvatar.image;
+
+    const receiptImg = document.getElementById('receipt-avatar-img');
+    if (receiptImg) receiptImg.src = userAvatar.image;
+
+    const nameDisplay = document.getElementById('avatar-name-display');
+    if (nameDisplay) nameDisplay.innerText = userAvatar.name || 'ลูกค้า';
 }
 
 function closeWelcome() {
