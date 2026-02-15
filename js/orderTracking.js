@@ -1,86 +1,196 @@
-// ===== ORDER TRACKING SYSTEM =====
+// ===== ORDER TRACKING SYSTEM (Pre-Order Flow) =====
+// Flow: สั่งวันนี้ → ทำที่บ้าน → เอาไปส่งวันต่อไป
 
 const ORDER_STATUS = {
-    PENDING: { code: 'pending', label: 'รอรับออเดอร์', icon: 'fa-clock', color: 'text-brand-yellow', bgColor: 'bg-stone-50' },
-    CONFIRMED: { code: 'confirmed', label: 'รับออเดอร์แล้ว', icon: 'fa-check-circle', color: 'text-brand-purple', bgColor: 'bg-[#EFEBE9]' },
-    PREPARING: { code: 'preparing', label: 'กำลังเตรียมอาหาร', icon: 'fa-fire', color: 'text-[#8D6E63]', bgColor: 'bg-[#F2EBE5]' },
-    READY: { code: 'ready', label: 'อาหารพร้อมแล้ว', icon: 'fa-utensils', color: 'text-[#558B2F]', bgColor: 'bg-[#F1F8E9]' },
-    COMPLETED: { code: 'completed', label: 'เสร็จสิ้น', icon: 'fa-star', color: 'text-gray-500', bgColor: 'bg-gray-50' }
-
+    PLACED: {
+        code: 'placed',
+        label: 'สั่งเรียบร้อย',
+        sublabel: 'ออเดอร์ถูกบันทึกแล้ว',
+        icon: 'fa-check-circle',
+        emoji: '✅',
+        color: 'text-emerald-600',
+        bgColor: 'bg-emerald-50',
+        borderColor: 'border-emerald-200'
+    },
+    COOKING: {
+        code: 'cooking',
+        label: 'กำลังเตรียมอาหาร',
+        sublabel: 'เจ้าของร้านกำลังทำให้คุณ',
+        icon: 'fa-fire',
+        emoji: '🔥',
+        color: 'text-orange-600',
+        bgColor: 'bg-orange-50',
+        borderColor: 'border-orange-200'
+    },
+    ON_THE_WAY: {
+        code: 'on_the_way',
+        label: 'กำลังนำส่ง',
+        sublabel: 'อาหารอยู่ระหว่างทาง',
+        icon: 'fa-motorcycle',
+        emoji: '🛵',
+        color: 'text-blue-600',
+        bgColor: 'bg-blue-50',
+        borderColor: 'border-blue-200'
+    },
+    DELIVERED: {
+        code: 'delivered',
+        label: 'ส่งถึงแล้ว!',
+        sublabel: 'รับอาหารได้เลยครับ',
+        icon: 'fa-box-open',
+        emoji: '📦',
+        color: 'text-purple-600',
+        bgColor: 'bg-purple-50',
+        borderColor: 'border-purple-200'
+    },
+    COMPLETED: {
+        code: 'completed',
+        label: 'เสร็จสิ้น',
+        sublabel: 'ขอบคุณที่อุดหนุนครับ',
+        icon: 'fa-star',
+        emoji: '⭐',
+        color: 'text-amber-600',
+        bgColor: 'bg-amber-50',
+        borderColor: 'border-amber-200'
+    }
 };
 
 let activeOrders = new Map();
 let activeOrderTrackingId = null;
 let trackingInterval = null;
 
+// --- Admin Mode (for shop owner to update status) ---
+let isAdminMode = false;
+const ADMIN_TAP_COUNT = 5;
+let adminTapCounter = 0;
+let adminTapTimeout = null;
+
+function toggleAdminMode() {
+    isAdminMode = !isAdminMode;
+    showToast(isAdminMode ? '🔓 โหมดเจ้าของร้าน: เปิด' : '🔒 โหมดเจ้าของร้าน: ปิด', isAdminMode ? 'success' : 'info');
+    // Re-render to show/hide admin controls
+    const sheet = document.getElementById('order-tracking-sheet');
+    if (sheet && !sheet.classList.contains('translate-y-full')) {
+        renderOrderTrackingContent();
+    }
+}
+
+function handleAdminTap() {
+    adminTapCounter++;
+    if (adminTapTimeout) clearTimeout(adminTapTimeout);
+    adminTapTimeout = setTimeout(() => { adminTapCounter = 0; }, 2000);
+    if (adminTapCounter >= ADMIN_TAP_COUNT) {
+        adminTapCounter = 0;
+        toggleAdminMode();
+    }
+}
+
+// --- Core Functions ---
+
 function startOrderTracking(orderId, items) {
+    const now = new Date();
+    // Calculate delivery date (next business day)
+    const deliveryDate = getNextDeliveryDate(now);
+
     const order = {
         id: orderId,
         items: items,
-        status: ORDER_STATUS.PENDING,
-        startTime: Date.now(),
-        estimatedTime: items.length * 3 + 5,
-        updates: []
+        status: ORDER_STATUS.PLACED,
+        orderDate: now.getTime(),
+        deliveryDate: deliveryDate.getTime(),
+        startTime: now.getTime(), // Keep for backward compat
+        estimatedTime: 0, // Not used in pre-order flow
+        updates: [
+            { status: ORDER_STATUS.PLACED, time: now.getTime(), note: 'ส่งออเดอร์แล้ว' }
+        ]
     };
 
     activeOrders.set(orderId, order);
     saveActiveOrders();
-    simulateOrderProgress(orderId);
 
-    // Open the new tracking sheet
+    // Open the tracking sheet
     openOrderTrackingSheet(orderId);
     showToast('ส่งออเดอร์เรียบร้อย! 🚀', 'success');
 }
 
-function simulateOrderProgress(orderId) {
+function getNextDeliveryDate(fromDate) {
+    const delivery = new Date(fromDate);
+    delivery.setDate(delivery.getDate() + 1);
+
+    // Skip weekends (Saturday=6, Sunday=0)
+    while (delivery.getDay() === 0 || delivery.getDay() === 6) {
+        delivery.setDate(delivery.getDate() + 1);
+    }
+
+    // Set delivery time to ~11:30 AM (typical lunch delivery)
+    delivery.setHours(11, 30, 0, 0);
+    return delivery;
+}
+
+function advanceOrderStatus(orderId) {
     const order = activeOrders.get(orderId);
     if (!order) return;
 
-    const transitions = [
-        { status: ORDER_STATUS.CONFIRMED, delay: 5000 },
-        { status: ORDER_STATUS.PREPARING, delay: 15000 },
-        { status: ORDER_STATUS.READY, delay: order.estimatedTime * 60000 * 0.8 },
-        { status: ORDER_STATUS.COMPLETED, delay: (order.estimatedTime * 60000) + 300000 }
-    ];
+    const statuses = Object.values(ORDER_STATUS);
+    const currentIdx = statuses.findIndex(s => s.code === order.status.code);
 
-    transitions.forEach(({ status, delay }) => {
-        setTimeout(() => {
-            if (activeOrders.has(orderId)) {
-                const currentOrder = activeOrders.get(orderId);
-                // Only update if not already past this stage
-                const currentStatusIdx = Object.values(ORDER_STATUS).findIndex(s => s.code === currentOrder.status.code);
-                const newStatusIdx = Object.values(ORDER_STATUS).findIndex(s => s.code === status.code);
+    if (currentIdx < statuses.length - 1) {
+        const nextStatus = statuses[currentIdx + 1];
+        order.status = nextStatus;
+        order.updates.push({
+            status: nextStatus,
+            time: Date.now(),
+            note: getStatusNote(nextStatus.code)
+        });
 
-                if (newStatusIdx > currentStatusIdx) {
-                    currentOrder.status = status;
-                    currentOrder.updates.push({ status: status, time: Date.now() });
+        saveActiveOrders();
 
-                    saveActiveOrders();
+        // Update UI if open
+        const sheet = document.getElementById('order-tracking-sheet');
+        if (sheet && !sheet.classList.contains('translate-y-full')) {
+            renderOrderTrackingContent();
+        }
 
-                    // Update UI if open
-                    const sheet = document.getElementById('order-tracking-sheet');
-                    if (sheet && !sheet.classList.contains('translate-y-full')) {
-                        renderOrderTrackingContent();
-                    }
-
-                    // Notification
-                    if (status.code === 'ready') {
-                        if (Notification.permission === 'granted') {
-                            new Notification('อาหารพร้อมแล้ว! 🍽️', {
-                                body: `Order ${orderId} พร้อมรับแล้วครับ`,
-                                icon: 'https://cdn-icons-png.flaticon.com/512/3448/3448609.png'
-                            });
-                        }
-                        try {
-                            // Play sound or other effect
-                            triggerHaptic('heavy');
-                        } catch (e) { }
-                    }
-                }
+        // Notification for key statuses
+        if (nextStatus.code === 'on_the_way' || nextStatus.code === 'delivered') {
+            if (Notification.permission === 'granted') {
+                const notifMessages = {
+                    'on_the_way': { title: '🛵 อาหารกำลังมา!', body: 'เจ้าของร้านกำลังนำอาหารมาส่ง' },
+                    'delivered': { title: '📦 อาหารถึงแล้ว!', body: 'รับอาหารได้เลยครับ' }
+                };
+                const msg = notifMessages[nextStatus.code];
+                new Notification(msg.title, {
+                    body: msg.body,
+                    icon: 'https://cdn-icons-png.flaticon.com/512/3448/3448609.png'
+                });
             }
-        }, delay);
-    });
+            try { triggerHaptic('heavy'); } catch (e) { }
+        }
+
+        showToast(`${nextStatus.emoji} ${nextStatus.label}`, 'success');
+    }
 }
+
+function getStatusNote(statusCode) {
+    const notes = {
+        'placed': 'ออเดอร์ถูกบันทึกเรียบร้อย',
+        'cooking': 'เจ้าของร้านเริ่มเตรียมอาหารแล้ว',
+        'on_the_way': 'อาหารอยู่ระหว่างทางไปที่ทำงาน',
+        'delivered': 'ส่งอาหารถึงแล้ว!',
+        'completed': 'ขอบคุณที่อุดหนุนครับ ⭐'
+    };
+    return notes[statusCode] || '';
+}
+
+function cancelOrder(orderId) {
+    if (!confirm('ต้องการยกเลิกออเดอร์นี้หรือไม่?')) return;
+    activeOrders.delete(orderId);
+    saveActiveOrders();
+    activeOrderTrackingId = null;
+    renderOrderTrackingContent();
+    showToast('ยกเลิกออเดอร์แล้ว', 'info');
+}
+
+// --- Persistence ---
 
 function saveActiveOrders() {
     const ordersArray = Array.from(activeOrders.entries());
@@ -95,8 +205,34 @@ function loadActiveOrders() {
             const ordersArray = JSON.parse(saved);
             activeOrders = new Map(ordersArray);
             const now = Date.now();
+
+            // Migration map: old status codes → new status
+            const migrationMap = {
+                'pending': ORDER_STATUS.PLACED,
+                'confirmed': ORDER_STATUS.PLACED,
+                'preparing': ORDER_STATUS.COOKING,
+                'ready': ORDER_STATUS.ON_THE_WAY,
+                'completed': ORDER_STATUS.COMPLETED
+            };
+
             for (const [id, order] of activeOrders) {
-                if (order.status.code === 'completed' && (now - order.startTime) > 86400000) {
+                // Migrate old status codes
+                if (order.status && migrationMap[order.status.code] && !ORDER_STATUS[order.status.code.toUpperCase()]) {
+                    order.status = migrationMap[order.status.code];
+                }
+
+                // Ensure new fields exist
+                if (!order.orderDate) order.orderDate = order.startTime || now;
+                if (!order.deliveryDate) {
+                    const delivery = new Date(order.orderDate);
+                    delivery.setDate(delivery.getDate() + 1);
+                    delivery.setHours(11, 30, 0, 0);
+                    order.deliveryDate = delivery.getTime();
+                }
+                if (!order.updates) order.updates = [];
+
+                // Auto-cleanup: remove completed orders older than 3 days
+                if (order.status.code === 'completed' && (now - order.orderDate) > 259200000) {
                     activeOrders.delete(id);
                 }
             }
@@ -107,7 +243,7 @@ function loadActiveOrders() {
     updateActiveOrdersButton();
 }
 
-// --- NEW SHEET UI LOGIC ---
+// --- Sheet UI Logic ---
 
 function openOrderTrackingSheet(orderId = null) {
     if (orderId) activeOrderTrackingId = orderId;
@@ -118,14 +254,13 @@ function openOrderTrackingSheet(orderId = null) {
 
     if (overlay && sheet) {
         renderOrderTrackingContent();
-
         overlay.classList.remove('hidden');
         setTimeout(() => {
             overlay.classList.remove('opacity-0');
             sheet.classList.remove('translate-y-full');
         }, 10);
 
-        // Start live timer
+        // Start live timer for delivery countdown
         if (trackingInterval) clearInterval(trackingInterval);
         trackingInterval = setInterval(updateTrackingTimers, 1000);
     }
@@ -150,106 +285,202 @@ function renderOrderTrackingContent() {
     const container = document.getElementById('order-tracking-content');
     if (!container) return;
 
-    // If specific order is selected -> Show Detail View
     if (activeOrderTrackingId && activeOrders.has(activeOrderTrackingId)) {
         renderOrderDetailView(container, activeOrders.get(activeOrderTrackingId));
-    }
-    // Else -> Show List View
-    else {
+    } else {
         renderOrderListView(container);
     }
 }
 
-function renderOrderDetailView(container, order) {
-    const progress = calculateOrderProgress(order);
-    const elapsed = Math.floor((Date.now() - order.startTime) / 60000);
-    const estimatedTotal = order.estimatedTime;
-    let remaining = Math.max(0, estimatedTotal - elapsed);
+// --- Detail View ---
 
-    // Status visual
+function renderOrderDetailView(container, order) {
     const steps = Object.values(ORDER_STATUS);
     const currentStepIndex = steps.findIndex(s => s.code === order.status.code);
+    const progress = ((currentStepIndex) / (steps.length - 1)) * 100;
+
+    // Delivery date info
+    const deliveryDate = new Date(order.deliveryDate || order.startTime + 86400000);
+    const orderDate = new Date(order.orderDate || order.startTime);
+    const now = new Date();
+
+    // Calculate time until delivery
+    const msUntilDelivery = deliveryDate.getTime() - now.getTime();
+    const hoursUntil = Math.max(0, Math.floor(msUntilDelivery / 3600000));
+    const minutesUntil = Math.max(0, Math.floor((msUntilDelivery % 3600000) / 60000));
+
+    const isDelivered = order.status.code === 'delivered' || order.status.code === 'completed';
+    const isCancellable = order.status.code === 'placed';
+
+    // Determine delivery label
+    let deliveryLabel = '';
+    const isToday = now.toDateString() === deliveryDate.toDateString();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const isTomorrow = tomorrow.toDateString() === deliveryDate.toDateString();
+
+    if (isDelivered) {
+        deliveryLabel = 'ส่งถึงแล้ว!';
+    } else if (isToday) {
+        deliveryLabel = 'วันนี้';
+    } else if (isTomorrow) {
+        deliveryLabel = 'พรุ่งนี้';
+    } else {
+        deliveryLabel = formatThaiDateShort(deliveryDate);
+    }
 
     let html = `
         <div class="mb-6">
-            <button onclick="activeOrderTrackingId=null; renderOrderTrackingContent()" class="text-indigo-600 font-bold text-sm mb-4 flex items-center gap-1">
+            <!-- Back Button -->
+            <button onclick="activeOrderTrackingId=null; renderOrderTrackingContent()" 
+                class="text-[#B58D67] font-bold text-sm mb-4 flex items-center gap-1 hover:text-[#8D6E63] transition-colors">
                 <i class="fas fa-chevron-left"></i> กลับไปหน้ารวม
             </button>
-            <div class="text-center mb-6">
-                <!-- Large Status Icon -->
-                <div class="w-24 h-24 ${order.status.bgColor} rounded-full flex items-center justify-center mx-auto mb-4 relative">
-                    <i class="fas ${order.status.icon} text-4xl ${order.status.color}"></i>
-                    ${order.status.code === 'preparing' ? '<div class="absolute -right-2 -top-2 w-8 h-8 bg-brand-yellow rounded-full flex items-center justify-center animate-bounce text-white">🔥</div>' : ''}
 
+            <!-- Status Hero Card -->
+            <div class="bg-white rounded-3xl border ${order.status.borderColor} p-6 mb-6 relative overflow-hidden shadow-sm">
+                <div class="absolute top-0 right-0 w-40 h-40 ${order.status.bgColor} rounded-full -translate-y-1/2 translate-x-1/2 opacity-50 blur-2xl"></div>
+                <div class="relative z-10 text-center">
+                    <div class="w-20 h-20 ${order.status.bgColor} rounded-2xl flex items-center justify-center mx-auto mb-3 text-4xl shadow-sm ${order.status.borderColor} border">
+                        ${order.status.emoji}
+                    </div>
+                    <h2 class="text-xl font-black text-gray-800 mb-1">${order.status.label}</h2>
+                    <p class="text-sm text-gray-500">${order.status.sublabel}</p>
+                    <p class="text-xs text-gray-400 mt-2">Order #${order.id}</p>
                 </div>
-                <h2 class="text-2xl font-bold text-gray-800 mb-1">${order.status.label}</h2>
-                <p class="text-sm text-gray-400">Order #${order.id.toString().slice(-6)}</p>
             </div>
 
-            <!-- Progress Stepper -->
-            <div class="flex justify-between items-center relative mb-8 px-2">
-                <!-- Connecting Line -->
-                <div class="absolute top-1/2 left-0 w-full h-1 bg-gray-100 -z-10 -translate-y-1/2 rounded-full"></div>
-                <div class="absolute top-1/2 left-0 h-1 bg-green-500 -z-10 -translate-y-1/2 rounded-full transition-all duration-1000" style="width: ${progress}%"></div>
-                
-                ${steps.map((s, idx) => {
-        const isCompleted = idx <= currentStepIndex;
-        const isCurrent = idx === currentStepIndex;
-
-        return `
-                        <div class="flex flex-col items-center gap-2 relative group w-12">
-                            <div class="w-8 h-8 rounded-full flex items-center justify-center border-2 z-10 
-                                ${isCompleted ? 'bg-green-500 border-green-500 text-white' : 'bg-white border-gray-200 text-gray-300'} 
-                                ${isCurrent ? 'ring-4 ring-green-100 scale-110' : ''} transition-all duration-300">
-                                <i class="fas ${isCompleted ? 'fa-check' : 'fa-circle text-[8px]'}"></i>
-                            </div>
-                            <!-- Tooltip/Label -->
-                            <div class="absolute top-10 text-[10px] whitespace-nowrap font-bold ${isCurrent ? 'text-gray-800' : 'text-gray-400'}">
-                                ${s.label.split(' ')[0]}
+            <!-- Delivery Info Card -->
+            <div class="bg-gradient-to-br from-[#4A403A] to-[#3F3733] rounded-2xl p-5 text-white mb-6 relative overflow-hidden shadow-lg">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
+                <div class="relative z-10">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <p class="text-[#B58D67] text-xs font-bold uppercase tracking-wider mb-1">📅 กำหนดส่ง</p>
+                            <p class="text-2xl font-black">${deliveryLabel}</p>
+                        </div>
+                        ${!isDelivered ? `
+                        <div class="text-right">
+                            <p class="text-gray-400 text-xs mb-1">เหลืออีก</p>
+                            <div class="flex items-baseline gap-1">
+                                <span class="text-3xl font-black font-mono live-timer" 
+                                    data-delivery="${order.deliveryDate || order.startTime + 86400000}">${hoursUntil}</span>
+                                <span class="text-sm text-gray-400">ชม.</span>
+                                <span class="text-3xl font-black font-mono live-timer-min" 
+                                    data-delivery="${order.deliveryDate || order.startTime + 86400000}">${minutesUntil}</span>
+                                <span class="text-sm text-gray-400">นาที</span>
                             </div>
                         </div>
-                    `;
-    }).join('')}
+                        ` : `
+                        <div class="w-14 h-14 bg-emerald-500/20 rounded-full flex items-center justify-center text-2xl">
+                            ✅
+                        </div>
+                        `}
+                    </div>
+                    <div class="flex gap-4 text-xs text-gray-400 border-t border-white/10 pt-3">
+                        <span><i class="far fa-calendar-alt mr-1"></i> สั่งเมื่อ: ${formatDateTimeShort(orderDate)}</span>
+                        <span><i class="far fa-clock mr-1"></i> ส่ง: ${formatDateTimeShort(deliveryDate)}</span>
+                    </div>
+                </div>
             </div>
 
-            <!-- Timer Card -->
-            <div class="bg-gray-800 rounded-2xl p-6 text-white text-center mb-6 relative overflow-hidden group">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
-                <p class="text-gray-400 text-xs uppercase tracking-wider mb-1">เวลาที่เหลือโดยประมาณ</p>
-                <div class="text-5xl font-black font-mono tracking-widest live-timer mb-2" data-start="${order.startTime}" data-est="${order.estimatedTime}">
-                    ${formatTime(remaining * 60)}
-                </div>
-                <div class="flex justify-center gap-4 text-xs text-gray-400">
-                    <span><i class="fas fa-play-circle ml-1"></i> เริ่ม: ${new Date(order.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                    <span><i class="fas fa-hourglass-half ml-1"></i> ประมาณ: ${estimatedTotal} นาที</span>
+            <!-- Progress Timeline (Vertical) -->
+            <div class="bg-white rounded-2xl border border-gray-100 p-5 mb-6 shadow-sm">
+                <h3 class="font-bold text-gray-800 text-sm mb-5 flex items-center gap-2">
+                    <i class="fas fa-route text-[#B58D67]"></i> สถานะการจัดส่ง
+                </h3>
+                <div class="relative pl-8">
+                    ${steps.map((s, idx) => {
+        const isCompleted = idx <= currentStepIndex;
+        const isCurrent = idx === currentStepIndex;
+        const update = order.updates.find(u => u.status.code === s.code);
+        const timeStr = update ? formatTimeOnly(new Date(update.time)) : '';
+        const dateStr = update ? formatDateShort(new Date(update.time)) : '';
+        const isLast = idx === steps.length - 1;
+
+        return `
+                            <div class="relative pb-${isLast ? '0' : '6'} group">
+                                <!-- Connecting Line -->
+                                ${!isLast ? `
+                                <div class="absolute left-[-20px] top-5 w-0.5 h-full ${isCompleted && idx < currentStepIndex ? 'bg-emerald-400' : 'bg-gray-200'}"></div>
+                                ` : ''}
+                                <!-- Dot -->
+                                <div class="absolute left-[-24px] top-1 w-3 h-3 rounded-full border-2 z-10
+                                    ${isCompleted ? 'bg-emerald-500 border-emerald-500' : 'bg-white border-gray-300'}
+                                    ${isCurrent ? 'ring-4 ring-emerald-100 scale-125' : ''} transition-all duration-300">
+                                </div>
+                                <!-- Content -->
+                                <div class="flex items-start justify-between ${isCurrent ? '' : 'opacity-60'}">
+                                    <div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-base">${s.emoji}</span>
+                                            <p class="font-bold text-sm ${isCurrent ? 'text-gray-800' : 'text-gray-600'}">${s.label}</p>
+                                        </div>
+                                        ${update ? `<p class="text-xs text-gray-400 mt-0.5 ml-7">${update.note || s.sublabel}</p>` : ''}
+                                    </div>
+                                    ${update ? `
+                                    <div class="text-right shrink-0 ml-3">
+                                        <p class="text-xs font-bold text-gray-500">${timeStr}</p>
+                                        <p class="text-[10px] text-gray-400">${dateStr}</p>
+                                    </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        `;
+    }).join('')}
                 </div>
             </div>
 
             <!-- Order Items -->
-            <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+            <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm mb-6">
                 <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-50">
-                    <h3 class="font-bold text-gray-800">รายการอาหาร</h3>
+                    <h3 class="font-bold text-gray-800 flex items-center gap-2 text-sm">
+                        <i class="fas fa-utensils text-[#B58D67]"></i> รายการอาหาร
+                    </h3>
                     <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-lg">${order.items.length} รายการ</span>
                 </div>
                 <div class="space-y-3">
                     ${order.items.map(item => `
-                        <div class="flex justify-between items-start gap-4">
-                            <div class="w-12 h-12 rounded-lg bg-gray-50 bg-cover bg-center shrink-0" style="background-image: url('${item.image || 'images/logo.png'}')"></div>
-                            <div class="flex-1">
-                                <p class="text-sm font-bold text-gray-800 line-clamp-1">${item.name}</p>
-                                <p class="text-xs text-gray-500 line-clamp-1">${item.meat || ''} ${item.addons?.join(', ') || ''} ${item.note || ''}</p>
+                        <div class="flex justify-between items-start gap-3">
+                            <div class="w-12 h-12 rounded-xl bg-gray-50 bg-cover bg-center shrink-0 border border-gray-100" 
+                                style="background-image: url('${item.image || 'images/logo.png'}')"></div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-bold text-gray-800 truncate">${item.name}</p>
+                                <p class="text-xs text-gray-500 truncate">${item.meat || ''} ${item.addons?.join(', ') || ''} ${item.note || ''}</p>
                             </div>
-                            <span class="text-sm font-bold text-indigo-600">x1</span>
+                            <span class="text-sm font-bold text-[#B58D67] shrink-0">${item.price}฿</span>
                         </div>
                     `).join('')}
                 </div>
-                <div class="mt-4 pt-3 border-t border-gray-50 flex justify-between items-center">
-                    <span class="text-gray-500 text-sm">อัพเดทล่าสุด</span>
-                    <span class="text-xs text-gray-400">${new Date(Math.max(...order.updates.map(u => u.time), order.startTime)).toLocaleTimeString()}</span>
+            </div>
+
+            <!-- Admin Controls (visible only in admin mode) -->
+            ${isAdminMode && !isDelivered ? `
+            <div class="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-200 p-4 mb-6 shadow-sm">
+                <div class="flex items-center gap-2 mb-3">
+                    <i class="fas fa-tools text-amber-600"></i>
+                    <h3 class="font-bold text-amber-800 text-sm">🔧 เจ้าของร้าน</h3>
+                </div>
+                <div class="space-y-2">
+                    <button onclick="advanceOrderStatus('${order.id}')" 
+                        class="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold py-3 rounded-xl shadow-md flex items-center justify-center gap-2 hover:shadow-lg active:scale-[0.98] transition-all">
+                        <i class="fas fa-arrow-right"></i>
+                        อัพเดทสถานะถัดไป
+                        <span class="text-xs opacity-80">(→ ${steps[Math.min(currentStepIndex + 1, steps.length - 1)]?.label || ''})</span>
+                    </button>
+                    ${isCancellable ? `
+                    <button onclick="cancelOrder('${order.id}')" 
+                        class="w-full bg-white text-red-500 border border-red-200 font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 hover:bg-red-50 transition-all text-sm">
+                        <i class="fas fa-times-circle"></i> ยกเลิกออเดอร์
+                    </button>
+                    ` : ''}
                 </div>
             </div>
-            
-            <button onclick="closeOrderTrackingSheet()" class="w-full mt-6 py-3 bg-gray-100 rounded-xl font-bold text-gray-600 hover:bg-gray-200 transition-all">
+            ` : ''}
+
+            <!-- Close Button -->
+            <button onclick="closeOrderTrackingSheet()" 
+                class="w-full py-3 bg-gray-100 rounded-xl font-bold text-gray-600 hover:bg-gray-200 transition-all">
                 ปิดหน้าต่าง
             </button>
         </div>
@@ -257,56 +488,109 @@ function renderOrderDetailView(container, order) {
     container.innerHTML = html;
 }
 
+// --- List View ---
+
 function renderOrderListView(container) {
-    const list = Array.from(activeOrders.values()).sort((a, b) => b.startTime - a.startTime);
+    const list = Array.from(activeOrders.values()).sort((a, b) => (b.orderDate || b.startTime) - (a.orderDate || a.startTime));
 
     if (list.length === 0) {
         container.innerHTML = `
             <div class="flex flex-col items-center justify-center h-64 text-center">
-                <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                    <i class="fas fa-clipboard-check text-3xl text-gray-300"></i>
+                <div class="w-24 h-24 bg-gray-50 rounded-3xl flex items-center justify-center mb-4 border border-gray-100">
+                    <span class="text-5xl">📋</span>
                 </div>
-                <h3 class="text-lg font-bold text-gray-800 mb-2">ไม่มีออเดอร์ที่สั่งอยู่</h3>
-                <p class="text-sm text-gray-400 max-w-xs mx-auto">สั่งอาหารอร่อยๆ กันเลยดีกว่า!</p>
-                <button onclick="closeOrderTrackingSheet()" class="mt-6 px-6 py-2 bg-indigo-600 text-white rounded-full font-bold shadow-lg hover:shadow-xl hover:bg-indigo-700 transition-all">
-                    ไปสั่งอาหาร
+                <h3 class="text-lg font-bold text-gray-800 mb-2">ยังไม่มีออเดอร์</h3>
+                <p class="text-sm text-gray-400 max-w-xs mx-auto mb-6">สั่งอาหารอร่อยๆ กันเลยดีกว่า!</p>
+                <button onclick="closeOrderTrackingSheet()" 
+                    class="px-8 py-3 bg-[#4A403A] text-white rounded-full font-bold shadow-lg hover:shadow-xl transition-all">
+                    ไปสั่งอาหาร 🌶️
                 </button>
             </div>
         `;
         return;
     }
 
-    let html = `<div class="space-y-4">`;
+    let html = `
+        <!-- Admin Mode Toggle (hidden trigger: tap header 5 times) -->
+        <div class="flex items-center justify-between mb-4" onclick="handleAdminTap()">
+            <div>
+                <p class="text-sm font-bold text-gray-700">ออเดอร์ทั้งหมด</p>
+                <p class="text-xs text-gray-400">${list.filter(o => o.status.code !== 'completed').length} รายการที่กำลังดำเนินการ</p>
+            </div>
+            ${isAdminMode ? `
+            <span class="text-xs bg-amber-100 text-amber-700 px-3 py-1 rounded-full font-bold border border-amber-200">
+                <i class="fas fa-tools mr-1"></i> โหมดร้าน
+            </span>
+            ` : ''}
+        </div>
+        <div class="space-y-3">
+    `;
+
     list.forEach(order => {
         const isCompleted = order.status.code === 'completed';
-        const elapsed = Math.floor((Date.now() - order.startTime) / 60000);
+        const deliveryDate = new Date(order.deliveryDate || (order.startTime || order.orderDate) + 86400000);
+        const orderDate = new Date(order.orderDate || order.startTime);
+        const now = new Date();
+
+        // Determine delivery display
+        const isToday = now.toDateString() === deliveryDate.toDateString();
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const isTomorrow = tomorrow.toDateString() === deliveryDate.toDateString();
+
+        let deliveryDisplay = '';
+        if (order.status.code === 'delivered' || isCompleted) {
+            deliveryDisplay = 'ส่งแล้ว ✅';
+        } else if (isToday) {
+            deliveryDisplay = 'ส่งวันนี้ 🔥';
+        } else if (isTomorrow) {
+            deliveryDisplay = 'ส่งพรุ่งนี้';
+        } else {
+            deliveryDisplay = `ส่ง ${formatDateShort(deliveryDate)}`;
+        }
+
+        const totalPrice = order.items ? order.items.reduce((sum, i) => sum + (i.price || 0), 0) : 0;
 
         html += `
             <div onclick="activeOrderTrackingId='${order.id}'; renderOrderTrackingContent()" 
-                class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer relative overflow-hidden group">
-                <div class="absolute top-0 left-0 w-1 h-full ${order.status.bgColor.replace('bg-', 'bg-')}"></div>
-                <div class="flex justify-between items-start mb-3">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 ${order.status.bgColor} rounded-full flex items-center justify-center text-lg">
-                            <i class="fas ${order.status.icon} ${order.status.color}"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-gray-800 text-sm">Order #${order.id.toString().slice(-4)}</h4>
-                            <p class="text-xs font-medium ${order.status.color}">${order.status.label}</p>
-                        </div>
-                    </div>
-                    <span class="text-xs text-gray-400 font-mono">${new Date(order.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                </div>
+                class="bg-white rounded-2xl p-4 border ${order.status.borderColor || 'border-gray-100'} shadow-sm hover:shadow-md transition-all cursor-pointer relative overflow-hidden group ${isCompleted ? 'opacity-60' : ''}">
+                <!-- Status Accent -->
+                <div class="absolute top-0 left-0 w-1.5 h-full rounded-l-2xl ${order.status.bgColor}"></div>
                 
-                <div class="flex justify-between items-end">
-                    <div class="text-xs text-gray-500">
-                        ${order.items.length} รายการ ・ ${elapsed} นาทีที่แล้ว
+                <div class="flex items-start gap-3 ml-2">
+                    <!-- Status Icon -->
+                    <div class="w-12 h-12 ${order.status.bgColor} rounded-xl flex items-center justify-center text-xl shrink-0 border ${order.status.borderColor}">
+                        ${order.status.emoji}
                     </div>
-                    <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-[#EFEBE9] group-hover:text-brand-purple transition-colors">
-
+                    
+                    <!-- Info -->
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between mb-1">
+                            <h4 class="font-bold text-gray-800 text-sm">${order.id}</h4>
+                            <span class="text-xs text-gray-400">${formatDateShort(orderDate)}</span>
+                        </div>
+                        <p class="text-xs font-medium ${order.status.color} mb-1">${order.status.label}</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-gray-500">${order.items.length} รายการ · ${totalPrice}฿</span>
+                            <span class="text-xs font-bold ${isToday && !isCompleted ? 'text-orange-600' : 'text-gray-500'}">${deliveryDisplay}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Arrow -->
+                    <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-[#F6F1EB] group-hover:text-[#B58D67] transition-colors shrink-0 self-center">
                         <i class="fas fa-chevron-right text-xs"></i>
                     </div>
                 </div>
+
+                ${isAdminMode && !isCompleted && order.status.code !== 'delivered' ? `
+                <!-- Quick Admin Action -->
+                <div class="mt-3 ml-2">
+                    <button onclick="event.stopPropagation(); advanceOrderStatus('${order.id}')" 
+                        class="w-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-1 hover:bg-emerald-100 active:scale-[0.98] transition-all">
+                        <i class="fas fa-arrow-right"></i> อัพเดทเป็น: ${getNextStatusLabel(order.status.code)}
+                    </button>
+                </div>
+                ` : ''}
             </div>
         `;
     });
@@ -314,19 +598,34 @@ function renderOrderListView(container) {
     container.innerHTML = html;
 }
 
+function getNextStatusLabel(currentCode) {
+    const statuses = Object.values(ORDER_STATUS);
+    const currentIdx = statuses.findIndex(s => s.code === currentCode);
+    if (currentIdx < statuses.length - 1) {
+        return statuses[currentIdx + 1].label;
+    }
+    return 'เสร็จสิ้น';
+}
+
+// --- Timer & Formatting ---
+
 function updateTrackingTimers() {
-    const timerEls = document.querySelectorAll('.live-timer');
-    timerEls.forEach(el => {
-        const start = parseInt(el.dataset.start);
-        const estMinutes = parseInt(el.dataset.est);
-        const elapsedSec = (Date.now() - start) / 1000;
-        const totalSec = estMinutes * 60;
-        const remainingSec = Math.max(0, totalSec - elapsedSec);
+    const now = Date.now();
 
-        el.textContent = formatTime(remainingSec);
+    // Update hour timers
+    document.querySelectorAll('.live-timer').forEach(el => {
+        const delivery = parseInt(el.dataset.delivery);
+        const msLeft = Math.max(0, delivery - now);
+        const hoursLeft = Math.floor(msLeft / 3600000);
+        el.textContent = hoursLeft;
+    });
 
-        if (remainingSec < 60) el.classList.add('text-red-500', 'animate-pulse');
-        else el.classList.remove('text-red-500', 'animate-pulse');
+    // Update minute timers
+    document.querySelectorAll('.live-timer-min').forEach(el => {
+        const delivery = parseInt(el.dataset.delivery);
+        const msLeft = Math.max(0, delivery - now);
+        const minutesLeft = Math.floor((msLeft % 3600000) / 60000);
+        el.textContent = minutesLeft.toString().padStart(2, '0');
     });
 }
 
@@ -336,34 +635,74 @@ function formatTime(seconds) {
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 }
 
+function formatTimeOnly(date) {
+    return date.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+}
+
+function formatDateShort(date) {
+    const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+    return `${date.getDate()} ${months[date.getMonth()]}`;
+}
+
+function formatThaiDateShort(date) {
+    const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+    const days = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสฯ', 'ศุกร์', 'เสาร์'];
+    return `วัน${days[date.getDay()]} ${date.getDate()} ${months[date.getMonth()]}`;
+}
+
+function formatDateTimeShort(date) {
+    return `${formatDateShort(date)} ${formatTimeOnly(date)}`;
+}
+
 function calculateOrderProgress(order) {
     const statuses = Object.values(ORDER_STATUS);
     const currentIndex = statuses.findIndex(s => s.code === order.status.code);
     return ((currentIndex) / (statuses.length - 1)) * 100;
 }
 
-// Legacy alias & helpers
+// --- Legacy Aliases ---
 function showOrderStatusModal(orderId) { openOrderTrackingSheet(orderId); }
 function closeOrderStatusModal() { closeOrderTrackingSheet(); }
 function showActiveOrdersList() { openOrderTrackingSheet(); }
 function closeActiveOrdersList() {
-    // Legacy support for index.html calls
     const modal = document.getElementById('active-orders-modal');
     if (modal) modal.classList.add('hidden');
     closeOrderTrackingSheet();
 }
 
+// --- Simulate for backward compat (does nothing now) ---
+function simulateOrderProgress() { /* No-op: pre-order flow uses manual updates */ }
+
+// --- Active Orders Button ---
 function updateActiveOrdersButton() {
     const container = document.getElementById('active-orders-btn');
     const countEl = document.getElementById('active-orders-count');
     if (!container || !countEl) return;
 
-    const nonCompletedOrders = Array.from(activeOrders.values())
+    const pendingOrders = Array.from(activeOrders.values())
         .filter(o => o.status.code !== 'completed');
 
-    if (nonCompletedOrders.length > 0) {
+    // Also update nav badge
+    const navBadge = document.getElementById('nav-tracking-badge');
+    if (navBadge) {
+        if (pendingOrders.length > 0) {
+            navBadge.classList.remove('hidden');
+            navBadge.textContent = pendingOrders.length;
+        } else {
+            navBadge.classList.add('hidden');
+        }
+    }
+
+    if (pendingOrders.length > 0) {
         container.classList.remove('hidden');
-        countEl.textContent = `${nonCompletedOrders.length} สถานะ`;
+
+        // Find the most urgent order
+        const urgentOrder = pendingOrders.sort((a, b) => {
+            const statusOrder = ['on_the_way', 'cooking', 'placed'];
+            return statusOrder.indexOf(a.status.code) - statusOrder.indexOf(b.status.code);
+        })[0];
+
+        countEl.textContent = `${pendingOrders.length} ออเดอร์ · ${urgentOrder?.status.label || ''}`;
         container.onclick = () => openOrderTrackingSheet();
     } else {
         container.classList.add('hidden');

@@ -243,17 +243,17 @@
         <!-- NEW: Active Orders Button -->
         <div id="active-orders-btn" class="hidden mb-3">
             <button onclick="showActiveOrdersList()"
-                class="w-full btn-bounce bg-white border border-[#B58D67] text-[#B58D67] p-3 rounded-xl shadow-sm flex items-center justify-between group">
+                class="w-full btn-bounce bg-white border border-[#B58D67] text-[#5D4037] p-3 rounded-xl shadow-sm flex items-center justify-between group">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-[#F6F1EB] rounded-full flex items-center justify-center">
-                        <i class="fas fa-fire animate-pulse"></i>
+                    <div class="w-10 h-10 bg-[#F6F1EB] rounded-full flex items-center justify-center text-lg">
+                        📋
                     </div>
                     <div class="text-left">
-                        <p class="text-sm font-bold">ออเดอร์กำลังดำเนินการ</p>
-                        <p class="text-xs opacity-80" id="active-orders-count">1 รายการ</p>
+                        <p class="text-sm font-bold">ออเดอร์ของคุณ</p>
+                        <p class="text-xs opacity-80 text-[#B58D67]" id="active-orders-count">1 ออเดอร์</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 text-[#B58D67]">
                     <span class="text-xs">ดูสถานะ</span>
                     <i class="fas fa-chevron-right"></i>
                 </div>
@@ -483,8 +483,8 @@
     </div>
 
     <!-- Mini Cart -->
-    <div id="mini-cart-bar"
-        class="fixed bottom-[calc(2.5rem+env(safe-area-inset-bottom))] left-5 right-5 z-[60] hidden stagger-item">
+    <div id="mini-cart-bar" class="fixed left-5 right-5 z-[60] hidden stagger-item"
+        style="bottom: calc(var(--bottom-nav-height, 52px) + env(safe-area-inset-bottom, 0px) + 8px);">
         <div onclick="openCheckout()"
             class="btn-bounce bg-gray-900 text-white p-4 rounded-full shadow-2xl flex justify-between items-center cursor-pointer border border-gray-800">
             <div class="flex items-center gap-3 pl-2">
@@ -699,8 +699,8 @@
             <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-4"></div>
             <div class="flex justify-between items-center mb-2">
                 <div>
-                    <h2 class="text-2xl font-black text-gray-800 flex items-center gap-2">🛵 สถานะออเดอร์</h2>
-                    <p class="text-xs text-gray-400 font-medium">ติดตามอาหารของคุณได้ที่นี่</p>
+                    <h2 class="text-2xl font-black text-gray-800 flex items-center gap-2">📋 สถานะออเดอร์</h2>
+                    <p class="text-xs text-gray-400 font-medium">สั่งวันนี้ ส่งวันต่อไป</p>
                 </div>
                 <button onclick="closeOrderTrackingSheet()"
                     class="btn-bounce w-10 h-10 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center hover:bg-gray-200"><i

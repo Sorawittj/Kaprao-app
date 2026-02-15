@@ -1,26 +1,31 @@
 /* ===== Responsive / Safe Area ===== */
 
-/* iOS Safe Area Support */
+/*
+ * Safe-area is now handled correctly by navigation.css:
+ * .bottom-nav gets padding-bottom: env(safe-area-inset-bottom)
+ * No need for extra media-query overrides — env() already adapts per device.
+ *
+ * Device coverage:
+ * - Samsung S23 Ultra (no safe-area) → env() = 0px → nav = 52px total
+ * - iPhone 13/14/15 (34px safe-area) → env() = 34px → nav = 52px + 34px = 86px
+ * - iPhone 16/17 (consistent notch/dynamic island) → same behavior
+ * - Android with gesture nav → env() adapts automatically
+ */
+
+/* iOS Safari viewport fix */
 @supports (padding: max(0px)) {
-    .bottom-nav {
-        padding-bottom: max(0px, env(safe-area-inset-bottom));
-    }
-
-    .bottom-nav-container {
-        padding-bottom: max(0px, env(safe-area-inset-bottom));
+    body {
+        /* Prevent content from going behind iOS status bar */
+        padding-top: env(safe-area-inset-top, 0px);
     }
 }
 
-/* iPhone X and later with notch */
-@media screen and (min-width: 375px) and (min-height: 812px) {
-    .bottom-nav {
-        padding-bottom: 34px;
-    }
-}
+/* Prevent text zoom on mobile inputs */
+@media screen and (max-width: 768px) {
 
-/* iPhone 14 Pro Max and larger */
-@media screen and (min-width: 430px) and (min-height: 932px) {
-    .bottom-nav {
-        padding-bottom: 34px;
+    input,
+    textarea,
+    select {
+        font-size: 16px !important;
     }
 }
