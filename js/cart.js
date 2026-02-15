@@ -28,7 +28,10 @@ function addToCart(itemToAdd) {
 }
 
 function updateMiniCart() {
+    // Disabled mini cart bar as per UI update
     const miniBar = document.getElementById('mini-cart-bar');
+    if (miniBar) miniBar.classList.add('hidden');
+    /*
     if (cart.length > 0) {
         miniBar.classList.remove('hidden');
         let total = cart.reduce((sum, i) => sum + i.price, 0);
@@ -39,6 +42,7 @@ function updateMiniCart() {
         document.getElementById('mini-count').innerText = '0';
         document.getElementById('mini-total').innerText = '0 ฿';
     }
+    */
 }
 
 function removeFromCart(id) {
@@ -50,7 +54,8 @@ function removeFromCart(id) {
         else if (discountValue > 0) applyDiscount();
         renderCheckoutList();
         updateMiniCart();
-        if (cart.length === 0) closeCheckout();
+        updateBottomNavBadge(); // Update badge on remove
+        // if (cart.length === 0) closeCheckout();
         showToast('ลบรายการเรียบร้อย', 'success');
         triggerHaptic();
     }
@@ -59,6 +64,22 @@ function removeFromCart(id) {
 function renderCheckoutList() {
     const container = document.getElementById('cart-list-container');
     container.innerHTML = '';
+
+    if (cart.length === 0) {
+        container.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-8 text-center">
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                    <i class="fas fa-shopping-basket text-2xl text-gray-400"></i>
+                </div>
+                <p class="text-gray-500 font-bold">ตะกร้าว่างเปล่า</p>
+                <p class="text-xs text-gray-400 mt-1">ยังไม่มีรายการอาหาร</p>
+                <button onclick="closeCheckout()" class="mt-4 text-sm text-indigo-500 font-bold hover:underline">เลือกเมนูอาหาร</button>
+            </div>
+        `;
+        updateTotalSummary();
+        return;
+    }
+
     cart.forEach(item => {
         const el = document.createElement('div');
         el.className = "bg-gray-50 p-3 rounded-xl border border-gray-100 flex justify-between items-start stagger-item";
@@ -149,26 +170,40 @@ function removeDiscount() {
 
 function animateFlyToCart(sourceEl, emoji = '🍱') {
     try {
-        const target = document.getElementById('mini-count') || document.getElementById('mini-cart-bar');
+        // Target the bottom nav cart badge or icon
+        const target = document.getElementById('nav-cart-badge') || document.querySelector('.bottom-nav-item[data-page="cart"]');
         if (!sourceEl || !target) return Promise.resolve();
+
         const srcRect = sourceEl.getBoundingClientRect();
         const tgtRect = target.getBoundingClientRect();
+
+        // If target is hidden (e.g. badge hidden initially), target parent
+        if (tgtRect.width === 0 && tgtRect.height === 0) {
+            const parent = document.querySelector('.bottom-nav-item[data-page="cart"]');
+            if (parent) return animateFlyToCart(sourceEl, emoji); // Retry with parent
+            return Promise.resolve();
+        }
+
         const fly = document.createElement('div');
         fly.className = 'fly-item';
         fly.innerText = emoji;
         document.body.appendChild(fly);
+
         const startX = srcRect.left + srcRect.width / 2;
         const startY = srcRect.top + srcRect.height / 2;
         const endX = tgtRect.left + tgtRect.width / 2;
         const endY = tgtRect.top + tgtRect.height / 2;
+
         const midX = (startX + endX) / 2 + (Math.random() * 80 - 40);
-        const midY = Math.min(startY, endY) - 140;
+        const midY = Math.min(startY, endY) - 150; // Arc higher
+
         const keyframes = [
             { transform: `translate(0px, 0px) scale(1)`, opacity: 1 },
-            { transform: `translate(${midX - startX}px, ${midY - startY}px) scale(0.95) rotate(${(Math.random() * 20) - 10}deg)`, opacity: 1, offset: 0.55 },
-            { transform: `translate(${endX - startX}px, ${endY - startY}px) scale(0.6) rotate(20deg)`, opacity: 0.0 }
+            { transform: `translate(${midX - startX}px, ${midY - startY}px) scale(1.2) rotate(${(Math.random() * 20) - 10}deg)`, opacity: 1, offset: 0.5 },
+            { transform: `translate(${endX - startX}px, ${endY - startY}px) scale(0.2) rotate(20deg)`, opacity: 0 }
         ];
-        const anim = fly.animate(keyframes, { duration: 700 + Math.random() * 200, easing: 'cubic-bezier(0.2,0.8,0.2,1)' });
+
+        const anim = fly.animate(keyframes, { duration: 800, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' });
         return new Promise(resolve => { anim.onfinish = () => { fly.remove(); resolve(); }; });
     } catch (e) { return Promise.resolve(); }
 }

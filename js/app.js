@@ -302,15 +302,8 @@ function navigateTo(page) {
             closeAllModals();
             break;
         case 'cart':
-            if (cart.length > 0) {
-                openCheckout();
-            } else {
-                showToast('ตะกร้าว่างเปล่า กรุณาเพิ่มรายการอาหารก่อน', 'info');
-                // If cart empty but active orders exist, maybe suggest tracking?
-                if (typeof activeOrders !== 'undefined' && activeOrders.size > 0) {
-                    navigateTo('tracking');
-                }
-            }
+            // Always open checkout to show cart status (even if empty)
+            openCheckout();
             break;
         case 'tracking':
             openOrderTrackingSheet();
@@ -328,8 +321,10 @@ function updateBottomNavBadge() {
         if (cart.length > 0) {
             cartBadge.textContent = cart.length > 99 ? '99+' : cart.length;
             cartBadge.classList.remove('hidden');
+            cartBadge.style.display = 'flex'; // Force display
         } else {
             cartBadge.classList.add('hidden');
+            cartBadge.style.display = 'none';
         }
     }
 
@@ -518,6 +513,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Load saved data
     loadUserDataSafe();
+    updateBottomNavBadge(); // Update badge immediately after loading user data
     loadActiveOrders();
 
     // Initialize services
@@ -838,13 +834,15 @@ function addToCartFromModal() {
         animateFlyToCart(modalImg, currentItem.icon || '🍱');
     } catch (e) { /* ignore animation errors */ }
 
-    // Show mini cart bar
+    // DISABLED: Mini cart bar
+    /*
     const cartBtn = document.getElementById('mini-cart-bar');
     if (cartBtn) {
         cartBtn.classList.remove('hidden');
         cartBtn.style.animation = 'bounce 0.5s ease-out';
         setTimeout(() => cartBtn.style.animation = '', 500);
     }
+    */
 
     closeModal();
     updateMiniCart();
@@ -852,4 +850,25 @@ function addToCartFromModal() {
     saveToLS();
     triggerHaptic();
     showToast(`เพิ่ม ${modalQty} รายการแล้ว! 🛒`, 'success');
+
+    // Animate Bottom Nav Cart Icon
+    setTimeout(animateCartIcon, 300); // Slight delay for fly animation to finish
+}
+
+function animateCartIcon() {
+    const cartIcon = document.querySelector('.bottom-nav-item[data-page="cart"] i');
+    if (cartIcon) {
+        // Reset animation to re-trigger
+        cartIcon.classList.remove('animate-cart-bump');
+        void cartIcon.offsetWidth; // Trigger reflow
+        cartIcon.classList.add('animate-cart-bump');
+
+        // Also animate the badge if visible
+        const badge = document.getElementById('nav-cart-badge');
+        if (badge && !badge.classList.contains('hidden')) {
+            badge.classList.remove('animate-pop');
+            void badge.offsetWidth;
+            badge.classList.add('animate-pop');
+        }
+    }
 }

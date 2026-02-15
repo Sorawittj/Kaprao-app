@@ -311,6 +311,7 @@ async function submitOrderToLine() {
             currentOrderId = "";
             saveToLS();
             updateMiniCart();
+            updateBottomNavBadge(); // Clear badge
             closeCheckout();
             hideGlobalLoader();
             window.location.href = `https://line.me/R/oaMessage/${lineOAId}/?${encodedMsg}`;

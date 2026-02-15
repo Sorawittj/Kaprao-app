@@ -134,7 +134,7 @@
     border-radius: 50%;
     background: var(--primary);
     box-shadow: 0 0 8px var(--primary);
-    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    animation: pop-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
     opacity: 1;
 }
 
@@ -157,8 +157,8 @@
     padding: 0 4px;
     border: 2px solid white;
     box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
-    z-index: 10;
-    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 50;
+    animation: pop-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 /* Modern Header */

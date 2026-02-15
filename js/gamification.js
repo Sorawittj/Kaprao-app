@@ -76,9 +76,9 @@ function checkAndAwardAchievements(orderData) {
         newAchievements.push(ACHIEVEMENTS.NIGHT_OWL);
     }
 
-    if (!hasAchievement('WEEKEND') && (day === 0 || day === 6)) {
-        awardAchievement('WEEKEND');
-        newAchievements.push(ACHIEVEMENTS.WEEKEND);
+    if (!hasAchievement('WEEKEND_WARRIOR') && (day === 0 || day === 6)) {
+        awardAchievement('WEEKEND_WARRIOR');
+        newAchievements.push(ACHIEVEMENTS.WEEKEND_WARRIOR);
     }
 
     newAchievements.forEach((ach, index) => {
