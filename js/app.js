@@ -402,6 +402,16 @@ function openMoreModal() {
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
                 </button>
+
+                <!-- Admin Mode Button -->
+                <button onclick="openAdminLoginModal(); closeMoreModal();" class="w-full flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 hover:shadow-md transition-all">
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center text-white text-xl">🔧</div>
+                    <div class="text-left">
+                        <p class="font-bold text-gray-800">โหมดเจ้าของร้าน</p>
+                        <p class="text-xs text-gray-500">สำหรับจัดการออเดอร์</p>
+                    </div>
+                    <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
+                </button>
             </div>
             
             <button onclick="closeMoreModal()" class="w-full mt-6 py-3 bg-gray-100 rounded-xl font-bold text-gray-600 hover:bg-gray-200 transition-all">

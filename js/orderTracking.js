@@ -60,9 +60,7 @@ let trackingInterval = null;
 
 // --- Admin Mode (for shop owner to update status) ---
 let isAdminMode = false;
-const ADMIN_TAP_COUNT = 5;
-let adminTapCounter = 0;
-let adminTapTimeout = null;
+let adminTapTimeout = null; // Deprecated, keeping for safety but unused locally now
 
 function toggleAdminMode() {
     isAdminMode = !isAdminMode;
@@ -74,15 +72,8 @@ function toggleAdminMode() {
     }
 }
 
-function handleAdminTap() {
-    adminTapCounter++;
-    if (adminTapTimeout) clearTimeout(adminTapTimeout);
-    adminTapTimeout = setTimeout(() => { adminTapCounter = 0; }, 2000);
-    if (adminTapCounter >= ADMIN_TAP_COUNT) {
-        adminTapCounter = 0;
-        toggleAdminMode();
-    }
-}
+// 5-tap Admin Mode trigger removed as requested.
+// Use openAdminLoginModal() instead.
 
 // --- Core Functions ---
 
@@ -511,8 +502,8 @@ function renderOrderListView(container) {
     }
 
     let html = `
-        <!-- Admin Mode Toggle (hidden trigger: tap header 5 times) -->
-        <div class="flex items-center justify-between mb-4" onclick="handleAdminTap()">
+        <!-- Admin Mode Toggle removed from here -->
+        <div class="flex items-center justify-between mb-4">
             <div>
                 <p class="text-sm font-bold text-gray-700">ออเดอร์ทั้งหมด</p>
                 <p class="text-xs text-gray-400">${list.filter(o => o.status.code !== 'completed').length} รายการที่กำลังดำเนินการ</p>
@@ -744,6 +735,113 @@ function getNextStatusLabel(currentCode) {
         return statuses[currentIdx + 1].label;
     }
     return 'เสร็จสิ้น';
+}
+
+// --- Admin Login Modal ---
+
+function openAdminLoginModal() {
+    if (isAdminMode) {
+        // Already logged in -> Confirm logout
+        if (confirm('คุณต้องการออกจากโหมดเจ้าของร้านใช่หรือไม่?')) {
+            isAdminMode = false;
+            showToast('🔒 ออกจากโหมดเจ้าของร้านแล้ว', 'info');
+
+            // Re-render if tracking sheet is open
+            const sheet = document.getElementById('order-tracking-sheet');
+            if (sheet && !sheet.classList.contains('translate-y-full')) {
+                renderOrderTrackingContent();
+            }
+        }
+        return;
+    }
+
+    // Create Modal for Password Input
+    const modalId = 'admin-login-modal';
+    let modal = document.getElementById(modalId);
+    if (modal) modal.remove();
+
+    modal = document.createElement('div');
+    modal.id = modalId;
+    modal.className = 'fixed inset-0 z-[250] bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 animate-fade-in';
+    modal.innerHTML = `
+        <div class="bg-white rounded-[2rem] p-6 w-full max-w-sm shadow-2xl relative overflow-hidden" onclick="event.stopPropagation()">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-gray-100 rounded-full -translate-y-1/2 translate-x-1/2 opacity-50"></div>
+            
+            <button onclick="document.getElementById('${modalId}').remove()" class="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center hover:bg-gray-200">
+                <i class="fas fa-times text-sm"></i>
+            </button>
+
+            <div class="text-center mb-6 relative z-10">
+                <div class="w-16 h-16 bg-gray-800 text-white rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl shadow-lg transform -rotate-3">
+                    🔐
+                </div>
+                <h2 class="text-xl font-black text-gray-800">เข้าสู่ระบบร้านค้า</h2>
+                <p class="text-xs text-gray-400 mt-1">สำหรับเจ้าของร้านเท่านั้น</p>
+            </div>
+
+            <div class="mb-6 relative z-10">
+                <label class="text-xs font-bold text-gray-500 mb-2 block pl-1">รหัสผ่าน</label>
+                <div class="relative">
+                    <input type="password" id="admin-password-input" placeholder="กรอกรหัสผ่าน..." 
+                        class="w-full bg-gray-50 border-2 border-gray-100 rounded-xl p-3 pl-10 text-center font-bold text-gray-800 focus:border-gray-800 focus:bg-white outline-none transition-all placeholder-gray-300"
+                        onkeydown="if(event.key === 'Enter') verifyAdminPassword()">
+                    <i class="fas fa-key absolute left-4 top-3.5 text-gray-300"></i>
+                </div>
+                <p id="admin-login-error" class="text-xs text-red-500 mt-2 text-center h-4"></p>
+            </div>
+
+            <button onclick="verifyAdminPassword()" 
+                class="w-full bg-gray-900 text-white font-bold py-3.5 rounded-xl shadow-lg hover:shadow-xl active:scale-95 transition-all text-sm relative z-10">
+                เข้าสู่ระบบ
+            </button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    // Focus input
+    setTimeout(() => {
+        const input = document.getElementById('admin-password-input');
+        if (input) input.focus();
+    }, 100);
+}
+
+function verifyAdminPassword() {
+    const input = document.getElementById('admin-password-input');
+    const errorMsg = document.getElementById('admin-login-error');
+    if (!input) return;
+
+    const password = input.value;
+
+    // Hardcoded simple password for demonstration: "5252" (Kaprao 52)
+    // In a real app, this should be an env var or hashed check, 
+    // but since this is client-side only for now, this suffices for basic protection.
+    const CORRECT_PASSWORD = '5252';
+
+    if (password === CORRECT_PASSWORD) {
+        isAdminMode = true;
+        document.getElementById('admin-login-modal').remove();
+        showToast('🔓 ยินดีต้อนรับเจ้าของร้าน!', 'success');
+        triggerHaptic('success');
+
+        // Navigate to tracking to show admin controls
+        navigateTo('tracking');
+
+        // Force re-render of tracking sheet
+        setTimeout(() => {
+            const sheet = document.getElementById('order-tracking-sheet');
+            if (sheet) renderOrderTrackingContent();
+        }, 100);
+
+    } else {
+        triggerHaptic('error');
+        input.classList.add('border-red-500', 'bg-red-50');
+        input.classList.add('animate-shake');
+        if (errorMsg) errorMsg.textContent = 'รหัสผ่านไม่ถูกต้อง';
+
+        setTimeout(() => {
+            input.classList.remove('animate-shake');
+        }, 500);
+    }
 }
 
 // --- Timer & Formatting ---
