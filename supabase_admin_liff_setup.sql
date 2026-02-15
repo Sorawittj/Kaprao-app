@@ -6,7 +6,8 @@ TRUNCATE TABLE public.admins RESTART IDENTITY;
 INSERT INTO public.admins (user_id, role)
 VALUES 
 ('U8f3b0668fc8e9e2d062e7716a7c02fff', 'owner'),
-('U6ec1f5a047384d71e047b2a5c6d8b3ae', 'owner');
+('U6ec1f5a047384d71e047b2a5c6d8b3ae', 'owner'),
+('1e1a27d6-5e3b-4749-b395-16ae517b38e8', 'owner');
 
 -- 3. ตรวจสอบ Policies (สำคัญมาก สำหรับการเข้าถึงด้วย User ID)
 -- อนุญาตให้ Admin อ่านข้อมูลตัวเอง

@@ -245,7 +245,11 @@
                 console.log("Admin Access Granted for:", userId);
             } else {
                 console.warn("User ID not found in admins table:", userId);
-                alert('Access Denied: คุณไม่มีสิทธิ์เข้าถึงส่วนนี้ (ID: ' + userId + ')');
+                const fixSql = `INSERT INTO public.admins (user_id, role) VALUES ('${userId}', 'owner');`;
+                console.log("%cTo fix this access denied error, run this SQL in Supabase Dashboard:", "color: red; font-size: 16px; font-weight: bold;");
+                console.log(fixSql);
+
+                alert('Access Denied: คุณไม่มีสิทธิ์เข้าถึงส่วนนี้\n\nID ของคุณคือ: ' + userId + '\n\nกรุณาแจ้งผู้ดูแลระบบ หรือรันคำสั่ง SQL ที่แสดงใน Console (F12) ใน Supabase Dashboard เพื่อเปิดสิทธิ์');
                 window.location.href = 'index.html';
             }
         }
