@@ -72,6 +72,7 @@
     <link rel="stylesheet" href="css/cosmic.css">
     <link rel="stylesheet" href="css/navigation.css">
     <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/redesign.css">
 
 </head>
 
@@ -201,260 +202,234 @@
         </div>
     </div>
 
-    <!-- Main Header -->
-    <div class="px-6 pt-6 pb-2 bg-transparent relative z-10">
-        <div class="flex justify-between items-start mb-6">
-            <div class="flex flex-col justify-center">
-                <div class="flex items-center gap-2 mb-1">
-                    <p id="greeting-text" class="text-xs text-gray-500 font-medium">สวัสดีครับ, วันนี้กินอะไรดี?</p>
-                    <button id="line-login-btn" onclick="handleLogin()"
-                        class="hidden bg-[#06C755] hover:bg-[#05b34c] text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm transition-all flex items-center gap-1 btn-bounce">
-                        <i class="fab fa-line"></i> เข้าสู่ระบบ
-                    </button>
-                </div>
-                <!-- Logo & Title Wrapper -->
-                <div class="flex items-center gap-3 mb-2 relative z-10">
-                    <img src="images/logo.png"
-                        class="w-14 h-14 object-contain rounded-xl shadow-sm border-2 border-white bg-white/50 backdrop-blur-sm"
-                        onerror="this.style.display='none'" alt="Shop Logo">
-                    <h1
-                        class="text-4xl sm:text-5xl font-black leading-none tracking-tighter pt-1 drop-shadow-sm whitespace-nowrap flex items-baseline">
-                        <span class="text-[#4A403A]">KAPRAO</span>
-                        <span class="text-[#9C836E] ml-1">52</span>
-                    </h1>
-                </div>
-
-            </div>
-            <div class="flex flex-col items-center">
-                <div id="header-avatar-btn" onclick="openAvatarModal()"
-                    class="btn-bounce w-24 h-24 rounded-full bg-white border-2 border-gray-100 shadow-md flex items-center justify-center relative cursor-pointer overflow-hidden hover:border-yellow-400 transition-colors">
-                    <img id="avatar-img" src="" class="w-full h-full object-cover" alt="รูปโปรไฟล์">
-                    <div class="absolute bottom-0 right-0 bg-[#B58D67] rounded-full w-7 h-7 flex items-center justify-center shadow-md border-2 border-white z-30"
-                        style="bottom: 5px; right: 5px;">
-                        <i class="fas fa-pen text-xs text-white"></i>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2 mt-3">
-                    <p id="avatar-name-display"
-                        class="text-xs font-round font-bold text-[#5D4037] tracking-wide bg-white px-4 py-1 rounded-full shadow-sm border border-[#E6DDD5] text-gray-700">
-                        ลูกค้า</p>
-
+    <!-- New Modern Header -->
+    <div class="modern-header safe-area-pt">
+        <div class="header-left">
+            <img src="images/logo.png" class="header-logo"
+                onerror="this.src='https://cdn-icons-png.flaticon.com/512/3448/3448609.png'" alt="Shop Logo">
+            <div class="header-text">
+                <h1 class="text-[#4A403A]">KAPRAO 52</h1>
+                <div class="flex items-center gap-1">
+                    <p id="greeting-text">สวัสดีครับ</p>
                     <div id="vip-badge"
-                        class="hidden text-[10px] font-bold text-[#9C836E] bg-[#F7F5F2] px-2 py-0.5 rounded-full border border-[#E6DDD5]">
+                        class="hidden text-[10px] bg-yellow-100 text-yellow-800 px-1 rounded border border-yellow-200">
                         VIP</div>
-
                 </div>
             </div>
         </div>
-
-        <!-- NEW: Active Orders Button -->
-        <div id="active-orders-btn" class="hidden mb-3">
-            <button onclick="showActiveOrdersList()"
-                class="w-full btn-bounce bg-white border border-[#B58D67] text-[#5D4037] p-3 rounded-xl shadow-sm flex items-center justify-between group">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-[#F6F1EB] rounded-full flex items-center justify-center text-lg">
-                        📋
-                    </div>
-                    <div class="text-left">
-                        <p class="text-sm font-bold">ออเดอร์ของคุณ</p>
-                        <p class="text-xs opacity-80 text-[#B58D67]" id="active-orders-count">1 ออเดอร์</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2 text-[#B58D67]">
-                    <span class="text-xs">ดูสถานะ</span>
-                    <i class="fas fa-chevron-right"></i>
-                </div>
+        <div class="header-right">
+            <button onclick="openPointsHistory()" class="icon-btn">
+                <i class="fas fa-coins text-yellow-500"></i>
             </button>
-        </div>
-
-        <!-- Points Card -->
-        <div class="glass-panel p-4 rounded-xl shadow-sm mb-1 flex items-center gap-4 stagger-item"
-            style="animation-delay: 0.1s;">
-            <div
-                class="w-16 h-16 rounded-full flex items-center justify-center text-3xl shadow-inner border-2 border-[#E7E5E0] bg-[#FAFAF9]">
-                🪙</div>
-
-            <div class="flex-1">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-sm font-bold text-gray-700">KAPRAO POINTS</span>
-                    <button onclick="openPointsHistory()"
-                        class="px-3 py-1.5 bg-[#4A403A] text-white text-xs font-medium rounded-lg shadow-sm hover:translate-y-px transition-all duration-200 flex items-center gap-1">
-                        📋 ประวัติ
-                    </button>
-
-                </div>
-                <div class="flex items-baseline gap-2">
-                    <span id="points-count" class="text-3xl font-black text-[#B58D67]">0</span>
-                    <span class="text-sm text-gray-400">พอยต์</span>
-                </div>
-
-                <div class="flex items-center gap-2 mt-1">
-                    <span class="text-[10px] text-gray-400">100 พอยต์ ใช้แทนเงิน 10 บาท</span>
-                    <button id="refresh-points-btn" onclick="manualRefreshPoints()"
-                        class="text-gray-400 hover:text-[#B58D67] p-1 transition-transform" aria-label="รีเฟรชพอยต์">
-                        <i class="fas fa-sync-alt text-xs"></i>
-                    </button>
-
-                </div>
+            <div class="icon-btn" onclick="openAvatarModal()" id="header-avatar-btn">
+                <img id="avatar-img" src="" class="w-full h-full rounded-full object-cover hidden" alt="Profile">
+                <i class="fas fa-user text-gray-400" id="default-avatar-icon"></i>
             </div>
-        </div>
-
-        <div class="flex justify-between items-center mb-4 mt-2">
-            <p class="text-[10px] text-gray-400">สะสมพอยต์แลกส่วนลดสุดคุ้ม!</p>
-            <div class="flex items-center gap-2">
-                <!-- NEW: Quick Order Button -->
-                <button onclick="openQuickOrderModal()"
-                    class="btn-bounce bg-white px-3 py-1.5 rounded-full border border-gray-200 shadow-sm flex items-center gap-2 text-xs font-bold text-gray-700 active:bg-gray-50 transition-all">
-                    <span>🔄 สั่งซ้ำ</span>
-                </button>
-                <button onclick="openMyTickets()"
-                    class="btn-bounce bg-white px-3 py-1.5 rounded-full border border-gray-200 shadow-sm flex items-center gap-2 text-xs font-bold text-gray-700 active:bg-gray-50 transition-all">
-                    <span>🎫 ตั๋วของฉัน</span>
-                    <div id="unread-ticket-dot" class="w-2 h-2 bg-red-500 rounded-full hidden"></div>
-                </button>
-            </div>
+            <button id="line-login-btn" onclick="handleLogin()"
+                class="hidden icon-btn bg-[#06C755] text-white border-transparent">
+                <i class="fab fa-line"></i>
+            </button>
         </div>
     </div>
 
-    <div class="max-w-md mx-auto px-5 relative z-10">
+    <!-- Hidden dummy ID to prevent JS errors from existing logic -->
+    <div id="active-orders-btn" class="hidden"></div>
 
-        <!-- NEW: Recommended Section (Smart Suggestions) -->
-        <div id="recommended-section" class="recommended-section hidden stagger-item" style="animation-delay: 0.05s;">
-            <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center gap-2">
-                    <span class="text-xl">✨</span>
-                    <h3 class="font-bold text-gray-800 text-sm">แนะนำสำหรับคุณ</h3>
+    <div id="page-home" class="view-section active pb-24">
+        <!-- Hero Banner -->
+        <div class="hero-banner">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h2 class="hero-title">กินฟรี<br>ทุกงวด!</h2>
+                    <p class="hero-desc">สั่งอาหารลุ้นหวยจาก Order ID</p>
+                    <button onclick="openMyTickets()" class="hero-btn hover:scale-105 transition-transform">
+                        <i class="fas fa-ticket-alt text-yellow-500"></i> ดูตั๋วของฉัน
+                        <div id="unread-ticket-dot" class="w-2 h-2 bg-red-500 rounded-full hidden ml-1"></div>
+                    </button>
                 </div>
-                <span class="text-[10px] text-gray-500 bg-white/70 px-2 py-1 rounded-full">จากประวัติการสั่ง</span>
-            </div>
-            <div id="recommended-items" class="flex gap-3 overflow-x-auto hide-scroll pb-1">
-                <!-- Dynamic content -->
+                <i
+                    class="fas fa-ticket-alt text-white opacity-20 text-9xl absolute -right-6 -bottom-6 transform -rotate-12"></i>
             </div>
         </div>
 
-        <!-- Randomizer Button -->
-        <div class="mb-6">
-            <button onclick="openRandomizer()"
-                class="w-full btn-bounce bg-white border-2 border-dashed border-gray-300 rounded-2xl p-4 flex items-center justify-between group hover:border-yellow-400 transition-all shadow-sm">
-                <div class="flex items-center gap-3">
-                    <div class="text-3xl animate-bounce-slow">🎲</div>
-                    <div class="text-left">
-                        <h3 class="text-gray-800 font-bold text-sm group-hover:text-yellow-600 transition-colors">
-                            คิดไม่ออก?</h3>
-                        <p class="text-gray-400 text-xs">ให้เราช่วยเลือกเมนูเด็ดๆ ให้</p>
+        <!-- Activity Stats -->
+        <div class="stats-row">
+            <div class="stat-card" onclick="showActiveOrdersList()">
+                <div class="stat-icon bg-blue-50 text-blue-500"><i class="fas fa-clipboard-list"></i></div>
+                <div class="stat-info overflow-hidden">
+                    <h4>สถานะออเดอร์</h4>
+                    <p id="active-orders-count" class="text-sm truncate text-gray-400">ไม่มีออเดอร์</p>
+                </div>
+            </div>
+            <div class="stat-card" onclick="openPointsHistory()">
+                <div class="stat-icon bg-yellow-50 text-yellow-500"><i class="fas fa-star"></i></div>
+                <div class="stat-info w-full">
+                    <div class="flex justify-between items-center w-full gap-2">
+                        <h4>พอยต์สะสม</h4>
+                        <button id="refresh-points-btn" onclick="manualRefreshPoints(); event.stopPropagation();"
+                            class="text-xs text-gray-300 hover:text-yellow-500"><i class="fas fa-sync-alt"></i></button>
+                    </div>
+                    <p id="points-count">0</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-md mx-auto px-5 relative z-10">
+
+            <!-- NEW: Recommended Section (Smart Suggestions) -->
+            <div id="recommended-section" class="recommended-section hidden stagger-item"
+                style="animation-delay: 0.05s;">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl">✨</span>
+                        <h3 class="font-bold text-gray-800 text-sm">แนะนำสำหรับคุณ</h3>
+                    </div>
+                    <span class="text-[10px] text-gray-500 bg-white/70 px-2 py-1 rounded-full">จากประวัติการสั่ง</span>
+                </div>
+                <div id="recommended-items" class="flex gap-3 overflow-x-auto hide-scroll pb-1">
+                    <!-- Dynamic content -->
+                </div>
+            </div>
+
+
+            <!-- Search & Categories -->
+            <div class="mb-3">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-3">
+                        <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2">หมวดหมู่</h3>
+                        <button onclick="toggleSearch()"
+                            class="btn-bounce w-9 h-9 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center text-gray-500 hover:text-indigo-500 transition-colors">
+                            <i class="fas fa-search text-xs"></i>
+                        </button>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="scrollTabs(-100)"
+                            class="btn-bounce bg-white w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:text-indigo-500 transition-all border border-gray-200 shadow-sm"><i
+                                class="fas fa-chevron-left text-xs"></i></button>
+                        <button onclick="scrollTabs(100)"
+                            class="btn-bounce bg-white w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:text-indigo-500 transition-all border border-gray-200 shadow-sm"><i
+                                class="fas fa-chevron-right text-xs"></i></button>
                     </div>
                 </div>
+
+                <div id="search-container" class="hidden mb-4 animate-fade-in-down">
+                    <div class="relative">
+                        <input type="text" id="search-input" placeholder="🔍 ค้นหาเมนู (เช่น หมู, กะเพรา, ไข่)"
+                            class="w-full bg-white border-2 border-[#E7E5E0] rounded-2xl py-3 pl-12 pr-10 text-sm font-bold text-[#3F3733] focus:border-[#B58D67] focus:ring-0 shadow-sm transition-all"
+                            onkeyup="handleSearch(this.value)" autocomplete="off" aria-label="ค้นหาเมนู">
+
+                        <div class="absolute left-4 top-3.5 text-gray-400">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <button onclick="toggleSearch()"
+                            class="absolute right-3 top-2 bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-200"
+                            aria-label="ปิดการค้นหา">
+                            <i class="fas fa-times text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Container -->
+            <div id="tabs-container"
+                class="sticky top-0 z-30 pt-2 pb-4 -mx-5 px-5 flex gap-3 snap-x scroll-smooth overflow-x-auto hide-scroll transition-all">
+                <button onclick="switchCategory('favorites')" id="tab-favorites"
+                    class="category-pill category-pill-favorites category-pill-inactive snap-start">
+                    <span class="text-xl tab-icon">❤️</span><span class="text-xs font-bold">ที่ชอบ</span>
+                </button>
+                <button onclick="switchCategory('kaprao')" id="tab-kaprao"
+                    class="category-pill category-pill-active snap-start">
+                    <span class="text-xl tab-icon">🌶️</span><span class="text-xs">กะเพรา</span>
+                </button>
+                <button onclick="switchCategory('tray')" id="tab-tray"
+                    class="category-pill category-pill-inactive snap-start">
+                    <span class="text-xl tab-icon">🍱</span><span class="text-xs font-bold">ชุดถาด</span>
+                </button>
+                <button onclick="switchCategory('garlic')" id="tab-garlic"
+                    class="category-pill category-pill-inactive snap-start">
+                    <span class="text-xl tab-icon">🧄</span><span class="text-xs">กระเทียม</span>
+                </button>
+                <button onclick="switchCategory('curry')" id="tab-curry"
+                    class="category-pill category-pill-inactive snap-start">
+                    <span class="text-xl tab-icon">🥘</span><span class="text-xs">พริกแกง</span>
+                </button>
+                <button onclick="switchCategory('noodle')" id="tab-noodle"
+                    class="category-pill category-pill-inactive snap-start">
+                    <span class="text-xl tab-icon">🍜</span><span class="text-xs">เมนูเส้น</span>
+                </button>
+                <button onclick="switchCategory('soup')" id="tab-soup"
+                    class="category-pill category-pill-inactive snap-start">
+                    <span class="text-xl tab-icon">🍲</span><span class="text-xs">แกง/ต้ม</span>
+                </button>
+                <button onclick="switchCategory('others')" id="tab-others"
+                    class="category-pill category-pill-inactive snap-start">
+                    <span class="text-xl tab-icon">🍳</span><span class="text-xs">อื่นๆ</span>
+                </button>
+                <button onclick="switchCategory('dessert')" id="tab-dessert"
+                    class="category-pill category-pill-inactive snap-start">
+                    <span class="text-xl tab-icon">🍨</span><span class="text-xs">ของหวาน</span>
+                </button>
+                <button onclick="switchCategory('promotion')" id="tab-promotion"
+                    class="category-pill category-pill-promotion snap-start">
+                    <span class="text-xl tab-icon">🧧</span><span class="text-xs font-bold">ส่วนลด</span>
+                </button>
+            </div>
+
+            <div class="mb-4 mt-2">
+                <h3 id="section-title" class="font-bold text-gray-800 text-lg">รายการแนะนำ</h3>
+            </div>
+
+            <div id="dessert-msg" class="hidden mb-6 stagger-item">
                 <div
-                    class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 group-hover:bg-yellow-400 group-hover:text-white transition-all">
-                    <i class="fas fa-chevron-right text-xs"></i>
-                </div>
-            </button>
-        </div>
-
-        <!-- Search & Categories -->
-        <div class="mb-3">
-            <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center gap-3">
-                    <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2">หมวดหมู่</h3>
-                    <button onclick="toggleSearch()"
-                        class="btn-bounce w-9 h-9 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center text-gray-500 hover:text-indigo-500 transition-colors">
-                        <i class="fas fa-search text-xs"></i>
-                    </button>
-                </div>
-                <div class="flex gap-2">
-                    <button onclick="scrollTabs(-100)"
-                        class="btn-bounce bg-white w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:text-indigo-500 transition-all border border-gray-200 shadow-sm"><i
-                            class="fas fa-chevron-left text-xs"></i></button>
-                    <button onclick="scrollTabs(100)"
-                        class="btn-bounce bg-white w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:text-indigo-500 transition-all border border-gray-200 shadow-sm"><i
-                            class="fas fa-chevron-right text-xs"></i></button>
+                    class="bg-white border border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-sm">
+                    <div class="text-3xl mb-2">🍨 ✨</div>
+                    <h4 class="font-bold text-indigo-500 text-sm">รอพบกับเมนูใหม่ๆ เร็วๆ นี้</h4>
+                    <p class="text-xs text-gray-400 mt-1">กำลังคัดสรรความอร่อยมาให้ลูกค้าทุกท่าน</p>
                 </div>
             </div>
 
-            <div id="search-container" class="hidden mb-4 animate-fade-in-down">
-                <div class="relative">
-                    <input type="text" id="search-input" placeholder="🔍 ค้นหาเมนู (เช่น หมู, กะเพรา, ไข่)"
-                        class="w-full bg-white border-2 border-[#E7E5E0] rounded-2xl py-3 pl-12 pr-10 text-sm font-bold text-[#3F3733] focus:border-[#B58D67] focus:ring-0 shadow-sm transition-all"
-                        onkeyup="handleSearch(this.value)" autocomplete="off" aria-label="ค้นหาเมนู">
+            <div id="menu-grid" class="grid grid-cols-2 gap-4 mb-20" role="grid" aria-label="เมนูอาหาร"></div>
 
-                    <div class="absolute left-4 top-3.5 text-gray-400">
-                        <i class="fas fa-search"></i>
-                    </div>
-                    <button onclick="toggleSearch()"
-                        class="absolute right-3 top-2 bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-200"
-                        aria-label="ปิดการค้นหา">
-                        <i class="fas fa-times text-xs"></i>
-                    </button>
-                </div>
+            <div class="text-center mt-12 mb-20 opacity-50">
+                <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ
+                    |
+                    Version 24.2.0 COSMIC EDITION</p>
             </div>
-        </div>
+        </div> <!-- Close max-w-md -->
+    </div> <!-- Close page-home -->
 
-        <!-- Tab Container -->
-        <div id="tabs-container"
-            class="sticky top-0 z-30 pt-2 pb-4 -mx-5 px-5 flex gap-3 snap-x scroll-smooth overflow-x-auto hide-scroll transition-all">
-            <button onclick="switchCategory('favorites')" id="tab-favorites"
-                class="category-pill category-pill-favorites category-pill-inactive snap-start">
-                <span class="text-xl tab-icon">❤️</span><span class="text-xs font-bold">ที่ชอบ</span>
-            </button>
-            <button onclick="switchCategory('kaprao')" id="tab-kaprao"
-                class="category-pill category-pill-active snap-start">
-                <span class="text-xl tab-icon">🌶️</span><span class="text-xs">กะเพรา</span>
-            </button>
-            <button onclick="switchCategory('tray')" id="tab-tray"
-                class="category-pill category-pill-inactive snap-start">
-                <span class="text-xl tab-icon">🍱</span><span class="text-xs font-bold">ชุดถาด</span>
-            </button>
-            <button onclick="switchCategory('garlic')" id="tab-garlic"
-                class="category-pill category-pill-inactive snap-start">
-                <span class="text-xl tab-icon">🧄</span><span class="text-xs">กระเทียม</span>
-            </button>
-            <button onclick="switchCategory('curry')" id="tab-curry"
-                class="category-pill category-pill-inactive snap-start">
-                <span class="text-xl tab-icon">🥘</span><span class="text-xs">พริกแกง</span>
-            </button>
-            <button onclick="switchCategory('noodle')" id="tab-noodle"
-                class="category-pill category-pill-inactive snap-start">
-                <span class="text-xl tab-icon">🍜</span><span class="text-xs">เมนูเส้น</span>
-            </button>
-            <button onclick="switchCategory('soup')" id="tab-soup"
-                class="category-pill category-pill-inactive snap-start">
-                <span class="text-xl tab-icon">🍲</span><span class="text-xs">แกง/ต้ม</span>
-            </button>
-            <button onclick="switchCategory('others')" id="tab-others"
-                class="category-pill category-pill-inactive snap-start">
-                <span class="text-xl tab-icon">🍳</span><span class="text-xs">อื่นๆ</span>
-            </button>
-            <button onclick="switchCategory('dessert')" id="tab-dessert"
-                class="category-pill category-pill-inactive snap-start">
-                <span class="text-xl tab-icon">🍨</span><span class="text-xs">ของหวาน</span>
-            </button>
-            <button onclick="switchCategory('promotion')" id="tab-promotion"
-                class="category-pill category-pill-promotion snap-start">
-                <span class="text-xl tab-icon">🧧</span><span class="text-xs font-bold">ส่วนลด</span>
-            </button>
-        </div>
-
-        <div class="mb-4 mt-2">
-            <h3 id="section-title" class="font-bold text-gray-800 text-lg">รายการแนะนำ</h3>
-        </div>
-
-        <div id="dessert-msg" class="hidden mb-6 stagger-item">
-            <div
-                class="bg-white border border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-sm">
-                <div class="text-3xl mb-2">🍨 ✨</div>
-                <h4 class="font-bold text-indigo-500 text-sm">รอพบกับเมนูใหม่ๆ เร็วๆ นี้</h4>
-                <p class="text-xs text-gray-400 mt-1">กำลังคัดสรรความอร่อยมาให้ลูกค้าทุกท่าน</p>
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav safe-area-pb">
+        <button class="nav-item active" onclick="scrollToTop()">
+            <i class="fas fa-home"></i>
+            <span>หน้าหลัก</span>
+        </button>
+        <button class="nav-item" onclick="showActiveOrdersList()">
+            <div class="relative">
+                <i class="fas fa-clipboard-list"></i>
+                <div id="nav-tracking-badge"
+                    class="absolute -top-1 -right-2 bg-red-500 text-white text-[9px] px-1.5 rounded-full hidden border border-white">
+                    0</div>
             </div>
-        </div>
+            <span>ออเดอร์</span>
+        </button>
+        <button class="nav-item" onclick="openMyTickets()">
+            <div class="relative">
+                <i class="fas fa-ticket-alt"></i>
+            </div>
+            <span>ตั๋วหวย</span>
+        </button>
+        <button class="nav-item" onclick="openAdminLoginModal()">
+            <i class="fas fa-user-cog"></i>
+            <span>ร้านค้า</span>
+        </button>
+    </nav>
 
-        <div id="menu-grid" class="grid grid-cols-2 gap-4 mb-20" role="grid" aria-label="เมนูอาหาร"></div>
-
-        <div class="text-center mt-12 mb-20 opacity-50">
-            <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">DEVELOPED BY SORAWIT THUNTHAKIJ |
-                Version 24.2.0 COSMIC EDITION</p>
-        </div>
-    </div>
-
+    <script>
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
     <!-- Tickets Sheet -->
     <div id="tickets-modal-overlay"
         class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[110] hidden transition-opacity opacity-0"
@@ -658,7 +633,8 @@
                         </div>
                         <div class="flex gap-2">
                             <input type="hidden" id="points-input" value="0">
-                            <div class="flex-1 text-[9px] text-yellow-600 flex items-center justify-end">*100 แต้ม = 10
+                            <div class="flex-1 text-[9px] text-yellow-600 flex items-center justify-end">*100 แต้ม =
+                                10
                                 บาท</div>
                         </div>
                     </div>
@@ -688,7 +664,8 @@
                 class="btn-bounce w-full bg-gradient-to-r from-gray-900 to-gray-800 text-white font-bold text-lg py-4 rounded-2xl shadow-xl shadow-gray-300 flex justify-between items-center px-6 group hover:shadow-2xl transition-all">
                 <span class="flex items-center gap-2 text-sm font-medium opacity-80"><i
                         class="fab fa-line text-green-400 text-lg"></i> ยืนยันออเดอร์</span>
-                <div class="flex items-center gap-2 group-active:scale-95 transition-transform"><span>ส่งเลย</span><i
+                <div class="flex items-center gap-2 group-active:scale-95 transition-transform">
+                    <span>ส่งเลย</span><i
                         class="fas fa-arrow-right bg-white/20 rounded-full w-6 h-6 flex items-center justify-center text-xs"></i>
                 </div>
             </button>
@@ -813,8 +790,8 @@
                 </div>
             </div>
             <div class="border-t-2 border-dashed border-gray-300 my-4"></div>
-            <div class="flex justify-between items-center mb-1"><span class="text-xs text-gray-500">Order ID</span><span
-                    class="font-bold text-gray-800 tracking-wide receipt-id">KP-XX99</span></div>
+            <div class="flex justify-between items-center mb-1"><span class="text-xs text-gray-500">Order
+                    ID</span><span class="font-bold text-gray-800 tracking-wide receipt-id">KP-XX99</span></div>
             <div class="flex justify-between items-center mb-1"><span class="text-xs text-gray-500">Date</span><span
                     class="font-medium text-xs text-gray-500 receipt-date">01/01/2024 12:00</span></div>
             <div class="flex justify-between items-center mb-4"><span class="text-xs text-gray-500">Customer</span><span
