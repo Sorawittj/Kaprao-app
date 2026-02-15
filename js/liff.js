@@ -1,67 +1,68 @@
 
 // =============================================
-// Kaprao52 App - Auth & LIFF Integration (Supabase)
+// Kaprao52 App - Auth & LIFF Integration (Native LIFF + Supabase Guest)
 // =============================================
 
 async function initLIFF() {
     console.log("Initializing App Auth...");
 
-    // 1. Check if Supabase is initialized
-    if (typeof window.supabaseClient === 'undefined') {
-        console.error("Supabase client not initialized. Check supabase-client.js");
-        return;
-    }
-
     try {
-        // 2. Check current Supabase session
-        const { data: { session }, error } = await window.supabaseClient.auth.getSession();
+        // 1. Initialize LIFF first (Primary Auth Source)
+        if (typeof liff !== 'undefined') {
+            try {
+                await liff.init({ liffId: MY_LIFF_ID });
 
-        if (session) {
-            console.log("Session found:", session.user.id);
-            await handleUserSession(session.user);
-        } else {
-            console.log("No session. Prompting login...");
-            const welcomeModal = document.getElementById('welcome-modal');
-            const loginBtn = document.getElementById('line-login-btn');
-            const moreLoginBtn = document.getElementById('more-login-btn');
-
-            // Show login buttons if not logged in
-            if (loginBtn) loginBtn.classList.remove('hidden');
-            if (moreLoginBtn) moreLoginBtn.classList.remove('hidden');
-
-            // Show welcome modal if not explicitly closed before (optional logic)
-            if (welcomeModal) welcomeModal.classList.remove('hidden');
-
-            // Allow LIFF init for window control but NO Auto-Login
-            if (typeof liff !== 'undefined') {
-                try {
-                    await liff.init({ liffId: MY_LIFF_ID });
-                } catch (e) { console.log('LIFF init warning:', e); }
+                if (liff.isLoggedIn()) {
+                    console.log("LIFF Logged In!");
+                    const profile = await liff.getProfile();
+                    await handleLiffSession(profile);
+                    return; // Stop here if LIFF is logged in
+                }
+            } catch (e) {
+                console.warn('LIFF init warning:', e);
             }
         }
+
+        // 2. If LIFF not logged in, check Guest Session
+        console.log("LIFF Not Logged In. Checking Guest Session...");
+        await checkGuestSession();
+
     } catch (err) {
         console.error("Auth Init Error:", err);
+        checkGuestSession(); // Fallback
     }
 }
 
-// Global Login Function: LINE
-window.loginWithLine = async function () {
-    try {
-        const { data, error } = await window.supabaseClient.auth.signInWithOAuth({
-            provider: 'line',
-            options: {
-                redirectTo: window.location.href, // Redirect back to this page
-                skipBrowserRedirect: false
-            }
-        });
-        if (error) throw error;
-    } catch (error) {
-        console.error("LINE Login Error:", error);
-        alert("Login failed: " + error.message);
+// 2. Fallback / Guest Session Check
+async function checkGuestSession() {
+    // Check if we have a saved guest session in Supabase
+    const { data: { session } } = await window.supabaseClient.auth.getSession();
+
+    if (session) {
+        console.log("Guest Session found:", session.user.id);
+        await handleUserSession(session.user);
+    } else {
+        // Show Login Buttons & Welcome Modal
+        const welcomeModal = document.getElementById('welcome-modal');
+        const loginBtn = document.getElementById('line-login-btn');
+        const moreLoginBtn = document.getElementById('more-login-btn');
+
+        if (loginBtn) loginBtn.classList.remove('hidden');
+        if (moreLoginBtn) moreLoginBtn.classList.remove('hidden');
+        if (welcomeModal) welcomeModal.classList.remove('hidden');
+    }
+}
+
+// Global Login Function: LINE (Native)
+window.loginWithLine = function () {
+    if (typeof liff !== 'undefined' && !liff.isLoggedIn()) {
+        liff.login({ redirectUri: window.location.href });
+    } else {
+        alert("LIFF SDK not ready");
     }
 };
 
-// Global Login Function: Guest
+// Global Login Function: Guest (Supabase)
 window.loginGuest = async function () {
     try {
         const { data, error } = await window.supabaseClient.auth.signInAnonymously();
@@ -77,72 +78,84 @@ window.loginGuest = async function () {
     }
 };
 
-async function handleUserSession(user) {
-    // 1. Set Global User State
-    userAvatar.userId = user.id;
-    userAvatar.isGuest = user.is_anonymous;
+// Handle LINE Profile (Native)
+async function handleLiffSession(profile) {
+    // Set Global State directly from LINE
+    userAvatar.userId = profile.userId; // This is the 'U...' ID we strictly need for Admin!
+    userAvatar.name = profile.displayName;
+    userAvatar.image = profile.pictureUrl;
+    userAvatar.isGuest = false;
 
-    // 2. Get Profile Info (for LINE users)
-    if (user.app_metadata.provider === 'line' || user.user_metadata) {
-        const meta = user.user_metadata;
-        // Construct display name and image
-        userAvatar.name = meta.full_name || meta.name || meta.displayName || userAvatar.name;
-        userAvatar.image = meta.avatar_url || meta.picture || meta.pictureUrl || userAvatar.image;
+    // Save to LocalStorage for Admin Dashboard check
+    localStorage.setItem('kaprao_user_data', JSON.stringify({
+        userId: profile.userId,
+        name: profile.displayName,
+        image: profile.pictureUrl
+    }));
 
-        // Update profile in Supabase 'profiles' table asynchronously
-        updateProfile(user);
-    }
+    console.log("LIFF Session Active for:", profile.displayName);
 
-    // 3. Update UI
+    // Update UI
+    if (typeof updateAvatarDisplay === 'function') updateAvatarDisplay();
+
+    // Hide Login Buttons
     const loginBtn = document.getElementById('line-login-btn');
     const moreLoginBtn = document.getElementById('more-login-btn');
+    if (loginBtn) loginBtn.classList.add('hidden');
+    if (moreLoginBtn) moreLoginBtn.classList.add('hidden');
 
-    // Hide login buttons if logged in (except maybe for Guests who want to upgrade?)
-    // For now, let's hide them if it's a full LINE user.
-    // If Guest, we might want to KEEP the login button visible to allow upgrade.
-
-    if (!user.is_anonymous) {
-        if (loginBtn) loginBtn.classList.add('hidden');
-        if (moreLoginBtn) moreLoginBtn.classList.add('hidden');
-    } else {
-        // If Guest, allow upgrading to LINE
-        if (loginBtn) loginBtn.classList.remove('hidden');
-        if (moreLoginBtn) moreLoginBtn.classList.remove('hidden');
-    }
-
-    // Close welcome modal
     if (typeof closeWelcome === 'function') closeWelcome();
 
-    if (typeof updateAvatarDisplay === 'function') updateAvatarDisplay();
-    if (typeof saveToLS === 'function') saveToLS();
-
-    // 4. Sync Data
-    if (typeof loadUserHistory === 'function') loadUserHistory(); // Defined in app.js
-    if (typeof loadActiveCart === 'function') loadActiveCart();   // Defined in app.js
-
-    // 5. Check Legacy Migration
-    if (typeof checkAndMigrateLegacyData === 'function') {
-        checkAndMigrateLegacyData(user);
-    }
-}
-
-async function updateProfile(user) {
+    // Sync with Supabase Profiles (Upsert)
     try {
-        const updates = {
-            id: user.id,
-            username: userAvatar.name, // using username col for display name mapping based on schema
-            display_name: userAvatar.name,
-            avatar_url: userAvatar.image,
-            updated_at: new Date(),
-        };
+        // Also ensure a Supabase session exists for RLS (e.g. Orders)
+        // We sign in anonymously to satisfy "authenticated" role for RLS
+        const { data: { session } } = await window.supabaseClient.auth.getSession();
+        if (!session) {
+            await window.supabaseClient.auth.signInAnonymously();
+        }
 
-        const { error } = await window.supabaseClient.from('profiles').upsert(updates);
-        if (error) throw error;
-    } catch (error) {
-        console.log("Profile update error:", error.message);
+        // Try to register/update profile in 'profiles' table
+        // Note: You might need to adjust 'profiles' RLS to allow upsert by public/anon if using 'user_id' as TEXT primary key.
+        const { error } = await window.supabaseClient
+            .from('profiles')
+            .upsert({
+                user_id: profile.userId, // Use LINE ID as Key
+                display_name: profile.displayName,
+                avatar_url: profile.pictureUrl,
+                updated_at: new Date()
+            }, { onConflict: 'user_id' });
+
+        if (error) console.error("Profile Sync Warning (rls?):", error.message);
+
+    } catch (e) { console.error("Sync Error", e); }
+}
+
+// Handle Guest Session (Supabase User Object)
+async function handleUserSession(user) {
+    // 1. Set Global User State
+    userAvatar.userId = user.id; // UUID
+    userAvatar.isGuest = user.is_anonymous;
+
+    // If we have saved user_metadata, use it (though rare for anon)
+    if (user.user_metadata) {
+        const meta = user.user_metadata;
+        userAvatar.name = meta.full_name || userAvatar.name;
     }
+
+    if (typeof updateAvatarDisplay === 'function') updateAvatarDisplay();
+
+    const loginBtn = document.getElementById('line-login-btn');
+    const moreLoginBtn = document.getElementById('more-login-btn');
+    // Guest MUST see login buttons to upgrade
+    if (loginBtn) loginBtn.classList.remove('hidden');
+    if (moreLoginBtn) moreLoginBtn.classList.remove('hidden');
+
+    if (typeof closeWelcome === 'function') closeWelcome();
 }
 
-function handleLogin() {
-    loginWithLine();
-}
+// Init on Load
+document.addEventListener('DOMContentLoaded', () => {
+    // Small delay to ensure Supabase/LIFF scripts loaded
+    setTimeout(initLIFF, 500);
+});
