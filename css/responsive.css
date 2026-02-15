@@ -1,0 +1,26 @@
+/* ===== Responsive / Safe Area ===== */
+
+/* iOS Safe Area Support */
+@supports (padding: max(0px)) {
+    .bottom-nav {
+        padding-bottom: max(0px, env(safe-area-inset-bottom));
+    }
+
+    .bottom-nav-container {
+        padding-bottom: max(0px, env(safe-area-inset-bottom));
+    }
+}
+
+/* iPhone X and later with notch */
+@media screen and (min-width: 375px) and (min-height: 812px) {
+    .bottom-nav {
+        padding-bottom: 34px;
+    }
+}
+
+/* iPhone 14 Pro Max and larger */
+@media screen and (min-width: 430px) and (min-height: 932px) {
+    .bottom-nav {
+        padding-bottom: 34px;
+    }
+}

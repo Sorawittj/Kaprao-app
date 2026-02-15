@@ -1,0 +1,164 @@
+/* ===== Bottom Navigation ===== */
+
+/* Mini Cart positioned above bottom nav */
+#mini-cart-bar {
+    z-index: 40;
+    bottom: calc(70px + env(safe-area-inset-bottom));
+    transition: bottom 0.3s ease, transform 0.3s ease;
+}
+
+#mini-cart-bar.hidden {
+    transform: translateY(100px);
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Bottom Nav with Glassmorphism */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.5);
+    z-index: 50;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-top: 10px;
+    box-shadow:
+        0 -8px 32px rgba(0, 0, 0, 0.08),
+        0 -1px 3px rgba(0, 0, 0, 0.05);
+    transform: translateZ(0);
+    will-change: transform;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+}
+
+.bottom-nav.hidden {
+    transform: translateY(100%);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.bottom-nav.show {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.bottom-nav-container {
+    max-width: 480px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 16px;
+    gap: 8px;
+    min-height: 60px;
+}
+
+.bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    min-width: 72px;
+    min-height: 50px;
+    -webkit-tap-highlight-color: transparent;
+    background: transparent;
+    padding-bottom: max(6px, env(safe-area-inset-bottom, 0px));
+}
+
+.bottom-nav-item:active {
+    transform: scale(0.92);
+}
+
+.bottom-nav-item:hover {
+    background: rgba(245, 158, 11, 0.08);
+}
+
+.bottom-nav-item.active {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(251, 191, 36, 0.15) 100%);
+    box-shadow:
+        0 2px 8px rgba(245, 158, 11, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.bottom-nav-item.active .bottom-nav-icon {
+    color: #F59E0B;
+    transform: translateY(-3px) scale(1.1);
+    filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.3));
+}
+
+.bottom-nav-item.active .bottom-nav-label {
+    color: #F59E0B;
+    font-weight: 700;
+    transform: translateY(-1px);
+}
+
+.bottom-nav-icon {
+    font-size: 22px;
+    color: #9CA3AF;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom: 4px;
+}
+
+.bottom-nav-label {
+    font-size: 11px;
+    color: #6B7280;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.bottom-nav-badge {
+    position: absolute;
+    top: 2px;
+    right: 12px;
+    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    display: flex;
+}
+
+/* Ripple effect for nav items */
+.bottom-nav-item::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    border-radius: 20px;
+    background: radial-gradient(circle, rgba(245, 158, 11, 0.2) 0%, transparent 70%);
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.3s ease;
+}
+
+.bottom-nav-item:active::after {
+    opacity: 1;
+    transform: scale(1);
+    transition: 0s;
+}
+
+/* Hide mini cart when bottom nav is present */
+body:has(.bottom-nav) #mini-cart-bar {
+    bottom: calc(70px + env(safe-area-inset-bottom));
+}
+
+/* Extra padding for main content */
+.max-w-md.mx-auto.px-5.relative.z-10:last-of-type {
+    padding-bottom: calc(90px + env(safe-area-inset-bottom));
+}

@@ -1,0 +1,86 @@
+/* ===== MINIMAL CLEANUPS (Refined) ===== */
+
+/* Remove Background Layers */
+.cosmic-bg-layer,
+.stars-layer,
+.food-particle,
+#food-particles-container,
+#blob-container,
+#bg-canvas,
+#confetti-canvas {
+    display: none !important;
+}
+
+/* Animations */
+@keyframes fadeInSoft {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-down {
+    animation: fadeInSoft 0.4s ease-out forwards;
+}
+
+.stagger-item {
+    opacity: 0;
+    animation: fadeInSoft 0.4s ease-out forwards;
+}
+
+/* Override glitzy effects with clean styles */
+.countdown-box {
+    background: var(--bg-input) !important;
+    color: var(--text-main) !important;
+    border: 1px solid var(--border-medium);
+    box-shadow: none !important;
+}
+
+/* Minimalist Card Hover */
+.fast-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary);
+}
+
+/* Soften gradients instead of removing them */
+.btn-gradient {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-focus) 100%) !important;
+    box-shadow: var(--shadow-sm) !important;
+    color: white !important;
+}
+
+.btn-gradient-purple {
+    background: linear-gradient(135deg, #4A403A 0%, #2D2420 100%) !important;
+    /* Dark roast gradient */
+    box-shadow: var(--shadow-sm) !important;
+    color: white !important;
+}
+
+/* Text adjustments regarding "Gold/Yellow" to be more Earthy */
+.text-yellow-500,
+.text-yellow-600,
+.text-yellow-700 {
+    color: var(--primary) !important;
+    /* Earthy Gold */
+    text-shadow: none !important;
+}
+
+.text-indigo-500,
+.text-indigo-600,
+.text-purple-600 {
+    color: var(--secondary-text-strong) !important;
+    /* Muted Green/Grey */
+    text-shadow: none !important;
+}
+
+/* Fix Modal Image Overlay - Ensure it's transparent gradient, not solid */
+.bg-gradient-to-b {
+    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), transparent) !important;
+    background-color: transparent !important;
+}

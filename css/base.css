@@ -1,0 +1,176 @@
+/* ===== Base Styles ===== */
+body {
+    color: var(--text-primary);
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+    background: var(--bg-primary);
+    transition: background-color 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+body.scroll-locked {
+    overflow: hidden;
+    height: 100vh;
+}
+
+.hide-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.hide-scroll {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.safe-area-pt {
+    padding-top: var(--sat);
+}
+
+.safe-area-pb {
+    padding-bottom: var(--sab);
+}
+
+.safe-area-pb-plus {
+    padding-bottom: calc(1rem + var(--sab));
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+::selection {
+    background-color: rgba(251, 191, 36, 0.3);
+    color: var(--text-primary);
+}
+
+@media screen and (max-width: 768px) {
+
+    input,
+    textarea,
+    select {
+        font-size: 16px !important;
+    }
+}
+
+#bg-canvas,
+#confetti-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+#bg-canvas {
+    z-index: -1;
+    opacity: 0.6;
+}
+
+#confetti-canvas {
+    z-index: 150;
+}
+
+input,
+textarea,
+select {
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    background: #FFFFFF;
+    color: #1F2937;
+    border: 1.5px solid #E5E7EB;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: #F59E0B;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+    outline: none;
+}
+
+/* Slate overrides for light theme */
+.bg-slate-800 {
+    background-color: #FFFFFF !important;
+    border: 1px solid #E5E7EB;
+    color: #1F2937;
+}
+
+.bg-slate-900 {
+    background-color: #F9FAFB !important;
+    color: #1F2937;
+}
+
+.bg-slate-700 {
+    background-color: #F3F4F6 !important;
+    color: #374151;
+}
+
+.text-slate-200,
+.text-slate-300,
+.text-slate-100 {
+    color: #1F2937 !important;
+}
+
+.text-slate-400 {
+    color: #6B7280 !important;
+}
+
+.text-slate-500 {
+    color: #9CA3AF !important;
+}
+
+.border-slate-700 {
+    border-color: #E5E7EB !important;
+}
+
+.border-slate-600 {
+    border-color: #D1D5DB !important;
+}
+
+#modal-content .bg-slate-800 {
+    background-color: #FFFFFF !important;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+#welcome-modal .bg-slate-800 {
+    background-color: #FFFFFF !important;
+    border: 1px solid #E5E7EB;
+    color: #1F2937 !important;
+}
+
+#welcome-modal .text-slate-300 {
+    color: #4B5563 !important;
+}
+
+#welcome-modal .text-slate-200 {
+    color: #111827 !important;
+}
+
+.ticket-stub.bg-slate-800\/50 {
+    background-color: #F3F4F6 !important;
+    border-color: #D1D5DB !important;
+}
+
+#mini-cart-bar .bg-slate-800\/95 {
+    background-color: #1F2937 !important;
+    color: #FFFFFF !important;
+    border-color: #374151;
+}
+
+#mini-cart-bar .text-slate-100 {
+    color: #FFFFFF !important;
+}
+
+#mini-cart-bar .text-slate-400 {
+    color: #9CA3AF !important;
+}
+
+.cart-item-title {
+    font-size: 0.85rem !important;
+    line-height: 1.2 !important;
+    margin-bottom: 0.25rem !important;
+}
+
+.cart-item-details {
+    font-size: 0.75rem !important;
+}

@@ -1,5 +1,5 @@
 // sw.js - Enhanced Service Worker for Kaprao52 PWA
-const CACHE_NAME = 'kaprao52-v25-cache-v1';
+const CACHE_NAME = 'kaprao52-v26-cache-v1';
 const STATIC_CACHE = 'kaprao52-static-v2';
 const IMAGE_CACHE = 'kaprao52-images-v2';
 const API_CACHE = 'kaprao52-api-v1';
@@ -29,13 +29,7 @@ const imageFiles = [
 ];
 
 // External resources with versioning
-const externalResources = [
-  'https://cdn.tailwindcss.com',
-  'https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&display=swap',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-  'https://html2canvas.hertzen.com/dist/html2canvas.min.js',
-  'https://static.line-scdn.net/liff/edge/2/sdk.js'
-];
+const externalResources = [];
 
 // Install event - Cache core assets
 self.addEventListener('install', (event) => {
@@ -72,10 +66,10 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           // Delete old versions of our caches
-          if (cacheName !== CACHE_NAME && 
-              cacheName !== STATIC_CACHE && 
-              cacheName !== IMAGE_CACHE && 
-              cacheName !== API_CACHE) {
+          if (cacheName !== CACHE_NAME &&
+            cacheName !== STATIC_CACHE &&
+            cacheName !== IMAGE_CACHE &&
+            cacheName !== API_CACHE) {
             console.log('[SW] Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
@@ -99,39 +93,44 @@ self.addEventListener('fetch', (event) => {
   }
 
   // Strategy 1: Network First for API calls (with cache fallback)
-  if (url.pathname.includes('googleapis.com') || 
-      url.pathname.includes('script.google.com')) {
+  if (url.pathname.includes('googleapis.com') ||
+    url.pathname.includes('script.google.com')) {
     event.respondWith(networkFirstStrategy(request, API_CACHE));
     return;
   }
 
   // Strategy 2: Network First for local images (to always get new images)
   if ((request.destination === 'image' ||
-      url.pathname.match(/\.(png|jpg|jpeg|gif|webp|svg)$/)) &&
-      url.origin === self.location.origin) {
+    url.pathname.match(/\.(png|jpg|jpeg|gif|webp|svg)$/)) &&
+    url.origin === self.location.origin) {
     event.respondWith(networkFirstStrategy(request, IMAGE_CACHE));
     return;
   }
 
   // Strategy 2b: Cache First for external images
   if (request.destination === 'image' ||
-      url.pathname.match(/\.(png|jpg|jpeg|gif|webp|svg)$/)) {
+    url.pathname.match(/\.(png|jpg|jpeg|gif|webp|svg)$/)) {
     event.respondWith(cacheFirstStrategy(request, IMAGE_CACHE));
     return;
   }
 
   // Strategy 3: Stale While Revalidate for static assets
-  if (url.pathname.includes('cdn.') || 
-      url.pathname.includes('static.')) {
+  if (url.pathname.includes('cdn.') ||
+    url.pathname.includes('static.')) {
     event.respondWith(staleWhileRevalidateStrategy(request, STATIC_CACHE));
     return;
   }
 
-  // Strategy 4: Cache First for navigation requests
+  // Strategy 4: Network First for navigation requests (HTML)
   if (request.mode === 'navigate') {
     event.respondWith(
-      caches.match('./index.html').then((response) => {
-        return response || fetch(request);
+      fetch(request).then((response) => {
+        return caches.open(CACHE_NAME).then((cache) => {
+          cache.put(request, response.clone());
+          return response;
+        });
+      }).catch(() => {
+        return caches.match('./index.html');
       })
     );
     return;
@@ -149,15 +148,15 @@ self.addEventListener('fetch', (event) => {
 async function cacheFirstStrategy(request, cacheName) {
   const cache = await caches.open(cacheName);
   const cached = await cache.match(request);
-  
+
   if (cached) {
     // Update cache in background
     fetch(request).then((response) => {
       cache.put(request, response.clone());
-    }).catch(() => {});
+    }).catch(() => { });
     return cached;
   }
-  
+
   try {
     const response = await fetch(request);
     if (response.ok) {
@@ -173,7 +172,7 @@ async function cacheFirstStrategy(request, cacheName) {
 // Network First Strategy
 async function networkFirstStrategy(request, cacheName) {
   const cache = await caches.open(cacheName);
-  
+
   try {
     const networkResponse = await fetch(request);
     if (networkResponse.ok) {
@@ -194,7 +193,7 @@ async function networkFirstStrategy(request, cacheName) {
 async function staleWhileRevalidateStrategy(request, cacheName) {
   const cache = await caches.open(cacheName);
   const cached = await cache.match(request);
-  
+
   // Always fetch from network to update cache
   const networkPromise = fetch(request).then((response) => {
     if (response.ok) {
@@ -205,12 +204,12 @@ async function staleWhileRevalidateStrategy(request, cacheName) {
     console.error('[SW] Network fetch failed:', error);
     return null;
   });
-  
+
   // Return cached version immediately if available
   if (cached) {
     return cached;
   }
-  
+
   // Otherwise wait for network
   return networkPromise.then((response) => {
     if (!response) {
@@ -254,7 +253,7 @@ self.addEventListener('push', (event) => {
       }
     ]
   };
-  
+
   event.waitUntil(
     self.registration.showNotification('Kaprao52', options)
   );
@@ -263,7 +262,7 @@ self.addEventListener('push', (event) => {
 // Handle notification clicks
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  
+
   if (event.action === 'open' || !event.action) {
     event.waitUntil(
       clients.openWindow(event.notification.data.url || './')
@@ -276,7 +275,7 @@ self.addEventListener('message', (event) => {
   if (event.data === 'skipWaiting') {
     self.skipWaiting();
   }
-  
+
   if (event.data === 'getCacheStats') {
     getCacheStats().then((stats) => {
       if (event.ports && event.ports[0]) {
@@ -290,13 +289,13 @@ self.addEventListener('message', (event) => {
 async function getCacheStats() {
   const cacheNames = [CACHE_NAME, STATIC_CACHE, IMAGE_CACHE, API_CACHE];
   const stats = {};
-  
+
   for (const name of cacheNames) {
     const cache = await caches.open(name);
     const keys = await cache.keys();
     stats[name] = keys.length;
   }
-  
+
   return stats;
 }
 
@@ -305,7 +304,7 @@ async function compressImage(imageBlob, maxWidth = 400, maxHeight = 400, quality
   try {
     // Create bitmap from blob
     const bitmap = await createImageBitmap(imageBlob);
-    
+
     // Calculate new dimensions maintaining aspect ratio
     let { width, height } = bitmap;
     if (width > maxWidth || height > maxHeight) {
@@ -313,19 +312,19 @@ async function compressImage(imageBlob, maxWidth = 400, maxHeight = 400, quality
       width = Math.round(width * ratio);
       height = Math.round(height * ratio);
     }
-    
+
     // Create canvas and draw resized image
     const canvas = new OffscreenCanvas(width, height);
     const ctx = canvas.getContext('2d');
     ctx.drawImage(bitmap, 0, 0, width, height);
     bitmap.close();
-    
+
     // Convert to blob with compression
     const compressedBlob = await canvas.convertToBlob({
       type: 'image/jpeg',
       quality: quality
     });
-    
+
     return compressedBlob;
   } catch (error) {
     console.error('[SW] Image compression failed:', error);
@@ -342,7 +341,7 @@ async function createThumbnail(imageBlob, size = 150) {
 async function cacheFirstWithCompression(request, cacheName) {
   const cache = await caches.open(cacheName);
   const cached = await cache.match(request);
-  
+
   if (cached) {
     // Update cache in background
     fetch(request).then(async (response) => {
@@ -357,22 +356,22 @@ async function cacheFirstWithCompression(request, cacheName) {
         });
         cache.put(request, compressedResponse);
       }
-    }).catch(() => {});
+    }).catch(() => { });
     return cached;
   }
-  
+
   try {
     const response = await fetch(request);
     if (!response.ok) return response;
-    
+
     // Compress image before caching
     const imageBlob = await response.blob();
     const originalSize = imageBlob.size;
     const compressedBlob = await compressImage(imageBlob, 400, 400, 0.85);
     const compressedSize = compressedBlob.size;
-    
-    console.log(`[SW] Image compressed: ${(originalSize/1024).toFixed(1)}KB → ${(compressedSize/1024).toFixed(1)}KB (${((1-compressedSize/originalSize)*100).toFixed(0)}% reduction)`);
-    
+
+    console.log(`[SW] Image compressed: ${(originalSize / 1024).toFixed(1)}KB → ${(compressedSize / 1024).toFixed(1)}KB (${((1 - compressedSize / originalSize) * 100).toFixed(0)}% reduction)`);
+
     const compressedResponse = new Response(compressedBlob, {
       headers: {
         'Content-Type': 'image/jpeg',
@@ -380,7 +379,7 @@ async function cacheFirstWithCompression(request, cacheName) {
         'X-Original-Size': originalSize.toString()
       }
     });
-    
+
     cache.put(request, compressedResponse.clone());
     return compressedResponse;
   } catch (error) {
