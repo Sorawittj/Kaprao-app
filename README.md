@@ -38,7 +38,50 @@
 
 ---
 
-## 🛠️ เทคโนโลยี (Tech Stack)
+## �️ การทำงานของระบบ (System Workflow)
+
+### 1. User Journey (เส้นทางผู้ใช้งาน)
+```mermaid
+graph TD
+    A[📱 Open App] --> B{Login?}
+    B -->|Yes| C[Fetch User Data]
+    B -->|No| D[Guest Mode]
+    C --> E[🏠 Home / Menu]
+    D --> E
+    E --> F[Select Food 🍛]
+    F --> G[Customize & Add to Cart 🛒]
+    G --> H[Checkout 💳]
+    H --> I[Send Order to LINE OA 📨]
+    I --> J[Order Tracking 🛵]
+    J --> K{Order Status}
+    K -->|Delivered| L[Earn Points & Ticket 🎫]
+```
+
+### 2. Gamification Loop (ระบบเล่นเกมสะสมแต้ม)
+```mermaid
+sequenceDiagram
+    participant User
+    participant App
+    participant System
+    
+    User->>App: สั่งซื้อสำเร็จ (Order Completed)
+    App->>System: บันทึกยอดซื้อ
+    System->>User: +Points (แต้มสะสม)
+    System->>User: +Lotto Ticket (ตั๋วหวย)
+    
+    User->>App: เล่นวงล้อเสี่ยงโชค (Wheel)
+    App->>System: ตรวจสอบสิทธิ์ (Daily Spin)
+    alt มีสิทธิ์หมุน
+        System->>User: แจกรางวัล (ส่วนลด/พอยต์)
+    else หมดสิทธิ์
+        System->>User: แจ้งเตือน "พรุ่งนี้มาใหม่นะ"
+    end
+```
+
+---
+
+
+## �🛠️ เทคโนโลยี (Tech Stack)
 
 - **Frontend**: HTML5, CSS3 (Modern CSS Variables, Animations), JavaScript (Vanilla ES6+)
 - **Styling**: Creative CSS Design System (Glassmorphism, Neon Effects)
