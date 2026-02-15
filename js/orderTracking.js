@@ -518,9 +518,15 @@ function renderOrderListView(container) {
                 <p class="text-xs text-gray-400">${list.filter(o => o.status.code !== 'completed').length} รายการที่กำลังดำเนินการ</p>
             </div>
             ${isAdminMode ? `
-            <span class="text-xs bg-amber-100 text-amber-700 px-3 py-1 rounded-full font-bold border border-amber-200">
-                <i class="fas fa-tools mr-1"></i> โหมดร้าน
-            </span>
+            <div class="flex gap-2 mb-2">
+                <span class="text-xs bg-amber-100 text-amber-700 px-3 py-1 rounded-full font-bold border border-amber-200">
+                    <i class="fas fa-tools mr-1"></i> โหมดร้าน
+                </span>
+                <button onclick="fetchOrdersFromSheet()" 
+                    class="text-xs bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-bold border border-indigo-200 hover:bg-indigo-200 transition-colors flex items-center gap-1">
+                    <i class="fas fa-sync-alt"></i> ดึงออเดอร์
+                </button>
+            </div>
             ` : ''}
         </div>
         <div class="space-y-3">
@@ -596,6 +602,139 @@ function renderOrderListView(container) {
     });
     html += `</div>`;
     container.innerHTML = html;
+}
+
+// --- Admin: Fetch Orders Function ---
+
+async function fetchOrdersFromSheet() {
+    if (!isAdminMode) return;
+
+    showToast('กำลังดึงข้อมูลออเดอร์...', 'info');
+    const updateBtn = document.querySelector('button[onclick="fetchOrdersFromSheet()"]');
+    if (updateBtn) {
+        const originalContent = updateBtn.innerHTML;
+        updateBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Loading...';
+        updateBtn.disabled = true;
+    }
+
+    try {
+        // Append action=getOrders to the URL
+        const scriptUrl = typeof GOOGLE_SCRIPT_URL !== 'undefined' ? GOOGLE_SCRIPT_URL : '';
+        if (!scriptUrl) throw new Error("No Script URL");
+
+        const url = new URL(scriptUrl);
+        url.searchParams.append('action', 'getOrders');
+
+        const response = await fetch(url.toString());
+        const data = await response.json();
+
+        if (Array.isArray(data)) {
+            let newOrdersCount = 0;
+            let updatedCount = 0;
+
+            data.forEach(row => {
+                // Map status string to object
+                const statusMap = {
+                    'placed': ORDER_STATUS.PLACED,
+                    'cooking': ORDER_STATUS.COOKING,
+                    'on_the_way': ORDER_STATUS.ON_THE_WAY,
+                    'delivered': ORDER_STATUS.DELIVERED,
+                    'completed': ORDER_STATUS.COMPLETED
+                };
+
+                const status = statusMap[row.status] || ORDER_STATUS.PLACED;
+
+                // Check if we already have this order
+                if (!activeOrders.has(row.id)) {
+                    // Start: New Order Logic
+                    // Intelligent Parsing: "Name (Meat) +Addon1,Addon2 [Note]"
+                    const simulatedItems = (row.details || 'รายการอาหาร').split('\n').map(line => {
+                        let name = line.trim();
+                        let meat = '';
+                        let addons = [];
+                        let note = '';
+
+                        // 1. Extract Note [x]
+                        const noteMatch = name.match(/\[(.*?)\]/);
+                        if (noteMatch) {
+                            note = noteMatch[1];
+                            name = name.replace(noteMatch[0], '').trim();
+                        }
+
+                        // 2. Extract Addons +x,y
+                        const addonMatch = name.match(/\+(.*)/);
+                        if (addonMatch) {
+                            // simple split by comma
+                            addons = addonMatch[1].split(',').map(s => s.trim());
+                            name = name.replace(addonMatch[0], '').trim();
+                        }
+
+                        // 3. Extract Meat (x)
+                        const meatMatch = name.match(/\((.*?)\)/);
+                        if (meatMatch) {
+                            meat = meatMatch[1];
+                            name = name.replace(meatMatch[0], '').trim();
+                        }
+
+                        return {
+                            name: name,
+                            meat: meat,
+                            addons: addons,
+                            note: note,
+                            price: 0,
+                            image: 'images/logo.png'
+                        };
+                    });
+
+                    const orderTimestamp = row.timestamp || Date.now();
+                    const nextDelivery = getNextDeliveryDate(new Date(orderTimestamp)).getTime();
+
+                    const newOrder = {
+                        id: row.id,
+                        items: simulatedItems,
+                        status: status,
+                        orderDate: orderTimestamp,
+                        deliveryDate: nextDelivery,
+                        startTime: orderTimestamp,
+                        updates: [{ status: status, time: Date.now(), note: 'Synced from Sheet' }],
+                        totalPrice: row.totalPrice || 0,
+                        isRemote: true // Flag to identify remote orders
+                    };
+
+                    activeOrders.set(row.id, newOrder);
+                    newOrdersCount++;
+                } else {
+                    // Update existing order status if different
+                    const existing = activeOrders.get(row.id);
+                    if (existing.status.code !== status.code) {
+                        existing.status = status;
+                        existing.updates.push({ status: status, time: Date.now(), note: 'Update from Sheet' });
+                        updatedCount++;
+                    }
+                }
+            });
+
+            saveActiveOrders();
+            renderOrderTrackingContent();
+
+            if (newOrdersCount > 0 || updatedCount > 0) {
+                showToast(`อัพเดทแล้ว! ใหม่ ${newOrdersCount} / เปลี่ยนสถานะ ${updatedCount}`, 'success');
+            } else {
+                showToast('ข้อมูลเป็นปัจจุบันแล้ว', 'info');
+            }
+        } else {
+            console.error("Invalid data format", data);
+            showToast('รูปแบบข้อมูลไม่ถูกต้อง', 'warning');
+        }
+    } catch (e) {
+        console.error(e);
+        showToast('ไม่สามารถดึงข้อมูลได้ (เช็ค URL / สิทธิ์)', 'error');
+    } finally {
+        if (updateBtn) {
+            updateBtn.innerHTML = '<i class="fas fa-sync-alt"></i> ดึงออเดอร์';
+            updateBtn.disabled = false;
+        }
+    }
 }
 
 function getNextStatusLabel(currentCode) {
