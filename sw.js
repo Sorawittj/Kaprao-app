@@ -1,5 +1,5 @@
 // sw.js - Enhanced Service Worker for Kaprao52 PWA
-const CACHE_NAME = 'kaprao52-v26-cache-v1';
+const CACHE_NAME = 'kaprao52-v27-cache-v1';
 const STATIC_CACHE = 'kaprao52-static-v2';
 const IMAGE_CACHE = 'kaprao52-images-v2';
 const API_CACHE = 'kaprao52-api-v1';
