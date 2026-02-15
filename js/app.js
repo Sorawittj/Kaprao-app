@@ -512,6 +512,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Initialize services
     initLIFF();
+    initCanvasBackground();
     fetchLottoResults();
     initPullToRefresh();
     initAccessibility();

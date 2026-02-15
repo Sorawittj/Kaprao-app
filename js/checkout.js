@@ -320,7 +320,8 @@ async function submitOrderToLine() {
         }, 1000);
     } catch (error) {
         hideGlobalLoader();
-        showToast("เกิดข้อผิดพลาด กรุณาลองใหม่", 'error');
+        console.error("Submit Order Error:", error);
+        showToast("เกิดข้อผิดพลาด: " + (error.message || "กรุณาลองใหม่"), 'error');
         isSubmitting = false;
         btn.innerHTML = originalText;
         btn.classList.remove('opacity-50', 'cursor-not-allowed');
