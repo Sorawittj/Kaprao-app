@@ -38,7 +38,10 @@ window.fetchMenuFromSupabase = async function () {
                     isTray: item.is_tray,
                     isNew: item.is_new,
                     kcal: item.kcal,
-                    image: item.image || 'https://placehold.co/400x300?text=Kaprao52', // Default Placeholder
+                    kcal: item.kcal,
+                    image: (item.image === 'images/kaprao-kai.jpg' || item.image === 'images/kaprao-pla-muek.jpg')
+                        ? 'https://placehold.co/400x300?text=No+Image'
+                        : (item.image || 'https://placehold.co/400x300?text=Kaprao52'), // Default Placeholder
                     desc: item.description,
                     available: item.is_available !== false // Default true
                 };

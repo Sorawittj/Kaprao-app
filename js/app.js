@@ -4,7 +4,10 @@
 window.addEventListener('error', function (e) { console.error('Global error caught:', e.error); e.preventDefault(); });
 document.addEventListener('error', function (e) {
     if (e.target.tagName.toLowerCase() === 'img') {
-        e.target.src = 'https://cdn-icons-png.flaticon.com/512/135/135161.png';
+        // Prevent infinite loop if placeholder also fails
+        if (e.target.src.includes('placehold.co')) return;
+
+        e.target.src = 'https://placehold.co/400x300?text=No+Image';
         e.target.alt = 'Image not found';
         e.target.classList.add('opacity-50');
     }

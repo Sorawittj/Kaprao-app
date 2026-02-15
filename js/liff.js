@@ -120,11 +120,11 @@ async function handleLiffSession(profile) {
         const { error } = await window.supabaseClient
             .from('profiles')
             .upsert({
-                user_id: profile.userId, // Use LINE ID as Key
+                id: profile.userId, // Use LINE ID as Key mapping to 'id' in profiles table
                 display_name: profile.displayName,
                 avatar_url: profile.pictureUrl,
                 updated_at: new Date()
-            }, { onConflict: 'user_id' });
+            }, { onConflict: 'id' });
 
         if (error) console.error("Profile Sync Warning (rls?):", error.message);
 
