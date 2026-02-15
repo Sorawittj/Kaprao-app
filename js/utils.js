@@ -224,6 +224,9 @@ const saveToLS = debounce(function () {
     localStorage.setItem(KEYS.USER, JSON.stringify(userState));
     localStorage.setItem(KEYS.FAVORITES, JSON.stringify([...favoriteItems]));
     localStorage.setItem(KEYS.STATS, JSON.stringify(userStats));
+
+    // Sync to Supabase
+    if (typeof syncCartToSupabase === 'function') syncCartToSupabase();
 }, 500);
 
 async function checkForUpdate() {

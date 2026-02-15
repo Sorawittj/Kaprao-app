@@ -97,6 +97,7 @@ function closeCheckout(isBackNav = false) {
     setTimeout(() => { overlay.classList.add('hidden'); sheet.style.transform = ''; }, 300);
     currentOpenModal = null;
     unlockScroll();
+    if (typeof setActiveNav === 'function') setActiveNav('home');
 }
 
 function openReceiptResult(imgData) {

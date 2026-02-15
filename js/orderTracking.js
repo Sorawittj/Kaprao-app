@@ -270,6 +270,7 @@ function closeOrderTrackingSheet() {
     }
     if (trackingInterval) clearInterval(trackingInterval);
     activeOrderTrackingId = null;
+    if (typeof setActiveNav === 'function') setActiveNav('home');
 }
 
 function renderOrderTrackingContent() {
@@ -805,44 +806,34 @@ function openAdminLoginModal() {
     }, 100);
 }
 
-function verifyAdminPassword() {
+// --- Admin Login Logic ---
+
+window.verifyAdminPassword = function () { // Make it global for onclick
     const input = document.getElementById('admin-password-input');
-    const errorMsg = document.getElementById('admin-login-error');
+    const error = document.getElementById('admin-login-error');
     if (!input) return;
 
-    const password = input.value;
+    if (input.value === '909090') { // Hardcoded password as per user request
+        // Remove modal
+        const modal = document.getElementById('admin-login-modal');
+        if (modal) modal.remove();
 
-    // Hardcoded simple password for demonstration: "5252" (Kaprao 52)
-    // In a real app, this should be an env var or hashed check, 
-    // but since this is client-side only for now, this suffices for basic protection.
-    const CORRECT_PASSWORD = '5252';
-
-    if (password === CORRECT_PASSWORD) {
-        isAdminMode = true;
-        document.getElementById('admin-login-modal').remove();
-        showToast('🔓 ยินดีต้อนรับเจ้าของร้าน!', 'success');
+        // Redirect to new Admin Dashboard
+        showToast('กำลังเข้าสู่ระบบหลังบ้าน...', 'success');
         triggerHaptic('success');
 
-        // Navigate to tracking to show admin controls
-        navigateTo('tracking');
-
-        // Force re-render of tracking sheet
         setTimeout(() => {
-            const sheet = document.getElementById('order-tracking-sheet');
-            if (sheet) renderOrderTrackingContent();
-        }, 100);
+            window.location.href = 'admin_dashboard.html';
+        }, 1000);
 
     } else {
-        triggerHaptic('error');
-        input.classList.add('border-red-500', 'bg-red-50');
+        // Shake animation
         input.classList.add('animate-shake');
-        if (errorMsg) errorMsg.textContent = 'รหัสผ่านไม่ถูกต้อง';
-
-        setTimeout(() => {
-            input.classList.remove('animate-shake');
-        }, 500);
+        if (error) error.innerText = 'รหัสผ่านไม่ถูกต้อง';
+        setTimeout(() => input.classList.remove('animate-shake'), 500);
+        input.value = '';
     }
-}
+};
 
 // --- Timer & Formatting ---
 

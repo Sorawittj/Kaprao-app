@@ -352,69 +352,114 @@ function closeAllModals() {
     try { closeQuickOrderModal(true); } catch (e) { }
 }
 
+// --- Modal Actions ---
 function openMoreModal() {
+    // Check login state
+    const isGuest = userAvatar.isGuest || !userAvatar.userId;
+
     const modal = document.createElement('div');
     modal.id = 'more-modal';
-    modal.className = 'fixed inset-0 z-[200] bg-black/50 backdrop-blur-sm flex items-end justify-center';
-    modal.innerHTML = `
-        <div class="bg-white rounded-t-[2rem] w-full max-w-md p-6 animate-slide-up" onclick="event.stopPropagation()">
-            <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6"></div>
-            <h2 class="text-xl font-bold text-gray-800 mb-4">เมนูอื่นๆ</h2>
-            
-            <div class="space-y-3">
-                <button onclick="openWheelOfFortune(); closeMoreModal();" class="w-full flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-pink-50 to-purple-50 border border-pink-100 hover:shadow-md transition-all">
-                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center text-white text-xl">🎡</div>
-                    <div class="text-left">
-                        <p class="font-bold text-gray-800">วงล้อเสี่ยงโชค</p>
-                        <p class="text-xs text-gray-500">ลุ้นรับส่วนลดพิเศษ</p>
-                    </div>
-                    <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
-                </button>
-                
-                <button onclick="openMyTickets(); closeMoreModal();" class="w-full flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-100 hover:shadow-md transition-all">
-                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-400 to-blue-500 flex items-center justify-center text-white text-xl">🎫</div>
-                    <div class="text-left">
-                        <p class="font-bold text-gray-800">ตั๋วหวยของฉัน</p>
-                        <p class="text-xs text-gray-500">ดูเลขลุ้นรางวัล</p>
-                    </div>
-                    <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
-                </button>
-                
-                <button onclick="openPointsHistory(); closeMoreModal();" class="w-full flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-100 hover:shadow-md transition-all">
-                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white text-xl">🪙</div>
-                    <div class="text-left">
-                        <p class="font-bold text-gray-800">ประวัติพอยต์</p>
-                        <p class="text-xs text-gray-500">ดูยอดพอยต์สะสม</p>
-                    </div>
-                    <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
-                </button>
-                
-                <button onclick="openQuickOrderModal(); closeMoreModal();" class="w-full flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 border border-green-100 hover:shadow-md transition-all">
-                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center text-white text-xl">🔄</div>
-                    <div class="text-left">
-                        <p class="font-bold text-gray-800">สั่งซ้ำ</p>
-                        <p class="text-xs text-gray-500">สั่งเมนูเดิมได้เลย</p>
-                    </div>
-                    <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
-                </button>
+    modal.className = 'fixed inset-0 z-[200] bg-black/50 backdrop-blur-sm flex items-end justify-center animate-fade-in';
 
-                <!-- Admin Mode Button -->
-                <button onclick="openAdminLoginModal(); closeMoreModal();" class="w-full flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 hover:shadow-md transition-all">
-                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center text-white text-xl">🔧</div>
-                    <div class="text-left">
-                        <p class="font-bold text-gray-800">โหมดเจ้าของร้าน</p>
-                        <p class="text-xs text-gray-500">สำหรับจัดการออเดอร์</p>
+    // Dynamic Content for Top Section
+    let authSection = '';
+
+    if (isGuest) {
+        // Show Login Button
+        authSection = `
+            <button onclick="loginWithLine(); closeMoreModal();" id="more-login-btn" 
+                class="w-full mb-4 bg-[#06C755] text-white p-4 rounded-2xl flex items-center justify-between shadow-md hover:shadow-lg transition-all btn-bounce">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl">
+                        <i class="fab fa-line"></i>
                     </div>
-                    <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
+                    <div class="text-left">
+                        <h3 class="font-bold text-lg">เข้าสู่ระบบด้วย LINE</h3>
+                        <p class="text-xs opacity-90">สะสมแต้มและดูประวัติการสั่ง</p>
+                    </div>
+                </div>
+                <i class="fas fa-chevron-right opacity-70"></i>
+            </button>
+        `;
+    } else {
+        // Show Profile Button
+        authSection = `
+            <button onclick="openAvatarModal(); closeMoreModal();" 
+                class="w-full mb-4 bg-white p-4 rounded-2xl flex items-center justify-between shadow-sm border border-gray-100 hover:border-indigo-100 transition-all">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center text-xl relative">
+                        ${userAvatar.image ? `<img src="${userAvatar.image}" class="w-full h-full rounded-full object-cover">` : '<i class="fas fa-user"></i>'}
+                        <div class="absolute -bottom-1 -right-1 bg-green-500 w-4 h-4 rounded-full border-2 border-white"></div>
+                    </div>
+                    <div class="text-left">
+                        <h3 class="font-bold text-gray-800 text-lg">${userAvatar.name || 'ลูกค้าทั่วไป'}</h3>
+                        <p class="text-xs text-indigo-500 font-medium">แก้ไขข้อมูลส่วนตัว</p>
+                    </div>
+                </div>
+                <i class="fas fa-chevron-right text-gray-300"></i>
+            </button>
+        `;
+    }
+
+    modal.innerHTML = `
+        <div class="bg-white rounded-t-[2rem] w-full max-w-md p-6 animate-slide-up relative safe-area-pb" onclick="event.stopPropagation()">
+            <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6"></div>
+            
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-black text-gray-800">เมนูเพิ่มเติม</h2>
+                <button onclick="closeMoreModal()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200"><i class="fas fa-times"></i></button>
+            </div>
+            
+            ${authSection}
+
+            <h3 class="text-sm font-bold text-gray-400 mb-3 ml-1">กิจกรรมและโปรโมชั่น</h3>
+            <div class="grid grid-cols-2 gap-3 mb-6">
+                <button onclick="openWheelOfFortune(); closeMoreModal();" class="p-4 rounded-2xl bg-gradient-to-br from-pink-50 to-purple-50 border border-pink-100 flex flex-col items-center justify-center gap-2 hover:shadow-md transition-all">
+                    <div class="text-3xl filter drop-shadow-sm">🎡</div>
+                    <span class="font-bold text-gray-700 text-sm">วงล้อเสี่ยงโชค</span>
+                </button>
+                <button onclick="openMyTickets(); closeMoreModal();" class="p-4 rounded-2xl bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-100 flex flex-col items-center justify-center gap-2 hover:shadow-md transition-all">
+                    <div class="text-3xl filter drop-shadow-sm">🎫</div>
+                    <span class="font-bold text-gray-700 text-sm">ตั๋วหวยของฉัน</span>
                 </button>
             </div>
             
-            <button onclick="closeMoreModal()" class="w-full mt-6 py-3 bg-gray-100 rounded-xl font-bold text-gray-600 hover:bg-gray-200 transition-all">
-                ปิด
-            </button>
+            <h3 class="text-sm font-bold text-gray-400 mb-3 ml-1">ทั่วไป</h3>
+            <div class="space-y-3">
+                <button onclick="openPointsHistory(); closeMoreModal();" class="w-full flex items-center gap-4 p-4 rounded-xl bg-gray-50 border border-gray-100 hover:bg-white hover:shadow-sm transition-all">
+                    <div class="w-10 h-10 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center text-lg">🪙</div>
+                    <div class="text-left flex-1">
+                        <p class="font-bold text-gray-800">ประวัติพอยต์</p>
+                        <p class="text-[10px] text-gray-500">ดูรายการได้และใช้พอยต์</p>
+                    </div>
+                </button>
+                
+                <button onclick="openQuickOrderModal(); closeMoreModal();" class="w-full flex items-center gap-4 p-4 rounded-xl bg-gray-50 border border-gray-100 hover:bg-white hover:shadow-sm transition-all">
+                    <div class="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-lg">🔄</div>
+                    <div class="text-left flex-1">
+                        <p class="font-bold text-gray-800">สั่งซ้ำ (Re-order)</p>
+                        <p class="text-[10px] text-gray-500">เลือกจากประวัติการสั่ง</p>
+                    </div>
+                </button>
+
+                <!-- Admin Mode Button -->
+                <button onclick="openAdminLoginModal(); closeMoreModal();" class="w-full flex items-center gap-4 p-4 rounded-xl bg-gray-50 border border-gray-100 hover:bg-white hover:shadow-sm transition-all group">
+                    <div class="w-10 h-10 rounded-full bg-gray-200 text-gray-500 group-hover:bg-indigo-100 group-hover:text-indigo-600 flex items-center justify-center text-lg transition-colors">🔧</div>
+                    <div class="text-left flex-1">
+                        <p class="font-bold text-gray-600 group-hover:text-indigo-700 transition-colors">โหมดเจ้าของร้าน</p>
+                        <p class="text-[10px] text-gray-400">จัดการร้านค้า (Admin)</p>
+                    </div>
+                </button>
+            </div>
+            
+            <div class="mt-8 text-center">
+                <p class="text-[10px] text-gray-300">Kaprao52 App v1.0.0</p>
+            </div>
         </div>
     `;
-    modal.onclick = () => closeMoreModal();
+    modal.onclick = (e) => {
+        if (e.target === modal) closeMoreModal();
+    };
     document.body.appendChild(modal);
 }
 
@@ -424,6 +469,7 @@ function closeMoreModal() {
         modal.style.opacity = '0';
         setTimeout(() => modal.remove(), 300);
     }
+    if (typeof setActiveNav === 'function') setActiveNav('home');
 }
 
 // --- SWIPE TO CLOSE ---
@@ -872,3 +918,92 @@ function animateCartIcon() {
         }
     }
 }
+
+// ----------------------------------------------------
+// SUPABASE SYNC FUNCTIONS
+// ----------------------------------------------------
+
+window.syncCartToSupabase = async function () {
+    if (!window.supabaseClient || !userAvatar.userId) return;
+    if (typeof isSyncing !== 'undefined' && isSyncing) return;
+
+    isSyncing = true;
+    try {
+        const total = cart.reduce((sum, item) => sum + (item.price || 0), 0);
+
+        const { data: existing, error: fetchError } = await window.supabaseClient
+            .from('orders')
+            .select('id')
+            .eq('user_id', userAvatar.userId)
+            .eq('status', 'cart')
+            .maybeSingle();
+
+        if (existing) {
+            await window.supabaseClient
+                .from('orders')
+                .update({ items: cart, total_price: total, updated_at: new Date() })
+                .eq('id', existing.id);
+        } else {
+            if (cart.length > 0) {
+                await window.supabaseClient
+                    .from('orders')
+                    .insert({ user_id: userAvatar.userId, items: cart, total_price: total, status: 'cart' });
+            }
+        }
+
+    } catch (err) {
+        console.error('Sync Cart Error:', err);
+    } finally {
+        isSyncing = false;
+    }
+};
+
+window.loadUserHistory = async function () {
+    if (!window.supabaseClient || !userAvatar.userId) return;
+    try {
+        const { data, error } = await window.supabaseClient
+            .from('orders')
+            .select('*')
+            .eq('user_id', userAvatar.userId)
+            .neq('status', 'cart')
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+            userStats.history = data; // Assuming userStats.history matches structure
+            // Update LS
+            localStorage.setItem(KEYS.HISTORY, JSON.stringify(data));
+            localStorage.setItem(KEYS.STATS, JSON.stringify(userStats));
+            // Trigger re-render of history if possible? 
+            // History is usually rendered when opening modal.
+        }
+    } catch (err) {
+        console.error('Load History Error:', err);
+    }
+};
+
+window.loadActiveCart = async function () {
+    if (!window.supabaseClient || !userAvatar.userId) return;
+    try {
+        const { data, error } = await window.supabaseClient
+            .from('orders')
+            .select('*')
+            .eq('user_id', userAvatar.userId)
+            .eq('status', 'cart')
+            .maybeSingle();
+
+        if (data && data.items && Array.isArray(data.items)) {
+            console.log("Found cloud cart", data.items.length);
+            if (cart.length === 0) {
+                cart = data.items;
+                updateMiniCart();
+                updateBottomNavBadge();
+                saveToLS();
+                showToast('โหลดตะกร้าเดิมเรียบร้อย! 🛒', 'success');
+            }
+        }
+    } catch (err) {
+        console.error('Load Cart Error:', err);
+    }
+};

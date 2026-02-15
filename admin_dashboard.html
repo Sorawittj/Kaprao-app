@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Kaprao52</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap');
+
+        body {
+            font-family: 'Prompt', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-sm border-b sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-utensils text-red-500 text-xl"></i>
+                    <h1 class="text-xl font-bold text-gray-800">Kaprao52 Admin</h1>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span id="admin-status" class="text-sm px-3 py-1 bg-green-100 text-green-700 rounded-full hidden">
+                        <i class="fas fa-shield-alt mr-1"></i> Owner
+                    </span>
+                    <button onclick="logoutAdmin()" class="text-gray-500 hover:text-red-500 transition-colors">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Tabs Navigation -->
+        <div class="flex gap-4 mb-6 border-b border-gray-200">
+            <button onclick="switchTab('orders')" id="tab-orders"
+                class="px-4 py-2 font-bold text-indigo-600 border-b-2 border-indigo-600 transition-colors">
+                รายการออเดอร์
+            </button>
+            <button onclick="switchTab('menu')" id="tab-menu"
+                class="px-4 py-2 font-bold text-gray-500 hover:text-indigo-600 transition-colors">
+                จัดการเมนู
+            </button>
+        </div>
+
+        <!-- Orders Section -->
+        <div id="section-orders">
+            <!-- Stats Overview -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <p class="text-gray-500 text-sm">Pending Orders</p>
+                    <h3 class="text-3xl font-bold text-orange-500" id="count-placed">0</h3>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <p class="text-gray-500 text-sm">Processing</p>
+                    <h3 class="text-3xl font-bold text-blue-500" id="count-cooking">0</h3>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <p class="text-gray-500 text-sm">Today's Revenue</p>
+                    <h3 class="text-3xl font-bold text-green-600" id="revenue-today">฿0</h3>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <p class="text-gray-500 text-sm">Total Orders</p>
+                    <h3 class="text-3xl font-bold text-gray-700" id="total-orders">0</h3>
+                </div>
+            </div>
+
+            <!-- Orders Table -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                    <h2 class="text-lg font-bold text-gray-800">Active Orders</h2>
+                    <div class="flex gap-2">
+                        <button onclick="fetchOrders()"
+                            class="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-all">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+                            <tr>
+                                <th class="p-4 font-semibold">Order ID</th>
+                                <th class="p-4 font-semibold">Time</th>
+                                <th class="p-4 font-semibold">Customer</th>
+                                <th class="p-4 font-semibold">Items</th>
+                                <th class="p-4 font-semibold">Total</th>
+                                <th class="p-4 font-semibold">Status</th>
+                                <th class="p-4 font-semibold text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-list" class="text-sm text-gray-700 divide-y divide-gray-100">
+                            <!-- Orders will be injected here -->
+                            <tr>
+                                <td colspan="7" class="p-8 text-center text-gray-400">Loading orders...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu Management Section -->
+        <div id="section-menu" class="hidden">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-lg font-bold text-gray-800">รายการอาหารในร้าน</h2>
+                    <button onclick="openAddMenuModal()"
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-xl transition-all shadow-md flex items-center gap-2">
+                        <i class="fas fa-plus"></i> เพิ่มเมนูใหม่
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="menu-grid">
+                    <!-- Menu Items Loaded Here -->
+                    <div class="col-span-full text-center py-10 text-gray-400">
+                        <i class="fas fa-circle-notch fa-spin text-2xl mb-2"></i><br>Loading Menu...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add/Edit Menu Modal -->
+        <div id="menu-modal"
+            class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl w-full max-w-md p-6 relative">
+                <h3 class="text-xl font-bold text-gray-800 mb-4" id="menu-modal-title">เพิ่มเมนู</h3>
+                <form id="menu-form" onsubmit="handleMenuSubmit(event)">
+                    <input type="hidden" id="menu-id">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1">ชื่อเมนู</label>
+                            <input type="text" id="menu-name" required
+                                class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-indigo-500">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1">ราคา (บาท)</label>
+                                <input type="number" id="menu-price" required
+                                    class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1">หมวดหมู่</label>
+                                <select id="menu-category"
+                                    class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-indigo-500">
+                                    <option value="kaprao">กะเพรา</option>
+                                    <option value="curry">แกง/พริกแกง</option>
+                                    <option value="noodle">เส้น</option>
+                                    <option value="garlic">กระเทียม</option>
+                                    <option value="soup">ต้ม/แกงจืด</option>
+                                    <option value="others">อื่นๆ</option>
+                                    <option value="dessert">ของหวาน/น้ำ</option>
+                                    <option value="tray">ถาด</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-4">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="menu-available" checked class="w-5 h-5 accent-indigo-600">
+                                <span class="text-sm font-medium">เปิดขาย</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="menu-new" class="w-5 h-5 accent-orange-500">
+                                <span class="text-sm font-medium">เมนูแนะนำ/ใหม่</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex gap-3">
+                        <button type="button" onclick="closeMenuModal()"
+                            class="flex-1 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200">ยกเลิก</button>
+                        <button type="submit"
+                            class="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 shadow-md">บันทึก</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Script -->
+    <script>
+        let currentUser = null;
+
+        // --- Init ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAdminAuth();
+            fetchOrders();
+
+            // Subscribe to realtime updates
+            setupRealtime();
+        });
+
+        // --- Auth ---
+        async function checkAdminAuth() {
+            // Priority 1: Check Supabase Auth (Email Login)
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            let userId = session?.user?.id;
+
+            // Priority 2: Check LocalStorage (LIFF Login)
+            if (!userId) {
+                const storedUser = localStorage.getItem('kaprao_user'); // Key used in liff.js? Let's check liff.js keys. 
+                // In app.js KEYS.USER = 'kaprao_user_data' -> userAvatar.userId
+                // Let's use a more generic approach or check what liff.js saves.
+                // Assuming liff.js saves to 'kaprao_user_data'
+                try {
+                    const localData = JSON.parse(localStorage.getItem('kaprao_user_data') || '{}');
+                    if (localData.userId) {
+                        userId = localData.userId;
+                        console.log("Found LIFF User ID:", userId);
+                    }
+                } catch (e) { console.error("Local user data parse error", e); }
+            }
+
+            if (!userId) {
+                alert('กรุณาล็อคอินผ่าน LINE ในหน้าแรกก่อนเข้าใช้งาน');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Verify if user is admin via DB check
+            // We select directly from admins table using the found userId
+            const { data: admin, error } = await supabaseClient
+                .from('admins')
+                .select('role')
+                .eq('user_id', userId)
+                .maybeSingle();
+
+            if (admin) {
+                currentUser = { id: userId, role: admin.role };
+                document.getElementById('admin-status').classList.remove('hidden');
+                console.log("Admin Access Granted for:", userId);
+            } else {
+                console.warn("User ID not found in admins table:", userId);
+                alert('Access Denied: คุณไม่มีสิทธิ์เข้าถึงส่วนนี้ (ID: ' + userId + ')');
+                window.location.href = 'index.html';
+            }
+        }
+
+        async function logoutAdmin() {
+            await supabaseClient.auth.signOut();
+            window.location.href = 'index.html';
+        }
+
+        // --- Fetch Data ---
+        async function fetchOrders() {
+            // Fetch Orders (Status != 'cart' and != 'cancelled')
+            const { data, error } = await supabaseClient
+                .from('orders')
+                .select(`
+                    id, created_at, status, total_price, items, user_id,
+                    profiles:user_id ( display_name, avatar_url )
+                `)
+                .neq('status', 'cart')
+                .order('created_at', { ascending: false })
+                .limit(50);
+
+            if (error) {
+                console.error('Fetch Error:', error);
+                return;
+            }
+
+            renderOrders(data);
+            calculateStats(data);
+        }
+
+        function calculateStats(orders) {
+            const placed = orders.filter(o => o.status === 'placed').length;
+            const cooking = orders.filter(o => ['cooking', 'delivering'].includes(o.status)).length;
+            const total = orders.length;
+
+            // Calculate today's revenue
+            const today = new Date().toISOString().split('T')[0];
+            const revenue = orders
+                .filter(o => o.created_at.startsWith(today) && o.status !== 'cancelled')
+                .reduce((sum, o) => sum + (o.total_price || 0), 0);
+
+            document.getElementById('count-placed').innerText = placed;
+            document.getElementById('count-cooking').innerText = cooking;
+            document.getElementById('total-orders').innerText = total;
+            document.getElementById('revenue-today').innerText = '฿' + revenue.toLocaleString();
+        }
+
+        function renderOrders(orders) {
+            const tbody = document.getElementById('orders-list');
+
+            if (orders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-400">No active orders found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = orders.map(order => {
+                const date = new Date(order.created_at).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+                const customerName = order.profiles?.display_name || 'Guest';
+                const itemsCount = (order.items || []).length;
+                const itemsList = (order.items || []).map(i => `${i.name} (${i.meat})`).join(', ');
+
+                let statusColor = 'bg-gray-100 text-gray-600';
+                if (order.status === 'placed') statusColor = 'bg-orange-100 text-orange-600';
+                if (order.status === 'cooking') statusColor = 'bg-blue-100 text-blue-600';
+                if (order.status === 'completed') statusColor = 'bg-green-100 text-green-600';
+
+                return `
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="p-4 font-mono text-xs text-gray-500">#${order.id}</td>
+                        <td class="p-4 text-gray-600 text-xs">${date}</td>
+                        <td class="p-4 font-medium text-gray-800">${customerName}</td>
+                        <td class="p-4">
+                            <div class="text-xs text-gray-600 truncate max-w-[200px]" title="${itemsList}">
+                                ${itemsCount} items: ${itemsList}
+                            </div>
+                        </td>
+                        <td class="p-4 font-bold text-gray-800">฿${order.total_price}</td>
+                        <td class="p-4">
+                            <span class="px-2 py-1 rounded-full text-xs font-bold ${statusColor} uppercase tracking-wider">
+                                ${order.status}
+                            </span>
+                        </td>
+                        <td class="p-4 text-right">
+                            <div class="flex gap-2 justify-end">
+                                ${order.status === 'placed' ? `
+                                    <button onclick="updateStatus(${order.id}, 'cooking')" class="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg shadow-sm text-xs transition-all">
+                                        <i class="fas fa-fire"></i> Cooking
+                                    </button>
+                                ` : ''}
+                                ${order.status === 'cooking' ? `
+                                    <button onclick="updateStatus(${order.id}, 'completed')" class="p-2 bg-green-500 hover:bg-green-600 text-white rounded-lg shadow-sm text-xs transition-all">
+                                        <i class="fas fa-check"></i> Complete
+                                    </button>
+                                ` : ''}
+                                <button onclick="deleteOrder(${order.id})" class="p-2 text-gray-300 hover:text-red-500 transition-all" title="Cancel Order">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // --- Actions ---
+        async function updateStatus(orderId, newStatus) {
+            const { error } = await supabaseClient
+                .from('orders')
+                .update({ status: newStatus, updated_at: new Date() })
+                .eq('id', orderId);
+
+            if (error) alert('Error: ' + error.message);
+            else fetchOrders(); // Refresh (Realtime will handle this later)
+        }
+
+        async function deleteOrder(orderId) {
+            if (!confirm('Delete this order?')) return;
+            const { error } = await supabaseClient
+                .from('orders')
+                .update({ status: 'cancelled' }) // Soft delete
+                .eq('id', orderId);
+
+            if (error) alert('Error: ' + error.message);
+            else fetchOrders();
+        }
+
+
+        // --- Tab Switching ---
+        function switchTab(tabId) {
+            // Updated Tab Styles
+            document.getElementById('tab-orders').className = tabId === 'orders' ? 'px-4 py-2 font-bold text-indigo-600 border-b-2 border-indigo-600 transition-colors' : 'px-4 py-2 font-bold text-gray-500 hover:text-indigo-600 transition-colors';
+            document.getElementById('tab-menu').className = tabId === 'menu' ? 'px-4 py-2 font-bold text-indigo-600 border-b-2 border-indigo-600 transition-colors' : 'px-4 py-2 font-bold text-gray-500 hover:text-indigo-600 transition-colors';
+
+            // Show/Hide Sections
+            document.getElementById('section-orders').classList.toggle('hidden', tabId !== 'orders');
+            document.getElementById('section-menu').classList.toggle('hidden', tabId !== 'menu');
+
+            if (tabId === 'menu') fetchMenu();
+        }
+
+        // --- Menu Management ---
+        let adminMenuCache = [];
+
+        async function fetchMenu() {
+            const grid = document.getElementById('menu-grid');
+            const { data, error } = await supabaseClient
+                .from('menu_items')
+                .select('*')
+                .order('id', { ascending: true });
+
+            if (error) {
+                console.error("Menu Fetch Error:", error);
+                grid.innerHTML = `<div class="col-span-full text-red-500 text-center">Failed to load menu.</div>`;
+                return;
+            }
+
+            adminMenuCache = data;
+            renderAdminMenu(data);
+        }
+
+        function renderAdminMenu(items) {
+            const grid = document.getElementById('menu-grid');
+            if (items.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center text-gray-400 py-8">No menu items found.</div>`;
+                return;
+            }
+
+            grid.innerHTML = items.map(item => `
+                <div class="bg-gray-50 rounded-xl p-4 border ${item.is_available ? 'border-gray-200' : 'border-red-200 bg-red-50'} relative group transition-all hover:shadow-md">
+                    <div class="flex items-start justify-between mb-2">
+                        <div class="text-3xl">${item.icon || '🍛'}</div>
+                        <div class="flex gap-2">
+                            <button onclick="editMenu(${item.id})" class="w-8 h-8 rounded-full bg-white text-indigo-500 shadow-sm flex items-center justify-center hover:bg-indigo-50">
+                                <i class="fas fa-pen text-xs"></i>
+                            </button>
+                            ${item.is_available ? `
+                            <button onclick="toggleMenuStatus(${item.id}, false)" class="w-8 h-8 rounded-full bg-white text-green-500 shadow-sm flex items-center justify-center hover:bg-red-50 hover:text-red-500" title="Mark Out of Stock">
+                                <i class="fas fa-toggle-on"></i>
+                            </button>` : `
+                            <button onclick="toggleMenuStatus(${item.id}, true)" class="w-8 h-8 rounded-full bg-white text-red-500 shadow-sm flex items-center justify-center hover:bg-green-50 hover:text-green-500" title="Mark Available">
+                                <i class="fas fa-toggle-off"></i>
+                            </button>`}
+                        </div>
+                    </div>
+                    <h3 class="font-bold text-gray-800 ${item.is_available ? '' : 'text-red-800 opacity-60'} line-clamp-1">${item.name}</h3>
+                    <div class="flex justify-between items-end mt-2">
+                        <p class="font-bold text-indigo-600">฿${item.price}</p>
+                        <span class="text-xs px-2 py-1 rounded-lg ${item.is_available ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700 font-bold'}">
+                            ${item.is_available ? 'พร้อมขาย' : 'หมด/ปิด'}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function toggleMenuStatus(id, newStatus) {
+            // Optimistic UI update
+            const item = adminMenuCache.find(i => i.id === id);
+            if (item) {
+                item.is_available = newStatus;
+                renderAdminMenu(adminMenuCache);
+            }
+
+            const { error } = await supabaseClient
+                .from('menu_items')
+                .update({ is_available: newStatus })
+                .eq('id', id);
+
+            if (error) {
+                alert('Update failed: ' + error.message);
+                fetchMenu(); // Revert on failure
+            }
+        }
+
+        // --- Add/Edit Menu Modal ---
+        function openAddMenuModal() {
+            document.getElementById('menu-id').value = ''; // Empty ID = New
+            document.getElementById('menu-name').value = '';
+            document.getElementById('menu-price').value = '';
+            document.getElementById('menu-category').value = 'kaprao';
+            document.getElementById('menu-available').checked = true;
+            document.getElementById('menu-new').checked = false;
+
+            document.getElementById('menu-modal-title').innerText = 'เพิ่มเมนูใหม่';
+            document.getElementById('menu-modal').classList.remove('hidden');
+        }
+
+        function editMenu(id) {
+            const item = adminMenuCache.find(i => i.id === id);
+            if (!item) return;
+
+            document.getElementById('menu-id').value = item.id;
+            document.getElementById('menu-name').value = item.name;
+            document.getElementById('menu-price').value = item.price;
+            document.getElementById('menu-category').value = item.category || 'kaprao';
+            document.getElementById('menu-available').checked = item.is_available;
+            document.getElementById('menu-new').checked = item.is_new;
+
+            document.getElementById('menu-modal-title').innerText = 'แก้ไขเมนู';
+            document.getElementById('menu-modal').classList.remove('hidden');
+        }
+
+        function closeMenuModal() {
+            document.getElementById('menu-modal').classList.add('hidden');
+        }
+
+        async function handleMenuSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('menu-id').value;
+            const name = document.getElementById('menu-name').value;
+            const price = parseInt(document.getElementById('menu-price').value);
+            const category = document.getElementById('menu-category').value;
+            const isAvailable = document.getElementById('menu-available').checked;
+            const isNew = document.getElementById('menu-new').checked;
+
+            const payload = {
+                name: name,
+                price: price,
+                category: category,
+                is_available: isAvailable,
+                is_new: isNew
+            };
+
+            let error;
+            if (id) {
+                // Update
+                const { error: err } = await supabaseClient.from('menu_items').update(payload).eq('id', id);
+                error = err;
+            } else {
+                // Insert
+                // Add defaults for fields not in form
+                payload.icon = '🍛';
+                payload.is_tray = false;
+                payload.req_meat = false;
+                const { error: err } = await supabaseClient.from('menu_items').insert(payload);
+                error = err;
+            }
+
+            if (error) {
+                alert('Error: ' + error.message);
+            } else {
+                closeMenuModal();
+                fetchMenu();
+            }
+        }
+
+
+        // --- Realtime ---
+        function setupRealtime() {
+            supabaseClient
+                .channel('admin-orders')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, (payload) => {
+                    console.log('Realtime update:', payload);
+                    fetchOrders(); // Reload on any change
+
+                    // Simple notification sound
+                    if (payload.eventType === 'INSERT' && payload.new.status === 'placed') {
+                        new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play().catch(() => { });
+                    }
+                })
+                .subscribe();
+        }
+
+    </script>
+</body>
+
+</html>

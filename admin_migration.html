@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin: Import Legacy Data</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+</head>
+
+<body class="bg-gray-100 p-10 font-sans">
+
+    <div class="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-xl">
+        <h1 class="text-2xl font-bold mb-4 text-gray-800">Admin Migration Tool 🛠️</h1>
+        <p class="text-gray-600 mb-4">Paste the JSON from Google Apps Script below to import legacy member points.</p>
+
+        <textarea id="jsonInput" rows="10"
+            class="w-full p-4 border border-gray-300 rounded-xl font-mono text-xs bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none"
+            placeholder='[{"line_user_id": "...", "points": 100, ...}]'></textarea>
+
+        <div class="mt-4 flex gap-4">
+            <button onclick="startImport()" id="btnImport"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-lg">
+                🚀 Start Import
+            </button>
+            <button onclick="clearLogs()"
+                class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 px-6 rounded-xl transition-all">
+                Clear Logs
+            </button>
+        </div>
+
+        <div id="status" class="mt-6 hidden">
+            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-2">
+                <div id="progressBar" class="bg-green-500 h-2.5 rounded-full" style="width: 0%"></div>
+            </div>
+            <p id="progressText" class="text-xs text-center text-gray-500">0%</p>
+        </div>
+
+        <div id="logs" class="mt-6 p-4 bg-black text-green-400 font-mono text-xs rounded-xl h-64 overflow-y-auto">
+            <p>> Ready to import...</p>
+        </div>
+    </div>
+
+    <script>
+        function log(msg, type = 'info') {
+            const logs = document.getElementById('logs');
+            const color = type === 'error' ? 'text-red-400' : (type === 'success' ? 'text-green-400' : 'text-gray-400');
+            logs.innerHTML += `<p class="${color}">> ${msg}</p>`;
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        function clearLogs() {
+            document.getElementById('logs').innerHTML = '<p>> Logs cleared.</p>';
+        }
+
+        async function startImport() {
+            const input = document.getElementById('jsonInput').value;
+            if (!input) { alert('Please paste JSON first!'); return; }
+
+            let data;
+            try {
+                data = JSON.parse(input);
+            } catch (e) {
+                alert('Invalid JSON format!');
+                return;
+            }
+
+            if (!Array.isArray(data) || data.length === 0) {
+                alert('JSON is empty or not an array!');
+                return;
+            }
+
+            const btn = document.getElementById('btnImport');
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            document.getElementById('status').classList.remove('hidden');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+
+            log(`Starting import of ${data.length} records...`);
+
+            // Batch processing to avoid rate limits
+            const BATCH_SIZE = 50;
+            let successCount = 0;
+            let errorCount = 0;
+
+            for (let i = 0; i < data.length; i += BATCH_SIZE) {
+                const batch = data.slice(i, i + BATCH_SIZE);
+
+                // Map fields to match Supabase table EXACTLY
+                // Table: line_user_id, points, total_orders, old_name
+                const formattedBatch = batch.map(item => ({
+                    line_user_id: item.line_user_id || item.userID, // Handle variations
+                    points: item.points || 0,
+                    total_orders: item.total_orders || 0,
+                    old_name: item.old_name || item.displayName || 'Unknown'
+                }));
+
+                try {
+                    const { error } = await supabaseClient
+                        .from('legacy_members')
+                        .upsert(formattedBatch, { onConflict: 'line_user_id' }); // Upsert to prevent duplicates
+
+                    if (error) throw error;
+
+                    successCount += batch.length;
+                    log(`Imported batch ${i} - ${Math.min(i + BATCH_SIZE, data.length)}...`, 'success');
+                } catch (err) {
+                    errorCount += batch.length;
+                    log(`Batch error: ${err.message}`, 'error');
+                }
+
+                // Update Progress
+                const progress = Math.round(((i + batch.length) / data.length) * 100);
+                progressBar.style.width = `${progress}%`;
+                progressText.innerText = `${progress}% (${successCount} Success, ${errorCount} Errors)`;
+            }
+
+            log(`DONE! Total imported: ${successCount}`, 'success');
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            alert('Import Complete! 🎉 Check logs for details.');
+        }
+    </script>
+</body>
+
+</html>
