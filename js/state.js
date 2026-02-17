@@ -16,6 +16,7 @@ let searchQuery = "";
 let favoriteItems = new Set();
 let isSyncing = false;
 let currentOpenModal = null;
+let isAdminMode = false;
 
 // Wheel of Fortune state
 let wheelSpinning = false;

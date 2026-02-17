@@ -55,9 +55,14 @@ function updateAvatarDisplay() {
     }
 }
 
-function closeWelcome() {
-    const modal = document.getElementById('welcome-modal'); modal.style.opacity = '0'; modal.style.transition = 'opacity 0.5s ease';
-    setTimeout(() => modal.classList.add('hidden'), 500); triggerHaptic();
+function closeWelcome(suppressHaptic = false) {
+    const modal = document.getElementById('welcome-modal');
+    if (modal) {
+        modal.style.opacity = '0';
+        modal.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => modal.classList.add('hidden'), 500);
+    }
+    if (!suppressHaptic && typeof triggerHaptic === 'function') triggerHaptic();
 
     // Show bottom nav after welcome modal closes
     const bottomNav = document.getElementById('bottom-nav');

@@ -2,7 +2,10 @@
 // Kaprao52 App - Menu Data
 // =============================================
 
-const menuItems = [
+// Kaprao52 App - Menu Data
+// =============================================
+
+let menuItems = [
     { id: 201, name: "Set 1: Solo Tray (ลุยเดี่ยว)", price: 89, icon: "📦", category: "tray", reqMeat: false, isTray: true, trayType: 1, kcal: 750, image: "images/solo-tray.jpg" },
     { id: 202, name: "Set 2: Buddy Tray (คู่หู)", price: 149, icon: "🍱", category: "tray", reqMeat: false, isTray: true, trayType: 2, kcal: 1400, image: "images/buddy-tray.jpg" },
     { id: 2, name: "กะเพราหน่อไม้", price: 55, icon: "🎍", category: "kaprao", reqMeat: true, kcal: 350, image: "images/kaprao-nor-mai.jpg" },

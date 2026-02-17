@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 
 <head>
     <meta charset="UTF-8">
@@ -8,305 +8,404 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-client.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Prompt', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            dark: '#2D2D2A',
+                            gold: '#C5A059',
+                            cream: '#FDFBF7'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap');
-
         body {
-            font-family: 'Prompt', sans-serif;
+            background-color: #FDFBF7;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+        }
+
+        .glass-dark {
+            background: rgba(45, 45, 42, 0.95);
+            backdrop-filter: blur(10px);
+            color: white;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #4F46E5, #9333EA);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .hide-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scroll {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
     </style>
 </head>
 
-<body class="bg-gray-100 min-h-screen">
+<body class="text-gray-800">
 
-    <!-- Navbar -->
-    <nav class="bg-white shadow-sm border-b sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
-                <div class="flex items-center gap-2">
-                    <i class="fas fa-utensils text-red-500 text-xl"></i>
-                    <h1 class="text-xl font-bold text-gray-800">Kaprao52 Admin</h1>
-                </div>
-                <div class="flex items-center gap-4">
-                    <span id="admin-status" class="text-sm px-3 py-1 bg-green-100 text-green-700 rounded-full hidden">
-                        <i class="fas fa-shield-alt mr-1"></i> Owner
-                    </span>
-                    <button onclick="logoutAdmin()" class="text-gray-500 hover:text-red-500 transition-colors">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
-                </div>
-            </div>
+    <!-- Toast -->
+    <div id="toast"
+        class="fixed top-4 right-4 z-[100] transform transition-all duration-300 translate-x-full opacity-0">
+        <div
+            class="bg-gray-800 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 border border-gray-700">
+            <i class="fas fa-info-circle text-brand-gold text-xl"></i>
+            <span id="toast-msg" class="font-medium">Notification</span>
         </div>
-    </nav>
+    </div>
 
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Login Overlay -->
+    <div id="login-overlay"
+        class="fixed inset-0 z-[100] bg-[#2D2D2A] flex items-center justify-center p-4 transition-all duration-500">
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-gold to-yellow-500"></div>
+            <div
+                class="w-20 h-20 bg-yellow-50 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl shadow-inner">
+                🔐
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">เจ้าของร้าน</h2>
+            <p class="text-gray-400 mb-8 text-sm">Kaprao52 Management System</p>
 
-        <!-- Tabs Navigation -->
-        <div class="flex gap-4 mb-6 border-b border-gray-200">
-            <button onclick="switchTab('orders')" id="tab-orders"
-                class="px-4 py-2 font-bold text-indigo-600 border-b-2 border-indigo-600 transition-colors">
-                รายการออเดอร์
-            </button>
-            <button onclick="switchTab('menu')" id="tab-menu"
-                class="px-4 py-2 font-bold text-gray-500 hover:text-indigo-600 transition-colors">
-                จัดการเมนู
-            </button>
+            <form onsubmit="handleLogin(event)" class="space-y-4">
+                <div class="relative">
+                    <input type="password" id="passcode-input"
+                        class="w-full text-center text-3xl tracking-[0.5em] p-4 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:border-brand-gold focus:bg-white outline-none transition-all font-bold text-gray-800 placeholder-gray-300"
+                        placeholder="••••••" maxlength="6" inputmode="numeric" required>
+                </div>
+                <button type="submit"
+                    class="w-full bg-gray-900 hover:bg-black text-white font-bold py-4 rounded-2xl transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2">
+                    <span>เข้าใช้งาน</span> <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+            <p id="login-error"
+                class="mt-4 text-red-500 text-sm font-medium hidden flex items-center justify-center gap-1">
+                <i class="fas fa-exclamation-circle"></i> รหัสผ่านไม่ถูกต้อง
+            </p>
         </div>
+    </div>
 
-        <!-- Orders Section -->
-        <div id="section-orders">
-            <!-- Stats Overview -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <p class="text-gray-500 text-sm">Pending Orders</p>
-                    <h3 class="text-3xl font-bold text-orange-500" id="count-placed">0</h3>
+    <!-- Main App -->
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white border-r border-gray-100 hidden md:flex flex-col z-20">
+            <div class="h-20 flex items-center px-6 border-b border-gray-50">
+                <div
+                    class="w-8 h-8 bg-brand-gold rounded-lg flex items-center justify-center text-white font-bold mr-3">
+                    K</div>
+                <span class="font-bold text-xl tracking-tight">KAPRAO52</span>
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <button onclick="switchTab('orders')" id="nav-orders"
+                    class="w-full text-left px-4 py-3 rounded-xl font-bold flex items-center gap-3 bg-gray-900 text-white shadow-lg shadow-gray-200 transition-all">
+                    <i class="fas fa-clipboard-list w-6"></i> รายการออเดอร์
+                </button>
+                <button onclick="switchTab('menu')" id="nav-menu"
+                    class="w-full text-left px-4 py-3 rounded-xl font-bold flex items-center gap-3 text-gray-400 hover:bg-gray-50 hover:text-gray-800 transition-all">
+                    <i class="fas fa-utensils w-6"></i> จัดการเมนู
+                </button>
+            </nav>
+            <div class="p-4 border-t border-gray-50 space-y-2">
+                <a href="index.html"
+                    class="w-full px-4 py-3 rounded-xl font-bold flex items-center gap-3 text-gray-500 hover:bg-gray-50 transition-all">
+                    <i class="fas fa-arrow-left w-6"></i> กลับหน้าร้าน
+                </a>
+                <button onclick="logoutAdmin()"
+                    class="w-full px-4 py-3 rounded-xl font-bold flex items-center gap-3 text-red-500 hover:bg-red-50 transition-all">
+                    <i class="fas fa-sign-out-alt w-6"></i> ออกจากระบบ
+                </button>
+            </div>
+        </aside>
+
+        <!-- Content -->
+        <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+            <!-- Mobile Header -->
+            <header
+                class="md:hidden h-16 bg-white/80 backdrop-blur border-b border-gray-100 flex items-center justify-between px-4 sticky top-0 z-30">
+                <div class="flex items-center gap-3">
+                    <a href="index.html"
+                        class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100"><i
+                            class="fas fa-arrow-left"></i></a>
+                    <div class="font-bold text-lg">KAPRAO52</div>
                 </div>
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <p class="text-gray-500 text-sm">Processing</p>
-                    <h3 class="text-3xl font-bold text-blue-500" id="count-cooking">0</h3>
-                </div>
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <p class="text-gray-500 text-sm">Today's Revenue</p>
-                    <h3 class="text-3xl font-bold text-green-600" id="revenue-today">฿0</h3>
-                </div>
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <p class="text-gray-500 text-sm">Total Orders</p>
-                    <h3 class="text-3xl font-bold text-gray-700" id="total-orders">0</h3>
-                </div>
+                <button onclick="logoutAdmin()" class="text-gray-400"><i class="fas fa-sign-out-alt"></i></button>
+            </header>
+
+            <!-- Bottom Nav Mobile -->
+            <div
+                class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex justify-around p-2 z-40 pb-safe">
+                <button onclick="switchTab('orders')" id="mob-orders"
+                    class="flex flex-col items-center p-2 text-brand-gold">
+                    <i class="fas fa-clipboard-list text-xl mb-1"></i>
+                    <span class="text-[10px] font-bold">ออเดอร์</span>
+                </button>
+                <button onclick="switchTab('menu')" id="mob-menu" class="flex flex-col items-center p-2 text-gray-400">
+                    <i class="fas fa-utensils text-xl mb-1"></i>
+                    <span class="text-[10px] font-bold">เมนู</span>
+                </button>
             </div>
 
-            <!-- Orders Table -->
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="p-6 border-b border-gray-100 flex justify-between items-center">
-                    <h2 class="text-lg font-bold text-gray-800">Active Orders</h2>
-                    <div class="flex gap-2">
-                        <button onclick="fetchOrders()"
-                            class="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-all">
-                            <i class="fas fa-sync-alt"></i> Refresh
-                        </button>
-                    </div>
-                </div>
+            <!-- Scrollable Area -->
+            <div class="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8 hide-scroll items-center gap-5">
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
-                            <tr>
-                                <th class="p-4 font-semibold">Order ID</th>
-                                <th class="p-4 font-semibold">Time</th>
-                                <th class="p-4 font-semibold">Customer</th>
-                                <th class="p-4 font-semibold">Items</th>
-                                <th class="p-4 font-semibold">Total</th>
-                                <th class="p-4 font-semibold">Status</th>
-                                <th class="p-4 font-semibold text-right">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="orders-list" class="text-sm text-gray-700 divide-y divide-gray-100">
-                            <!-- Orders will be injected here -->
-                            <tr>
-                                <td colspan="7" class="p-8 text-center text-gray-400">Loading orders...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Menu Management Section -->
-        <div id="section-menu" class="hidden">
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-lg font-bold text-gray-800">รายการอาหารในร้าน</h2>
-                    <button onclick="openAddMenuModal()"
-                        class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-xl transition-all shadow-md flex items-center gap-2">
-                        <i class="fas fa-plus"></i> เพิ่มเมนูใหม่
-                    </button>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="menu-grid">
-                    <!-- Menu Items Loaded Here -->
-                    <div class="col-span-full text-center py-10 text-gray-400">
-                        <i class="fas fa-circle-notch fa-spin text-2xl mb-2"></i><br>Loading Menu...
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Add/Edit Menu Modal -->
-        <div id="menu-modal"
-            class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
-            <div class="bg-white rounded-2xl w-full max-w-md p-6 relative">
-                <h3 class="text-xl font-bold text-gray-800 mb-4" id="menu-modal-title">เพิ่มเมนู</h3>
-                <form id="menu-form" onsubmit="handleMenuSubmit(event)">
-                    <input type="hidden" id="menu-id">
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">ชื่อเมนู</label>
-                            <input type="text" id="menu-name" required
-                                class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-indigo-500">
+                <!-- Section: Orders -->
+                <div id="section-orders" class="animate-fade-in space-y-6 max-w-6xl mx-auto w-full">
+                    <!-- Stats -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 card-hover">
+                            <p class="text-xs text-gray-400 font-bold uppercase mb-2">รอรายการ</p>
+                            <h3 class="text-3xl md:text-4xl font-black text-orange-500" id="count-placed">0</h3>
                         </div>
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 card-hover">
+                            <p class="text-xs text-gray-400 font-bold uppercase mb-2">กำลังทำ</p>
+                            <h3 class="text-3xl md:text-4xl font-black text-blue-500" id="count-cooking">0</h3>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 card-hover">
+                            <p class="text-xs text-gray-400 font-bold uppercase mb-2">ยอดขายวันนี้</p>
+                            <h3 class="text-2xl md:text-3xl font-black text-green-600 truncate" id="revenue-today">฿0
+                            </h3>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 card-hover">
+                            <p class="text-xs text-gray-400 font-bold uppercase mb-2">ออเดอร์รวม</p>
+                            <h3 class="text-3xl md:text-4xl font-black text-gray-800" id="total-orders">0</h3>
+                        </div>
+                    </div>
+
+                    <!-- Orders List -->
+                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div
+                            class="p-6 border-b border-gray-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                             <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-1">ราคา (บาท)</label>
-                                <input type="number" id="menu-price" required
-                                    class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-indigo-500">
+                                <h2 class="text-xl font-bold text-gray-800">รายการล่าสุด</h2>
+                                <p class="text-sm text-gray-400">จัดการออเดอร์ที่เข้ามาทั้งหมด</p>
                             </div>
+                            <button onclick="fetchOrders()"
+                                class="px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-xl text-sm font-bold transition-all border border-gray-200 flex items-center gap-2">
+                                <i class="fas fa-sync-alt"></i> อัปเดต
+                            </button>
+                        </div>
+
+                        <!-- Desktop Table -->
+                        <div class="hidden md:block overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-gray-50/50 text-gray-400 text-xs uppercase tracking-wider">
+                                    <tr>
+                                        <th class="p-5 font-bold">#ID</th>
+                                        <th class="p-5 font-bold">เวลา</th>
+                                        <th class="p-5 font-bold">ลูกค้า</th>
+                                        <th class="p-5 font-bold">รายการอาหาร</th>
+                                        <th class="p-5 font-bold">ยอดรวม</th>
+                                        <th class="p-5 font-bold">สถานะ</th>
+                                        <th class="p-5 text-right font-bold">จัดการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="orders-list-desktop" class="text-sm divide-y divide-gray-50"></tbody>
+                            </table>
+                        </div>
+
+                        <!-- Mobile Cards -->
+                        <div id="orders-list-mobile" class="md:hidden divide-y divide-gray-50"></div>
+                    </div>
+                </div>
+
+                <!-- Section: Menu -->
+                <div id="section-menu" class="hidden animate-fade-in max-w-6xl mx-auto w-full">
+                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden p-6 md:p-8">
+                        <div class="flex justify-between items-center mb-8">
                             <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-1">หมวดหมู่</label>
-                                <select id="menu-category"
-                                    class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-indigo-500">
-                                    <option value="kaprao">กะเพรา</option>
-                                    <option value="curry">แกง/พริกแกง</option>
-                                    <option value="noodle">เส้น</option>
-                                    <option value="garlic">กระเทียม</option>
-                                    <option value="soup">ต้ม/แกงจืด</option>
-                                    <option value="others">อื่นๆ</option>
-                                    <option value="dessert">ของหวาน/น้ำ</option>
-                                    <option value="tray">ถาด</option>
-                                </select>
+                                <h2 class="text-2xl font-bold text-gray-800">จัดการเมนู</h2>
+                                <p class="text-sm text-gray-400">เปิด/ปิด เมนู และแก้ไขราคา</p>
                             </div>
+                            <button onclick="openAddMenuModal()"
+                                class="bg-gray-900 hover:bg-black text-white font-bold py-3 px-6 rounded-2xl transition-all shadow-lg shadow-gray-200 flex items-center gap-2">
+                                <i class="fas fa-plus"></i> <span class="hidden md:inline">เพิ่มเมนู</span>
+                            </button>
                         </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" id="menu-grid"></div>
+                    </div>
+                </div>
 
-                        <div class="flex items-center gap-4">
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" id="menu-available" checked class="w-5 h-5 accent-indigo-600">
-                                <span class="text-sm font-medium">เปิดขาย</span>
-                            </label>
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" id="menu-new" class="w-5 h-5 accent-orange-500">
-                                <span class="text-sm font-medium">เมนูแนะนำ/ใหม่</span>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="mt-6 flex gap-3">
-                        <button type="button" onclick="closeMenuModal()"
-                            class="flex-1 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200">ยกเลิก</button>
-                        <button type="submit"
-                            class="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 shadow-md">บันทึก</button>
-                    </div>
-                </form>
             </div>
-        </div>
+        </main>
+    </div>
 
-    </main>
+    <!-- Modals -->
+    <!-- Menu Modal -->
+    <div id="menu-modal"
+        class="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity">
+        <div class="bg-white rounded-[2rem] w-full max-w-md p-8 relative shadow-2xl animate-pop-in">
+            <button onclick="closeMenuModal()" class="absolute top-6 right-6 text-gray-300 hover:text-gray-600"><i
+                    class="fas fa-times text-xl"></i></button>
+            <h3 class="text-2xl font-bold text-gray-800 mb-6" id="menu-modal-title">เพิ่มเมนู</h3>
+            <form id="menu-form" onsubmit="handleMenuSubmit(event)" class="space-y-5">
+                <input type="hidden" id="menu-id">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1">ชื่อเมนู</label>
+                    <input type="text" id="menu-name" required
+                        class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl outline-none focus:border-brand-gold focus:bg-white transition-all font-medium text-gray-800"
+                        placeholder="เช่น กะเพราหมูสับ">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1">ราคา</label>
+                        <input type="number" id="menu-price" required
+                            class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl outline-none focus:border-brand-gold focus:bg-white transition-all font-bold text-gray-800"
+                            placeholder="0">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1">หมวด</label>
+                        <select id="menu-category"
+                            class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl outline-none focus:border-brand-gold focus:bg-white transition-all font-medium text-gray-800 appearance-none">
+                            <option value="kaprao">กะเพรา</option>
+                            <option value="tray">ชุดถาด</option>
+                            <option value="curry">แกง/พริกแกง</option>
+                            <option value="noodle">เส้น</option>
+                            <option value="garlic">กระเทียม</option>
+                            <option value="soup">ต้ม/แกงจืด</option>
+                            <option value="dessert">ของหวาน/น้ำ</option>
+                            <option value="others">อื่นๆ</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex gap-4 pt-2">
+                    <label
+                        class="flex-1 flex items-center justify-between p-4 bg-gray-50 rounded-2xl cursor-pointer border-2 border-transparent hover:border-gray-200 transition-all">
+                        <span class="text-sm font-bold text-gray-600">เปิดขาย</span>
+                        <input type="checkbox" id="menu-available" checked class="w-6 h-6 accent-green-500 rounded-md">
+                    </label>
+                    <label
+                        class="flex-1 flex items-center justify-between p-4 bg-gray-50 rounded-2xl cursor-pointer border-2 border-transparent hover:border-gray-200 transition-all">
+                        <span class="text-sm font-bold text-gray-600">เมนูใหม่</span>
+                        <input type="checkbox" id="menu-new" class="w-6 h-6 accent-orange-500 rounded-md">
+                    </label>
+                </div>
+                <button type="submit"
+                    class="w-full py-4 bg-gray-900 text-white font-bold rounded-2xl hover:bg-black transition-all shadow-lg active:scale-95">บันทึกข้อมูล</button>
+            </form>
+        </div>
+    </div>
 
     <!-- Script -->
     <script>
-        let currentUser = null;
+        // Configuration
+        const ADMIN_PASSCODE = '909090';
 
-        // --- Init ---
+        function showToast(msg, type = 'info') {
+            const toast = document.getElementById('toast');
+            const msgEl = document.getElementById('toast-msg');
+            msgEl.innerText = msg;
+            toast.classList.remove('translate-x-full', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-x-full', 'opacity-0');
+            }, 3000);
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
-            await checkAdminAuth();
-            fetchOrders();
-
-            // Subscribe to realtime updates
-            setupRealtime();
+            checkAuth();
+            if (isLoggedIn()) initDashboard();
         });
 
-        // --- Auth ---
-        async function checkAdminAuth() {
-            // Priority 1: Check Supabase Auth (Email Login)
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            let userId = session?.user?.id;
+        function isLoggedIn() { return sessionStorage.getItem('admin_session') === 'true'; }
 
-            // Priority 2: Check LocalStorage (LIFF Login)
-            if (!userId) {
-                const storedUser = localStorage.getItem('kaprao_user'); // Key used in liff.js? Let's check liff.js keys. 
-                // In app.js KEYS.USER = 'kaprao_user_data' -> userAvatar.userId
-                // Let's use a more generic approach or check what liff.js saves.
-                // Assuming liff.js saves to 'kaprao_user_data'
-                try {
-                    const localData = JSON.parse(localStorage.getItem('kaprao_user_data') || '{}');
-                    if (localData.userId) {
-                        userId = localData.userId;
-                        console.log("Found LIFF User ID:", userId);
-                    }
-                } catch (e) { console.error("Local user data parse error", e); }
-            }
-
-            if (!userId) {
-                alert('กรุณาล็อคอินผ่าน LINE ในหน้าแรกก่อนเข้าใช้งาน');
-                window.location.href = 'index.html';
-                return;
-            }
-
-            // Verify if user is admin via DB check
-            // We select directly from admins table using the found userId
-            const { data: admin, error } = await supabaseClient
-                .from('admins')
-                .select('role')
-                .eq('user_id', userId)
-                .maybeSingle();
-
-            if (admin) {
-                currentUser = { id: userId, role: admin.role };
-                document.getElementById('admin-status').classList.remove('hidden');
-                console.log("Admin Access Granted for:", userId);
+        function checkAuth() {
+            const overlay = document.getElementById('login-overlay');
+            if (isLoggedIn()) {
+                overlay.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => overlay.style.display = 'none', 500);
             } else {
-                console.warn("User ID not found in admins table:", userId);
-                const fixSql = `INSERT INTO public.admins (user_id, role) VALUES ('${userId}', 'owner');`;
-                console.log("%cTo fix this access denied error, run this SQL in Supabase Dashboard:", "color: red; font-size: 16px; font-weight: bold;");
-                console.log(fixSql);
-
-                alert('Access Denied: คุณไม่มีสิทธิ์เข้าถึงส่วนนี้\n\nID ของคุณคือ: ' + userId + '\n\nกรุณาแจ้งผู้ดูแลระบบ หรือรันคำสั่ง SQL ที่แสดงใน Console (F12) ใน Supabase Dashboard เพื่อเปิดสิทธิ์');
-                window.location.href = 'index.html';
+                overlay.style.display = 'flex';
+                overlay.classList.remove('opacity-0', 'pointer-events-none');
+                document.getElementById('passcode-input').value = '';
+                document.getElementById('passcode-input').focus();
             }
         }
 
-        async function logoutAdmin() {
-            await supabaseClient.auth.signOut();
-            window.location.href = 'index.html';
+        function handleLogin(e) {
+            e.preventDefault();
+            const input = document.getElementById('passcode-input').value;
+            if (input === ADMIN_PASSCODE) {
+                sessionStorage.setItem('admin_session', 'true');
+                checkAuth();
+                initDashboard();
+            } else {
+                const err = document.getElementById('login-error');
+                err.classList.remove('hidden');
+                document.getElementById('passcode-input').value = '';
+                // Shake
+                const box = document.querySelector('#login-overlay > div');
+                box.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-10px)' }, { transform: 'translateX(10px)' }, { transform: 'translateX(0)' }], { duration: 300 });
+            }
         }
 
-        // --- Fetch Data ---
+        function logoutAdmin() {
+            if (confirm('ต้องการออกจากระบบ?')) {
+                sessionStorage.removeItem('admin_session');
+                location.reload();
+            }
+        }
+
+        async function initDashboard() {
+            renderLoading();
+            await fetchOrders();
+            await fetchMenu();
+            setupRealtime();
+        }
+
+        function renderLoading() {
+            const loading = `<tr><td colspan="7" class="p-8 text-center text-gray-400 animate-pulse">กำลังโหลดข้อมูล...</td></tr>`;
+            document.getElementById('orders-list-desktop').innerHTML = loading;
+            document.getElementById('orders-list-mobile').innerHTML = `<div class="p-8 text-center text-gray-400 animate-pulse">กำลังโหลดข้อมูล...</div>`;
+        }
+
         async function fetchOrders() {
-            // Primary Attempt: Fetch Orders + Customer Profile
             let { data, error } = await supabaseClient
                 .from('orders')
-                .select(`
-                    id, created_at, status, total_price, items, user_id,
-                    profiles:user_id ( display_name, avatar_url )
-                `)
+                .select('*')
                 .neq('status', 'cart')
                 .order('created_at', { ascending: false })
-                .limit(50);
-
-            // Fallback: If foreign key missing (PGRST200), fetch orders ONLY
-            if (error && error.code === 'PGRST200') {
-                console.warn("⚠️ Relation 'profiles' not found. Fetching orders without customer data...");
-                const res = await supabaseClient
-                    .from('orders')
-                    .select('*') // No join
-                    .neq('status', 'cart')
-                    .order('created_at', { ascending: false })
-                    .limit(50);
-
-                data = res.data;
-                error = res.error;
-            }
+                .limit(100);
 
             if (error) {
                 console.error('Fetch Error:', error);
-                document.getElementById('orders-list').innerHTML =
-                    `<tr><td colspan="7" class="p-8 text-center text-red-500">Error: ${error.message}</td></tr>`;
+                showToast('โหลดข้อมูลไม่สำเร็จ: ' + error.message);
                 return;
             }
-
             renderOrders(data);
             calculateStats(data);
         }
 
         function calculateStats(orders) {
-            const placed = orders.filter(o => o.status === 'placed').length;
+            const placed = orders.filter(o => o.status === 'placed' || o.status === 'pending_payment').length;
             const cooking = orders.filter(o => ['cooking', 'delivering'].includes(o.status)).length;
             const total = orders.length;
-
-            // Calculate today's revenue
             const today = new Date().toISOString().split('T')[0];
-            const revenue = orders
-                .filter(o => o.created_at.startsWith(today) && o.status !== 'cancelled')
-                .reduce((sum, o) => sum + (o.total_price || 0), 0);
+            const revenue = orders.filter(o => o.created_at.startsWith(today) && o.status !== 'cancelled').reduce((sum, o) => sum + (o.total_price || 0), 0);
 
             document.getElementById('count-placed').innerText = placed;
             document.getElementById('count-cooking').innerText = cooking;
@@ -315,261 +414,225 @@
         }
 
         function renderOrders(orders) {
-            const tbody = document.getElementById('orders-list');
+            const tbody = document.getElementById('orders-list-desktop');
+            const mobileList = document.getElementById('orders-list-mobile');
 
             if (orders.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-400">No active orders found.</td></tr>`;
+                const empty = `<tr><td colspan="7" class="p-12 text-center text-gray-400"><i class="fas fa-inbox text-4xl mb-3 opacity-20"></i><br>ยังไม่มีออเดอร์เข้ามา</td></tr>`;
+                tbody.innerHTML = empty;
+                mobileList.innerHTML = `<div class="p-12 text-center text-gray-400"><i class="fas fa-inbox text-4xl mb-3 opacity-20"></i><br>ยังไม่มีออเดอร์เข้ามา</div>`;
                 return;
             }
 
-            tbody.innerHTML = orders.map(order => {
-                const date = new Date(order.created_at).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
-                const customerName = order.profiles?.display_name || 'Guest';
-                const itemsCount = (order.items || []).length;
-                const itemsList = (order.items || []).map(i => `${i.name} (${i.meat})`).join(', ');
+            // Desktop Render
+            tbody.innerHTML = orders.map(order => createOrderRow(order)).join('');
 
-                let statusColor = 'bg-gray-100 text-gray-600';
-                if (order.status === 'placed') statusColor = 'bg-orange-100 text-orange-600';
-                if (order.status === 'cooking') statusColor = 'bg-blue-100 text-blue-600';
-                if (order.status === 'completed') statusColor = 'bg-green-100 text-green-600';
-
-                return `
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="p-4 font-mono text-xs text-gray-500">#${order.id}</td>
-                        <td class="p-4 text-gray-600 text-xs">${date}</td>
-                        <td class="p-4 font-medium text-gray-800">${customerName}</td>
-                        <td class="p-4">
-                            <div class="text-xs text-gray-600 truncate max-w-[200px]" title="${itemsList}">
-                                ${itemsCount} items: ${itemsList}
-                            </div>
-                        </td>
-                        <td class="p-4 font-bold text-gray-800">฿${order.total_price}</td>
-                        <td class="p-4">
-                            <span class="px-2 py-1 rounded-full text-xs font-bold ${statusColor} uppercase tracking-wider">
-                                ${order.status}
-                            </span>
-                        </td>
-                        <td class="p-4 text-right">
-                            <div class="flex gap-2 justify-end">
-                                ${order.status === 'placed' ? `
-                                    <button onclick="updateStatus(${order.id}, 'cooking')" class="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg shadow-sm text-xs transition-all">
-                                        <i class="fas fa-fire"></i> Cooking
-                                    </button>
-                                ` : ''}
-                                ${order.status === 'cooking' ? `
-                                    <button onclick="updateStatus(${order.id}, 'completed')" class="p-2 bg-green-500 hover:bg-green-600 text-white rounded-lg shadow-sm text-xs transition-all">
-                                        <i class="fas fa-check"></i> Complete
-                                    </button>
-                                ` : ''}
-                                <button onclick="deleteOrder(${order.id})" class="p-2 text-gray-300 hover:text-red-500 transition-all" title="Cancel Order">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
+            // Mobile Render
+            mobileList.innerHTML = orders.map(order => createOrderCard(order)).join('');
         }
 
-        // --- Actions ---
-        async function updateStatus(orderId, newStatus) {
-            const { error } = await supabaseClient
-                .from('orders')
-                .update({ status: newStatus, updated_at: new Date() })
-                .eq('id', orderId);
+        function createOrderRow(order) {
+            const date = new Date(order.created_at).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+            const customerName = order.customer_name || 'ลูกค้าทั่วไป';
+            let itemsListText = '';
+            try {
+                const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
+                itemsListText = items.map(i => `${i.name} ${i.meat ? ' ' + i.meat : ''}`).join(', ');
+            } catch (e) { }
 
-            if (error) alert('Error: ' + error.message);
-            else fetchOrders(); // Refresh (Realtime will handle this later)
+            let statusBadge = getStatusBadge(order.status);
+            let actions = getActionButtons(order);
+
+            return `
+                <tr class="hover:bg-gray-50 transition-colors border-b border-gray-50/50 group">
+                    <td class="p-5 font-mono text-xs text-gray-400 group-hover:text-gray-600">#${order.id}</td>
+                    <td class="p-5 text-gray-500 text-sm font-medium">${date}</td>
+                    <td class="p-5 font-bold text-gray-800">${customerName} <span class="text-[10px] bg-gray-100 text-gray-500 px-1 py-0.5 rounded ml-1 uppercase">${order.payment_method || '-'}</span></td>
+                    <td class="p-5">
+                        <div class="text-sm text-gray-600 line-clamp-1 max-w-[200px]" title="${itemsListText}">${itemsListText}</div>
+                    </td>
+                    <td class="p-5 font-bold text-gray-800">฿${order.total_price}</td>
+                    <td class="p-5">${statusBadge}</td>
+                    <td class="p-5 text-right"><div class="flex gap-2 justify-end">${actions}</div></td>
+                </tr>
+            `;
+        }
+
+        function createOrderCard(order) {
+            const date = new Date(order.created_at).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+            let itemsListText = '';
+            try {
+                const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
+                itemsListText = items.map(i => `<div class="flex justify-between text-sm text-gray-600"><span>${i.name} ${i.meat || ''}</span><span class="font-bold text-gray-400">x${i.qty || 1}</span></div>`).join('');
+            } catch (e) { }
+
+            return `
+                <div class="p-5 bg-white">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <span class="font-mono text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded-lg">#${order.id}</span>
+                            <span class="ml-2 font-bold text-gray-800">${order.customer_name || 'ลูกค้า'}</span>
+                        </div>
+                        <span class="text-xs font-medium text-gray-400">${date}</span>
+                    </div>
+                    <div class="space-y-1 mb-4 border-l-2 border-gray-100 pl-3">
+                        ${itemsListText}
+                    </div>
+                    <div class="flex justify-between items-center border-t border-gray-50 pt-3">
+                        <div class="flex items-center gap-2">
+                            <span class="font-black text-lg text-gray-800">฿${order.total_price}</span>
+                            ${getStatusBadge(order.status)}
+                        </div>
+                        <div class="flex gap-2">${getActionButtons(order)}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getStatusBadge(status) {
+            const map = {
+                'placed': ['bg-orange-100 text-orange-600', 'รอทำ'],
+                'pending_payment': ['bg-yellow-100 text-yellow-600', 'รอโอน'],
+                'cooking': ['bg-blue-100 text-blue-600', 'กำลังทำ'],
+                'completed': ['bg-green-100 text-green-600', 'เสร็จ'],
+                'cancelled': ['bg-red-50 text-red-500', 'ยกเลิก']
+            };
+            const [cls, label] = map[status] || ['bg-gray-100 text-gray-500', status];
+            return `<span class="px-2.5 py-1 rounded-full text-xs font-bold ${cls}">${label}</span>`;
+        }
+
+        function getActionButtons(order) {
+            if (order.status === 'cancelled') return '';
+            let btns = '';
+            if (order.status === 'placed' || order.status === 'pending_payment') {
+                btns += `<button onclick="updateStatus(${order.id}, 'cooking')" class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center shadow hover:bg-blue-600 transition-all"><i class="fas fa-fire text-xs"></i></button>`;
+            }
+            if (order.status === 'cooking') {
+                btns += `<button onclick="updateStatus(${order.id}, 'completed')" class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center shadow hover:bg-green-600 transition-all"><i class="fas fa-check text-xs"></i></button>`;
+            }
+            btns += `<button onclick="deleteOrder(${order.id})" class="w-8 h-8 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition-all"><i class="fas fa-trash text-xs"></i></button>`;
+            return btns;
+        }
+
+        async function updateStatus(orderId, newStatus) {
+            const { error } = await supabaseClient.from('orders').update({ status: newStatus, updated_at: new Date() }).eq('id', orderId);
+            if (error) showToast('Error: ' + error.message, 'error');
         }
 
         async function deleteOrder(orderId) {
-            if (!confirm('Delete this order?')) return;
-            const { error } = await supabaseClient
-                .from('orders')
-                .update({ status: 'cancelled' }) // Soft delete
-                .eq('id', orderId);
-
-            if (error) alert('Error: ' + error.message);
-            else fetchOrders();
+            if (!confirm('ยืนยันลบ/ยกเลิกออเดอร์นี้?')) return;
+            const { error } = await supabaseClient.from('orders').update({ status: 'cancelled' }).eq('id', orderId);
+            if (error) showToast('Error: ' + error.message);
         }
 
-
-        // --- Tab Switching ---
-        function switchTab(tabId) {
-            // Updated Tab Styles
-            document.getElementById('tab-orders').className = tabId === 'orders' ? 'px-4 py-2 font-bold text-indigo-600 border-b-2 border-indigo-600 transition-colors' : 'px-4 py-2 font-bold text-gray-500 hover:text-indigo-600 transition-colors';
-            document.getElementById('tab-menu').className = tabId === 'menu' ? 'px-4 py-2 font-bold text-indigo-600 border-b-2 border-indigo-600 transition-colors' : 'px-4 py-2 font-bold text-gray-500 hover:text-indigo-600 transition-colors';
-
-            // Show/Hide Sections
-            document.getElementById('section-orders').classList.toggle('hidden', tabId !== 'orders');
-            document.getElementById('section-menu').classList.toggle('hidden', tabId !== 'menu');
-
-            if (tabId === 'menu') fetchMenu();
-        }
-
-        // --- Menu Management ---
+        // --- Menu ---
         let adminMenuCache = [];
-
         async function fetchMenu() {
-            const grid = document.getElementById('menu-grid');
-            const { data, error } = await supabaseClient
-                .from('menu_items')
-                .select('*')
-                .order('id', { ascending: true });
-
-            if (error) {
-                console.error("Menu Fetch Error:", error);
-                grid.innerHTML = `<div class="col-span-full text-red-500 text-center">Failed to load menu.</div>`;
-                return;
-            }
-
+            const { data, error } = await supabaseClient.from('menu_items').select('*').order('id', { ascending: true });
+            if (error) { console.error(error); return; }
             adminMenuCache = data;
             renderAdminMenu(data);
         }
 
         function renderAdminMenu(items) {
             const grid = document.getElementById('menu-grid');
-            if (items.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center text-gray-400 py-8">No menu items found.</div>`;
-                return;
-            }
+            if (items.length === 0) { grid.innerHTML = `<div class="col-span-full text-center text-gray-400 py-10">ยังไม่มีเมนู</div>`; return; }
 
             grid.innerHTML = items.map(item => `
-                <div class="bg-gray-50 rounded-xl p-4 border ${item.is_available ? 'border-gray-200' : 'border-red-200 bg-red-50'} relative group transition-all hover:shadow-md">
-                    <div class="flex items-start justify-between mb-2">
-                        <div class="text-3xl">${item.icon || '🍛'}</div>
+                <div class="bg-gray-50 rounded-2xl p-5 border ${item.is_available ? 'border-gray-200' : 'border-red-200 bg-red-50/50'} relative group transition-all hover:shadow-lg card-hover">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-2xl border border-gray-100">${item.icon || '🍛'}</div>
                         <div class="flex gap-2">
-                            <button onclick="editMenu(${item.id})" class="w-8 h-8 rounded-full bg-white text-indigo-500 shadow-sm flex items-center justify-center hover:bg-indigo-50">
-                                <i class="fas fa-pen text-xs"></i>
-                            </button>
-                            ${item.is_available ? `
-                            <button onclick="toggleMenuStatus(${item.id}, false)" class="w-8 h-8 rounded-full bg-white text-green-500 shadow-sm flex items-center justify-center hover:bg-red-50 hover:text-red-500" title="Mark Out of Stock">
-                                <i class="fas fa-toggle-on"></i>
-                            </button>` : `
-                            <button onclick="toggleMenuStatus(${item.id}, true)" class="w-8 h-8 rounded-full bg-white text-red-500 shadow-sm flex items-center justify-center hover:bg-green-50 hover:text-green-500" title="Mark Available">
-                                <i class="fas fa-toggle-off"></i>
-                            </button>`}
+                             <button onclick="editMenu(${item.id})" class="w-8 h-8 rounded-full bg-white text-indigo-500 shadow-sm flex items-center justify-center hover:bg-indigo-50"><i class="fas fa-pen text-xs"></i></button>
+                             <button onclick="toggleMenuStatus(${item.id}, ${!item.is_available})" class="w-8 h-8 rounded-full shadow-sm flex items-center justify-center transition-all ${item.is_available ? 'bg-green-100 text-green-600 hover:bg-red-100 hover:text-red-600' : 'bg-red-100 text-red-600 hover:bg-green-100 hover:text-green-600'}">
+                                <i class="fas ${item.is_available ? 'fa-toggle-on' : 'fa-toggle-off'}"></i>
+                             </button>
                         </div>
                     </div>
-                    <h3 class="font-bold text-gray-800 ${item.is_available ? '' : 'text-red-800 opacity-60'} line-clamp-1">${item.name}</h3>
-                    <div class="flex justify-between items-end mt-2">
-                        <p class="font-bold text-indigo-600">฿${item.price}</p>
-                        <span class="text-xs px-2 py-1 rounded-lg ${item.is_available ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700 font-bold'}">
-                            ${item.is_available ? 'พร้อมขาย' : 'หมด/ปิด'}
-                        </span>
+                    <h3 class="font-bold text-gray-800 text-lg mb-1 line-clamp-1">${item.name}</h3>
+                    <p class="text-xs text-gray-400 mb-3">${item.category}</p>
+                    <div class="flex justify-between items-center border-t border-gray-200/50 pt-3">
+                        <span class="font-black text-xl text-gray-800">฿${item.price}</span>
+                         <span class="text-[10px] font-bold px-2 py-1 rounded-lg uppercase ${item.is_available ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-500'}">${item.is_available ? 'Active' : 'Hidden'}</span>
                     </div>
                 </div>
             `).join('');
         }
 
         async function toggleMenuStatus(id, newStatus) {
-            // Optimistic UI update
             const item = adminMenuCache.find(i => i.id === id);
-            if (item) {
-                item.is_available = newStatus;
-                renderAdminMenu(adminMenuCache);
-            }
-
-            const { error } = await supabaseClient
-                .from('menu_items')
-                .update({ is_available: newStatus })
-                .eq('id', id);
-
-            if (error) {
-                alert('Update failed: ' + error.message);
-                fetchMenu(); // Revert on failure
-            }
+            if (item) { item.is_available = newStatus; renderAdminMenu(adminMenuCache); }
+            const { error } = await supabaseClient.from('menu_items').update({ is_available: newStatus }).eq('id', id);
+            if (error) { showToast('Update failed: ' + error.message); fetchMenu(); }
         }
 
-        // --- Add/Edit Menu Modal ---
+        // --- Tabs ---
+        function switchTab(tabId) {
+            const isOrders = tabId === 'orders';
+            document.getElementById('nav-orders').className = isOrders ? 'w-full text-left px-4 py-3 rounded-xl font-bold flex items-center gap-3 bg-gray-900 text-white shadow-lg shadow-gray-200 transition-all' : 'w-full text-left px-4 py-3 rounded-xl font-bold flex items-center gap-3 text-gray-400 hover:bg-gray-50 hover:text-gray-800 transition-all';
+            document.getElementById('nav-menu').className = !isOrders ? 'w-full text-left px-4 py-3 rounded-xl font-bold flex items-center gap-3 bg-gray-900 text-white shadow-lg shadow-gray-200 transition-all' : 'w-full text-left px-4 py-3 rounded-xl font-bold flex items-center gap-3 text-gray-400 hover:bg-gray-50 hover:text-gray-800 transition-all';
+
+            // Mobile Nav
+            document.getElementById('mob-orders').className = isOrders ? 'flex flex-col items-center p-2 text-brand-gold scale-110 transition-transform' : 'flex flex-col items-center p-2 text-gray-400 transition-transform';
+            document.getElementById('mob-menu').className = !isOrders ? 'flex flex-col items-center p-2 text-brand-gold scale-110 transition-transform' : 'flex flex-col items-center p-2 text-gray-400 transition-transform';
+
+            document.getElementById('section-orders').classList.toggle('hidden', !isOrders);
+            document.getElementById('section-menu').classList.toggle('hidden', isOrders);
+            if (!isOrders) fetchMenu();
+        }
+
+        // --- Modals ---
         function openAddMenuModal() {
-            document.getElementById('menu-id').value = ''; // Empty ID = New
+            document.getElementById('menu-id').value = '';
             document.getElementById('menu-name').value = '';
             document.getElementById('menu-price').value = '';
-            document.getElementById('menu-category').value = 'kaprao';
             document.getElementById('menu-available').checked = true;
-            document.getElementById('menu-new').checked = false;
-
             document.getElementById('menu-modal-title').innerText = 'เพิ่มเมนูใหม่';
             document.getElementById('menu-modal').classList.remove('hidden');
         }
-
         function editMenu(id) {
             const item = adminMenuCache.find(i => i.id === id);
             if (!item) return;
-
             document.getElementById('menu-id').value = item.id;
             document.getElementById('menu-name').value = item.name;
             document.getElementById('menu-price').value = item.price;
-            document.getElementById('menu-category').value = item.category || 'kaprao';
+            document.getElementById('menu-category').value = item.category || 'kaprao'; // Ensure category matches select values
             document.getElementById('menu-available').checked = item.is_available;
             document.getElementById('menu-new').checked = item.is_new;
-
             document.getElementById('menu-modal-title').innerText = 'แก้ไขเมนู';
             document.getElementById('menu-modal').classList.remove('hidden');
         }
-
-        function closeMenuModal() {
-            document.getElementById('menu-modal').classList.add('hidden');
-        }
-
+        function closeMenuModal() { document.getElementById('menu-modal').classList.add('hidden'); }
         async function handleMenuSubmit(e) {
             e.preventDefault();
             const id = document.getElementById('menu-id').value;
-            const name = document.getElementById('menu-name').value;
-            const price = parseInt(document.getElementById('menu-price').value);
-            const category = document.getElementById('menu-category').value;
-            const isAvailable = document.getElementById('menu-available').checked;
-            const isNew = document.getElementById('menu-new').checked;
-
             const payload = {
-                name: name,
-                price: price,
-                category: category,
-                is_available: isAvailable,
-                is_new: isNew
+                name: document.getElementById('menu-name').value,
+                price: parseInt(document.getElementById('menu-price').value),
+                category: document.getElementById('menu-category').value,
+                is_available: document.getElementById('menu-available').checked,
+                is_new: document.getElementById('menu-new').checked
             };
-
             let error;
-            if (id) {
-                // Update
-                const { error: err } = await supabaseClient.from('menu_items').update(payload).eq('id', id);
-                error = err;
-            } else {
-                // Insert
-                // Add defaults for fields not in form
-                payload.icon = '🍛';
-                payload.is_tray = false;
-                payload.req_meat = false;
-                const { error: err } = await supabaseClient.from('menu_items').insert(payload);
-                error = err;
-            }
-
-            if (error) {
-                alert('Error: ' + error.message);
-            } else {
-                closeMenuModal();
-                fetchMenu();
-            }
+            if (id) { const { error: err } = await supabaseClient.from('menu_items').update(payload).eq('id', id); error = err; }
+            else { payload.icon = '🍛'; const { error: err } = await supabaseClient.from('menu_items').insert(payload); error = err; }
+            if (error) showToast('Error: ' + error.message, 'error'); else { closeMenuModal(); fetchMenu(); showToast('บันทึกเรียบร้อย', 'success'); }
         }
-
 
         // --- Realtime ---
         function setupRealtime() {
             supabaseClient
-                .channel('admin-orders')
+                .channel('admin-dashboard')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, (payload) => {
-                    console.log('Realtime update:', payload);
-                    fetchOrders(); // Reload on any change
-
-                    // Simple notification sound
-                    if (payload.eventType === 'INSERT' && payload.new.status === 'placed') {
+                    fetchOrders();
+                    if (payload.eventType === 'INSERT') {
                         new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play().catch(() => { });
+                        showToast('มีออเดอร์ใหม่เข้ามา!', 'success');
                     }
                 })
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'menu_items' }, () => fetchMenu())
                 .subscribe();
         }
-
     </script>
 </body>
 

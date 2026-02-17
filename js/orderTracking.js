@@ -1,5 +1,4 @@
-// ===== ORDER TRACKING SYSTEM (Pre-Order Flow) =====
-// Flow: สั่งวันนี้ → ทำที่บ้าน → เอาไปส่งวันต่อไป
+﻿// ===== ORDER TRACKING SYSTEM (Supabase Enhanced) =====
 
 const ORDER_STATUS = {
     PLACED: {
@@ -15,7 +14,7 @@ const ORDER_STATUS = {
     COOKING: {
         code: 'cooking',
         label: 'กำลังเตรียมอาหาร',
-        sublabel: 'เจ้าของร้านกำลังทำให้คุณ',
+        sublabel: 'แม่ครัวกำลังปรุงสุดฝีมือ',
         icon: 'fa-fire',
         emoji: '🔥',
         color: 'text-orange-600',
@@ -51,35 +50,31 @@ const ORDER_STATUS = {
         color: 'text-amber-600',
         bgColor: 'bg-amber-50',
         borderColor: 'border-amber-200'
+    },
+    CANCELLED: {
+        code: 'cancelled',
+        label: 'ยกเลิก',
+        sublabel: 'ออเดอร์ถูกยกเลิก',
+        icon: 'fa-times-circle',
+        emoji: '❌',
+        color: 'text-red-600',
+        bgColor: 'bg-red-50',
+        borderColor: 'border-red-200'
     }
 };
 
 let activeOrders = new Map();
 let activeOrderTrackingId = null;
 let trackingInterval = null;
-
-// --- Admin Mode (for shop owner to update status) ---
-let isAdminMode = false;
-let adminTapTimeout = null; // Deprecated, keeping for safety but unused locally now
-
-function toggleAdminMode() {
-    isAdminMode = !isAdminMode;
-    showToast(isAdminMode ? '🔓 โหมดเจ้าของร้าน: เปิด' : '🔒 โหมดเจ้าของร้าน: ปิด', isAdminMode ? 'success' : 'info');
-    // Re-render to show/hide admin controls
-    const sheet = document.getElementById('order-tracking-sheet');
-    if (sheet && !sheet.classList.contains('translate-y-full')) {
-        renderOrderTrackingContent();
-    }
-}
-
-// 5-tap Admin Mode trigger removed as requested.
-// Use openAdminLoginModal() instead.
+let trackingSubscription = null;
 
 // --- Core Functions ---
 
 function startOrderTracking(orderId, items) {
+    if (!orderId) return;
+
     const now = new Date();
-    // Calculate delivery date (next business day)
+    // Default delivery time logic (can be updated by Supabase later)
     const deliveryDate = getNextDeliveryDate(now);
 
     const order = {
@@ -88,8 +83,7 @@ function startOrderTracking(orderId, items) {
         status: ORDER_STATUS.PLACED,
         orderDate: now.getTime(),
         deliveryDate: deliveryDate.getTime(),
-        startTime: now.getTime(), // Keep for backward compat
-        estimatedTime: 0, // Not used in pre-order flow
+        startTime: now.getTime(),
         updates: [
             { status: ORDER_STATUS.PLACED, time: now.getTime(), note: 'ส่งออเดอร์แล้ว' }
         ]
@@ -98,10 +92,71 @@ function startOrderTracking(orderId, items) {
     activeOrders.set(orderId, order);
     saveActiveOrders();
 
-    // Open the tracking sheet
+    // Open UI
     openOrderTrackingSheet(orderId);
+
+    // Start Realtime
+    setupTrackingRealtime(orderId);
+
     showToast('ส่งออเดอร์เรียบร้อย! 🚀', 'success');
 }
+
+function setupTrackingRealtime(orderId) {
+    if (typeof supabaseClient === 'undefined') return;
+
+    if (trackingSubscription) supabaseClient.removeChannel(trackingSubscription);
+
+    // Initial check
+    checkRemoteStatus(orderId);
+
+    trackingSubscription = supabaseClient
+        .channel(`tracking:${orderId}`)
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders', filter: `id=eq.${orderId}` }, (payload) => {
+            console.log('Realtime Status Update:', payload.new.status);
+            handleStatusUpdate(orderId, payload.new.status);
+        })
+        .subscribe();
+}
+
+async function checkRemoteStatus(orderId) {
+    const { data } = await supabaseClient.from('orders').select('status').eq('id', orderId).single();
+    if (data) handleStatusUpdate(orderId, data.status);
+}
+
+function handleStatusUpdate(orderId, newStatusCode) {
+    const order = activeOrders.get(orderId);
+    if (!order) return;
+
+    // Map DB status to ORDER_STATUS
+    // DB: placed, cooking, completed, cancelled
+    // ORDER_STATUS keys: PLACED, COOKING, COMPLETED, CANCELLED
+    let statusKey = newStatusCode.toUpperCase();
+
+    // Fallback mapping if needed
+    if (newStatusCode === 'pending_payment') statusKey = 'PLACED';
+
+    const newStatusObj = ORDER_STATUS[statusKey];
+    if (newStatusObj && order.status.code !== newStatusObj.code) {
+        order.status = newStatusObj;
+        order.updates.push({
+            status: newStatusObj,
+            time: Date.now(),
+            note: getStatusNote(newStatusCode)
+        });
+        saveActiveOrders();
+
+        // Refresh UI
+        if (activeOrderTrackingId === orderId) {
+            renderOrderTrackingContent();
+        }
+
+        // Toast
+        showToast(`สถานะออเดอร์: ${newStatusObj.label}`, 'info');
+        if (newStatusCode === 'cooking') new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play().catch(() => { });
+        triggerHaptic();
+    }
+}
+
 
 function getNextDeliveryDate(fromDate) {
     const delivery = new Date(fromDate);
@@ -117,6 +172,10 @@ function getNextDeliveryDate(fromDate) {
     return delivery;
 }
 
+function stopTracking() {
+    if (trackingSubscription) supabaseClient.removeChannel(trackingSubscription);
+    localStorage.removeItem('active_tracking_order');
+}
 function advanceOrderStatus(orderId) {
     const order = activeOrders.get(orderId);
     if (!order) return;

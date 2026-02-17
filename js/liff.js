@@ -104,7 +104,7 @@ async function handleLiffSession(profile) {
     if (loginBtn) loginBtn.classList.add('hidden');
     if (moreLoginBtn) moreLoginBtn.classList.add('hidden');
 
-    if (typeof closeWelcome === 'function') closeWelcome();
+    if (typeof closeWelcome === 'function') closeWelcome(true);
 
     // Sync with Supabase Profiles (Upsert)
     try {
@@ -151,7 +151,7 @@ async function handleUserSession(user) {
     if (loginBtn) loginBtn.classList.remove('hidden');
     if (moreLoginBtn) moreLoginBtn.classList.remove('hidden');
 
-    if (typeof closeWelcome === 'function') closeWelcome();
+    if (typeof closeWelcome === 'function') closeWelcome(true);
 }
 
 // Init on Load
