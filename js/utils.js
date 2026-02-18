@@ -105,7 +105,13 @@ function debounce(func, wait) {
 function playSound(type) { /* Sound disabled */ }
 
 function triggerHaptic(intensity = 'light') {
-    if (navigator.vibrate) navigator.vibrate(intensity === 'heavy' ? [80, 40, 80] : 15);
+    try {
+        if (navigator.vibrate && window.isSecureContext) {
+            navigator.vibrate(intensity === 'heavy' ? [80, 40, 80] : 15);
+        }
+    } catch (e) {
+        // Ignore vibrate errors
+    }
 }
 
 function showGlobalLoader(text = "กำลังโหลด...") {

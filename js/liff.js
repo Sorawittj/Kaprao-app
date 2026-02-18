@@ -183,7 +183,7 @@ async function handleLiffSession(profile) {
                             updated_at: new Date().toISOString()
                         }, { onConflict: 'id' });
                 } else {
-                    console.error("Profile Sync Warning:", error.message);
+                    console.warn("Profile Sync: RLS policy requires SQL migration. Run supabase_full_migration.sql in Supabase SQL Editor.");
                 }
             }
         } catch (e) { console.error("Sync Error", e); }
