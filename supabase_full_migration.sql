@@ -17,6 +17,28 @@ ADD COLUMN IF NOT EXISTS display_name text;
 -- Index for LINE User ID lookup
 CREATE INDEX IF NOT EXISTS idx_profiles_line_user_id ON public.profiles(line_user_id);
 
+ALTER TABLE public.profiles enable row level security;
+
+-- Allow users to insert their own profile
+DROP POLICY IF EXISTS "Users can insert their own profile" ON public.profiles;
+CREATE POLICY "Users can insert their own profile" on public.profiles
+    for insert with check (auth.uid() = id);
+
+-- Allow users to update their own profile
+DROP POLICY IF EXISTS "Users can update their own profile" ON public.profiles;
+CREATE POLICY "Users can update their own profile" on public.profiles
+    for update using (auth.uid() = id);
+
+-- Allow users to view their own profile
+DROP POLICY IF EXISTS "Users can view their own profile" ON public.profiles;
+CREATE POLICY "Users can view their own profile" on public.profiles
+    for select using (auth.uid() = id);
+
+-- Allow anyone to view profiles (for admin)
+DROP POLICY IF EXISTS "Anyone can view all profiles" ON public.profiles;
+CREATE POLICY "Anyone can view all profiles" on public.profiles
+    for select using (true);
+
 -- =============================================
 -- 2. ORDERS TABLE - Add missing columns
 -- =============================================
@@ -53,6 +75,16 @@ CREATE TABLE IF NOT EXISTS public.lotto_pool (
 );
 
 ALTER TABLE public.lotto_pool enable row level security;
+
+-- Allow anyone to view lotto pool
+DROP POLICY IF EXISTS "Anyone can view lotto pool" ON public.lotto_pool;
+CREATE POLICY "Anyone can view lotto pool" on public.lotto_pool
+    for select using (true);
+
+-- Allow users to insert their own lotto numbers
+DROP POLICY IF EXISTS "Users can insert their own lotto" ON public.lotto_pool;
+CREATE POLICY "Users can insert their own lotto" on public.lotto_pool
+    for insert with check (auth.uid() = user_id OR auth.role() IN ('authenticated', 'anon'));
 
 DROP POLICY IF EXISTS "Users can view their own lotto numbers" ON public.lotto_pool;
 CREATE POLICY "Users can view their own lotto numbers" on public.lotto_pool 
@@ -111,11 +143,12 @@ CREATE POLICY "Anyone can view lotto results" on public.lotto_results
 -- =============================================
 
 -- Allow anonymous users to insert orders (for guest checkout)
+-- This allows any authenticated or anonymous user to insert orders
 DROP POLICY IF EXISTS "Users can insert their own orders" ON public.orders;
 CREATE POLICY "Users can insert their own orders" on public.orders
     for insert with check (
         auth.uid() = user_id OR 
-        (auth.uid() IS NOT NULL AND user_id IS NULL)
+        (auth.role() IN ('authenticated', 'anon'))
     );
 
 -- Allow users to view their own orders
