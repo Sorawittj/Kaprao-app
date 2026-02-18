@@ -4,10 +4,10 @@
 window.addEventListener('error', function (e) { console.error('Global error caught:', e.error); e.preventDefault(); });
 document.addEventListener('error', function (e) {
     if (e.target.tagName.toLowerCase() === 'img') {
-        // Prevent infinite loop if placeholder also fails
-        if (e.target.src.includes('placehold.co')) return;
+        const fallback = 'images/logo.png'; // Use local fallback
+        if (e.target.src.includes(fallback)) return; // Prevent loop
 
-        e.target.src = 'https://placehold.co/400x300?text=No+Image';
+        e.target.src = fallback;
         e.target.alt = 'Image not found';
         e.target.classList.add('opacity-50');
     }
