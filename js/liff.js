@@ -152,6 +152,21 @@ async function handleUserSession(user) {
     if (moreLoginBtn) moreLoginBtn.classList.remove('hidden');
 
     if (typeof closeWelcome === 'function') closeWelcome(true);
+
+    // Sync Guest Profile to Supabase (Upsert)
+    // REQUIRED for foreign key constraints in 'orders' table
+    try {
+        const { error } = await window.supabaseClient
+            .from('profiles')
+            .upsert({
+                id: user.id, // Supabase UUID
+                display_name: userAvatar.name || 'Guest',
+                avatar_url: userAvatar.image,
+                updated_at: new Date()
+            }, { onConflict: 'id' });
+
+        if (error) console.error("Guest Profile Sync Warning:", error.message);
+    } catch (e) { console.error("Guest Sync Error", e); }
 }
 
 // Init on Load
