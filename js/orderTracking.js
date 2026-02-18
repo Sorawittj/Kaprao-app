@@ -67,6 +67,7 @@ let activeOrders = new Map();
 let activeOrderTrackingId = null;
 let trackingInterval = null;
 let trackingSubscription = null;
+let userOrdersSubscription = null; // New global subscription for user's orders
 
 // --- Core Functions ---
 
@@ -543,9 +544,21 @@ function renderOrderDetailView(container, order) {
 
 function renderOrderListView(container) {
     const list = Array.from(activeOrders.values()).sort((a, b) => {
-        const timeA = new Date(a.orderDate || a.startTime || 0).getTime();
-        const timeB = new Date(b.orderDate || b.startTime || 0).getTime();
-        return timeB - timeA; // Descending: Newest First
+        let timeA = new Date(a.orderDate || a.startTime || 0).getTime();
+        let timeB = new Date(b.orderDate || b.startTime || 0).getTime();
+
+        // Handle invalid dates
+        if (isNaN(timeA)) timeA = 0;
+        if (isNaN(timeB)) timeB = 0;
+
+        // Primary sort: Time Descending
+        if (timeB !== timeA) return timeB - timeA;
+
+        // Secondary sort: ID Descending (assuming higher ID = newer)
+        // Extract numeric part if possible
+        const idA = parseInt(String(a.id).replace(/\D/g, '')) || 0;
+        const idB = parseInt(String(b.id).replace(/\D/g, '')) || 0;
+        return idB - idA;
     });
 
     if (list.length === 0) {
@@ -885,8 +898,56 @@ async function loadOrdersFromSupabase(userId) {
     }
 }
 
+
+// --- User-Level Realtime Subscription (New) ---
+
+function setupUserOrderRealtime(userId) {
+    if (typeof supabaseClient === 'undefined' || !userId) return;
+
+    if (userOrdersSubscription) {
+        console.log("Existing subscription found, removing...");
+        supabaseClient.removeChannel(userOrdersSubscription);
+    }
+
+    console.log("Setting up realtime for user orders:", userId);
+
+    userOrdersSubscription = supabaseClient
+        .channel(`user-orders:${userId}`)
+        .on('postgres_changes', {
+            event: '*', // Listen to INSERT (new device order) and UPDATE (status change)
+            schema: 'public',
+            table: 'orders',
+            filter: `user_id=eq.${userId}`
+        }, (payload) => {
+            console.log('Realtime User Order Event:', payload);
+
+            if (payload.eventType === 'INSERT') {
+                // New order placed on another device
+                console.log("New order detected from other device!");
+                loadOrdersFromSupabase(userId); // Reload full list to be safe and simple
+                showToast('มีออเดอร์ใหม่เข้ามา! 📥', 'info');
+            } else if (payload.eventType === 'UPDATE') {
+                // Status update on any existing order
+                const newStatus = payload.new.status;
+                const orderId = payload.new.id.toString();
+
+                // If we have it locally, update it
+                if (activeOrders.has(orderId)) {
+                    handleStatusUpdate(orderId, newStatus);
+                } else {
+                    // If not found locally (maybe synced list outdated?), reload
+                    loadOrdersFromSupabase(userId);
+                }
+            }
+        })
+        .subscribe((status) => {
+            console.log("User Realtime Subscription Status:", status);
+        });
+}
+
 // Expose to window
 window.loadOrdersFromSupabase = loadOrdersFromSupabase;
+window.setupUserOrderRealtime = setupUserOrderRealtime;
 
 
 function openAdminLoginModal() {

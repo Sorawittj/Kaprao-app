@@ -89,5 +89,63 @@ window.fetchMenuFromSupabase = async function () {
 // Auto-load on start
 document.addEventListener('DOMContentLoaded', () => {
     // Delay slightly to ensure Supabase client is ready
-    setTimeout(fetchMenuFromSupabase, 800);
+    setTimeout(() => {
+        fetchMenuFromSupabase();
+        setupMenuRealtime();
+    }, 800);
 });
+
+function setupMenuRealtime() {
+    if (window.menuRealtimeSubscription) return; // Prevent multiple subscriptions
+    if (!window.supabaseClient) return;
+
+    window.menuRealtimeSubscription = window.supabaseClient
+        .channel('menu_updates')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'menu_items' }, (payload) => {
+            console.log('Menu Realtime Update:', payload);
+
+            if (payload.eventType === 'UPDATE') {
+                const newItem = payload.new;
+                const index = window.menuItems.findIndex(i => i.id === newItem.id);
+
+                if (index !== -1) {
+                    // Update existing item in place
+                    const oldItem = window.menuItems[index];
+
+                    // Create updated object
+                    const updatedItem = {
+                        ...oldItem,
+                        name: newItem.name !== undefined ? newItem.name : oldItem.name,
+                        price: newItem.price !== undefined ? newItem.price : oldItem.price,
+                        category: newItem.category !== undefined ? newItem.category : oldItem.category,
+                        // Helper: allow nulls if DB allows, but usually fallback to old
+                        soldOut: newItem.is_available === false, // Critical Mapping
+                        isNew: newItem.is_new !== undefined ? newItem.is_new : oldItem.isNew,
+                        isTray: newItem.is_tray !== undefined ? newItem.is_tray : oldItem.isTray, // Ensure tray update
+                        reqMeat: newItem.req_meat !== undefined ? newItem.req_meat : oldItem.reqMeat,
+                        desc: newItem.description !== undefined ? newItem.description : oldItem.desc
+                    };
+
+                    window.menuItems[index] = updatedItem;
+
+                    // Re-render
+                    if (typeof renderMenu === 'function') {
+                        renderMenu();
+                        // Optional: Show toast if an item in view changed status
+                        // showToast(`เมนู ${updatedItem.name} มีการอัปเดต`, 'info'); 
+                    }
+                } else {
+                    // Item updated but not in local list? Fetch all to be safe
+                    fetchMenuFromSupabase();
+                }
+            } else {
+                // INSERT or DELETE
+                fetchMenuFromSupabase();
+            }
+        })
+        .subscribe((status) => {
+            if (status === 'SUBSCRIBED') {
+                console.log('Listening for menu updates...');
+            }
+        });
+}

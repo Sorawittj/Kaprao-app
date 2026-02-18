@@ -3,1054 +3,375 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard | Kaprao52</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/supabase-client.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kaprao52 Chef's Table | Admin Control</title>
+
+    <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: { sans: ['Prompt', 'sans-serif'] },
                     colors: {
-                        brand: {
-                            dark: '#2D2D2A',
-                            gold: '#C5A059',
-                            cream: '#FDFBF7'
+                        amber: {
+                            50: '#fffbeb', 100: '#fef3c7', 200: '#fde68a',
+                            300: '#fcd34d', 400: '#fbbf24', 500: '#f59e0b',
+                            600: '#d97706', 700: '#b45309', 800: '#92400e', 900: '#78350f'
+                        },
+                        gray: {
+                            850: '#1f2937', 900: '#111827', 950: '#030712'
                         }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-out',
+                        'slide-up': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+                        slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } }
                     }
                 }
             }
         }
     </script>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+
     <style>
         body {
-            background-color: #FDFBF7;
+            background-color: #F9FAFB;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .glass {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
 
-        .glass-dark {
-            background: rgba(45, 45, 42, 0.95);
-            backdrop-filter: blur(10px);
-            color: white;
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
         }
 
-        .gradient-text {
-            background: linear-gradient(135deg, #4F46E5, #9333EA);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
         }
 
-        .card-hover {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #E5E7EB;
+            border-radius: 20px;
         }
 
-        .card-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
-        }
-
-        .hide-scroll::-webkit-scrollbar {
+        .hide-scrollbar::-webkit-scrollbar {
             display: none;
-        }
-
-        .hide-scroll {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
         }
     </style>
 </head>
 
-<body class="text-gray-800">
+<body class="text-gray-800 antialiased overflow-hidden h-screen flex">
 
-    <!-- Toast -->
+    <!-- Toast Notification -->
     <div id="toast"
-        class="fixed top-4 right-4 z-[100] transform transition-all duration-300 translate-x-full opacity-0">
-        <div
-            class="bg-gray-800 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 border border-gray-700">
-            <i class="fas fa-info-circle text-brand-gold text-xl"></i>
-            <span id="toast-msg" class="font-medium">Notification</span>
-        </div>
+        class="fixed top-6 right-6 z-[100] transform transition-all duration-300 translate-x-10 opacity-0 flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl font-medium min-w-[300px] border border-white/10 glass">
+        <i class="fas fa-info-circle text-xl"></i>
+        <span id="toast-msg">Notification</span>
     </div>
 
     <!-- Login Overlay -->
     <div id="login-overlay"
-        class="fixed inset-0 z-[100] bg-[#2D2D2A] flex items-center justify-center p-4 transition-all duration-500">
-        <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-gold to-yellow-500"></div>
+        class="fixed inset-0 z-[200] bg-gray-900 flex items-center justify-center p-4 transition-all duration-500">
+        <div
+            class="bg-white rounded-[2rem] p-8 max-w-sm w-full shadow-2xl text-center relative overflow-hidden animate-slide-up">
+            <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-amber-400 to-orange-500"></div>
             <div
-                class="w-20 h-20 bg-yellow-50 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl shadow-inner">
-                🔐
+                class="w-24 h-24 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-6 text-5xl shadow-inner border border-amber-100">
+                👨‍🍳
             </div>
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">เจ้าของร้าน</h2>
-            <p class="text-gray-400 mb-8 text-sm">Kaprao52 Management System</p>
+            <h2 class="text-2xl font-black text-gray-800 mb-2 tracking-tight">CHEF'S TABLE</h2>
+            <p class="text-gray-400 mb-8 text-sm font-medium">Kaprao52 Management System</p>
 
             <form onsubmit="handleLogin(event)" class="space-y-4">
-                <div class="relative">
+                <div class="relative group">
                     <input type="password" id="passcode-input"
-                        class="w-full text-center text-3xl tracking-[0.5em] p-4 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:border-brand-gold focus:bg-white outline-none transition-all font-bold text-gray-800 placeholder-gray-300"
+                        class="w-full text-center text-3xl tracking-[0.5em] p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-amber-400 focus:bg-white outline-none transition-all font-bold text-gray-800 placeholder-gray-300 group-hover:border-gray-200"
                         placeholder="••••••" maxlength="6" inputmode="numeric" required>
                 </div>
                 <button type="submit"
-                    class="w-full bg-gray-900 hover:bg-black text-white font-bold py-4 rounded-2xl transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2">
-                    <span>เข้าใช้งาน</span> <i class="fas fa-arrow-right"></i>
+                    class="w-full bg-gray-900 hover:bg-black text-white font-bold py-4 rounded-2xl transition-all shadow-lg active:scale-[0.98] flex items-center justify-center gap-2 group">
+                    <span>เข้าครัว</span> <i
+                        class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
                 </button>
             </form>
             <p id="login-error"
-                class="mt-4 text-red-500 text-sm font-medium hidden flex items-center justify-center gap-1">
-                <i class="fas fa-exclamation-circle"></i> รหัสผ่านไม่ถูกต้อง
+                class="mt-4 text-red-500 text-sm font-bold hidden bg-red-50 py-2 rounded-lg animate-pulse">
+                <i class="fas fa-times-circle mr-1"></i> รหัสผ่านไม่ถูกต้อง
             </p>
         </div>
     </div>
 
-    <!-- Main App -->
-    <div class="flex h-screen overflow-hidden">
-        <!-- Sidebar -->
-        <aside class="w-64 bg-white border-r border-gray-100 hidden md:flex flex-col z-20">
-            <div class="h-20 flex items-center px-6 border-b border-gray-50">
-                <div
-                    class="w-8 h-8 bg-brand-gold rounded-lg flex items-center justify-center text-white font-bold mr-3">
-                    K</div>
-                <span class="font-bold text-xl tracking-tight">KAPRAO52</span>
-            </div>
-            <nav class="flex-1 p-4 space-y-2">
-                <button onclick="switchTab('orders')" id="nav-orders"
-                    class="w-full text-left px-4 py-3 rounded-xl font-bold flex items-center gap-3 bg-gray-900 text-white shadow-lg shadow-gray-200 transition-all">
-                    <i class="fas fa-clipboard-list w-6"></i> รายการออเดอร์
-                </button>
-                <button onclick="switchTab('customers')" id="nav-customers"
-                    class="w-full text-left px-4 py-3 rounded-xl font-bold flex items-center gap-3 text-gray-400 hover:bg-gray-50 hover:text-gray-800 transition-all">
-                    <i class="fas fa-users w-6"></i> ลูกค้า & พอยต์
-                </button>
-                <button onclick="switchTab('menu')" id="nav-menu"
-                    class="w-full text-left px-4 py-3 rounded-xl font-bold flex items-center gap-3 text-gray-400 hover:bg-gray-50 hover:text-gray-800 transition-all">
-                    <i class="fas fa-utensils w-6"></i> จัดการเมนู
-                </button>
-            </nav>
-            <div class="p-4 border-t border-gray-50 space-y-2">
-                <a href="index.html"
-                    class="w-full px-4 py-3 rounded-xl font-bold flex items-center gap-3 text-gray-500 hover:bg-gray-50 transition-all">
-                    <i class="fas fa-arrow-left w-6"></i> กลับหน้าร้าน
-                </a>
-                <button onclick="logoutAdmin()"
-                    class="w-full px-4 py-3 rounded-xl font-bold flex items-center gap-3 text-red-500 hover:bg-red-50 transition-all">
-                    <i class="fas fa-sign-out-alt w-6"></i> ออกจากระบบ
-                </button>
-            </div>
-        </aside>
+    <!-- Sidebar Overlay (Mobile) -->
+    <div id="sidebar-overlay" onclick="toggleMobileSidebar()"
+        class="fixed inset-0 bg-black/50 z-20 hidden opacity-0 transition-opacity duration-300 md:hidden backdrop-blur-sm">
+    </div>
 
-        <!-- Content -->
-        <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
-            <!-- Mobile Header -->
-            <header
-                class="md:hidden h-16 bg-white/80 backdrop-blur border-b border-gray-100 flex items-center justify-between px-4 sticky top-0 z-30">
-                <div class="flex items-center gap-3">
-                    <a href="index.html"
-                        class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100"><i
-                            class="fas fa-arrow-left"></i></a>
-                    <div class="font-bold text-lg">KAPRAO52</div>
-                </div>
-                <button onclick="logoutAdmin()" class="text-gray-400"><i class="fas fa-sign-out-alt"></i></button>
-            </header>
+    <!-- Sidebar -->
+    <aside id="sidebar"
+        class="fixed inset-y-0 left-0 w-72 bg-gray-900 text-white flex-col transform -translate-x-full md:translate-x-0 md:relative md:flex transition-transform duration-300 z-30 shadow-2xl overflow-hidden h-full">
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 opacity-5 pointer-events-none"
+            style="background-image: radial-gradient(#fbbf24 1px, transparent 1px); background-size: 24px 24px;"></div>
 
-            <!-- Bottom Nav Mobile -->
+        <div class="h-24 flex items-center px-8 border-b border-gray-800 relative z-10">
             <div
-                class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex justify-around p-2 z-40 pb-safe">
-                <button onclick="switchTab('orders')" id="mob-orders"
-                    class="flex flex-col items-center p-2 text-brand-gold">
-                    <i class="fas fa-clipboard-list text-xl mb-1"></i>
-                    <span class="text-[10px] font-bold">ออเดอร์</span>
-                </button>
-                <button onclick="switchTab('customers')" id="mob-customers"
-                    class="flex flex-col items-center p-2 text-gray-400">
-                    <i class="fas fa-users text-xl mb-1"></i>
-                    <span class="text-[10px] font-bold">ลูกค้า</span>
-                </button>
-                <button onclick="switchTab('menu')" id="mob-menu" class="flex flex-col items-center p-2 text-gray-400">
-                    <i class="fas fa-utensils text-xl mb-1"></i>
-                    <span class="text-[10px] font-bold">เมนู</span>
-                </button>
+                class="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center text-white font-black text-xl mr-3 shadow-lg shadow-orange-500/20">
+                K</div>
+            <div>
+                <h1 class="font-black text-xl tracking-tight text-white leading-none">KAPRAO52</h1>
+                <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase mt-1">Michelin Dashboard</p>
             </div>
-
-            <!-- Scrollable Area -->
-            <div class="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8 hide-scroll items-center gap-5">
-
-                <!-- Section: Orders -->
-                <div id="section-orders" class="animate-fade-in space-y-6 max-w-6xl mx-auto w-full">
-                    <!-- Stats -->
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
-                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 card-hover">
-                            <p class="text-xs text-gray-400 font-bold uppercase mb-2">รอรายการ</p>
-                            <h3 class="text-3xl md:text-4xl font-black text-orange-500" id="count-placed">0</h3>
-                        </div>
-                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 card-hover">
-                            <p class="text-xs text-gray-400 font-bold uppercase mb-2">กำลังทำ</p>
-                            <h3 class="text-3xl md:text-4xl font-black text-blue-500" id="count-cooking">0</h3>
-                        </div>
-                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 card-hover">
-                            <p class="text-xs text-gray-400 font-bold uppercase mb-2">ยอดขายวันนี้</p>
-                            <h3 class="text-2xl md:text-3xl font-black text-green-600 truncate" id="revenue-today">฿0
-                            </h3>
-                        </div>
-                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 card-hover">
-                            <p class="text-xs text-gray-400 font-bold uppercase mb-2">ออเดอร์รวม</p>
-                            <h3 class="text-3xl md:text-4xl font-black text-gray-800" id="total-orders">0</h3>
-                        </div>
-                    </div>
-
-                    <!-- Orders List -->
-                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                        <div
-                            class="p-6 border-b border-gray-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                            <div>
-                                <h2 class="text-xl font-bold text-gray-800">รายการล่าสุด</h2>
-                                <p class="text-sm text-gray-400">จัดการออเดอร์ที่เข้ามาทั้งหมด</p>
-                            </div>
-                            <div class="flex gap-2">
-                                <button onclick="exportOrdersCSV()"
-                                    class="px-4 py-2 bg-green-50 hover:bg-green-100 text-green-700 rounded-xl text-sm font-bold transition-all border border-green-200 flex items-center gap-2">
-                                    <i class="fas fa-file-csv"></i> Export CSV
-                                </button>
-                                <button onclick="fetchOrders()"
-                                    class="px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-xl text-sm font-bold transition-all border border-gray-200 flex items-center gap-2">
-                                    <i class="fas fa-sync-alt"></i> อัปเดต
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Desktop Table -->
-                        <div class="hidden md:block overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead class="bg-gray-50/50 text-gray-400 text-xs uppercase tracking-wider">
-                                    <tr>
-                                        <th class="p-5 font-bold">#ID</th>
-                                        <th class="p-5 font-bold">เวลา</th>
-                                        <th class="p-5 font-bold">ลูกค้า</th>
-                                        <th class="p-5 font-bold">รายการอาหาร</th>
-                                        <th class="p-5 font-bold">ยอดรวม</th>
-                                        <th class="p-5 font-bold">สถานะ</th>
-                                        <th class="p-5 text-right font-bold">จัดการ</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="orders-list-desktop" class="text-sm divide-y divide-gray-50"></tbody>
-                            </table>
-                        </div>
-
-                        <!-- Mobile Cards -->
-                        <div id="orders-list-mobile" class="md:hidden divide-y divide-gray-50"></div>
-                    </div>
-                </div>
-
-                <!-- Section: Customers -->
-                <div id="section-customers" class="hidden animate-fade-in space-y-6 max-w-6xl mx-auto w-full">
-                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                        <div
-                            class="p-6 border-b border-gray-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                            <div>
-                                <h2 class="text-xl font-bold text-gray-800">ลูกค้า & พอยต์สะสม</h2>
-                                <p class="text-sm text-gray-400">ข้อมูลลูกค้าและแต้มสะสมทั้งหมด</p>
-                            </div>
-                            <div class="flex gap-2">
-                                <button onclick="exportCustomersCSV()"
-                                    class="px-4 py-2 bg-green-50 hover:bg-green-100 text-green-700 rounded-xl text-sm font-bold transition-all border border-green-200 flex items-center gap-2">
-                                    <i class="fas fa-file-csv"></i> Export CSV
-                                </button>
-                                <button onclick="fetchCustomers()"
-                                    class="px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-xl text-sm font-bold transition-all border border-gray-200 flex items-center gap-2">
-                                    <i class="fas fa-sync-alt"></i> อัปเดต
-                                </button>
-                            </div>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead class="bg-gray-50/50 text-gray-400 text-xs uppercase tracking-wider">
-                                    <tr>
-                                        <th class="p-4 font-bold">ลูกค้า</th>
-                                        <th class="p-4 font-bold">พอยต์สะสม</th>
-                                        <th class="p-4 font-bold">ออเดอร์รวม</th>
-                                        <th class="p-4 font-bold">ระดับ</th>
-                                        <th class="p-4 font-bold">LINE ID</th>
-                                        <th class="p-4 font-bold">อัปเดตล่าสุด</th>
-                                        <th class="p-4 font-bold text-right">จัดการพอยต์</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="customers-list" class="text-sm divide-y divide-gray-50"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Section: Menu -->
-                <div id="section-menu" class="hidden animate-fade-in max-w-6xl mx-auto w-full">
-                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden p-6 md:p-8">
-                        <div class="flex justify-between items-center mb-8">
-                            <div>
-                                <h2 class="text-2xl font-bold text-gray-800">จัดการเมนู</h2>
-                                <p class="text-sm text-gray-400">เปิด/ปิด เมนู และแก้ไขราคา</p>
-                            </div>
-                            <button onclick="openAddMenuModal()"
-                                class="bg-gray-900 hover:bg-black text-white font-bold py-3 px-6 rounded-2xl transition-all shadow-lg shadow-gray-200 flex items-center gap-2">
-                                <i class="fas fa-plus"></i> <span class="hidden md:inline">เพิ่มเมนู</span>
-                            </button>
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" id="menu-grid"></div>
-                    </div>
-                </div>
-
-            </div>
-        </main>
-    </div>
-
-    <!-- Modals -->
-    <!-- Menu Modal -->
-    <div id="menu-modal"
-        class="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity">
-        <div class="bg-white rounded-[2rem] w-full max-w-md p-8 relative shadow-2xl animate-pop-in">
-            <button onclick="closeMenuModal()" class="absolute top-6 right-6 text-gray-300 hover:text-gray-600"><i
-                    class="fas fa-times text-xl"></i></button>
-            <h3 class="text-2xl font-bold text-gray-800 mb-6" id="menu-modal-title">เพิ่มเมนู</h3>
-            <form id="menu-form" onsubmit="handleMenuSubmit(event)" class="space-y-5">
-                <input type="hidden" id="menu-id">
-                <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1">ชื่อเมนู</label>
-                    <input type="text" id="menu-name" required
-                        class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl outline-none focus:border-brand-gold focus:bg-white transition-all font-medium text-gray-800"
-                        placeholder="เช่น กะเพราหมูสับ">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1">ราคา</label>
-                        <input type="number" id="menu-price" required
-                            class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl outline-none focus:border-brand-gold focus:bg-white transition-all font-bold text-gray-800"
-                            placeholder="0">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1">หมวด</label>
-                        <select id="menu-category"
-                            class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl outline-none focus:border-brand-gold focus:bg-white transition-all font-medium text-gray-800 appearance-none">
-                            <option value="kaprao">กะเพรา</option>
-                            <option value="tray">ชุดถาด</option>
-                            <option value="curry">แกง/พริกแกง</option>
-                            <option value="noodle">เส้น</option>
-                            <option value="garlic">กระเทียม</option>
-                            <option value="soup">ต้ม/แกงจืด</option>
-                            <option value="dessert">ของหวาน/น้ำ</option>
-                            <option value="others">อื่นๆ</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="flex gap-4 pt-2">
-                    <label
-                        class="flex-1 flex items-center justify-between p-4 bg-gray-50 rounded-2xl cursor-pointer border-2 border-transparent hover:border-gray-200 transition-all">
-                        <span class="text-sm font-bold text-gray-600">เปิดขาย</span>
-                        <input type="checkbox" id="menu-available" checked class="w-6 h-6 accent-green-500 rounded-md">
-                    </label>
-                    <label
-                        class="flex-1 flex items-center justify-between p-4 bg-gray-50 rounded-2xl cursor-pointer border-2 border-transparent hover:border-gray-200 transition-all">
-                        <span class="text-sm font-bold text-gray-600">เมนูใหม่</span>
-                        <input type="checkbox" id="menu-new" class="w-6 h-6 accent-orange-500 rounded-md">
-                    </label>
-                </div>
-                <button type="submit"
-                    class="w-full py-4 bg-gray-900 text-white font-bold rounded-2xl hover:bg-black transition-all shadow-lg active:scale-95">บันทึกข้อมูล</button>
-            </form>
         </div>
+
+        <nav class="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar relative z-10">
+            <p class="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-4">Main Menu</p>
+
+            <button onclick="switchTab('orders')" data-tab="orders"
+                class="nav-item w-full text-left px-5 py-3.5 rounded-xl font-bold flex items-center gap-4 transition-all group bg-amber-400 text-gray-900 shadow-lg">
+                <i class="fas fa-clipboard-list w-6 text-center text-lg"></i>
+                <span>ออเดอร์</span>
+                <span id="badge-orders"
+                    class="ml-auto bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full hidden">New</span>
+            </button>
+
+            <button onclick="switchTab('menu')" data-tab="menu"
+                class="nav-item w-full text-left px-5 py-3.5 rounded-xl font-bold flex items-center gap-4 text-gray-400 hover:bg-white/10 hover:text-white transition-all group">
+                <i class="fas fa-utensils w-6 text-center text-lg group-hover:text-amber-400 transition-colors"></i>
+                <span>จัดการเมนู</span>
+            </button>
+
+            <button onclick="switchTab('customers')" data-tab="customers"
+                class="nav-item w-full text-left px-5 py-3.5 rounded-xl font-bold flex items-center gap-4 text-gray-400 hover:bg-white/10 hover:text-white transition-all group">
+                <i class="fas fa-users w-6 text-center text-lg group-hover:text-amber-400 transition-colors"></i>
+                <span>ลูกค้า & สมาชิก</span>
+            </button> <!-- Fixed closing tag -->
+
+            <div class="mt-8 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">System</div>
+
+            <a href="index.html"
+                class="w-full text-left px-5 py-3.5 rounded-xl font-bold flex items-center gap-4 text-gray-400 hover:bg-white/10 hover:text-white transition-all group">
+                <i class="fas fa-store w-6 text-center text-lg group-hover:text-green-400 transition-colors"></i>
+                <span>หน้าร้าน</span>
+            </a>
+
+            <button onclick="logoutAdmin()"
+                class="w-full text-left px-5 py-3.5 rounded-xl font-bold flex items-center gap-4 text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all group">
+                <i class="fas fa-sign-out-alt w-6 text-center text-lg"></i>
+                <span>ออกจากระบบ</span>
+            </button>
+        </nav>
+
+        <div class="p-6 border-t border-gray-800 relative z-10 bg-gray-900/50">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-xl">👨‍🍳</div>
+                <div>
+                    <p class="font-bold text-sm text-white">Head Chef</p>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                        <p class="text-xs text-green-400 font-medium">Online</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative bg-[#F9FAFB]">
+        <!-- Top Header -->
+        <header
+            class="h-20 bg-white border-b border-gray-100 flex items-center justify-between px-6 md:px-10 sticky top-0 z-10 shadow-sm">
+            <div class="flex items-center gap-4 md:hidden">
+                <button onclick="toggleMobileSidebar()"
+                    class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 active:scale-95 transition-all">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="font-black text-xl tracking-tight text-gray-900">KAPRAO52</div>
+            </div>
+
+            <div class="hidden md:block">
+                <h2 class="text-xl font-bold text-gray-800" id="page-title">Dashboard Overview</h2>
+                <p class="text-xs text-gray-400 font-medium" id="header-date">Wait...</p>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="hidden md:flex flex-col items-end mr-2">
+                    <span class="text-xs text-gray-400 font-bold uppercase tracking-wider">Kitchen Time</span>
+                    <span class="text-xl font-black font-mono text-gray-800 leading-none" id="header-time">--:--</span>
+                </div>
+                <button
+                    class="w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-amber-500 hover:border-amber-200 transition-all relative shadow-sm">
+                    <i class="fas fa-bell"></i>
+                    <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8 pb-24 md:pb-8">
+
+            <!-- Section: Orders -->
+            <div id="section-orders" class="content-section max-w-7xl mx-auto space-y-8 animate-fade-in">
+                <!-- Stats Row -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div
+                        class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition-all group">
+                        <div class="flex justify-between items-start mb-2">
+                            <span
+                                class="w-10 h-10 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center group-hover:scale-110 transition-transform"><i
+                                    class="fas fa-concierge-bell"></i></span>
+                            <span class="text-xs font-bold bg-gray-50 text-gray-400 px-2 py-1 rounded-lg">Today</span>
+                        </div>
+                        <h3 class="text-gray-400 text-xs font-bold uppercase mb-1">New Orders</h3>
+                        <p class="text-3xl font-black text-gray-800" id="stat-pending">0</p>
+                    </div>
+                    <div
+                        class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition-all group">
+                        <div class="flex justify-between items-start mb-2">
+                            <span
+                                class="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center group-hover:scale-110 transition-transform"><i
+                                    class="fas fa-fire"></i></span>
+                        </div>
+                        <h3 class="text-gray-400 text-xs font-bold uppercase mb-1">Cooking</h3>
+                        <p class="text-3xl font-black text-gray-800" id="stat-cooking">0</p>
+                    </div>
+                    <div
+                        class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition-all group">
+                        <div class="flex justify-between items-start mb-2">
+                            <span
+                                class="w-10 h-10 rounded-xl bg-green-50 text-green-500 flex items-center justify-center group-hover:scale-110 transition-transform"><i
+                                    class="fas fa-check-circle"></i></span>
+                        </div>
+                        <h3 class="text-gray-400 text-xs font-bold uppercase mb-1">Completed</h3>
+                        <p class="text-3xl font-black text-gray-800" id="stat-completed">0</p>
+                    </div>
+                    <div
+                        class="bg-gradient-to-br from-gray-900 to-black p-5 rounded-2xl shadow-xl text-white transform hover:-translate-y-1 transition-transform">
+                        <div class="flex justify-between items-start mb-2">
+                            <span
+                                class="w-10 h-10 rounded-xl bg-white/10 text-amber-400 flex items-center justify-center"><i
+                                    class="fas fa-coins"></i></span>
+                        </div>
+                        <h3 class="text-gray-400 text-xs font-bold uppercase mb-1">Total Revenue</h3>
+                        <p class="text-3xl font-black text-amber-400" id="stat-revenue">฿0</p>
+                    </div>
+                </div>
+
+                <!-- Live Orders Feed -->
+                <div>
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                            <span class="w-2 h-8 bg-amber-500 rounded-full"></span> Live Orders Feed
+                        </h3>
+                        <button onclick="fetchOrders()"
+                            class="px-4 py-2 bg-white border border-gray-200 rounded-xl shadow-sm text-sm font-bold text-gray-600 hover:bg-gray-50 flex items-center gap-2 transition-all active:scale-95">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+
+                    <!-- Orders Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" id="orders-grid">
+                        <!-- Items injected by JS -->
+                        <div
+                            class="col-span-full flex flex-col items-center justify-center py-20 text-gray-400 opacity-50">
+                            <div class="animate-pulse flex flex-col items-center">
+                                <i class="fas fa-circle-notch fa-spin text-4xl mb-4 text-amber-400"></i>
+                                <p>Loading Kitchen Data...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section: Menu -->
+            <div id="section-menu" class="content-section max-w-7xl mx-auto hidden animate-fade-in">
+                <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-6 md:p-8">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800">Menu Management</h2>
+                            <p class="text-sm text-gray-400">Control availability and pricing</p>
+                        </div>
+                        <button onclick="openAddMenuModal()"
+                            class="bg-gray-900 hover:bg-black text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center gap-2 active:scale-95">
+                            <i class="fas fa-plus"></i> Add New Item
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="menu-grid">
+                        <!-- Menu items injected by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section: Customers -->
+            <div id="section-customers" class="content-section max-w-7xl mx-auto hidden animate-fade-in">
+                <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-8 border-b border-gray-50">
+                        <h2 class="text-2xl font-bold text-gray-800">Customers Database</h2>
+                        <p class="text-sm text-gray-400">Top loyal customers & points</p>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-gray-50 text-gray-400 text-xs uppercase tracking-wider font-bold">
+                                <tr>
+                                    <th class="p-4 text-center">Rank</th>
+                                    <th class="p-4">Customer</th>
+                                    <th class="p-4 text-center">Tier</th>
+                                    <th class="p-4 text-right">Points</th>
+                                    <th class="p-4 text-right">Orders</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customers-list" class="text-sm divide-y divide-gray-50">
+                                <!-- Customer items injected by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Mobile Bottom Nav -->
+    <div
+        class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex justify-around p-2 pb-safe z-50 shadow-lg-up">
+        <button onclick="switchTab('orders')" data-tab="orders"
+            class="mob-nav-item flex flex-col items-center p-2 text-amber-500 scale-110 transition-all">
+            <i class="fas fa-clipboard-list text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">Orders</span>
+        </button>
+        <button onclick="switchTab('menu')" data-tab="menu"
+            class="mob-nav-item flex flex-col items-center p-2 text-gray-400 transition-all">
+            <i class="fas fa-utensils text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">Menu</span>
+        </button>
+        <button onclick="switchTab('customers')" data-tab="customers"
+            class="mob-nav-item flex flex-col items-center p-2 text-gray-400 transition-all">
+            <i class="fas fa-users text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">Users</span>
+        </button>
     </div>
 
-    <!-- Script -->
-    <script>
-        // Configuration
-        const ADMIN_PASSCODE = '909090';
+    <!-- Logic Script -->
+    <script src="js/admin.js"></script>
 
-        function showToast(msg, type = 'info') {
-            const toast = document.getElementById('toast');
-            const msgEl = document.getElementById('toast-msg');
-            msgEl.innerText = msg;
-            toast.classList.remove('translate-x-full', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('translate-x-full', 'opacity-0');
-            }, 3000);
-        }
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            checkAuth();
-            if (isLoggedIn()) initDashboard();
-        });
-
-        function isLoggedIn() { return sessionStorage.getItem('admin_session') === 'true'; }
-
-        function checkAuth() {
-            const overlay = document.getElementById('login-overlay');
-            if (isLoggedIn()) {
-                overlay.classList.add('opacity-0', 'pointer-events-none');
-                setTimeout(() => overlay.style.display = 'none', 500);
-            } else {
-                overlay.style.display = 'flex';
-                overlay.classList.remove('opacity-0', 'pointer-events-none');
-                document.getElementById('passcode-input').value = '';
-                document.getElementById('passcode-input').focus();
-            }
-        }
-
-        function handleLogin(e) {
-            e.preventDefault();
-            const input = document.getElementById('passcode-input').value;
-            if (input === ADMIN_PASSCODE) {
-                sessionStorage.setItem('admin_session', 'true');
-                checkAuth();
-                initDashboard();
-            } else {
-                const err = document.getElementById('login-error');
-                err.classList.remove('hidden');
-                document.getElementById('passcode-input').value = '';
-                // Shake
-                const box = document.querySelector('#login-overlay > div');
-                box.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-10px)' }, { transform: 'translateX(10px)' }, { transform: 'translateX(0)' }], { duration: 300 });
-            }
-        }
-
-        function logoutAdmin() {
-            if (confirm('ต้องการออกจากระบบ?')) {
-                sessionStorage.removeItem('admin_session');
-                location.reload();
-            }
-        }
-
-        async function initDashboard() {
-            renderLoading();
-            await fetchOrders();
-            await fetchMenu();
-            setupRealtime();
-        }
-
-        function renderLoading() {
-            const loading = `<tr><td colspan="7" class="p-8 text-center text-gray-400 animate-pulse">กำลังโหลดข้อมูล...</td></tr>`;
-            document.getElementById('orders-list-desktop').innerHTML = loading;
-            document.getElementById('orders-list-mobile').innerHTML = `<div class="p-8 text-center text-gray-400 animate-pulse">กำลังโหลดข้อมูล...</div>`;
-        }
-
-        async function fetchOrders() {
-            // Try to fetch with profile join for points info
-            let { data, error } = await supabaseClient
-                .from('orders')
-                .select(`
-                    *,
-                    profiles:user_id (display_name, points, total_orders, tier, line_user_id),
-                    lotto_pool (number, draw_date)
-                `)
-                .neq('status', 'cart')
-                .order('created_at', { ascending: false })
-                .limit(100);
-
-            if (error) {
-                console.error('Fetch Error:', error);
-                // Fallback: fetch without join
-                let { data: fallbackData, error: fallbackError } = await supabaseClient
-                    .from('orders')
-                    .select('*')
-                    .neq('status', 'cart')
-                    .order('created_at', { ascending: false })
-                    .limit(100);
-                if (fallbackError) {
-                    showToast('โหลดข้อมูลไม่สำเร็จ: ' + fallbackError.message);
-                    return;
-                }
-                data = fallbackData;
-            }
-            renderOrders(data || []);
-            calculateStats(data || []);
-        }
-
-        function calculateStats(orders) {
-            const placed = orders.filter(o => o.status === 'placed' || o.status === 'pending_payment').length;
-            const cooking = orders.filter(o => ['cooking', 'delivering'].includes(o.status)).length;
-            const total = orders.length;
-            const today = new Date().toISOString().split('T')[0];
-            const revenue = orders.filter(o => o.created_at.startsWith(today) && o.status !== 'cancelled').reduce((sum, o) => sum + (o.total_price || 0), 0);
-
-            document.getElementById('count-placed').innerText = placed;
-            document.getElementById('count-cooking').innerText = cooking;
-            document.getElementById('total-orders').innerText = total;
-            document.getElementById('revenue-today').innerText = '฿' + revenue.toLocaleString();
-        }
-
-        function renderOrders(orders) {
-            const tbody = document.getElementById('orders-list-desktop');
-            const mobileList = document.getElementById('orders-list-mobile');
-
-            if (orders.length === 0) {
-                const empty = `<tr><td colspan="7" class="p-12 text-center text-gray-400"><i class="fas fa-inbox text-4xl mb-3 opacity-20"></i><br>ยังไม่มีออเดอร์เข้ามา</td></tr>`;
-                tbody.innerHTML = empty;
-                mobileList.innerHTML = `<div class="p-12 text-center text-gray-400"><i class="fas fa-inbox text-4xl mb-3 opacity-20"></i><br>ยังไม่มีออเดอร์เข้ามา</div>`;
-                return;
-            }
-
-            // Desktop Render
-            tbody.innerHTML = orders.map(order => createOrderRow(order)).join('');
-
-            // Mobile Render
-            mobileList.innerHTML = orders.map(order => createOrderCard(order)).join('');
-        }
-
-        function createOrderRow(order) {
-            const dateObj = new Date(order.created_at);
-            const date = dateObj.toLocaleString('th-TH', {
-                day: '2-digit', month: '2-digit',
-                hour: '2-digit', minute: '2-digit'
-            });
-            const customerName = order.customer_name || (order.profiles && order.profiles.display_name) || 'ลูกค้าทั่วไป';
-            let itemsListText = '';
-            let itemsDetailHtml = '';
-            try {
-                const items = typeof order.items === 'string' ? JSON.parse(order.items) : (order.items || []);
-                itemsListText = items.map(i => `${i.name}${i.meat ? ' [' + i.meat + ']' : ''}`).join(', ');
-                itemsDetailHtml = items.map(i => {
-                    let detail = i.name;
-                    if (i.meat) detail += ` <span class="text-orange-500">[${i.meat}]</span>`;
-                    if (i.addons && i.addons.length) detail += ` <span class="text-gray-400">+${i.addons.join(',')}</span>`;
-                    return `<div class="text-xs">${detail} <span class="text-gray-400">฿${i.price}</span></div>`;
-                }).join('');
-            } catch (e) { }
-
-            // Lotto number
-            const lottoNum = order.lotto_pool && order.lotto_pool.length > 0
-                ? order.lotto_pool[0].number
-                : (order.id ? String(order.id).slice(-2).padStart(2, '0') : '-');
-
-            // Points info
-            const pointsEarned = order.points_earned || 0;
-            const pointsRedeemed = order.points_redeemed || 0;
-            const userPoints = order.profiles ? order.profiles.points : '-';
-
-            let statusBadge = getStatusBadge(order.status);
-            let actions = getActionButtons(order);
-
-            return `
-                <tr class="hover:bg-gray-50 transition-colors border-b border-gray-50/50 group">
-                    <td class="p-4">
-                        <div class="font-mono text-xs text-gray-400">#${order.id}</div>
-                        <div class="text-[10px] text-indigo-500 font-bold mt-1">🎟️ ${lottoNum}</div>
-                    </td>
-                    <td class="p-4 text-gray-500 text-xs font-medium">${date}</td>
-                    <td class="p-4">
-                        <div class="font-bold text-gray-800 text-sm">${customerName}</div>
-                        <div class="text-[10px] text-gray-400 mt-0.5">
-                            <span class="bg-gray-100 px-1 py-0.5 rounded uppercase">${order.payment_method || '-'}</span>
-                            ${pointsEarned > 0 ? `<span class="bg-green-100 text-green-600 px-1 py-0.5 rounded ml-1">+${pointsEarned}pt</span>` : ''}
-                            ${pointsRedeemed > 0 ? `<span class="bg-orange-100 text-orange-600 px-1 py-0.5 rounded ml-1">-${pointsRedeemed}pt</span>` : ''}
-                        </div>
-                    </td>
-                    <td class="p-4">
-                        <div class="text-xs text-gray-600 max-w-[200px]">${itemsDetailHtml || itemsListText}</div>
-                    </td>
-                    <td class="p-4">
-                        <div class="font-bold text-gray-800">฿${order.total_price}</div>
-                        ${order.discount_amount > 0 ? `<div class="text-[10px] text-green-600">ลด ฿${order.discount_amount}</div>` : ''}
-                    </td>
-                    <td class="p-4">${statusBadge}</td>
-                    <td class="p-4 text-right"><div class="flex gap-2 justify-end">${actions}</div></td>
-                </tr>
-            `;
-        }
-
-        function createOrderCard(order) {
-            const dateObj = new Date(order.created_at);
-            const date = dateObj.toLocaleString('th-TH', {
-                day: '2-digit', month: '2-digit',
-                hour: '2-digit', minute: '2-digit'
-            });
-            const customerName = order.customer_name || (order.profiles && order.profiles.display_name) || 'ลูกค้า';
-            let itemsListHtml = '';
-            try {
-                const items = typeof order.items === 'string' ? JSON.parse(order.items) : (order.items || []);
-                itemsListHtml = items.map(i => {
-                    let detail = i.name;
-                    if (i.meat) detail += ` <span class="text-orange-500 text-[10px]">[${i.meat}]</span>`;
-                    if (i.addons && i.addons.length) detail += ` <span class="text-gray-400 text-[10px]">+${i.addons.join(',')}</span>`;
-                    return `<div class="flex justify-between text-sm text-gray-600"><span>${detail}</span><span class="font-bold text-gray-400">฿${i.price}</span></div>`;
-                }).join('');
-            } catch (e) { }
-
-            // Lotto number
-            const lottoNum = order.lotto_pool && order.lotto_pool.length > 0
-                ? order.lotto_pool[0].number
-                : (order.id ? String(order.id).slice(-2).padStart(2, '0') : '-');
-
-            const pointsEarned = order.points_earned || 0;
-            const pointsRedeemed = order.points_redeemed || 0;
-
-            return `
-                <div class="p-5 bg-white">
-                    <div class="flex justify-between items-start mb-3">
-                        <div>
-                            <span class="font-mono text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded-lg">#${order.id}</span>
-                            <span class="ml-2 font-bold text-gray-800">${customerName}</span>
-                            <span class="ml-1 text-[10px] bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded font-bold">🎟️${lottoNum}</span>
-                        </div>
-                        <span class="text-xs font-medium text-gray-400">${date}</span>
-                    </div>
-                    <div class="space-y-1 mb-3 border-l-2 border-gray-100 pl-3">
-                        ${itemsListHtml}
-                    </div>
-                    ${(pointsEarned > 0 || pointsRedeemed > 0) ? `
-                    <div class="flex gap-2 mb-3">
-                        ${pointsEarned > 0 ? `<span class="text-[10px] bg-green-100 text-green-600 px-2 py-1 rounded font-bold">+${pointsEarned} แต้ม</span>` : ''}
-                        ${pointsRedeemed > 0 ? `<span class="text-[10px] bg-orange-100 text-orange-600 px-2 py-1 rounded font-bold">ใช้ ${pointsRedeemed} แต้ม</span>` : ''}
-                    </div>` : ''}
-                    <div class="flex justify-between items-center border-t border-gray-50 pt-3">
-                        <div class="flex items-center gap-2">
-                            <span class="font-black text-lg text-gray-800">฿${order.total_price}</span>
-                            ${order.discount_amount > 0 ? `<span class="text-xs text-green-600">ลด ฿${order.discount_amount}</span>` : ''}
-                            ${getStatusBadge(order.status)}
-                        </div>
-                        <div class="flex gap-2">${getActionButtons(order)}</div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function getStatusBadge(status) {
-            const map = {
-                'placed': ['bg-orange-100 text-orange-600', 'รอทำ'],
-                'pending_payment': ['bg-yellow-100 text-yellow-600', 'รอโอน'],
-                'cooking': ['bg-blue-100 text-blue-600', 'กำลังทำ'],
-                'completed': ['bg-green-100 text-green-600', 'เสร็จ'],
-                'cancelled': ['bg-red-50 text-red-500', 'ยกเลิก']
-            };
-            const [cls, label] = map[status] || ['bg-gray-100 text-gray-500', status];
-            return `<span class="px-2.5 py-1 rounded-full text-xs font-bold ${cls}">${label}</span>`;
-        }
-
-        function getActionButtons(order) {
-            if (order.status === 'cancelled') return '';
-            let btns = '';
-            if (order.status === 'placed' || order.status === 'pending_payment') {
-                btns += `<button onclick="updateStatus(${order.id}, 'cooking')" class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center shadow hover:bg-blue-600 transition-all"><i class="fas fa-fire text-xs"></i></button>`;
-            }
-            if (order.status === 'cooking') {
-                btns += `<button onclick="updateStatus(${order.id}, 'completed')" class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center shadow hover:bg-green-600 transition-all"><i class="fas fa-check text-xs"></i></button>`;
-            }
-            btns += `<button onclick="deleteOrder(${order.id})" class="w-8 h-8 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition-all"><i class="fas fa-trash text-xs"></i></button>`;
-            return btns;
-        }
-
-        async function updateStatus(orderId, newStatus) {
-            const { error } = await supabaseClient.from('orders').update({ status: newStatus, updated_at: new Date() }).eq('id', orderId);
-            if (error) showToast('Error: ' + error.message, 'error');
-        }
-
-        async function deleteOrder(orderId) {
-            if (!confirm('ยืนยันลบ/ยกเลิกออเดอร์นี้?')) return;
-            const { error } = await supabaseClient.from('orders').update({ status: 'cancelled' }).eq('id', orderId);
-            if (error) showToast('Error: ' + error.message);
-        }
-
-        // --- Menu ---
-        let adminMenuCache = [];
-        async function fetchMenu() {
-            const { data, error } = await supabaseClient.from('menu_items').select('*').order('id', { ascending: true });
-            if (error) { console.error(error); return; }
-            adminMenuCache = data;
-            renderAdminMenu(data);
-        }
-
-        function renderAdminMenu(items) {
-            const grid = document.getElementById('menu-grid');
-            if (items.length === 0) { grid.innerHTML = `<div class="col-span-full text-center text-gray-400 py-10">ยังไม่มีเมนู</div>`; return; }
-
-            grid.innerHTML = items.map(item => `
-                <div class="bg-gray-50 rounded-2xl p-5 border ${item.is_available ? 'border-gray-200' : 'border-red-200 bg-red-50/50'} relative group transition-all hover:shadow-lg card-hover">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-2xl border border-gray-100">${item.icon || '🍛'}</div>
-                        <div class="flex gap-2">
-                             <button onclick="editMenu(${item.id})" class="w-8 h-8 rounded-full bg-white text-indigo-500 shadow-sm flex items-center justify-center hover:bg-indigo-50"><i class="fas fa-pen text-xs"></i></button>
-                             <button onclick="toggleMenuStatus(${item.id}, ${!item.is_available})" class="w-8 h-8 rounded-full shadow-sm flex items-center justify-center transition-all ${item.is_available ? 'bg-green-100 text-green-600 hover:bg-red-100 hover:text-red-600' : 'bg-red-100 text-red-600 hover:bg-green-100 hover:text-green-600'}">
-                                <i class="fas ${item.is_available ? 'fa-toggle-on' : 'fa-toggle-off'}"></i>
-                             </button>
-                        </div>
-                    </div>
-                    <h3 class="font-bold text-gray-800 text-lg mb-1 line-clamp-1">${item.name}</h3>
-                    <p class="text-xs text-gray-400 mb-3">${item.category}</p>
-                    <div class="flex justify-between items-center border-t border-gray-200/50 pt-3">
-                        <span class="font-black text-xl text-gray-800">฿${item.price}</span>
-                         <span class="text-[10px] font-bold px-2 py-1 rounded-lg uppercase ${item.is_available ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-500'}">${item.is_available ? 'Active' : 'Hidden'}</span>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        async function toggleMenuStatus(id, newStatus) {
-            const item = adminMenuCache.find(i => i.id === id);
-            if (item) { item.is_available = newStatus; renderAdminMenu(adminMenuCache); }
-            const { error } = await supabaseClient.from('menu_items').update({ is_available: newStatus }).eq('id', id);
-            if (error) { showToast('Update failed: ' + error.message); fetchMenu(); }
-        }
-
-        // --- Tabs ---
-        function switchTab(tabId) {
-            const isOrders = tabId === 'orders';
-            document.getElementById('nav-orders').className = isOrders ? 'w-full text-left px-4 py-3 rounded-xl font-bold flex items-center gap-3 bg-gray-900 text-white shadow-lg shadow-gray-200 transition-all' : 'w-full text-left px-4 py-3 rounded-xl font-bold flex items-center gap-3 text-gray-400 hover:bg-gray-50 hover:text-gray-800 transition-all';
-            document.getElementById('nav-menu').className = !isOrders ? 'w-full text-left px-4 py-3 rounded-xl font-bold flex items-center gap-3 bg-gray-900 text-white shadow-lg shadow-gray-200 transition-all' : 'w-full text-left px-4 py-3 rounded-xl font-bold flex items-center gap-3 text-gray-400 hover:bg-gray-50 hover:text-gray-800 transition-all';
-
-            // Mobile Nav
-            document.getElementById('mob-orders').className = isOrders ? 'flex flex-col items-center p-2 text-brand-gold scale-110 transition-transform' : 'flex flex-col items-center p-2 text-gray-400 transition-transform';
-            document.getElementById('mob-menu').className = !isOrders ? 'flex flex-col items-center p-2 text-brand-gold scale-110 transition-transform' : 'flex flex-col items-center p-2 text-gray-400 transition-transform';
-
-            document.getElementById('section-orders').classList.toggle('hidden', !isOrders);
-            document.getElementById('section-menu').classList.toggle('hidden', isOrders);
-            if (!isOrders) fetchMenu();
-        }
-
-        // --- Modals ---
-        function openAddMenuModal() {
-            document.getElementById('menu-id').value = '';
-            document.getElementById('menu-name').value = '';
-            document.getElementById('menu-price').value = '';
-            document.getElementById('menu-available').checked = true;
-            document.getElementById('menu-modal-title').innerText = 'เพิ่มเมนูใหม่';
-            document.getElementById('menu-modal').classList.remove('hidden');
-        }
-        function editMenu(id) {
-            const item = adminMenuCache.find(i => i.id === id);
-            if (!item) return;
-            document.getElementById('menu-id').value = item.id;
-            document.getElementById('menu-name').value = item.name;
-            document.getElementById('menu-price').value = item.price;
-            document.getElementById('menu-category').value = item.category || 'kaprao'; // Ensure category matches select values
-            document.getElementById('menu-available').checked = item.is_available;
-            document.getElementById('menu-new').checked = item.is_new;
-            document.getElementById('menu-modal-title').innerText = 'แก้ไขเมนู';
-            document.getElementById('menu-modal').classList.remove('hidden');
-        }
-        function closeMenuModal() { document.getElementById('menu-modal').classList.add('hidden'); }
-        async function handleMenuSubmit(e) {
-            e.preventDefault();
-            const id = document.getElementById('menu-id').value;
-            const payload = {
-                name: document.getElementById('menu-name').value,
-                price: parseInt(document.getElementById('menu-price').value),
-                category: document.getElementById('menu-category').value,
-                is_available: document.getElementById('menu-available').checked,
-                is_new: document.getElementById('menu-new').checked
-            };
-            let error;
-            if (id) { const { error: err } = await supabaseClient.from('menu_items').update(payload).eq('id', id); error = err; }
-            else { payload.icon = '🍛'; const { error: err } = await supabaseClient.from('menu_items').insert(payload); error = err; }
-            if (error) showToast('Error: ' + error.message, 'error'); else { closeMenuModal(); fetchMenu(); showToast('บันทึกเรียบร้อย', 'success'); }
-        }
-
-        // --- Customers ---
-        let customersCache = [];
-        async function fetchCustomers() {
-            const { data, error } = await supabaseClient
-                .from('profiles')
-                .select('*')
-                .order('total_orders', { ascending: false })
-                .limit(100);
-
-            if (error) {
-                console.error('Fetch customers error:', error);
-                showToast('โหลดข้อมูลลูกค้าไม่สำเร็จ');
-                return;
-            }
-            customersCache = data || [];
-            renderCustomers(customersCache);
-        }
-
-        function renderCustomers(customers) {
-            const tbody = document.getElementById('customers-list');
-            if (!tbody) return;
-            if (customers.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-gray-400">ยังไม่มีข้อมูลลูกค้า</td></tr>';
-                return;
-            }
-            tbody.innerHTML = customers.map(c => {
-                const tierBadge = c.tier === 'VIP'
-                    ? '<span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs font-bold">VIP</span>'
-                    : c.tier === 'GOLD'
-                        ? '<span class="bg-yellow-50 text-yellow-600 px-2 py-1 rounded-full text-xs font-bold">GOLD</span>'
-                        : '<span class="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs font-bold">MEMBER</span>';
-
-                const lastOrder = c.updated_at ? new Date(c.updated_at).toLocaleDateString('th-TH') : '-';
-
-                return `
-                    <tr class="hover:bg-gray-50">
-                        <td class="p-4">
-                            <div class="font-bold text-gray-800">${c.display_name || 'Guest'}</div>
-                            <div class="text-xs text-gray-400">ID: ${c.id.slice(0, 8)}...</div>
-                        </td>
-                        <td class="p-4"><span class="font-bold text-green-600">${c.points || 0}</span> pt</td>
-                        <td class="p-4 font-bold text-gray-800">${c.total_orders || 0}</td>
-                        <td class="p-4">${tierBadge}</td>
-                        <td class="p-4 text-xs text-gray-500 font-mono">${c.line_user_id || '-'}</td>
-                        <td class="p-4 text-xs text-gray-400">${lastOrder}</td>
-                        <td class="p-4 text-right">
-                            <button onclick="openPointsModal('${c.id}', ${c.points || 0}, '${c.display_name || 'Guest'}')" class="px-3 py-1 bg-blue-500 text-white rounded-lg text-xs font-bold hover:bg-blue-600">แก้ไข</button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        async function openPointsModal(userId, currentPoints, userName) {
-            // Create enhanced modal for points adjustment
-            const modal = document.createElement('div');
-            modal.id = 'points-adjust-modal';
-            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
-            modal.innerHTML = `
-                <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4">📝 ปรับพอยต์</h3>
-                    <div class="bg-gray-50 rounded-xl p-4 mb-4">
-                        <div class="text-sm text-gray-500">ลูกค้า</div>
-                        <div class="font-bold text-lg text-gray-800">${userName}</div>
-                        <div class="mt-2 text-sm text-gray-500">พอยต์ปัจจุบัน</div>
-                        <div class="font-bold text-2xl text-green-600">${currentPoints} <span class="text-sm font-normal">แต้ม</span></div>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label class="block text-sm font-bold text-gray-700 mb-2">ปรับพอยต์</label>
-                        <div class="flex gap-2 mb-2">
-                            <button onclick="document.getElementById('points-adjust-input').value = '10'" class="flex-1 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-bold hover:bg-green-200">+10</button>
-                            <button onclick="document.getElementById('points-adjust-input').value = '30'" class="flex-1 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-bold hover:bg-green-200">+30</button>
-                            <button onclick="document.getElementById('points-adjust-input').value = '50'" class="flex-1 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-bold hover:bg-green-200">+50</button>
-                            <button onclick="document.getElementById('points-adjust-input').value = '100'" class="flex-1 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-bold hover:bg-green-200">+100</button>
-                        </div>
-                        <input type="number" id="points-adjust-input" placeholder="ใส่ตัวเลข (เช่น 50 หรือ -20)" 
-                            class="w-full p-3 border border-gray-200 rounded-xl text-lg font-bold text-center"
-                            style="font-size: 18px;">
-                        <div class="text-xs text-gray-400 mt-1">⚠️ ใส่ตัวเลขติดลบหากต้องการหักพอยต์</div>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="block text-sm font-bold text-gray-700 mb-2">หมายเหตุ</label>
-                        <select id="points-reason" class="w-full p-3 border border-gray-200 rounded-xl">
-                            <option value="">-- เลือกเหตุผล --</option>
-                            <option value="ขอโทษลูกค้า">🙏 ขอโทษลูกค้า</option>
-                            <option value="แจกพอยต์ชดเชย">🎁 แจกพอยต์ชดเชย</option>
-                            <option value="โปรโมชั่นพิเศษ">⭐ โปรโมชั่นพิเศษ</option>
-                            <option value="สมาชิกใหม่">👋 สมาชิกใหม่</option>
-                            <option value="ลบพอยต์ผิดพลาด">❌ ลบพอยต์ผิดพลาด</option>
-                            <option value="อื่นๆ">📝 อื่นๆ</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-4">
-                        <input type="text" id="points-note" placeholder="หมายเหตุเพิ่มเติม (ถ้ามี)" 
-                            class="w-full p-3 border border-gray-200 rounded-xl">
-                    </div>
-
-                    <div class="bg-blue-50 rounded-xl p-3 mb-4">
-                        <div class="text-sm text-blue-600 font-bold">ผลลัพธ์ที่ได้</div>
-                        <div class="text-2xl font-bold text-blue-700" id="points-preview">${currentPoints} แต้ม</div>
-                    </div>
-
-                    <div class="flex gap-3">
-                        <button onclick="document.getElementById('points-adjust-modal').remove()" 
-                            class="flex-1 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200">ยกเลิก</button>
-                        <button onclick="saveAdjustedPoints('${userId}', ${currentPoints})" 
-                            class="flex-1 py-3 bg-blue-500 text-white rounded-xl font-bold hover:bg-blue-600">บันทึก</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-
-            // Add event listener for live preview
-            document.getElementById('points-adjust-input').addEventListener('input', function () {
-                const adjust = parseInt(this.value) || 0;
-                const newTotal = currentPoints + adjust;
-                document.getElementById('points-preview').textContent = `${newTotal} แต้ม`;
-                document.getElementById('points-preview').className = adjust >= 0
-                    ? 'text-2xl font-bold text-green-600'
-                    : 'text-2xl font-bold text-red-500';
-            });
-        }
-
-        async function saveAdjustedPoints(userId, currentPoints) {
-            const adjustInput = document.getElementById('points-adjust-input');
-            const reason = document.getElementById('points-reason').value;
-            const note = document.getElementById('points-note').value;
-
-            const adjust = parseInt(adjustInput?.value) || 0;
-            const newPoints = currentPoints + adjust;
-
-            if (newPoints < 0) {
-                showToast('พอยต์ไม่ติดลบได้', 'error');
-                return;
-            }
-
-            if (adjust === 0) {
-                showToast('กรุณาใส่จำนวนพอยต์ที่ต้องการปรับ', 'error');
-                return;
-            }
-
-            // Update profile
-            const { error } = await supabaseClient
-                .from('profiles')
-                .update({ points: newPoints, updated_at: new Date() })
-                .eq('id', userId);
-
-            if (error) {
-                showToast('แก้ไขไม่สำเร็จ: ' + error.message, 'error');
-                return;
-            }
-
-            // Log the adjustment in point_logs
-            await supabaseClient.from('point_logs').insert({
-                user_id: userId,
-                action: adjust > 0 ? 'BONUS' : 'ADJUST',
-                amount: Math.abs(adjust),
-                note: `${reason}${note ? ' - ' + note : ''}`,
-                order_id: null
-            });
-
-            document.getElementById('points-adjust-modal')?.remove();
-            showToast(`${adjust > 0 ? 'เพิ่ม' : 'หัก'}พอยต์ ${Math.abs(adjust)} แต้ม${reason ? ' (' + reason + ')' : ''} เรียบร้อย`, 'success');
-            fetchCustomers();
-        }
-
-        // --- Export Functions ---
-        async function exportOrdersCSV() {
-            const { data, error } = await supabaseClient
-                .from('orders')
-                .select('*')
-                .neq('status', 'cart')
-                .order('created_at', { ascending: false });
-
-            if (error || !data) {
-                showToast('ไม่สามารถดึงข้อมูลได้', 'error');
-                return;
-            }
-
-            const csv = generateOrdersCSV(data);
-            downloadCSV(csv, `kaprao52_orders_${new Date().toISOString().split('T')[0]}.csv`);
-            showToast('ดาวน์โหลด CSV เรียบร้อย', 'success');
-        }
-
-        function generateOrdersCSV(orders) {
-            const headers = ['Order ID', 'วันที่', 'เวลา', 'ลูกค้า', 'รายการ', 'ยอดรวม', 'ส่วนลด', 'วิธีชำระ', 'สถานะ', 'พอยต์ได้', 'พอยต์ใช้', 'เลขหวย'];
-            const rows = orders.map(o => {
-                const date = new Date(o.created_at);
-                const items = Array.isArray(o.items) ? o.items.map(i => `${i.name}${i.meat ? '[' + i.meat + ']' : ''}`).join(', ') : '';
-                return [
-                    o.id,
-                    date.toLocaleDateString('th-TH'),
-                    date.toLocaleTimeString('th-TH'),
-                    o.customer_name || 'ลูกค้า',
-                    items,
-                    o.total_price,
-                    o.discount_amount || 0,
-                    o.payment_method || '-',
-                    o.status,
-                    o.points_earned || 0,
-                    o.points_redeemed || 0,
-                    o.id ? String(o.id).slice(-2).padStart(2, '0') : '-'
-                ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(',');
-            });
-            return [headers.join(','), ...rows].join('\n');
-        }
-
-        async function exportCustomersCSV() {
-            await fetchCustomers();
-            const csv = generateCustomersCSV(customersCache);
-            downloadCSV(csv, `kaprao52_customers_${new Date().toISOString().split('T')[0]}.csv`);
-            showToast('ดาวน์โหลด CSV เรียบร้อย', 'success');
-        }
-
-        function generateCustomersCSV(customers) {
-            const headers = ['ID', 'ชื่อ', 'พอยต์', 'ออเดอร์รวม', 'ระดับ', 'LINE ID', 'อัปเดตล่าสุด'];
-            const rows = customers.map(c => [
-                c.id,
-                c.display_name || 'Guest',
-                c.points || 0,
-                c.total_orders || 0,
-                c.tier || 'MEMBER',
-                c.line_user_id || '',
-                c.updated_at ? new Date(c.updated_at).toISOString() : ''
-            ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','));
-            return [headers.join(','), ...rows].join('\n');
-        }
-
-        function downloadCSV(csvContent, filename) {
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = filename;
-            link.click();
-        }
-
-        // --- Tab Switcher ---
-        function switchTab(tabId) {
-            const isOrders = tabId === 'orders';
-            const isCustomers = tabId === 'customers';
-            const isMenu = tabId === 'menu';
-
-            // Update nav buttons
-            const updateNav = (id, active) => {
-                const el = document.getElementById(id);
-                if (!el) return;
-                if (active) {
-                    el.className = 'w-full text-left px-4 py-3 rounded-xl font-bold flex items-center gap-3 bg-gray-900 text-white shadow-lg shadow-gray-200 transition-all';
-                } else {
-                    el.className = 'w-full text-left px-4 py-3 rounded-xl font-bold flex items-center gap-3 text-gray-400 hover:bg-gray-50 hover:text-gray-800 transition-all';
-                }
-            };
-            updateNav('nav-orders', isOrders);
-            updateNav('nav-customers', isCustomers);
-            updateNav('nav-menu', isMenu);
-
-            // Update mobile nav
-            const updateMob = (id, active) => {
-                const el = document.getElementById(id);
-                if (!el) return;
-                if (active) {
-                    el.className = 'flex flex-col items-center p-2 text-brand-gold scale-110 transition-transform';
-                } else {
-                    el.className = 'flex flex-col items-center p-2 text-gray-400 transition-transform';
-                }
-            };
-            updateMob('mob-orders', isOrders);
-            updateMob('mob-customers', isCustomers);
-            updateMob('mob-menu', isMenu);
-
-            // Show/hide sections
-            document.getElementById('section-orders').classList.toggle('hidden', !isOrders);
-            document.getElementById('section-customers').classList.toggle('hidden', !isCustomers);
-            document.getElementById('section-menu').classList.toggle('hidden', !isMenu);
-
-            // Load data if needed
-            if (isCustomers) fetchCustomers();
-            if (isMenu) fetchMenu();
-        }
-
-        // --- Realtime ---
-        function setupRealtime() {
-            supabaseClient
-                .channel('admin-dashboard')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, (payload) => {
-                    fetchOrders();
-                    if (payload.eventType === 'INSERT') {
-                        new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play().catch(() => { });
-                        showToast('มีออเดอร์ใหม่เข้ามา!', 'success');
-                    }
-                })
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => {
-                    const custSection = document.getElementById('section-customers');
-                    if (custSection && !custSection.classList.contains('hidden')) {
-                        fetchCustomers();
-                    }
-                })
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'menu_items' }, () => fetchMenu())
-                .subscribe();
-        }
-    </script>
 </body>
 
 </html>

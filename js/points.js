@@ -1,12 +1,19 @@
 // ===== POINTS SYSTEM =====
 
-// New Points Logic (Updated):
-// - Orders 60-119฿ = 10 points
-// - Orders 120+฿ = 30 points
+// New Points Logic (Updated per request):
+// - < 60 = 0
+// - 60-119 = 10
+// - 120-149 = 30
+// - 150+ = 30 + 10 for every additional 30 baht (e.g. 150=40, 180=50)
 function calculatePoints(netTotal) {
-    if (netTotal < 60) return 0;       // ต่ำกว่า 60 บาท = 0 พอยต์
-    if (netTotal < 120) return 10;    // 60-119 บาท = 10 พอยต์
-    return 30;                         // 120+ บาท = 30 พอยต์
+    if (netTotal < 60) return 0;
+    if (netTotal < 120) return 10;
+
+    // Base 30 at 120.
+    // For 150+, it accumulates.
+    // Logic: 120 is base tier (30pts).
+    // Steps above 120 calculated by 30-baht increments.
+    return 30 + Math.floor((netTotal - 120) / 30) * 10;
 }
 
 function updatePointsDisplay() {

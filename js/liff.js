@@ -215,6 +215,13 @@ async function handleLiffSession(profile) {
                 await window.loadOrdersFromSupabase(supabaseUserId);
             }
         } catch (e) { console.warn("Order history sync warning:", e); }
+
+        // 8. Setup Realtime Sync for new orders (New)
+        try {
+            if (typeof window.setupUserOrderRealtime === 'function') {
+                window.setupUserOrderRealtime(supabaseUserId);
+            }
+        } catch (e) { console.warn("Realtime sync warning:", e); }
     }
 }
 
@@ -275,6 +282,13 @@ async function handleUserSession(user) {
             await window.loadOrdersFromSupabase(user.id);
         }
     } catch (e) { console.warn("Guest order history sync warning:", e); }
+
+    // Setup Realtime Sync
+    try {
+        if (typeof window.setupUserOrderRealtime === 'function') {
+            window.setupUserOrderRealtime(user.id);
+        }
+    } catch (e) { console.warn("Guest realtime sync warning:", e); }
 }
 
 // Init on Load

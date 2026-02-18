@@ -665,10 +665,11 @@ if ('serviceWorker' in navigator) {
 
 // =============================================
 // Food Detail Modal Logic
-// =============================================
 
 
 
+
+// --- REFACTORED MODAL LOGIC ---
 
 function openModal(item) {
     if (!item) return;
@@ -690,33 +691,39 @@ function openModal(item) {
     const noteEl = document.getElementById('modal-note');
     if (noteEl) noteEl.value = '';
 
-    // Options
+    // Options Container
     const optionsContainer = document.getElementById('modal-options');
     if (optionsContainer) {
         optionsContainer.innerHTML = '';
 
-        // 1. Meat Selection (Tray or items requiring meat)
-        if (item.isTray || item.reqMeat) {
-            let meats = [];
-            if (item.isTray) {
-                meats = [
-                    { id: 'pork', name: 'หมูสับ', price: 0 },
-                    { id: 'chicken', name: 'ไก่สับ', price: 0 },
-                    { id: 'crispy', name: 'หมูกรอบ', price: 20 },
-                    { id: 'beef', name: 'เนื้อโคขุน', price: 30 }
-                ];
+        // TRAY LOGIC (Rich UI)
+        if (item.isTray) {
+            // Create a specific container for tray options if needed, or just use optionsContainer
+            // renderTrayOptions from menu.js expects 'tray-options-container' ID.
+            // We'll create it inside modal-options.
+            const trayContainer = document.createElement('div');
+            trayContainer.id = 'tray-options-container';
+            optionsContainer.appendChild(trayContainer);
+
+            if (typeof renderTrayOptions === 'function') {
+                renderTrayOptions(item.trayType || 1);
             } else {
-                meats = [
-                    { id: 'pork', name: 'หมูสับ', price: 0 },
-                    { id: 'chicken', name: 'ไก่สับ', price: 0 },
-                    { id: 'crispy', name: 'หมูกรอบ', price: 15 },
-                    { id: 'beef', name: 'เนื้อโคขุน', price: 20 }
-                ];
+                // Fallback if menu.js function missing
+                trayContainer.innerHTML = '<p class="text-red-500">Error loading tray options</p>';
             }
+
+            // STANDARD LOGIC (Normal Items)
+        } else if (item.reqMeat) {
+            const meats = [
+                { id: 'pork', name: t('meat_pork'), price: 0 },
+                { id: 'chicken', name: t('meat_chicken'), price: 0 },
+                { id: 'crispy', name: t('meat_crispy'), price: 15 },
+                { id: 'beef', name: t('meat_beef'), price: 20 }
+            ];
 
             const meatDiv = document.createElement('div');
             meatDiv.className = 'mb-4';
-            meatDiv.innerHTML = `<h4 class="text-xs font-bold text-gray-500 mb-2">เลือกเนื้อสัตว์${!item.isTray ? ' (จำเป็น)' : ''}</h4>`;
+            meatDiv.innerHTML = `<h4 class="text-xs font-bold text-gray-500 mb-2">${t('modal_meat_label')}</h4>`;
             meats.forEach((m, idx) => {
                 const isChecked = idx === 0 ? 'checked' : '';
                 meatDiv.innerHTML += `
@@ -731,43 +738,20 @@ function openModal(item) {
             optionsContainer.appendChild(meatDiv);
         }
 
-        // 2. Egg selection (Tray only - Included)
-        if (item.isTray) {
-            const eggs = [
-                { id: 'fried', name: 'ไข่ดาว', price: 10 },
-                { id: 'omelet', name: 'ไข่เจียว', price: 15 },
-                { id: 'no-egg', name: 'ไม่รับไข่', price: 0 }
-            ];
-            const eggDiv = document.createElement('div');
-            eggDiv.className = 'mb-4';
-            eggDiv.innerHTML = `<h4 class="text-xs font-bold text-gray-500 mb-2">เลือกไข่ (แถมฟรีในชุด)</h4>`;
-            eggs.forEach((e, idx) => {
-                const isChecked = idx === 0 ? 'checked' : '';
-                eggDiv.innerHTML += `
-                    <label class="flex items-center justify-between p-3 border border-gray-100 rounded-xl mb-2 cursor-pointer has-checked:border-brand-yellow has-checked:bg-[#FDFBF7] transition-all">
-                        <div class="flex items-center gap-3">
-                            <input type="radio" name="egg-opt" class="w-5 h-5 accent-brand-yellow" value="${e.id}" data-price="${e.price}" ${isChecked} onchange="updateModalPrice()">
-                            <span class="text-sm font-bold text-gray-700">${e.name}</span>
-                        </div>
-                        ${e.price > 0 ? `<span class="text-xs text-brand-purple font-bold">+${e.price}</span>` : ''}
-                    </label>`;
-            });
-            optionsContainer.appendChild(eggDiv);
-        }
-
         // 3. Generic addons (For everyone)
         const generalAddons = [
-            { id: 'special', name: 'พิเศษ', price: 10 },
-            { id: 'kaidao', name: 'ไข่ดาว', price: 10 },
-            { id: 'kaikhon', name: 'ไข่ข้น', price: 10 },
-            { id: 'kaijiao', name: 'ไข่เจียว', price: 10 },
-            { id: 'kaiyiewma', name: 'ไข่เยี่ยวม้า', price: 10 },
-            { id: 'kaitom', name: 'ไข่ต้ม', price: 10 },
-            { id: 'rice', name: 'เพิ่มข้าว', price: 10 }
+            { id: 'special', name: t('special'), price: 10 },
+            { id: 'kaidao', name: t('egg_fried'), price: 10 },
+            { id: 'kaikhon', name: t('egg_scrambled'), price: 10 },
+            { id: 'kaijiao', name: t('egg_omelet'), price: 10 },
+            { id: 'kaiyiewma', name: t('egg_century'), price: 10 },
+            { id: 'kaitom', name: t('egg_boiled'), price: 10 },
+            { id: 'rice', name: t('rice_extra'), price: 10 }
         ];
 
         const addonDiv = document.createElement('div');
-        addonDiv.innerHTML = `<h4 class="text-xs font-bold text-gray-500 mb-2">เพิ่มเติม</h4>`;
+        addonDiv.className = 'mt-4';
+        addonDiv.innerHTML = `<h4 class="text-xs font-bold text-gray-500 mb-2">${t('modal_addons_label')}</h4>`;
         generalAddons.forEach(a => {
             addonDiv.innerHTML += `
                 <label class="flex items-center justify-between p-3 border border-gray-100 rounded-xl mb-2 cursor-pointer has-checked:border-brand-yellow has-checked:bg-[#FDFBF7] transition-all">
@@ -816,18 +800,36 @@ function closeModal(isBackNav = false) {
 function updateModalPrice() {
     if (!currentItem) return;
     let price = currentItem.price;
+
+    // Handle Standard Meat
     const meat = document.querySelector('input[name="meat-opt"]:checked');
     if (meat) price += parseFloat(meat.dataset.price || 0);
+
+    // Handle Tray Meat (if different name)
+    const trayMeat = document.querySelector('input[name="tray-meat"]:checked');
+    if (trayMeat) price += parseFloat(trayMeat.dataset.price || 0);
+
+    // Handle Standard Egg
     const egg = document.querySelector('input[name="egg-opt"]:checked');
     if (egg) price += parseFloat(egg.dataset.price || 0);
+
+    // Handle Tray Egg
+    const trayEgg = document.querySelector('input[name="tray-egg"]:checked');
+    if (trayEgg) price += parseFloat(trayEgg.dataset.price || 0);
+
+    // Addons
     document.querySelectorAll('.addon-checkbox:checked').forEach(cb => {
         price += parseFloat(cb.dataset.price || 0);
     });
+
     const total = price * modalQty;
     const priceDisplay = document.getElementById('modal-price-display');
     if (priceDisplay) priceDisplay.innerText = price;
     const btnTotal = document.getElementById('modal-total-btn');
     if (btnTotal) btnTotal.innerText = `${total} ฿`;
+
+    // Also update tray summary text if function exists
+    if (typeof updateTraySummary === 'function' && currentItem.isTray) updateTraySummary();
 }
 
 function adjustModalQty(delta) {
@@ -852,8 +854,11 @@ function addToCartFromModal() {
         addonPriceTotal += parseFloat(cb.dataset.price || 0);
     });
 
+    // --- MEAT SELECTION ---
     let meatInfo = '';
     let meatPrice = 0;
+
+    // Try Standard Meat
     const meat = document.querySelector('input[name="meat-opt"]:checked');
     if (meat) {
         const label = meat.closest('label');
@@ -861,8 +866,18 @@ function addToCartFromModal() {
         meatPrice = parseFloat(meat.dataset.price || 0);
     }
 
+    // Try Tray Meat (Priority if exists)
+    const trayMeat = document.querySelector('input[name="tray-meat"]:checked');
+    if (trayMeat) {
+        meatInfo = trayMeat.value; // Tray meat value is usually the name e.g. "กะเพราหมูสับ"
+        meatPrice = parseFloat(trayMeat.dataset.price || 0);
+    }
+
+    // --- EGG SELECTION ---
     let eggInfo = '';
     let eggPrice = 0;
+
+    // Try Standard Egg
     const egg = document.querySelector('input[name="egg-opt"]:checked');
     if (egg) {
         const label = egg.closest('label');
@@ -871,8 +886,17 @@ function addToCartFromModal() {
         if (eggInfo) note = (note ? note + ' ' : '') + `[${eggInfo}]`;
     }
 
+    // Try Tray Egg
+    const trayEgg = document.querySelector('input[name="tray-egg"]:checked');
+    if (trayEgg) {
+        eggInfo = trayEgg.value;
+        eggPrice = parseFloat(trayEgg.dataset.price || 0);
+        // For tray, egg is part of the set, clearly label it
+        if (eggInfo) note = (note ? note + ' ' : '') + `+${eggInfo}`;
+    }
+
     // Required meat validation
-    if (currentItem.reqMeat && !meatInfo) {
+    if ((currentItem.reqMeat || (currentItem.isTray)) && !meatInfo) {
         showToast('กรุณาเลือกเนื้อสัตว์', 'warning');
         triggerHaptic('heavy');
         return;

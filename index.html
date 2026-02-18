@@ -239,6 +239,10 @@
             </div>
         </div>
         <div class="header-right">
+            <button onclick="i18n.setLanguage(i18n.currentLang === 'th' ? 'en' : 'th')"
+                class="icon-btn border border-gray-200">
+                <span class="text-xs font-bold uppercase" id="lang-display">TH</span>
+            </button>
             <button onclick="openPointsHistory()" class="icon-btn">
                 <i class="fas fa-coins text-yellow-500"></i>
             </button>
@@ -849,6 +853,8 @@
     <script src="js/config.js"></script>
     <script src="js/data/menu.js"></script>
     <script src="js/data/promotions.js"></script>
+    <script src="js/data/translations.js"></script> <!-- New -->
+    <script src="js/i18n.js"></script> <!-- New -->
     <script src="js/state.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/lottery.js"></script>

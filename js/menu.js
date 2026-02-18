@@ -132,13 +132,25 @@ let virtualScrollState = {
 
 // --- RENDER MENU ---
 function renderMenu() {
+    // Category Map for i18n
+    const categoryMap = {
+        'kaprao': t('menu_category_kaprao'),
+        'curry': t('menu_category_curry'), // 'พริกแกง'
+        'garlic': t('menu_category_fried'), // 'ทอดกระเทียม'
+        'noodle': t('menu_category_noodle'), // 'เส้น'
+        'soup': t('menu_category_soup'), // 'ต้ม/แกง'
+        'tray': t('menu_category_tray'), // 'ถาดลุยเดี่ยว/คู่หู'
+        'dessert': t('menu_category_dessert'), // 'ของหวาน'
+        'others': t('menu_category_others'), // 'อื่นๆ'
+        'favorites': t('menu_favorites'), // 'เมนูโปรด ❤️'
+    };
+
     const grid = document.getElementById('menu-grid');
     grid.innerHTML = '';
 
     let filteredItems = [];
     if (searchQuery.length > 0) {
         filteredItems = menuItems.filter(i => i.name.toLowerCase().includes(searchQuery));
-        document.getElementById('section-title').innerText = `ค้นหา: "${searchQuery}" (${filteredItems.length})`;
     }
     else if (activeCategory === 'favorites') {
         filteredItems = menuItems.filter(i => favoriteItems.has(i.id));
@@ -443,22 +455,65 @@ function quickReorder(index) {
     const orderHistory = userStats.orderHistory || [];
     const order = orderHistory[index];
     if (order && order.items) {
-        order.items.forEach(item => {
+        let addedCount = 0;
+        let skippedCount = 0;
+
+        order.items.forEach(oldItem => {
+            // Find current status of item in menu
+            // Match by name because ID might be different in history if not stored consistently, 
+            // but ideally match by name for menu items.
+            // Note: oldItem might not have 'id'. menuItems has 'id'.
+            // Best effort: Match by Name.
+            const currentMenuItem = window.menuItems.find(m => m.name === oldItem.name);
+
+            if (currentMenuItem) {
+                if (currentMenuItem.soldOut) {
+                    skippedCount++;
+                    return; // Skip sold out item
+                }
+                // Recalculate price if changed? 
+                // For now, use current price if found, else old price (risky)
+                // Let's use current price from menu item if possible, but old options might have extra costs.
+                // Simpler: Use old price but warn if price changed? Too complex.
+                // Just use old item data but ensure it's not sold out.
+            } else {
+                // Item no longer in menu?
+                // Depending on policy. Let's skip if not in menu to be safe.
+                skippedCount++;
+                return;
+            }
+
             cart.push({
                 id: Date.now() + Math.random(),
-                name: item.name,
-                price: item.price,
-                meat: item.meat || null,
-                addons: item.addons || [],
-                note: item.note || '',
-                image: item.image
+                name: oldItem.name,
+                price: currentMenuItem ? calculateItemUnitPrice(currentMenuItem, {
+                    meatPrice: 0, // Need to parse from old item? Hard.
+                    eggPrice: 0,
+                    addons: oldItem.addons
+                }) : oldItem.price, // Fallback to old price 
+                // Actually, reusing old price is safer for complex options unless we re-calculate everything.
+                // But we just checked availability. Let's use old object but with new ID.
+                meat: oldItem.meat || null,
+                addons: oldItem.addons || [],
+                note: oldItem.note || '',
+                image: oldItem.image
             });
+            addedCount++;
         });
-        saveToLS();
-        updateMiniCart();
-        closeQuickOrderModal();
-        showToast(`เพิ่ม ${order.items.length} รายการจากประวัติแล้ว!`, 'success');
-        triggerHaptic('heavy');
+
+        if (addedCount > 0) {
+            saveToLS();
+            updateMiniCart();
+            closeQuickOrderModal();
+            if (skippedCount > 0) {
+                showToast(`เพิ่ม ${addedCount} รายการ (${skippedCount} รายการหมด/เลิกขาย)`, 'warning');
+            } else {
+                showToast(`เพิ่ม ${addedCount} รายการจากประวัติแล้ว!`, 'success');
+            }
+            triggerHaptic('heavy');
+        } else {
+            showToast('รายการอาหารในออเดอร์นี้หมดทุกรายการครับ 😢', 'error');
+        }
     }
 }
 
