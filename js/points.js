@@ -1,7 +1,12 @@
 // ===== POINTS SYSTEM =====
 
+// New Points Logic (Updated):
+// - Orders 60-119฿ = 10 points
+// - Orders 120+฿ = 30 points
 function calculatePoints(netTotal) {
-    if (netTotal < 60) return 0; if (netTotal < 100) return 10; if (netTotal < 150) return 20; if (netTotal < 200) return 30; if (netTotal < 250) return 40; if (netTotal < 300) return 50; return 60;
+    if (netTotal < 60) return 0;       // ต่ำกว่า 60 บาท = 0 พอยต์
+    if (netTotal < 120) return 10;    // 60-119 บาท = 10 พอยต์
+    return 30;                         // 120+ บาท = 30 พอยต์
 }
 
 function updatePointsDisplay() {

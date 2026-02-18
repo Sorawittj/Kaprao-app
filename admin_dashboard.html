@@ -126,6 +126,10 @@
                     class="w-full text-left px-4 py-3 rounded-xl font-bold flex items-center gap-3 bg-gray-900 text-white shadow-lg shadow-gray-200 transition-all">
                     <i class="fas fa-clipboard-list w-6"></i> รายการออเดอร์
                 </button>
+                <button onclick="switchTab('customers')" id="nav-customers"
+                    class="w-full text-left px-4 py-3 rounded-xl font-bold flex items-center gap-3 text-gray-400 hover:bg-gray-50 hover:text-gray-800 transition-all">
+                    <i class="fas fa-users w-6"></i> ลูกค้า & พอยต์
+                </button>
                 <button onclick="switchTab('menu')" id="nav-menu"
                     class="w-full text-left px-4 py-3 rounded-xl font-bold flex items-center gap-3 text-gray-400 hover:bg-gray-50 hover:text-gray-800 transition-all">
                     <i class="fas fa-utensils w-6"></i> จัดการเมนู
@@ -164,6 +168,11 @@
                     class="flex flex-col items-center p-2 text-brand-gold">
                     <i class="fas fa-clipboard-list text-xl mb-1"></i>
                     <span class="text-[10px] font-bold">ออเดอร์</span>
+                </button>
+                <button onclick="switchTab('customers')" id="mob-customers"
+                    class="flex flex-col items-center p-2 text-gray-400">
+                    <i class="fas fa-users text-xl mb-1"></i>
+                    <span class="text-[10px] font-bold">ลูกค้า</span>
                 </button>
                 <button onclick="switchTab('menu')" id="mob-menu" class="flex flex-col items-center p-2 text-gray-400">
                     <i class="fas fa-utensils text-xl mb-1"></i>
@@ -205,10 +214,16 @@
                                 <h2 class="text-xl font-bold text-gray-800">รายการล่าสุด</h2>
                                 <p class="text-sm text-gray-400">จัดการออเดอร์ที่เข้ามาทั้งหมด</p>
                             </div>
-                            <button onclick="fetchOrders()"
-                                class="px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-xl text-sm font-bold transition-all border border-gray-200 flex items-center gap-2">
-                                <i class="fas fa-sync-alt"></i> อัปเดต
-                            </button>
+                            <div class="flex gap-2">
+                                <button onclick="exportOrdersCSV()"
+                                    class="px-4 py-2 bg-green-50 hover:bg-green-100 text-green-700 rounded-xl text-sm font-bold transition-all border border-green-200 flex items-center gap-2">
+                                    <i class="fas fa-file-csv"></i> Export CSV
+                                </button>
+                                <button onclick="fetchOrders()"
+                                    class="px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-xl text-sm font-bold transition-all border border-gray-200 flex items-center gap-2">
+                                    <i class="fas fa-sync-alt"></i> อัปเดต
+                                </button>
+                            </div>
                         </div>
 
                         <!-- Desktop Table -->
@@ -231,6 +246,45 @@
 
                         <!-- Mobile Cards -->
                         <div id="orders-list-mobile" class="md:hidden divide-y divide-gray-50"></div>
+                    </div>
+                </div>
+
+                <!-- Section: Customers -->
+                <div id="section-customers" class="hidden animate-fade-in space-y-6 max-w-6xl mx-auto w-full">
+                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div
+                            class="p-6 border-b border-gray-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                            <div>
+                                <h2 class="text-xl font-bold text-gray-800">ลูกค้า & พอยต์สะสม</h2>
+                                <p class="text-sm text-gray-400">ข้อมูลลูกค้าและแต้มสะสมทั้งหมด</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="exportCustomersCSV()"
+                                    class="px-4 py-2 bg-green-50 hover:bg-green-100 text-green-700 rounded-xl text-sm font-bold transition-all border border-green-200 flex items-center gap-2">
+                                    <i class="fas fa-file-csv"></i> Export CSV
+                                </button>
+                                <button onclick="fetchCustomers()"
+                                    class="px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-xl text-sm font-bold transition-all border border-gray-200 flex items-center gap-2">
+                                    <i class="fas fa-sync-alt"></i> อัปเดต
+                                </button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-gray-50/50 text-gray-400 text-xs uppercase tracking-wider">
+                                    <tr>
+                                        <th class="p-4 font-bold">ลูกค้า</th>
+                                        <th class="p-4 font-bold">พอยต์สะสม</th>
+                                        <th class="p-4 font-bold">ออเดอร์รวม</th>
+                                        <th class="p-4 font-bold">ระดับ</th>
+                                        <th class="p-4 font-bold">LINE ID</th>
+                                        <th class="p-4 font-bold">อัปเดตล่าสุด</th>
+                                        <th class="p-4 font-bold text-right">จัดการพอยต์</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="customers-list" class="text-sm divide-y divide-gray-50"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
@@ -384,20 +438,35 @@
         }
 
         async function fetchOrders() {
+            // Try to fetch with profile join for points info
             let { data, error } = await supabaseClient
                 .from('orders')
-                .select('*')
+                .select(`
+                    *,
+                    profiles:user_id (display_name, points, total_orders, tier, line_user_id),
+                    lotto_pool (number, draw_date)
+                `)
                 .neq('status', 'cart')
                 .order('created_at', { ascending: false })
                 .limit(100);
 
             if (error) {
                 console.error('Fetch Error:', error);
-                showToast('โหลดข้อมูลไม่สำเร็จ: ' + error.message);
-                return;
+                // Fallback: fetch without join
+                let { data: fallbackData, error: fallbackError } = await supabaseClient
+                    .from('orders')
+                    .select('*')
+                    .neq('status', 'cart')
+                    .order('created_at', { ascending: false })
+                    .limit(100);
+                if (fallbackError) {
+                    showToast('โหลดข้อมูลไม่สำเร็จ: ' + fallbackError.message);
+                    return;
+                }
+                data = fallbackData;
             }
-            renderOrders(data);
-            calculateStats(data);
+            renderOrders(data || []);
+            calculateStats(data || []);
         }
 
         function calculateStats(orders) {
@@ -432,55 +501,114 @@
         }
 
         function createOrderRow(order) {
-            const date = new Date(order.created_at).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
-            const customerName = order.customer_name || 'ลูกค้าทั่วไป';
+            const dateObj = new Date(order.created_at);
+            const date = dateObj.toLocaleString('th-TH', {
+                day: '2-digit', month: '2-digit',
+                hour: '2-digit', minute: '2-digit'
+            });
+            const customerName = order.customer_name || (order.profiles && order.profiles.display_name) || 'ลูกค้าทั่วไป';
             let itemsListText = '';
+            let itemsDetailHtml = '';
             try {
-                const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
-                itemsListText = items.map(i => `${i.name} ${i.meat ? ' ' + i.meat : ''}`).join(', ');
+                const items = typeof order.items === 'string' ? JSON.parse(order.items) : (order.items || []);
+                itemsListText = items.map(i => `${i.name}${i.meat ? ' [' + i.meat + ']' : ''}`).join(', ');
+                itemsDetailHtml = items.map(i => {
+                    let detail = i.name;
+                    if (i.meat) detail += ` <span class="text-orange-500">[${i.meat}]</span>`;
+                    if (i.addons && i.addons.length) detail += ` <span class="text-gray-400">+${i.addons.join(',')}</span>`;
+                    return `<div class="text-xs">${detail} <span class="text-gray-400">฿${i.price}</span></div>`;
+                }).join('');
             } catch (e) { }
+
+            // Lotto number
+            const lottoNum = order.lotto_pool && order.lotto_pool.length > 0
+                ? order.lotto_pool[0].number
+                : (order.id ? String(order.id).slice(-2).padStart(2, '0') : '-');
+
+            // Points info
+            const pointsEarned = order.points_earned || 0;
+            const pointsRedeemed = order.points_redeemed || 0;
+            const userPoints = order.profiles ? order.profiles.points : '-';
 
             let statusBadge = getStatusBadge(order.status);
             let actions = getActionButtons(order);
 
             return `
                 <tr class="hover:bg-gray-50 transition-colors border-b border-gray-50/50 group">
-                    <td class="p-5 font-mono text-xs text-gray-400 group-hover:text-gray-600">#${order.id}</td>
-                    <td class="p-5 text-gray-500 text-sm font-medium">${date}</td>
-                    <td class="p-5 font-bold text-gray-800">${customerName} <span class="text-[10px] bg-gray-100 text-gray-500 px-1 py-0.5 rounded ml-1 uppercase">${order.payment_method || '-'}</span></td>
-                    <td class="p-5">
-                        <div class="text-sm text-gray-600 line-clamp-1 max-w-[200px]" title="${itemsListText}">${itemsListText}</div>
+                    <td class="p-4">
+                        <div class="font-mono text-xs text-gray-400">#${order.id}</div>
+                        <div class="text-[10px] text-indigo-500 font-bold mt-1">🎟️ ${lottoNum}</div>
                     </td>
-                    <td class="p-5 font-bold text-gray-800">฿${order.total_price}</td>
-                    <td class="p-5">${statusBadge}</td>
-                    <td class="p-5 text-right"><div class="flex gap-2 justify-end">${actions}</div></td>
+                    <td class="p-4 text-gray-500 text-xs font-medium">${date}</td>
+                    <td class="p-4">
+                        <div class="font-bold text-gray-800 text-sm">${customerName}</div>
+                        <div class="text-[10px] text-gray-400 mt-0.5">
+                            <span class="bg-gray-100 px-1 py-0.5 rounded uppercase">${order.payment_method || '-'}</span>
+                            ${pointsEarned > 0 ? `<span class="bg-green-100 text-green-600 px-1 py-0.5 rounded ml-1">+${pointsEarned}pt</span>` : ''}
+                            ${pointsRedeemed > 0 ? `<span class="bg-orange-100 text-orange-600 px-1 py-0.5 rounded ml-1">-${pointsRedeemed}pt</span>` : ''}
+                        </div>
+                    </td>
+                    <td class="p-4">
+                        <div class="text-xs text-gray-600 max-w-[200px]">${itemsDetailHtml || itemsListText}</div>
+                    </td>
+                    <td class="p-4">
+                        <div class="font-bold text-gray-800">฿${order.total_price}</div>
+                        ${order.discount_amount > 0 ? `<div class="text-[10px] text-green-600">ลด ฿${order.discount_amount}</div>` : ''}
+                    </td>
+                    <td class="p-4">${statusBadge}</td>
+                    <td class="p-4 text-right"><div class="flex gap-2 justify-end">${actions}</div></td>
                 </tr>
             `;
         }
 
         function createOrderCard(order) {
-            const date = new Date(order.created_at).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
-            let itemsListText = '';
+            const dateObj = new Date(order.created_at);
+            const date = dateObj.toLocaleString('th-TH', {
+                day: '2-digit', month: '2-digit',
+                hour: '2-digit', minute: '2-digit'
+            });
+            const customerName = order.customer_name || (order.profiles && order.profiles.display_name) || 'ลูกค้า';
+            let itemsListHtml = '';
             try {
-                const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
-                itemsListText = items.map(i => `<div class="flex justify-between text-sm text-gray-600"><span>${i.name} ${i.meat || ''}</span><span class="font-bold text-gray-400">x${i.qty || 1}</span></div>`).join('');
+                const items = typeof order.items === 'string' ? JSON.parse(order.items) : (order.items || []);
+                itemsListHtml = items.map(i => {
+                    let detail = i.name;
+                    if (i.meat) detail += ` <span class="text-orange-500 text-[10px]">[${i.meat}]</span>`;
+                    if (i.addons && i.addons.length) detail += ` <span class="text-gray-400 text-[10px]">+${i.addons.join(',')}</span>`;
+                    return `<div class="flex justify-between text-sm text-gray-600"><span>${detail}</span><span class="font-bold text-gray-400">฿${i.price}</span></div>`;
+                }).join('');
             } catch (e) { }
+
+            // Lotto number
+            const lottoNum = order.lotto_pool && order.lotto_pool.length > 0
+                ? order.lotto_pool[0].number
+                : (order.id ? String(order.id).slice(-2).padStart(2, '0') : '-');
+
+            const pointsEarned = order.points_earned || 0;
+            const pointsRedeemed = order.points_redeemed || 0;
 
             return `
                 <div class="p-5 bg-white">
                     <div class="flex justify-between items-start mb-3">
                         <div>
                             <span class="font-mono text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded-lg">#${order.id}</span>
-                            <span class="ml-2 font-bold text-gray-800">${order.customer_name || 'ลูกค้า'}</span>
+                            <span class="ml-2 font-bold text-gray-800">${customerName}</span>
+                            <span class="ml-1 text-[10px] bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded font-bold">🎟️${lottoNum}</span>
                         </div>
                         <span class="text-xs font-medium text-gray-400">${date}</span>
                     </div>
-                    <div class="space-y-1 mb-4 border-l-2 border-gray-100 pl-3">
-                        ${itemsListText}
+                    <div class="space-y-1 mb-3 border-l-2 border-gray-100 pl-3">
+                        ${itemsListHtml}
                     </div>
+                    ${(pointsEarned > 0 || pointsRedeemed > 0) ? `
+                    <div class="flex gap-2 mb-3">
+                        ${pointsEarned > 0 ? `<span class="text-[10px] bg-green-100 text-green-600 px-2 py-1 rounded font-bold">+${pointsEarned} แต้ม</span>` : ''}
+                        ${pointsRedeemed > 0 ? `<span class="text-[10px] bg-orange-100 text-orange-600 px-2 py-1 rounded font-bold">ใช้ ${pointsRedeemed} แต้ม</span>` : ''}
+                    </div>` : ''}
                     <div class="flex justify-between items-center border-t border-gray-50 pt-3">
                         <div class="flex items-center gap-2">
                             <span class="font-black text-lg text-gray-800">฿${order.total_price}</span>
+                            ${order.discount_amount > 0 ? `<span class="text-xs text-green-600">ลด ฿${order.discount_amount}</span>` : ''}
                             ${getStatusBadge(order.status)}
                         </div>
                         <div class="flex gap-2">${getActionButtons(order)}</div>
@@ -619,6 +747,289 @@
             if (error) showToast('Error: ' + error.message, 'error'); else { closeMenuModal(); fetchMenu(); showToast('บันทึกเรียบร้อย', 'success'); }
         }
 
+        // --- Customers ---
+        let customersCache = [];
+        async function fetchCustomers() {
+            const { data, error } = await supabaseClient
+                .from('profiles')
+                .select('*')
+                .order('total_orders', { ascending: false })
+                .limit(100);
+
+            if (error) {
+                console.error('Fetch customers error:', error);
+                showToast('โหลดข้อมูลลูกค้าไม่สำเร็จ');
+                return;
+            }
+            customersCache = data || [];
+            renderCustomers(customersCache);
+        }
+
+        function renderCustomers(customers) {
+            const tbody = document.getElementById('customers-list');
+            if (!tbody) return;
+            if (customers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-gray-400">ยังไม่มีข้อมูลลูกค้า</td></tr>';
+                return;
+            }
+            tbody.innerHTML = customers.map(c => {
+                const tierBadge = c.tier === 'VIP'
+                    ? '<span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs font-bold">VIP</span>'
+                    : c.tier === 'GOLD'
+                        ? '<span class="bg-yellow-50 text-yellow-600 px-2 py-1 rounded-full text-xs font-bold">GOLD</span>'
+                        : '<span class="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs font-bold">MEMBER</span>';
+
+                const lastOrder = c.updated_at ? new Date(c.updated_at).toLocaleDateString('th-TH') : '-';
+
+                return `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-4">
+                            <div class="font-bold text-gray-800">${c.display_name || 'Guest'}</div>
+                            <div class="text-xs text-gray-400">ID: ${c.id.slice(0, 8)}...</div>
+                        </td>
+                        <td class="p-4"><span class="font-bold text-green-600">${c.points || 0}</span> pt</td>
+                        <td class="p-4 font-bold text-gray-800">${c.total_orders || 0}</td>
+                        <td class="p-4">${tierBadge}</td>
+                        <td class="p-4 text-xs text-gray-500 font-mono">${c.line_user_id || '-'}</td>
+                        <td class="p-4 text-xs text-gray-400">${lastOrder}</td>
+                        <td class="p-4 text-right">
+                            <button onclick="openPointsModal('${c.id}', ${c.points || 0}, '${c.display_name || 'Guest'}')" class="px-3 py-1 bg-blue-500 text-white rounded-lg text-xs font-bold hover:bg-blue-600">แก้ไข</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function openPointsModal(userId, currentPoints, userName) {
+            // Create enhanced modal for points adjustment
+            const modal = document.createElement('div');
+            modal.id = 'points-adjust-modal';
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+            modal.innerHTML = `
+                <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">📝 ปรับพอยต์</h3>
+                    <div class="bg-gray-50 rounded-xl p-4 mb-4">
+                        <div class="text-sm text-gray-500">ลูกค้า</div>
+                        <div class="font-bold text-lg text-gray-800">${userName}</div>
+                        <div class="mt-2 text-sm text-gray-500">พอยต์ปัจจุบัน</div>
+                        <div class="font-bold text-2xl text-green-600">${currentPoints} <span class="text-sm font-normal">แต้ม</span></div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-gray-700 mb-2">ปรับพอยต์</label>
+                        <div class="flex gap-2 mb-2">
+                            <button onclick="document.getElementById('points-adjust-input').value = '10'" class="flex-1 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-bold hover:bg-green-200">+10</button>
+                            <button onclick="document.getElementById('points-adjust-input').value = '30'" class="flex-1 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-bold hover:bg-green-200">+30</button>
+                            <button onclick="document.getElementById('points-adjust-input').value = '50'" class="flex-1 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-bold hover:bg-green-200">+50</button>
+                            <button onclick="document.getElementById('points-adjust-input').value = '100'" class="flex-1 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-bold hover:bg-green-200">+100</button>
+                        </div>
+                        <input type="number" id="points-adjust-input" placeholder="ใส่ตัวเลข (เช่น 50 หรือ -20)" 
+                            class="w-full p-3 border border-gray-200 rounded-xl text-lg font-bold text-center"
+                            style="font-size: 18px;">
+                        <div class="text-xs text-gray-400 mt-1">⚠️ ใส่ตัวเลขติดลบหากต้องการหักพอยต์</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-gray-700 mb-2">หมายเหตุ</label>
+                        <select id="points-reason" class="w-full p-3 border border-gray-200 rounded-xl">
+                            <option value="">-- เลือกเหตุผล --</option>
+                            <option value="ขอโทษลูกค้า">🙏 ขอโทษลูกค้า</option>
+                            <option value="แจกพอยต์ชดเชย">🎁 แจกพอยต์ชดเชย</option>
+                            <option value="โปรโมชั่นพิเศษ">⭐ โปรโมชั่นพิเศษ</option>
+                            <option value="สมาชิกใหม่">👋 สมาชิกใหม่</option>
+                            <option value="ลบพอยต์ผิดพลาด">❌ ลบพอยต์ผิดพลาด</option>
+                            <option value="อื่นๆ">📝 อื่นๆ</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <input type="text" id="points-note" placeholder="หมายเหตุเพิ่มเติม (ถ้ามี)" 
+                            class="w-full p-3 border border-gray-200 rounded-xl">
+                    </div>
+
+                    <div class="bg-blue-50 rounded-xl p-3 mb-4">
+                        <div class="text-sm text-blue-600 font-bold">ผลลัพธ์ที่ได้</div>
+                        <div class="text-2xl font-bold text-blue-700" id="points-preview">${currentPoints} แต้ม</div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button onclick="document.getElementById('points-adjust-modal').remove()" 
+                            class="flex-1 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200">ยกเลิก</button>
+                        <button onclick="saveAdjustedPoints('${userId}', ${currentPoints})" 
+                            class="flex-1 py-3 bg-blue-500 text-white rounded-xl font-bold hover:bg-blue-600">บันทึก</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            // Add event listener for live preview
+            document.getElementById('points-adjust-input').addEventListener('input', function () {
+                const adjust = parseInt(this.value) || 0;
+                const newTotal = currentPoints + adjust;
+                document.getElementById('points-preview').textContent = `${newTotal} แต้ม`;
+                document.getElementById('points-preview').className = adjust >= 0
+                    ? 'text-2xl font-bold text-green-600'
+                    : 'text-2xl font-bold text-red-500';
+            });
+        }
+
+        async function saveAdjustedPoints(userId, currentPoints) {
+            const adjustInput = document.getElementById('points-adjust-input');
+            const reason = document.getElementById('points-reason').value;
+            const note = document.getElementById('points-note').value;
+
+            const adjust = parseInt(adjustInput?.value) || 0;
+            const newPoints = currentPoints + adjust;
+
+            if (newPoints < 0) {
+                showToast('พอยต์ไม่ติดลบได้', 'error');
+                return;
+            }
+
+            if (adjust === 0) {
+                showToast('กรุณาใส่จำนวนพอยต์ที่ต้องการปรับ', 'error');
+                return;
+            }
+
+            // Update profile
+            const { error } = await supabaseClient
+                .from('profiles')
+                .update({ points: newPoints, updated_at: new Date() })
+                .eq('id', userId);
+
+            if (error) {
+                showToast('แก้ไขไม่สำเร็จ: ' + error.message, 'error');
+                return;
+            }
+
+            // Log the adjustment in point_logs
+            await supabaseClient.from('point_logs').insert({
+                user_id: userId,
+                action: adjust > 0 ? 'BONUS' : 'ADJUST',
+                amount: Math.abs(adjust),
+                note: `${reason}${note ? ' - ' + note : ''}`,
+                order_id: null
+            });
+
+            document.getElementById('points-adjust-modal')?.remove();
+            showToast(`${adjust > 0 ? 'เพิ่ม' : 'หัก'}พอยต์ ${Math.abs(adjust)} แต้ม${reason ? ' (' + reason + ')' : ''} เรียบร้อย`, 'success');
+            fetchCustomers();
+        }
+
+        // --- Export Functions ---
+        async function exportOrdersCSV() {
+            const { data, error } = await supabaseClient
+                .from('orders')
+                .select('*')
+                .neq('status', 'cart')
+                .order('created_at', { ascending: false });
+
+            if (error || !data) {
+                showToast('ไม่สามารถดึงข้อมูลได้', 'error');
+                return;
+            }
+
+            const csv = generateOrdersCSV(data);
+            downloadCSV(csv, `kaprao52_orders_${new Date().toISOString().split('T')[0]}.csv`);
+            showToast('ดาวน์โหลด CSV เรียบร้อย', 'success');
+        }
+
+        function generateOrdersCSV(orders) {
+            const headers = ['Order ID', 'วันที่', 'เวลา', 'ลูกค้า', 'รายการ', 'ยอดรวม', 'ส่วนลด', 'วิธีชำระ', 'สถานะ', 'พอยต์ได้', 'พอยต์ใช้', 'เลขหวย'];
+            const rows = orders.map(o => {
+                const date = new Date(o.created_at);
+                const items = Array.isArray(o.items) ? o.items.map(i => `${i.name}${i.meat ? '[' + i.meat + ']' : ''}`).join(', ') : '';
+                return [
+                    o.id,
+                    date.toLocaleDateString('th-TH'),
+                    date.toLocaleTimeString('th-TH'),
+                    o.customer_name || 'ลูกค้า',
+                    items,
+                    o.total_price,
+                    o.discount_amount || 0,
+                    o.payment_method || '-',
+                    o.status,
+                    o.points_earned || 0,
+                    o.points_redeemed || 0,
+                    o.id ? String(o.id).slice(-2).padStart(2, '0') : '-'
+                ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(',');
+            });
+            return [headers.join(','), ...rows].join('\n');
+        }
+
+        async function exportCustomersCSV() {
+            await fetchCustomers();
+            const csv = generateCustomersCSV(customersCache);
+            downloadCSV(csv, `kaprao52_customers_${new Date().toISOString().split('T')[0]}.csv`);
+            showToast('ดาวน์โหลด CSV เรียบร้อย', 'success');
+        }
+
+        function generateCustomersCSV(customers) {
+            const headers = ['ID', 'ชื่อ', 'พอยต์', 'ออเดอร์รวม', 'ระดับ', 'LINE ID', 'อัปเดตล่าสุด'];
+            const rows = customers.map(c => [
+                c.id,
+                c.display_name || 'Guest',
+                c.points || 0,
+                c.total_orders || 0,
+                c.tier || 'MEMBER',
+                c.line_user_id || '',
+                c.updated_at ? new Date(c.updated_at).toISOString() : ''
+            ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','));
+            return [headers.join(','), ...rows].join('\n');
+        }
+
+        function downloadCSV(csvContent, filename) {
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+        }
+
+        // --- Tab Switcher ---
+        function switchTab(tabId) {
+            const isOrders = tabId === 'orders';
+            const isCustomers = tabId === 'customers';
+            const isMenu = tabId === 'menu';
+
+            // Update nav buttons
+            const updateNav = (id, active) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                if (active) {
+                    el.className = 'w-full text-left px-4 py-3 rounded-xl font-bold flex items-center gap-3 bg-gray-900 text-white shadow-lg shadow-gray-200 transition-all';
+                } else {
+                    el.className = 'w-full text-left px-4 py-3 rounded-xl font-bold flex items-center gap-3 text-gray-400 hover:bg-gray-50 hover:text-gray-800 transition-all';
+                }
+            };
+            updateNav('nav-orders', isOrders);
+            updateNav('nav-customers', isCustomers);
+            updateNav('nav-menu', isMenu);
+
+            // Update mobile nav
+            const updateMob = (id, active) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                if (active) {
+                    el.className = 'flex flex-col items-center p-2 text-brand-gold scale-110 transition-transform';
+                } else {
+                    el.className = 'flex flex-col items-center p-2 text-gray-400 transition-transform';
+                }
+            };
+            updateMob('mob-orders', isOrders);
+            updateMob('mob-customers', isCustomers);
+            updateMob('mob-menu', isMenu);
+
+            // Show/hide sections
+            document.getElementById('section-orders').classList.toggle('hidden', !isOrders);
+            document.getElementById('section-customers').classList.toggle('hidden', !isCustomers);
+            document.getElementById('section-menu').classList.toggle('hidden', !isMenu);
+
+            // Load data if needed
+            if (isCustomers) fetchCustomers();
+            if (isMenu) fetchMenu();
+        }
+
         // --- Realtime ---
         function setupRealtime() {
             supabaseClient
@@ -628,6 +1039,12 @@
                     if (payload.eventType === 'INSERT') {
                         new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play().catch(() => { });
                         showToast('มีออเดอร์ใหม่เข้ามา!', 'success');
+                    }
+                })
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => {
+                    const custSection = document.getElementById('section-customers');
+                    if (custSection && !custSection.classList.contains('hidden')) {
+                        fetchCustomers();
                     }
                 })
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'menu_items' }, () => fetchMenu())

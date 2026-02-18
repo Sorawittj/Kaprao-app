@@ -88,6 +88,23 @@ async function fetchLottoResults() {
     try {
         console.log('Checking lottery results...');
         updateLotteryCountdown();
+
+        // Try to fetch from Supabase lotto_results table
+        if (typeof supabaseClient !== 'undefined') {
+            const { data, error } = await supabaseClient
+                .from('lotto_results')
+                .select('*')
+                .order('draw_date', { ascending: false })
+                .limit(10);
+
+            if (!error && data && data.length > 0) {
+                data.forEach(r => {
+                    const dateKey = formatDateForDraw(new Date(r.draw_date));
+                    OFFICIAL_RESULTS[dateKey] = r.last2;
+                });
+                console.log('Lotto results loaded from Supabase:', Object.keys(OFFICIAL_RESULTS).length);
+            }
+        }
     } catch (e) {
         console.error('Lotto fetch error', e);
     }
@@ -114,35 +131,106 @@ function updateTicketBadge() {
     }
 }
 
+// =============================================
+// SUPABASE-BASED SYNC FUNCTIONS (replaces Google Script)
+// =============================================
+
+/**
+ * Sync ticket history from Supabase lotto_pool table
+ */
 async function syncTicketHistory(userId) {
     if (isSyncing) return;
     isSyncing = true;
     try {
-        const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getHistory&userId=${userId}`);
-        const data = await response.json();
-        if (data.history) {
-            lottoHistory = data.history;
+        if (!window.supabaseClient || !userId) return;
+
+        const { data, error } = await window.supabaseClient
+            .from('lotto_pool')
+            .select('*, orders(customer_name, total_price, items, created_at)')
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false })
+            .limit(20);
+
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+            // Map Supabase lotto_pool to local lottoHistory format
+            const mapped = data.map(t => {
+                const drawDateStr = formatDateForDraw(new Date(t.draw_date));
+                const orderDate = t.orders ? new Date(t.orders.created_at) : new Date();
+                return {
+                    id: `KP-${String(t.order_id).padStart(6, '0')}`,
+                    supabaseOrderId: t.order_id,
+                    number: t.number,
+                    date: getStandardDate(orderDate),
+                    drawDate: drawDateStr,
+                    drawDateTimestamp: new Date(t.draw_date).getTime(),
+                    timestamp: orderDate.getTime(),
+                    price: t.orders ? t.orders.total_price : 0,
+                    status: 'pending',
+                    checkedDate: null,
+                    items: t.orders ? t.orders.items : [],
+                    customerName: t.orders ? t.orders.customer_name : 'ลูกค้า'
+                };
+            });
+
+            lottoHistory = mapped;
             localStorage.setItem(KEYS.HISTORY, JSON.stringify(lottoHistory));
+            updateTicketBadge();
+            console.log('Ticket history synced from Supabase:', lottoHistory.length);
         }
     } catch (e) {
-        console.error('Sync history error', e);
+        console.error('Sync ticket history error (Supabase):', e);
     } finally {
         isSyncing = false;
         updateTicketBadge();
     }
 }
 
+/**
+ * Sync user stats (points) from Supabase profiles table
+ */
 async function syncUserStatsFromServer(userId) {
     try {
-        const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getStats&userId=${userId}`);
-        const data = await response.json();
-        if (data.points !== undefined) {
-            userStats.points = data.points;
+        if (!window.supabaseClient || !userId) return;
+
+        const { data, error } = await window.supabaseClient
+            .from('profiles')
+            .select('points, total_orders, tier, display_name')
+            .eq('id', userId)
+            .maybeSingle();
+
+        if (error) throw error;
+
+        if (data) {
+            userStats.points = data.points || 0;
+            userStats.totalOrders = data.total_orders || 0;
+            userStats.tier = data.tier || 'MEMBER';
+
+            // Also load point history
+            const { data: logs, error: logsError } = await window.supabaseClient
+                .from('point_logs')
+                .select('*')
+                .eq('user_id', userId)
+                .order('created_at', { ascending: false })
+                .limit(30);
+
+            if (!logsError && logs) {
+                userStats.history = logs.map(log => ({
+                    type: log.action === 'EARN' ? 'earn' : 'redeem',
+                    amount: log.amount,
+                    date: log.created_at,
+                    orderId: log.order_id ? `KP-${String(log.order_id).padStart(6, '0')}` : null,
+                    note: log.note
+                }));
+            }
+
             localStorage.setItem(KEYS.STATS, JSON.stringify(userStats));
-            updatePointsDisplay();
+            if (typeof updatePointsDisplay === 'function') updatePointsDisplay();
+            console.log('User stats synced from Supabase. Points:', userStats.points);
         }
     } catch (e) {
-        console.error('Sync stats error', e);
+        console.error('Sync stats error (Supabase):', e);
     }
 }
 
@@ -160,7 +248,7 @@ function openMyTickets() {
         if (list) {
             list.innerHTML = '';
             if (lottoHistory.length === 0) {
-                list.innerHTML = `<div class="text-center text-gray-400 mt-10"><div class="text-4xl mb-2 opacity-30">🎟️</div><p class="text-sm">ยังไม่มีประวัติการสั่งซื้อ</p></div>`;
+                list.innerHTML = `<div class="text-center text-gray-400 mt-10"><div class="text-4xl mb-2 opacity-30">🎟️</div><p class="text-sm">ยังไม่มีประวัติการสั่งซื้อ</p><p class="text-xs mt-1 text-gray-300">สั่งอาหารเพื่อรับเลขลุ้นโชค!</p></div>`;
             } else {
                 lottoHistory.forEach((t, index) => {
                     const status = getLotteryStatus(t);

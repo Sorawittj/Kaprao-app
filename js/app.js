@@ -599,9 +599,8 @@ document.addEventListener('DOMContentLoaded', () => {
     loadGamificationData();
     // initFoodParticles(); // Removed in minimal theme
 
-    // --- SUPABASE MENU FETCH ---
+    // --- SUPABASE MENU REALTIME (fetch is handled by dynamicMenu.js) ---
     if (typeof supabaseClient !== 'undefined') {
-        fetchMenuFromSupabase();
         setupMenuRealtime();
     }
 
@@ -637,40 +636,15 @@ function hideLoader() {
 }
 
 // --- SUPABASE MENU LOGIC ---
-async function fetchMenuFromSupabase() {
-    try {
-        const { data, error } = await supabaseClient
-            .from('menu_items')
-            .select('*')
-            .order('id', { ascending: true });
-
-        if (error) throw error;
-
-        if (data && data.length > 0) {
-            // Update the global menuItems variable
-            // Map Supabase fields to app fields
-            // App uses: soldOut (boolean), isNew (boolean)
-            menuItems = data.map(item => ({
-                ...item,
-                // Supabase: is_available (true=available), App: soldOut (true=unavailable)
-                soldOut: !item.is_available,
-                isNew: item.is_new
-            }));
-
-            console.log("Menu fetched from Supabase:", menuItems.length);
-            if (typeof renderMenu === 'function') renderMenu();
-        }
-    } catch (e) {
-        console.error("Error fetching menu:", e);
-    }
-}
+// fetchMenuFromSupabase is defined in js/dynamicMenu.js (merged with local data)
 
 function setupMenuRealtime() {
+    if (typeof supabaseClient === 'undefined') return;
     supabaseClient
         .channel('public-menu')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'menu_items' }, () => {
             console.log('Realtime Menu Update');
-            fetchMenuFromSupabase();
+            if (typeof fetchMenuFromSupabase === 'function') fetchMenuFromSupabase();
             showToast('เมนูมีการอัพเดท 🔄', 'info');
         })
         .subscribe();

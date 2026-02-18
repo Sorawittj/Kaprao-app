@@ -3,6 +3,7 @@
 const PROMPTPAY_NUMBER = '0928496930'; // Update with actual shop PromptPay number
 
 let currentOrderId = "";
+let currentSupabaseOrderId = null; // Store Supabase numeric ID
 
 function generateOrderId() {
     const now = Date.now().toString();
@@ -21,7 +22,7 @@ function generateOrderId() {
     return currentOrderId;
 }
 
-function saveTicketToHistory(orderId, totalPrice) {
+function saveTicketToHistory(orderId, totalPrice, supabaseId) {
     const today = new Date();
     // Assuming utility functions exist globally: getThaiLotteryDrawDate, getStandardDate
     const drawDateStr = typeof getThaiLotteryDrawDate === 'function' ? getThaiLotteryDrawDate(today) : new Date().toLocaleDateString();
@@ -41,9 +42,15 @@ function saveTicketToHistory(orderId, totalPrice) {
         drawDateTimestamp = Date.now();
     }
 
+    // Lottery number: last 2 digits of Supabase order ID (if available), else from KP order ID
+    const lottoNumber = supabaseId
+        ? String(supabaseId).slice(-2).padStart(2, '0')
+        : orderId.slice(-2);
+
     const ticket = {
         id: orderId,
-        number: orderId.slice(-2),
+        supabaseOrderId: supabaseId || null,
+        number: lottoNumber,
         date: todayStr,
         drawDate: drawDateStr,
         drawDateTimestamp: drawDateTimestamp,
@@ -61,6 +68,8 @@ function saveTicketToHistory(orderId, totalPrice) {
         localStorage.setItem(KEYS.HISTORY, JSON.stringify(lottoHistory));
         if (typeof updateTicketBadge === 'function') updateTicketBadge();
     }
+
+    return lottoNumber;
 }
 
 function openCheckout() {
@@ -112,7 +121,7 @@ function closeCheckout(isBackNav = false) {
     overlay.classList.add('opacity-0');
     sheet.classList.add('translate-y-full');
     setTimeout(() => { overlay.classList.add('hidden'); sheet.style.transform = ''; }, 300);
-    if (typeof currentOpenModal !== 'undefined') currentOpenModal = null; // Careful with global assignment
+    if (typeof currentOpenModal !== 'undefined') currentOpenModal = null;
     if (typeof unlockScroll === 'function') unlockScroll();
     if (typeof setActiveNav === 'function') setActiveNav('home');
 }
@@ -202,13 +211,11 @@ function reprintReceipt(ticketIndex) {
 
 // --- PAYMENT & SUBMISSION ---
 
-// function selectPaymentMethod() and showQRCode() updated for Kasikorn Bank
-
 const KBANK_INFO = {
     bankName: 'ธนาคารกสิกรไทย (KBANK)',
     accNumber: '203-3-57019-0',
-    accName: 'Kaprao52', // Placeholder name
-    qrImage: 'images/payment_qr.jpg' // User must upload this
+    accName: 'Kaprao52',
+    qrImage: 'images/payment_qr.jpg'
 };
 
 function selectPaymentMethod() {
@@ -220,7 +227,18 @@ function selectPaymentMethod() {
     modal.className = "fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-end justify-center animate-fade-in";
     modal.id = "payment-modal";
 
-    const total = cart.reduce((sum, i) => sum + i.price, 0);
+    // Calculate actual total with discounts
+    let subtotal = cart.reduce((sum, i) => sum + i.price, 0);
+    let discountFromCode = 0;
+    const code = document.getElementById('discount-code') ? document.getElementById('discount-code').value.trim().toUpperCase() : '';
+    if (typeof promotions !== 'undefined') {
+        const promo = promotions.find(p => p.code === code);
+        if (promo && subtotal >= promo.minOrder) discountFromCode = promo.value;
+    }
+    let discountFromPoints = (typeof pointsRedeemed !== 'undefined' && typeof isPointsActive !== 'undefined' && isPointsActive)
+        ? Math.floor(pointsRedeemed / 100) * 10
+        : 0;
+    const total = Math.max(0, subtotal - discountFromCode - discountFromPoints);
 
     modal.innerHTML = `
         <div class="bg-white rounded-t-[2rem] w-full max-w-md p-6 animate-slide-up relative safe-area-pb">
@@ -268,7 +286,17 @@ function selectPaymentMethod() {
 
 function showQRCode() {
     const modalBody = document.querySelector('#payment-modal > div');
-    const total = cart.reduce((sum, i) => sum + i.price, 0);
+    let subtotal = cart.reduce((sum, i) => sum + i.price, 0);
+    let discountFromCode = 0;
+    const code = document.getElementById('discount-code') ? document.getElementById('discount-code').value.trim().toUpperCase() : '';
+    if (typeof promotions !== 'undefined') {
+        const promo = promotions.find(p => p.code === code);
+        if (promo && subtotal >= promo.minOrder) discountFromCode = promo.value;
+    }
+    let discountFromPoints = (typeof pointsRedeemed !== 'undefined' && typeof isPointsActive !== 'undefined' && isPointsActive)
+        ? Math.floor(pointsRedeemed / 100) * 10
+        : 0;
+    const total = Math.max(0, subtotal - discountFromCode - discountFromPoints);
 
     modalBody.innerHTML = `
         <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-4"></div>
@@ -278,7 +306,6 @@ function showQRCode() {
         </div>
         
         <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 mb-4 flex flex-col items-center">
-            <!-- QR Image specific to KBANK -->
             <img src="${KBANK_INFO.qrImage}" 
                  onerror="this.src='https://via.placeholder.com/300x300?text=Please+Upload+QR'; this.classList.add('opacity-50')"
                  class="w-48 h-48 object-contain rounded-lg mb-3 shadow-sm bg-white">
@@ -305,7 +332,6 @@ function showQRCode() {
 
 // isSubmitting is declared in state.js
 
-
 async function confirmOrder(paymentMethod) {
     document.getElementById('payment-modal')?.remove();
 
@@ -313,73 +339,217 @@ async function confirmOrder(paymentMethod) {
     if (isSubmitting) return;
 
     const name = document.getElementById('user-name').value.trim();
+    if (!name) {
+        showToast('กรุณาใส่ชื่อผู้สั่งก่อนครับ', 'warning');
+        return;
+    }
+    if (cart.length === 0) {
+        showToast('ตะกร้าว่างเปล่า', 'warning');
+        return;
+    }
+
     isSubmitting = true;
     showGlobalLoader("กำลังส่งออเดอร์...");
 
     try {
+        // --- Calculate Totals ---
         let subtotal = cart.reduce((sum, i) => sum + i.price, 0);
         let discountFromCode = 0;
+        const code = document.getElementById('discount-code') ? document.getElementById('discount-code').value.trim().toUpperCase() : '';
+        let promoCode = null;
+        if (typeof promotions !== 'undefined') {
+            const promo = promotions.find(p => p.code === code);
+            if (promo && subtotal >= promo.minOrder) {
+                discountFromCode = promo.value;
+                promoCode = code;
+            }
+        }
         let discountFromPoints = 0;
-        let netTotal = subtotal;
-        // In real app, calculate actual net total safely
+        let redeemedPoints = 0;
+        if (typeof isPointsActive !== 'undefined' && isPointsActive && typeof pointsRedeemed !== 'undefined') {
+            redeemedPoints = pointsRedeemed;
+            discountFromPoints = Math.floor(redeemedPoints / 100) * 10;
+        }
+        const totalDiscount = discountFromCode + discountFromPoints;
+        const netTotal = Math.max(0, subtotal - totalDiscount);
 
-        // Generate ID
+        // Calculate points to earn (10 baht = 1 point)
+        const pointsToEarn = typeof calculatePoints === 'function'
+            ? calculatePoints(netTotal)
+            : Math.floor(netTotal / 10);
+
+        // Generate local order ID
         if (!currentOrderId) generateOrderId();
+        const localOrderId = currentOrderId;
 
-        // 1. Prepare Supabase Payload
-        const orderPayload = {
-            status: 'placed',
-            payment_method: paymentMethod,
-            payment_status: paymentMethod === 'promptpay' ? 'paid_verify' : 'pending',
-            total_price: netTotal,
-            user_id: (typeof userAvatar !== 'undefined' && userAvatar.userId) ? userAvatar.userId : null,
-            customer_name: name,
-            items: cart, // Supabase JSONB
-            created_at: new Date()
-        };
-
-        // 2. Insert into Supabase
+        // --- Insert into Supabase ---
+        let supabaseOrderId = null;
         if (typeof supabaseClient !== 'undefined') {
-            const { error } = await supabaseClient.from('orders').insert(orderPayload);
+            const orderPayload = {
+                status: 'placed', // Insert directly as 'placed' to trigger points
+                payment_method: paymentMethod,
+                payment_status: paymentMethod === 'bank_transfer' ? 'paid_verify' : 'pending',
+                total_price: netTotal,
+                subtotal_price: subtotal,
+                discount_amount: totalDiscount,
+                discount_code: promoCode,
+                points_redeemed: redeemedPoints,
+                points_earned: pointsToEarn,
+                user_id: (typeof userAvatar !== 'undefined' && userAvatar.userId) ? userAvatar.userId : null,
+                line_user_id: (typeof userAvatar !== 'undefined' && userAvatar.lineUserId) ? userAvatar.lineUserId : null,
+                customer_name: name,
+                items: cart,
+                created_at: new Date().toISOString()
+            };
+
+            const { data: insertedOrder, error } = await supabaseClient
+                .from('orders')
+                .insert(orderPayload)
+                .select('id')
+                .single();
+
             if (error) {
                 console.error('Supabase Insert Error:', error);
-                throw new Error('บันทึกข้อมูลไม่สำเร็จ: ' + error.message);
+                // Try without extra columns in case they don't exist yet
+                const fallbackPayload = {
+                    status: 'placed',
+                    payment_method: paymentMethod,
+                    payment_status: paymentMethod === 'bank_transfer' ? 'paid_verify' : 'pending',
+                    total_price: netTotal,
+                    user_id: (typeof userAvatar !== 'undefined' && userAvatar.userId) ? userAvatar.userId : null,
+                    customer_name: name,
+                    items: cart,
+                    created_at: new Date().toISOString()
+                };
+                const { data: fallbackOrder, error: fallbackError } = await supabaseClient
+                    .from('orders')
+                    .insert(fallbackPayload)
+                    .select('id')
+                    .single();
+
+                if (fallbackError) {
+                    throw new Error('บันทึกข้อมูลไม่สำเร็จ: ' + fallbackError.message);
+                }
+                if (fallbackOrder) supabaseOrderId = fallbackOrder.id;
+            } else {
+                if (insertedOrder) supabaseOrderId = insertedOrder.id;
+            }
+
+            // --- Update Points Locally (optimistic update) ---
+            // The Supabase trigger will handle server-side, but update UI immediately
+            if (userAvatar.userId) {
+                // Deduct redeemed points
+                if (redeemedPoints > 0) {
+                    userStats.points = Math.max(0, (userStats.points || 0) - redeemedPoints);
+                    // Log redemption
+                    userStats.history = userStats.history || [];
+                    userStats.history.unshift({
+                        type: 'redeem',
+                        amount: redeemedPoints,
+                        date: new Date().toISOString(),
+                        orderId: localOrderId,
+                        note: 'แลกส่วนลด'
+                    });
+                }
+                // Add earned points
+                if (pointsToEarn > 0) {
+                    userStats.points = (userStats.points || 0) + pointsToEarn;
+                    userStats.history = userStats.history || [];
+                    userStats.history.unshift({
+                        type: 'earn',
+                        amount: pointsToEarn,
+                        date: new Date().toISOString(),
+                        orderId: localOrderId,
+                        note: 'สั่งอาหาร'
+                    });
+                }
+                localStorage.setItem(KEYS.STATS, JSON.stringify(userStats));
+                if (typeof updatePointsDisplay === 'function') updatePointsDisplay();
+
+                // Also update points in Supabase profiles directly (in case trigger doesn't fire)
+                try {
+                    const pointsDelta = pointsToEarn - (redeemedPoints > 0 ? Math.floor(redeemedPoints / 100) * 100 : 0);
+                    // Actually: earn points, deduct redeemed points (not discount amount)
+                    const netPointsDelta = pointsToEarn - redeemedPoints;
+                    await supabaseClient.rpc('update_user_points', {
+                        p_user_id: userAvatar.userId,
+                        p_points_delta: netPointsDelta,
+                        p_order_id: supabaseOrderId
+                    }).catch(e => {
+                        // RPC might not exist, fallback to direct update
+                        console.warn('RPC update_user_points not available, using direct update');
+                        return supabaseClient
+                            .from('profiles')
+                            .upsert({
+                                id: userAvatar.userId,
+                                points: Math.max(0, (userStats.points || 0)),
+                                updated_at: new Date().toISOString()
+                            }, { onConflict: 'id' });
+                    });
+                } catch (pointsErr) {
+                    console.warn('Points update warning:', pointsErr);
+                }
             }
         }
 
-        // 3. Save History & Gamification
-        saveTicketToHistory(currentOrderId, netTotal);
+        // --- Save History & Gamification ---
+        const lottoNumber = saveTicketToHistory(localOrderId, netTotal, supabaseOrderId);
 
-        // 4. Start Tracking (Critical Step)
-        if (typeof startOrderTracking === 'function') {
-            startOrderTracking(currentOrderId, cart);
+        // Update gamification
+        if (typeof gamificationData !== 'undefined') {
+            gamificationData.totalOrders = (gamificationData.totalOrders || 0) + 1;
+            gamificationData.totalSpent = (gamificationData.totalSpent || 0) + netTotal;
+            if (typeof updateStreak === 'function') updateStreak();
+            if (typeof checkAndAwardAchievements === 'function') checkAndAwardAchievements({ total: netTotal });
+            if (typeof saveGamificationData === 'function') saveGamificationData();
         }
 
-        // 5. Cleanup
-        const finalOrderId = currentOrderId;
+        // --- Start Tracking ---
+        if (typeof startOrderTracking === 'function') {
+            startOrderTracking(localOrderId, cart);
+        }
+
+        // --- Cleanup ---
+        const finalOrderId = localOrderId;
         const finalCart = [...cart];
+        const finalName = name;
+        const finalNetTotal = netTotal;
+        const finalSubtotal = subtotal;
+        const finalDiscount = totalDiscount;
+        const finalLottoNumber = lottoNumber;
+        const finalDrawDate = typeof getThaiLotteryDrawDate === 'function' ? getThaiLotteryDrawDate() : '';
+        const finalPointsEarned = pointsToEarn;
 
         cart = [];
         if (typeof discountValue !== 'undefined') discountValue = 0;
+        if (typeof pointsRedeemed !== 'undefined') pointsRedeemed = 0;
+        if (typeof isPointsActive !== 'undefined') isPointsActive = false;
         currentOrderId = "";
+        currentSupabaseOrderId = null;
         if (typeof saveToLS === 'function') saveToLS();
         if (typeof updateMiniCart === 'function') updateMiniCart();
         if (typeof updateBottomNavBadge === 'function') updateBottomNavBadge();
         closeCheckout();
         hideGlobalLoader();
 
-        // 6. Redirect to LINE (After cleanup and tracking)
-        // Generate LINE Message
-        let msg = `🔥 ออเดอร์ใหม่! [${finalOrderId}]\n👤 คุณ ${name}\n`;
-        msg += `💳 ชำระ: ${paymentMethod === 'promptpay' ? 'โอนจ่าย (QR) ✅' : 'จ่ายทีหลัง/เงินสด 🕒'}\n`;
-        msg += `------------------------\n`;
-        finalCart.forEach((i, index) => {
-            msg += `${index + 1}. ${i.name} (${i.price}.-)\n`;
+        // --- Build LINE Message ---
+        const lineOAId = "@772ysswn";
+        let msg = buildLineOrderMessage({
+            orderId: finalOrderId,
+            supabaseOrderId: supabaseOrderId,
+            name: finalName,
+            paymentMethod: paymentMethod,
+            items: finalCart,
+            subtotal: finalSubtotal,
+            discount: finalDiscount,
+            netTotal: finalNetTotal,
+            lottoNumber: finalLottoNumber,
+            drawDate: finalDrawDate,
+            pointsEarned: finalPointsEarned,
+            redeemedPoints: redeemedPoints
         });
-        msg += `------------------------\n💰 ยอดรวม: ${netTotal} บาท\n`;
 
         const encodedMsg = encodeURIComponent(msg);
-        const lineOAId = "@772ysswn";
 
         // Use a short timeout to ensure UI updates before navigation
         setTimeout(() => {
@@ -387,10 +557,76 @@ async function confirmOrder(paymentMethod) {
             isSubmitting = false;
         }, 500);
 
+        // Sync stats from server after a delay
+        if (userAvatar.userId) {
+            setTimeout(async () => {
+                if (typeof syncUserStatsFromServer === 'function') {
+                    await syncUserStatsFromServer(userAvatar.userId);
+                }
+            }, 3000);
+        }
+
     } catch (error) {
         hideGlobalLoader();
         console.error("Order Error:", error);
         showToast("เกิดข้อผิดพลาด: " + error.message, 'error');
         isSubmitting = false;
     }
+}
+
+/**
+ * Build a comprehensive LINE message for the order
+ */
+function buildLineOrderMessage({ orderId, supabaseOrderId, name, paymentMethod, items, subtotal, discount, netTotal, lottoNumber, drawDate, pointsEarned, redeemedPoints }) {
+    const now = new Date();
+    const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    const dateStr = typeof getStandardDate === 'function' ? getStandardDate(now) : now.toLocaleDateString('th-TH');
+
+    let paymentLabel = '';
+    if (paymentMethod === 'bank_transfer') paymentLabel = 'โอนเงิน/สแกนจ่าย ✅';
+    else if (paymentMethod === 'cod') paymentLabel = 'จ่ายทีหลัง/เงินสด 🕒';
+    else paymentLabel = paymentMethod;
+
+    let msg = `🔥 ออเดอร์ใหม่! [${orderId}]\n`;
+    msg += `👤 คุณ ${name}\n`;
+    msg += `🕐 ${dateStr} เวลา ${timeStr} น.\n`;
+    msg += `💳 ชำระ: ${paymentLabel}\n`;
+    msg += `━━━━━━━━━━━━━━━━━━━━\n`;
+
+    items.forEach((item, index) => {
+        let detail = `${index + 1}. ${item.name}`;
+        if (item.meat) detail += ` [${item.meat}]`;
+        if (item.addons && item.addons.length > 0) detail += ` +${item.addons.join(', ')}`;
+        if (item.note) detail += ` (${item.note})`;
+        msg += `${detail} — ${item.price}฿\n`;
+    });
+
+    msg += `━━━━━━━━━━━━━━━━━━━━\n`;
+
+    if (discount > 0) {
+        msg += `💰 ราคารวม: ${subtotal}฿\n`;
+        msg += `🎁 ส่วนลด: -${discount}฿\n`;
+        msg += `✅ ยอดสุทธิ: ${netTotal}฿\n`;
+    } else {
+        msg += `💰 ยอดรวม: ${netTotal}฿\n`;
+    }
+
+    if (redeemedPoints > 0) {
+        msg += `🪙 ใช้พอยต์: ${redeemedPoints} แต้ม\n`;
+    }
+
+    if (pointsEarned > 0) {
+        msg += `⭐ ได้รับพอยต์: +${pointsEarned} แต้ม\n`;
+    }
+
+    msg += `━━━━━━━━━━━━━━━━━━━━\n`;
+    msg += `🎟️ เลขลุ้นโชค: ${lottoNumber}\n`;
+    if (drawDate) {
+        const drawDateFormatted = typeof formatThaiDate === 'function' ? formatThaiDate(drawDate) : drawDate;
+        msg += `📅 งวดวันที่: ${drawDateFormatted}\n`;
+    }
+    msg += `━━━━━━━━━━━━━━━━━━━━\n`;
+    msg += `ขอบคุณที่อุดหนุนร้านกะเพรา52 ครับ! 🙏`;
+
+    return msg;
 }
