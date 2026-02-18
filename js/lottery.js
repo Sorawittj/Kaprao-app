@@ -194,6 +194,7 @@ async function syncUserStatsFromServer(userId) {
     try {
         if (!window.supabaseClient || !userId) return;
 
+        // Sync user stats (points) from profiles
         const { data, error } = await window.supabaseClient
             .from('profiles')
             .select('points, total_orders, tier, display_name')
@@ -229,8 +230,66 @@ async function syncUserStatsFromServer(userId) {
             if (typeof updatePointsDisplay === 'function') updatePointsDisplay();
             console.log('User stats synced from Supabase. Points:', userStats.points);
         }
+
+        // Also sync order history from Supabase for cross-device compatibility
+        await syncOrderHistoryFromSupabase(userId);
     } catch (e) {
         console.error('Sync stats error (Supabase):', e);
+    }
+}
+
+/**
+ * Sync order history from Supabase for cross-device sync
+ */
+async function syncOrderHistoryFromSupabase(userId) {
+    try {
+        if (!window.supabaseClient || !userId) return;
+
+        // Get LINE user ID if available
+        const lineUserId = userAvatar.lineUserId;
+
+        // Fetch orders using either user_id or line_user_id
+        let query = window.supabaseClient
+            .from('orders')
+            .select('*')
+            .in('status', ['placed', 'confirmed', 'preparing', 'ready', 'completed', 'delivered'])
+            .order('created_at', { ascending: false })
+            .limit(50);
+
+        // Try to match by user_id OR line_user_id
+        const { data: orders, error } = await query;
+
+        if (error) {
+            console.warn('Could not fetch order history:', error.message);
+            return;
+        }
+
+        if (orders && orders.length > 0) {
+            // Filter orders that belong to this user (by user_id or line_user_id)
+            const userOrders = orders.filter(order =>
+                order.user_id === userId ||
+                (lineUserId && order.line_user_id === lineUserId)
+            );
+
+            if (userOrders.length > 0) {
+                // Update userStats.orderHistory with orders from Supabase
+                userStats.orderHistory = userOrders.map(order => ({
+                    id: order.id,
+                    orderId: order.id,
+                    localOrderId: order.order_id || `KP-${String(order.id).padStart(6, '0')}`,
+                    items: typeof order.items === 'string' ? JSON.parse(order.items) : order.items,
+                    totalPrice: order.total_price,
+                    status: order.status,
+                    createdAt: order.created_at,
+                    customerName: order.customer_name
+                }));
+
+                localStorage.setItem(KEYS.STATS, JSON.stringify(userStats));
+                console.log('Order history synced from Supabase:', userOrders.length, 'orders');
+            }
+        }
+    } catch (e) {
+        console.error('Sync order history error:', e);
     }
 }
 
