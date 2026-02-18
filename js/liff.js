@@ -208,6 +208,13 @@ async function handleLiffSession(profile) {
                 await window.loadActiveCart();
             }
         } catch (e) { console.warn("Cart load warning:", e); }
+
+        // 7. Load order history from Supabase (New)
+        try {
+            if (typeof window.loadOrdersFromSupabase === 'function') {
+                await window.loadOrdersFromSupabase(supabaseUserId);
+            }
+        } catch (e) { console.warn("Order history sync warning:", e); }
     }
 }
 
@@ -261,6 +268,13 @@ async function handleUserSession(user) {
             await window.loadActiveCart();
         }
     } catch (e) { console.warn("Guest cart load warning:", e); }
+
+    // Load order history
+    try {
+        if (typeof window.loadOrdersFromSupabase === 'function') {
+            await window.loadOrdersFromSupabase(user.id);
+        }
+    } catch (e) { console.warn("Guest order history sync warning:", e); }
 }
 
 // Init on Load

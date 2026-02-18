@@ -542,7 +542,11 @@ function renderOrderDetailView(container, order) {
 // --- List View ---
 
 function renderOrderListView(container) {
-    const list = Array.from(activeOrders.values()).sort((a, b) => (b.orderDate || b.startTime) - (a.orderDate || a.startTime));
+    const list = Array.from(activeOrders.values()).sort((a, b) => {
+        const timeA = new Date(a.orderDate || a.startTime || 0).getTime();
+        const timeB = new Date(b.orderDate || b.startTime || 0).getTime();
+        return timeB - timeA; // Descending: Newest First
+    });
 
     if (list.length === 0) {
         container.innerHTML = `
@@ -798,6 +802,92 @@ function getNextStatusLabel(currentCode) {
 }
 
 // --- Admin Login Modal ---
+
+// --- Sync Orders from Supabase (New) ---
+
+async function loadOrdersFromSupabase(userId) {
+    if (typeof supabaseClient === 'undefined' || !userId) return;
+
+    try {
+        console.log("Syncing orders for user:", userId);
+        const { data, error } = await supabaseClient
+            .from('orders')
+            .select('*')
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false })
+            .limit(20);
+
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+            let newCount = 0;
+
+            data.forEach(row => {
+                // Use Supabase ID as key (converted to string)
+                const orderId = row.id.toString();
+
+                // Map status
+                let statusKey = (row.status || 'placed').toUpperCase();
+                if (statusKey === 'PENDING_PAYMENT') statusKey = 'PLACED';
+                else if (statusKey === 'PAID_VERIFY') statusKey = 'PLACED';
+
+                const statusObj = ORDER_STATUS[statusKey] || ORDER_STATUS.PLACED;
+                const orderDate = new Date(row.created_at).getTime();
+
+                // Only add if not already present (avoid overwriting local with potentially less data, 
+                // though server is source of truth for status)
+                // Note: Local might have "KP-xxx", Server has "123". We can't easily dedup without more info.
+                // accepting that on the original device we might see duplicates or just keeping both.
+                // For the "Sync to other device" case, activeOrders is empty, so this fills it.
+
+                if (!activeOrders.has(orderId)) {
+                    const deliveryDate = getNextDeliveryDate(new Date(orderDate)).getTime();
+
+                    const order = {
+                        id: orderId,
+                        items: row.items || [],
+                        status: statusObj,
+                        orderDate: orderDate,
+                        deliveryDate: deliveryDate,
+                        startTime: orderDate,
+                        updates: [
+                            { status: statusObj, time: orderDate, note: 'Synced from server' }
+                        ],
+                        totalPrice: row.total_price || 0,
+                        isRemote: true
+                    };
+
+                    activeOrders.set(orderId, order);
+                    newCount++;
+                } else {
+                    // Update status of existing synced order
+                    const existing = activeOrders.get(orderId);
+                    if (existing.status.code !== statusObj.code) {
+                        existing.status = statusObj;
+                        existing.updates.push({
+                            status: statusObj,
+                            time: Date.now(),
+                            note: 'Update from server'
+                        });
+                        newCount++;
+                    }
+                }
+            });
+
+            if (newCount > 0) {
+                saveActiveOrders();
+                renderOrderTrackingContent();
+                // showToast(`ซิงค์ข้อมูล ${newCount} ออเดอร์`, 'success');
+            }
+        }
+    } catch (e) {
+        console.error("Error syncing orders:", e);
+    }
+}
+
+// Expose to window
+window.loadOrdersFromSupabase = loadOrdersFromSupabase;
+
 
 function openAdminLoginModal() {
     if (isAdminMode) {
