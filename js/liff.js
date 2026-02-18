@@ -79,16 +79,40 @@ window.loginGuest = async function () {
 };
 
 // Handle LINE Profile (Native)
+// Handle LINE Profile (Native)
 async function handleLiffSession(profile) {
-    // Set Global State directly from LINE
-    userAvatar.userId = profile.userId; // This is the 'U...' ID we strictly need for Admin!
+    // 1. First, ensure we have a valid Supabase Session to perform the write
+    // This is critical: The 'profiles.id' MUST be the Supabase Auth UUID, not the LINE ID,
+    // because 'orders.user_id' acts as a foreign key to 'auth.users.id'.
+    let supabaseUserId = null;
+
+    try {
+        const { data: { session } } = await window.supabaseClient.auth.getSession();
+        if (session) {
+            supabaseUserId = session.user.id;
+        } else {
+            // Sign in anonymously to get a valid UUID
+            const { data, error } = await window.supabaseClient.auth.signInAnonymously();
+            if (error) throw error;
+            supabaseUserId = data.user.id;
+        }
+    } catch (e) {
+        console.error("Supabase Auth Error during LIFF init:", e);
+        // Fallback: If auth fails, we can't save legally to DB with RLS but we continue for UI
+    }
+
+    // 2. Set Global State
+    // IMPORTANT: We use the Supabase UUID for database operations, but keep LINE info for display
+    userAvatar.userId = supabaseUserId; // This must be the UUID for orders table FK
     userAvatar.name = profile.displayName;
     userAvatar.image = profile.pictureUrl;
     userAvatar.isGuest = false;
+    userAvatar.lineUserId = profile.userId; // Store LINE ID separately if needed
 
-    // Save to LocalStorage for Admin Dashboard check
+    // Save to LocalStorage
     localStorage.setItem('kaprao_user_data', JSON.stringify({
-        userId: profile.userId,
+        userId: supabaseUserId,
+        lineUserId: profile.userId,
         name: profile.displayName,
         image: profile.pictureUrl
     }));
@@ -106,29 +130,23 @@ async function handleLiffSession(profile) {
 
     if (typeof closeWelcome === 'function') closeWelcome(true);
 
-    // Sync with Supabase Profiles (Upsert)
-    try {
-        // Also ensure a Supabase session exists for RLS (e.g. Orders)
-        // We sign in anonymously to satisfy "authenticated" role for RLS
-        const { data: { session } } = await window.supabaseClient.auth.getSession();
-        if (!session) {
-            await window.supabaseClient.auth.signInAnonymously();
-        }
+    // 3. Sync Profile to Supabase
+    // We bind the LINE profile info to the Supabase User ID (UUID)
+    if (supabaseUserId) {
+        try {
+            const { error } = await window.supabaseClient
+                .from('profiles')
+                .upsert({
+                    id: supabaseUserId, // UUID matching auth.users
+                    display_name: profile.displayName,
+                    avatar_url: profile.pictureUrl,
+                    // You might want to save line_user_id here if you add a column for it
+                    updated_at: new Date()
+                }, { onConflict: 'id' });
 
-        // Try to register/update profile in 'profiles' table
-        // Note: You might need to adjust 'profiles' RLS to allow upsert by public/anon if using 'user_id' as TEXT primary key.
-        const { error } = await window.supabaseClient
-            .from('profiles')
-            .upsert({
-                id: profile.userId, // Use LINE ID as Key mapping to 'id' in profiles table
-                display_name: profile.displayName,
-                avatar_url: profile.pictureUrl,
-                updated_at: new Date()
-            }, { onConflict: 'id' });
-
-        if (error) console.error("Profile Sync Warning (rls?):", error.message);
-
-    } catch (e) { console.error("Sync Error", e); }
+            if (error) console.error("Profile Sync Warning:", error.message);
+        } catch (e) { console.error("Sync Error", e); }
+    }
 }
 
 // Handle Guest Session (Supabase User Object)
