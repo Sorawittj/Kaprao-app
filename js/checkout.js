@@ -526,12 +526,18 @@ async function confirmOrder(paymentMethod) {
         }
 
         // 4. Start Local Tracking
+        // CRITICAL: Strictly use Supabase ID. Do not fallback to local ID.
+        if (!supabaseOrderId) {
+            throw new Error("Tracking Error: No Server ID returned");
+        }
+
+        const trackingId = supabaseOrderId;
         if (typeof startOrderTracking === 'function') {
-            startOrderTracking(localOrderId, cart);
+            startOrderTracking(trackingId, cart);
         }
 
         // 5. Cleanup & UI Updates
-        const finalOrderId = localOrderId;
+        const finalOrderId = trackingId;
         const finalCart = [...cart];
         const finalName = name;
         const finalNetTotal = netTotal;
@@ -557,7 +563,7 @@ async function confirmOrder(paymentMethod) {
         // 6. Build & Send LINE Message
         const lineOAId = "@772ysswn";
         let msg = buildLineOrderMessage({
-            orderId: finalOrderId,
+            orderId: finalOrderId.toString(),
             supabaseOrderId: supabaseOrderId,
             name: finalName,
             paymentMethod: paymentMethod,
@@ -611,7 +617,10 @@ function buildLineOrderMessage({ orderId, supabaseOrderId, name, paymentMethod, 
     else if (paymentMethod === 'cod') paymentLabel = 'จ่ายทีหลัง/เงินสด 🕒';
     else paymentLabel = paymentMethod;
 
-    let msg = `🔥 ออเดอร์ใหม่! [${orderId}]\n`;
+    // Use Supabase ID if available for cleaner look, fallback to passed orderId
+    const displayId = supabaseOrderId ? `#${supabaseOrderId}` : orderId;
+
+    let msg = `🔥 ออเดอร์ใหม่! [${displayId}]\n`;
     msg += `👤 คุณ ${name}\n`;
     msg += `🕐 ${dateStr} เวลา ${timeStr} น.\n`;
     msg += `💳 ชำระ: ${paymentLabel}\n`;

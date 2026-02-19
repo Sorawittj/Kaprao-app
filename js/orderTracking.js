@@ -286,6 +286,13 @@ function loadActiveOrders() {
                 if (order.status.code === 'completed' && (now - order.orderDate) > 259200000) {
                     activeOrders.delete(id);
                 }
+
+                // SECURITY & CLEANUP:
+                // If we are in Supabase mode (which we are), remove any legacy 'KP-' orders immediately
+                // to prevent user confusion. The server is the source of truth.
+                if (String(id).startsWith('KP-')) {
+                    activeOrders.delete(id);
+                }
             }
         }
     } catch (e) {
@@ -398,7 +405,7 @@ function renderOrderDetailView(container, order) {
                     </div>
                     <h2 class="text-xl font-black text-gray-800 mb-1">${order.status.label}</h2>
                     <p class="text-sm text-gray-500">${order.status.sublabel}</p>
-                    <p class="text-xs text-gray-400 mt-2">Order #${order.id}</p>
+                    <p class="text-xs text-gray-400 mt-2">Order ${formatOrderId(order.id)}</p>
                 </div>
             </div>
 
@@ -640,7 +647,7 @@ function renderOrderListView(container) {
                     <!-- Info -->
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center justify-between mb-1">
-                            <h4 class="font-bold text-gray-800 text-sm">${order.id}</h4>
+                            <h4 class="font-bold text-gray-800 text-sm">${formatOrderId(order.id)}</h4>
                             <span class="text-xs text-gray-400">${formatDateShort(orderDate)}</span>
                         </div>
                         <p class="text-xs font-medium ${order.status.color} mb-1">${order.status.label}</p>
@@ -833,6 +840,14 @@ async function loadOrdersFromSupabase(userId) {
         if (error) throw error;
 
         if (data && data.length > 0) {
+            // Cleanup: Remote 'KP-' local IDs if we are successfully syncing to prevent duplicates
+            // We assume server is source of truth.
+            for (const [key] of activeOrders) {
+                if (String(key).startsWith('KP-')) {
+                    activeOrders.delete(key);
+                }
+            }
+
             let newCount = 0;
 
             data.forEach(row => {
@@ -922,10 +937,43 @@ function setupUserOrderRealtime(userId) {
             console.log('Realtime User Order Event:', payload);
 
             if (payload.eventType === 'INSERT') {
-                // New order placed on another device
-                console.log("New order detected from other device!");
-                loadOrdersFromSupabase(userId); // Reload full list to be safe and simple
-                showToast('มีออเดอร์ใหม่เข้ามา! 📥', 'info');
+                // New order placed on another device OR this device
+                const newId = payload.new.id.toString();
+                console.log("New order detected:", newId);
+
+                if (!activeOrders.has(newId)) {
+                    // Only load if we don't have it (avoid redundant fetch for self-placed orders)
+                    // But we might need full details (items), which payload might lack if toast.
+                    // Payload.new has columns. 'items' is JSONB, so it should be there.
+
+                    if (payload.new.items) {
+                        // Optimistic Add from Payload directly! Fast!
+                        const orderDate = new Date(payload.new.created_at).getTime();
+                        const deliveryDate = getNextDeliveryDate(new Date(orderDate)).getTime();
+                        let statusKey = (payload.new.status || 'placed').toUpperCase();
+                        if (statusKey === 'PENDING_PAYMENT') statusKey = 'PLACED';
+                        const statusObj = ORDER_STATUS[statusKey] || ORDER_STATUS.PLACED;
+
+                        const newOrder = {
+                            id: newId,
+                            items: payload.new.items || [],
+                            status: statusObj,
+                            orderDate: orderDate,
+                            deliveryDate: deliveryDate,
+                            startTime: orderDate,
+                            updates: [{ status: statusObj, time: orderDate, note: 'Realtime sync' }],
+                            totalPrice: payload.new.total_price || 0,
+                            isRemote: true
+                        };
+                        activeOrders.set(newId, newOrder);
+                        saveActiveOrders();
+                        renderOrderTrackingContent();
+                        showToast('มีออเดอร์ใหม่เข้ามา! 📥', 'info');
+                    } else {
+                        // Fallback to fetch if payload incomplete
+                        loadOrdersFromSupabase(userId);
+                    }
+                }
             } else if (payload.eventType === 'UPDATE') {
                 // Status update on any existing order
                 const newStatus = payload.new.status;
@@ -1145,4 +1193,18 @@ function updateActiveOrdersButton() {
     } else {
         container.classList.add('hidden');
     }
+}
+
+function formatOrderId(id) {
+    const idStr = String(id);
+    if (idStr.startsWith('KP-')) return idStr;
+    // If it's a UUID-like string (long), truncate or keep as is?
+    // Supabase ID is BigInt (e.g., 105), so it's short. 
+    // If user has UUIDs, we assume they are long.
+    if (idStr.length > 10 && !idStr.startsWith('KP-')) {
+        // Check if it looks like a number
+        if (/^\d+$/.test(idStr)) return `#${idStr}`;
+        return `#${idStr.slice(0, 6)}...`;
+    }
+    return `#${idStr}`;
 }
