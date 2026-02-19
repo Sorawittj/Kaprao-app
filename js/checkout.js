@@ -90,14 +90,13 @@ function openCheckout() {
                 <div class="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 p-4 rounded-xl mb-3 shadow-sm relative overflow-hidden stagger-item">
                     <div class="absolute -right-4 -top-4 bg-indigo-100 opacity-50 w-20 h-20 rounded-full"></div>
                     <div class="flex flex-col z-10">
-                        <span class="text-[10px] text-gray-500 uppercase tracking-wider">Order ID ของคุณ</span>
+                        <span class="text-[10px] text-gray-500 uppercase tracking-wider">สิทธิพิเศษ</span>
                         <div class="flex items-baseline gap-1">
-                            <span class="font-bold text-xl text-gray-800">${lottoId.slice(0, -2)}</span>
-                            <span class="font-black text-3xl text-yellow-500 drop-shadow-sm">${lottoId.slice(-2)}</span>
+                            <span class="font-bold text-lg text-gray-800">ลุ้นหวยกินฟรี!</span>
                         </div>
                         <div class="mt-2 text-xs text-indigo-600">
                             <i class="fas fa-calendar-alt mr-1"></i>
-                            ลุ้นหวยงวด ${typeof formatThaiDate === 'function' ? formatThaiDate(nextDraw) : nextDraw}
+                            งวด ${typeof formatThaiDate === 'function' ? formatThaiDate(nextDraw) : nextDraw}
                         </div>
                     </div>
                     <div class="absolute top-4 right-4 z-10 text-3xl">🎟️</div>
@@ -344,6 +343,22 @@ async function confirmOrder(paymentMethod) {
         return;
     }
 
+    // 1.1 STOCK CHECK (Crucial Update)
+    if (window.menuItems && Array.isArray(window.menuItems)) {
+        const soldOutItems = cart.filter(cartItem => {
+            // Match by name as we don't store ID in cart (legacy design)
+            const menuItem = window.menuItems.find(m => m.name === cartItem.name);
+            return menuItem && menuItem.soldOut;
+        });
+
+        if (soldOutItems.length > 0) {
+            const itemNames = soldOutItems.map(i => i.name).join(', ');
+            showToast(`ขออภัย! ${itemNames} หมดแล้วครับ 😢`, 'error');
+            // Optional: Highlight them in cart or ask to remove
+            return;
+        }
+    }
+
     // 2. Network Check
     if (!navigator.onLine) {
         showToast('ไม่สามารถเชื่อมต่ออินเทอร์เน็ตได้', 'error');
@@ -476,37 +491,11 @@ async function confirmOrder(paymentMethod) {
             localStorage.setItem(KEYS.STATS, JSON.stringify(userStats));
             if (typeof updatePointsDisplay === 'function') updatePointsDisplay();
 
-            // Sync Points to Supabase (Fire & Forget)
-            try {
-                // Determine net change for simple update
-                const netPointsDelta = pointsToEarn - redeemedPoints;
-
-                // Try RPC first (best practice)
-                supabaseClient.rpc('update_user_points', {
-                    p_user_id: userAvatar.userId,
-                    p_points_delta: netPointsDelta,
-                    p_order_id: supabaseOrderId
-                }).then(({ error }) => {
-                    if (error) {
-                        // Fallback to direct update if RPC fails
-                        console.warn('RPC update failed, using direct update:', error.message);
-                        return supabaseClient
-                            .from('profiles')
-                            .select('points')
-                            .eq('id', userAvatar.userId)
-                            .single()
-                            .then(({ data: currentProfile }) => {
-                                const newPoints = Math.max(0, (currentProfile?.points || 0) + netPointsDelta);
-                                return supabaseClient
-                                    .from('profiles')
-                                    .update({ points: newPoints, updated_at: new Date().toISOString() })
-                                    .eq('id', userAvatar.userId);
-                            });
-                    }
-                }).catch(err => console.error("Points sync error:", err));
-            } catch (pointsErr) {
-                console.warn('Points update initiation warning:', pointsErr);
-            }
+            // Sync Points to Supabase -> DISABLED to avoid Double Counting
+            // The Supabase Trigger 'handle_order_placed' (in supabase_full_migration.sql) automatically
+            // calculates points and updates the profile when a new order is inserted.
+            // We only need the local optimistic update above for immediate UI feedback.
+            console.log("Points sync handled by DB Trigger");
         }
 
         // 2. Request Notification Permission (if not granted)
@@ -581,18 +570,16 @@ async function confirmOrder(paymentMethod) {
 
         showToast('สั่งอาหารเรียบร้อย! 🚀', 'success');
 
+        // Delay redirect slightly to ensure background requests (points sync) have a chance to fly
         setTimeout(() => {
             window.location.href = `https://line.me/R/oaMessage/${lineOAId}/?${encodedMsg}`;
             isSubmitting = false;
-        }, 800);
+        }, 1500);
 
-        // 7. Background Sync Stats
+        // 7. Background Sync Stats (Redundant if RPC works, but good for safety)
         if (userAvatar.userId) {
-            setTimeout(async () => {
-                if (typeof syncUserStatsFromServer === 'function') {
-                    await syncUserStatsFromServer(userAvatar.userId);
-                }
-            }, 3000);
+            // We don't await this because we are redirecting anyway
+            syncUserStatsFromServer(userAvatar.userId).catch(e => console.log('Bg sync error', e));
         }
 
     } catch (error) {
