@@ -194,27 +194,28 @@ function openCheckout() {
         }
 
         const bannerContainer = document.getElementById('order-id-banner');
-        if (typeof cart !== 'undefined' && cart.length > 0) {
-            const lottoId = generateOrderId();
-            const nextDraw = typeof getThaiLotteryDrawDate === 'function' ? getThaiLotteryDrawDate() : "";
-            bannerContainer.classList.remove('hidden');
-            bannerContainer.innerHTML = `
-                <div class="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 p-4 rounded-xl mb-3 shadow-sm relative overflow-hidden stagger-item">
-                    <div class="absolute -right-4 -top-4 bg-indigo-100 opacity-50 w-20 h-20 rounded-full"></div>
-                    <div class="flex flex-col z-10">
-                        <span class="text-[10px] text-gray-500 uppercase tracking-wider">สิทธิพิเศษ</span>
-                        <div class="flex items-baseline gap-1">
-                            <span class="font-bold text-lg text-gray-800">ลุ้นหวยกินฟรี!</span>
-                        </div>
-                        <div class="mt-2 text-xs text-indigo-600">
-                            <i class="fas fa-calendar-alt mr-1"></i>
-                            งวด ${typeof formatThaiDate === 'function' ? formatThaiDate(nextDraw) : nextDraw}
+        if (bannerContainer) {
+            if (typeof cart !== 'undefined' && cart.length > 0) {
+                const lottoId = generateOrderId();
+                const nextDraw = typeof getThaiLotteryDrawDate === 'function' ? getThaiLotteryDrawDate() : "";
+                bannerContainer.classList.remove('hidden');
+                bannerContainer.innerHTML = `
+                    <div class="modern-promo-card">
+                        <div class="promo-icon">🎟️</div>
+                        <div class="promo-content">
+                            <div class="promo-label">สิทธิพิเศษ</div>
+                            <div class="promo-title">ลุ้นหวยกินฟรี!</div>
+                            <div class="promo-date">
+                                <i class="far fa-calendar-alt"></i>
+                                <span>งวด ${typeof formatThaiDate === 'function' ? formatThaiDate(nextDraw) : nextDraw}</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="absolute top-4 right-4 z-10 text-3xl">🎟️</div>
-                </div>
-            `;
-        } else if (bannerContainer) bannerContainer.classList.add('hidden');
+                `;
+            } else {
+                bannerContainer.classList.add('hidden');
+            }
+        }
 
         if (typeof resetPointsDiscount === 'function') resetPointsDiscount();
         const overlay = document.getElementById('checkout-overlay');
