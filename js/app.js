@@ -903,7 +903,7 @@ function addToCartFromModal() {
     const meat = document.querySelector('input[name="meat-opt"]:checked');
     if (meat) {
         const label = meat.closest('label');
-        meatInfo = label ? label.querySelector('span.text-sm').innerText : meat.value;
+        meatInfo = label ? label.querySelector('.option-label').textContent : meat.value;
         meatPrice = parseFloat(meat.dataset.price || 0);
     }
 
@@ -922,7 +922,7 @@ function addToCartFromModal() {
     const egg = document.querySelector('input[name="egg-opt"]:checked');
     if (egg) {
         const label = egg.closest('label');
-        eggInfo = label ? label.querySelector('span.text-sm').innerText : egg.value;
+        eggInfo = label ? label.querySelector('.option-label').textContent : egg.value;
         eggPrice = parseFloat(egg.dataset.price || 0);
         if (eggInfo) note = (note ? note + ' ' : '') + `[${eggInfo}]`;
     }
