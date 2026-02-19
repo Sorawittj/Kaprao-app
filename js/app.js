@@ -715,13 +715,32 @@ function openModal(item) {
             meats.forEach((m, idx) => {
                 const isChecked = idx === 0 ? 'checked' : '';
                 const label = document.createElement('label');
-                label.className = 'modern-option';
-                if (isChecked) label.classList.add('selected');
-                label.innerHTML = `
-                    <input type="radio" name="meat-opt" value="${m.id}" data-price="${m.price}" ${isChecked} onchange="updateModalPrice(); document.querySelectorAll('input[name=\"meat-opt\"]').forEach(r => r.closest('.modern-option').classList.toggle('selected', r.checked));">
-                    <span class="option-label">${m.name}</span>
-                    ${m.price > 0 ? `<span class="option-price">+${m.price}</span>` : '<span class="option-price"></span>'}
-                `;
+                label.className = 'modern-option' + (isChecked ? ' selected' : '');
+                
+                const input = document.createElement('input');
+                input.type = 'radio';
+                input.name = 'meat-opt';
+                input.value = m.id;
+                input.dataset.price = m.price;
+                if (isChecked) input.checked = true;
+                input.onchange = function() {
+                    updateModalPrice();
+                    document.querySelectorAll('input[name="meat-opt"]').forEach(r => {
+                        r.closest('.modern-option').classList.toggle('selected', r.checked);
+                    });
+                };
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'option-label';
+                nameSpan.textContent = m.name;
+                
+                const priceSpan = document.createElement('span');
+                priceSpan.className = 'option-price';
+                priceSpan.textContent = m.price > 0 ? '+' + m.price : '';
+                
+                label.appendChild(input);
+                label.appendChild(nameSpan);
+                label.appendChild(priceSpan);
                 meatDiv.appendChild(label);
             });
             optionsContainer.appendChild(meatDiv);
@@ -743,11 +762,29 @@ function openModal(item) {
         generalAddons.forEach(a => {
             const label = document.createElement('label');
             label.className = 'modern-option';
-            label.innerHTML = `
-                <input type="checkbox" class="addon-checkbox" value="${a.id}" data-price="${a.price}" data-name="${a.name}" onchange="updateModalPrice(); this.closest('.modern-option').classList.toggle('selected', this.checked);">
-                <span class="option-label">${a.name}</span>
-                <span class="option-price">+${a.price}</span>
-            `;
+            
+            const input = document.createElement('input');
+            input.type = 'checkbox';
+            input.className = 'addon-checkbox';
+            input.value = a.id;
+            input.dataset.price = a.price;
+            input.dataset.name = a.name;
+            input.onchange = function() {
+                updateModalPrice();
+                this.closest('.modern-option').classList.toggle('selected', this.checked);
+            };
+            
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'option-label';
+            nameSpan.textContent = a.name;
+            
+            const priceSpan = document.createElement('span');
+            priceSpan.className = 'option-price';
+            priceSpan.textContent = '+' + a.price;
+            
+            label.appendChild(input);
+            label.appendChild(nameSpan);
+            label.appendChild(priceSpan);
             addonDiv.appendChild(label);
         });
         optionsContainer.appendChild(addonDiv);
