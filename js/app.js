@@ -850,7 +850,7 @@ function addToCartFromModal() {
     // --- VALIDATION: Check real-time status ---
     if (window.menuItems) {
         const latestItem = window.menuItems.find(i => i.id === currentItem.id);
-        if (latestItem && (latestItem.soldOut || !latestItem.is_available)) { // Check both flags to be safe
+        if (latestItem && (latestItem.soldOut === true || latestItem.is_available === false)) {
             showToast('ขออภัย เมนูนี้เพิ่งหมดครับ 😢', 'error');
             closeModal();
             triggerHaptic('heavy');
