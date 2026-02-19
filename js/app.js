@@ -639,16 +639,40 @@ function updateShopStatusUI() {
     }
 }
 
-// --- SERVICE WORKER ---
+// --- SERVICE WORKER v2 (Phase 5) ---
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=26').then(registration => {
-            console.log('ServiceWorker registration successful with scope: ', registration.scope);
-            // Force update checks
-            registration.update();
-        }, err => {
-            console.log('ServiceWorker registration failed: ', err);
-        });
+        navigator.serviceWorker.register('/sw.v2.js')
+            .then(registration => {
+                console.log('[App] SW v2 registered:', registration.scope);
+                
+                // Check for updates every 60 minutes
+                setInterval(() => {
+                    registration.update();
+                }, 60 * 60 * 1000);
+                
+                // Handle updates
+                registration.addEventListener('updatefound', () => {
+                    const newWorker = registration.installing;
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            // New version available
+                            if (window.appState?.ui) {
+                                window.appState.ui.showToast(
+                                    'มีเวอร์ชั่นใหม่! กำลังอัพเดท...',
+                                    'info'
+                                );
+                            }
+                            // Skip waiting and activate
+                            newWorker.postMessage('skipWaiting');
+                            setTimeout(() => window.location.reload(), 1500);
+                        }
+                    });
+                });
+            })
+            .catch(err => {
+                console.error('[App] SW registration failed:', err);
+            });
     });
 }
 

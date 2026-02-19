@@ -1,30 +1,33 @@
 // =============================================
-// Kaprao52 App - Global State
+// Kaprao52 App - Global State (Legacy with New System Bridge)
 // =============================================
 
-let cart = [];
-let currentItem = null;
-let activeCategory = 'kaprao';
-let discountValue = 0;
-let modalQty = 1;
-let userStats = { points: 0, history: [], orderHistory: [] };
-let lottoHistory = [];
-let isSubmitting = false;
-let pointsRedeemed = 0;
-let isPointsActive = false;
-let searchQuery = "";
-let favoriteItems = new Set();
-let isSyncing = false;
-let currentOpenModal = null;
-let isAdminMode = false;
+// Always define legacy globals first
+// These are used by old code throughout the app
+
+window.cart = [];
+window.currentItem = null;
+window.activeCategory = 'kaprao';
+window.discountValue = 0;
+window.modalQty = 1;
+window.userStats = { points: 0, history: [], orderHistory: [] };
+window.lottoHistory = [];
+window.isSubmitting = false;
+window.pointsRedeemed = 0;
+window.isPointsActive = false;
+window.searchQuery = "";
+window.favoriteItems = new Set();
+window.isSyncing = false;
+window.currentOpenModal = null;
+window.isAdminMode = false;
 
 // Wheel of Fortune state
-let wheelSpinning = false;
-let wheelAngle = 0;
-let wheelSpinsToday = 0;
-const MAX_WHEEL_SPINS = 3;
+window.wheelSpinning = false;
+window.wheelAngle = 0;
+window.wheelSpinsToday = 0;
+window.MAX_WHEEL_SPINS = 3;
 
-const avatarOptions = [
+window.avatarOptions = [
     'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Dog%20face/3D/dog_face_3d.png',
     'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Cat%20face/3D/cat_face_3d.png',
     'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Tiger%20face/3D/tiger_face_3d.png',
@@ -36,4 +39,76 @@ const avatarOptions = [
     'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Panda/3D/panda_3d.png',
     'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Frog/3D/frog_3d.png'
 ];
-let userAvatar = { image: avatarOptions[0], hat: false, name: 'น้องฝึกหัด', userId: null };
+window.userAvatar = { image: window.avatarOptions[0], hat: false, name: 'น้องฝึกหัด', userId: null };
+
+// Sync function - bridges legacy globals with new StateManager
+window.syncLegacyState = function() {
+    if (!window.appState) {
+        console.log('[State] New StateManager not available, using legacy state');
+        return;
+    }
+    
+    console.log('[State] Syncing with new StateManager...');
+    
+    // Two-way sync: When new state changes, update legacy globals
+    window.appState.cart.subscribe('items', (newItems) => {
+        window.cart = newItems;
+        if (typeof updateMiniCart === 'function') updateMiniCart();
+        if (typeof updateBottomNavBadge === 'function') updateBottomNavBadge();
+    });
+    
+    window.appState.cart.subscribe('pointsRedeemed', (val) => {
+        window.pointsRedeemed = val;
+    });
+    
+    window.appState.cart.subscribe('isPointsActive', (val) => {
+        window.isPointsActive = val;
+    });
+    
+    window.appState.user.subscribe('points', (newPoints) => {
+        window.userStats.points = newPoints;
+        if (typeof updatePointsDisplay === 'function') updatePointsDisplay();
+    });
+    
+    window.appState.user.subscribe('name', (name) => {
+        window.userAvatar.name = name;
+    });
+    
+    window.appState.user.subscribe('avatar', (avatar) => {
+        window.userAvatar.image = avatar;
+    });
+    
+    window.appState.user.subscribe('id', (id) => {
+        window.userAvatar.userId = id;
+    });
+    
+    // Also sync from legacy to new (for functions that modify legacy globals)
+    // We do this by keeping them in sync bidirectionally
+    
+    // Override legacy cart modification functions to also update new state
+    const originalCartPush = window.cart.push;
+    window.cart.push = function(...args) {
+        const result = Array.prototype.push.apply(this, args);
+        if (window.appState?.cart) {
+            window.appState.cart.replaceState({ items: window.cart });
+        }
+        return result;
+    };
+    
+    const originalCartSplice = window.cart.splice;
+    window.cart.splice = function(...args) {
+        const result = Array.prototype.splice.apply(this, args);
+        if (window.appState?.cart) {
+            window.appState.cart.replaceState({ items: window.cart });
+        }
+        return result;
+    };
+    
+    console.log('[State] Legacy state synced with StateManager');
+};
+
+// Auto-sync when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    // Delay to ensure all scripts loaded
+    setTimeout(window.syncLegacyState, 50);
+});

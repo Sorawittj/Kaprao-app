@@ -1,16 +1,100 @@
 {
-    "name": "Kaprao52",
+    "name": "Kaprao52 - กะเพราอร่อยที่สุดในซอย",
     "short_name": "Kaprao52",
-    "start_url": "./index.html",
+    "description": "สั่งอาหารออนไลน์ สะสมแต้ม ลุ้นหวยกินฟรี",
+    "start_url": "/index.html",
     "display": "standalone",
-    "background_color": "#F5F7FB",
-    "theme_color": "#7C77D6",
+    "background_color": "#FDFBF7",
+    "theme_color": "#FF6B00",
     "orientation": "portrait",
+    "scope": "/",
+    "categories": ["food", "lifestyle", "shopping"],
+    "lang": "th",
     "icons": [
         {
-            "src": "https://cdn-icons-png.flaticon.com/512/3448/3448609.png",
+            "src": "/icons/icon-72x72.png",
+            "sizes": "72x72",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "/icons/icon-96x96.png",
+            "sizes": "96x96",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "/icons/icon-128x128.png",
+            "sizes": "128x128",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "/icons/icon-144x144.png",
+            "sizes": "144x144",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "/icons/icon-152x152.png",
+            "sizes": "152x152",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "/icons/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "/icons/icon-384x384.png",
+            "sizes": "384x384",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "/icons/icon-512x512.png",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "maskable any"
         }
-    ]
+    ],
+    "screenshots": [
+        {
+            "src": "/screenshots/screenshot1.png",
+            "sizes": "750x1334",
+            "type": "image/png",
+            "form_factor": "narrow"
+        },
+        {
+            "src": "/screenshots/screenshot2.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "form_factor": "wide"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "สั่งอาหาร",
+            "short_name": "สั่งอาหาร",
+            "description": "สั่งอาหารทันที",
+            "url": "/index.html?action=order",
+            "icons": [{ "src": "/icons/shortcut-order.png", "sizes": "96x96" }]
+        },
+        {
+            "name": "ตะกร้า",
+            "short_name": "ตะกร้า",
+            "description": "ดูตะกร้าสินค้า",
+            "url": "/index.html?action=cart",
+            "icons": [{ "src": "/icons/shortcut-cart.png", "sizes": "96x96" }]
+        }
+    ],
+    "related_applications": [
+        {
+            "platform": "play",
+            "url": "https://play.google.com/store/apps/details?id=com.kaprao52.app"
+        }
+    ],
+    "prefer_related_applications": false
 }

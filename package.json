@@ -1,22 +1,24 @@
 {
   "name": "kaprao-app",
   "version": "1.0.0",
-  "description": "",
-  "main": "sw.js",
+  "description": "Kaprao52 Food Ordering App",
+  "main": "index.html",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npx serve",
-    "build": "echo \"Build complete - Static site ready\"",
-    "lint": "npx htmlhint index.html"
+    "test": "echo \"No tests specified\" && exit 0",
+    "dev": "npx serve -l 3000",
+    "build": "npm run validate && echo \"✓ Build complete - Static site ready\"",
+    "lint": "npm run lint:html && npm run lint:js",
+    "lint:html": "npx htmlhint index.html",
+    "lint:js": "node scripts/validate-js.js",
+    "validate": "npm run lint && node scripts/validate-structure.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Sorawittj/Kaprao-app.git"
   },
-  "keywords": [],
+  "keywords": ["food", "ordering", "pwa", "thailand"],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/Sorawittj/Kaprao-app/issues"
   },
