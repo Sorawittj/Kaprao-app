@@ -602,6 +602,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- SUPABASE MENU REALTIME (fetch is handled by dynamicMenu.js) ---
     if (typeof supabaseClient !== 'undefined') {
         setupMenuRealtime();
+        fetchShopStatus(); // Sync shop status
     }
 
     checkSeasonalTheme();
@@ -648,6 +649,42 @@ function setupMenuRealtime() {
             showToast('เมนูมีการอัพเดท 🔄', 'info');
         })
         .subscribe();
+}
+
+// --- Shop Status Logic ---
+window.isShopOpen = true; // Default
+
+async function fetchShopStatus() {
+    if (!window.supabaseClient) return;
+    const { data } = await supabaseClient
+        .from('menu_items')
+        .select('is_available')
+        .eq('name', '__SHOP_STATUS__')
+        .maybeSingle();
+
+    if (data) {
+        window.isShopOpen = data.is_available;
+        updateShopStatusUI();
+    }
+}
+
+function updateShopStatusUI() {
+    const banner = document.getElementById('shop-closed-banner');
+    if (!window.isShopOpen) {
+        if (!banner) {
+            const div = document.createElement('div');
+            div.id = 'shop-closed-banner';
+            div.className = 'fixed top-0 left-0 right-0 bg-red-600 text-white text-center py-2 z-[60] font-bold text-sm shadow-lg animate-slide-up';
+            div.innerHTML = '<i class="fas fa-store-slash mr-2"></i> ขณะนี้ร้านปิดให้บริการชั่วคราวครับ';
+            document.body.appendChild(div);
+            document.body.style.paddingTop = '30px';
+        }
+    } else {
+        if (banner) {
+            banner.remove();
+            document.body.style.paddingTop = '';
+        }
+    }
 }
 
 // --- SERVICE WORKER ---
@@ -798,6 +835,11 @@ function closeModal(isBackNav = false) {
 }
 
 function updateModalPrice() {
+    if (!window.isShopOpen) {
+        showToast('ขออภัย ร้านปิดให้บริการชั่วคราวครับ', 'error');
+        closeModal();
+        return;
+    }
     if (!currentItem) return;
     let price = currentItem.price;
 
@@ -854,6 +896,17 @@ function addToCartFromModal() {
         addonPriceTotal += parseFloat(cb.dataset.price || 0);
     });
 
+    // --- VALIDATION: Check real-time status ---
+    if (window.menuItems) {
+        const latestItem = window.menuItems.find(i => i.id === currentItem.id);
+        if (latestItem && (latestItem.soldOut || !latestItem.is_available)) { // Check both flags to be safe
+            showToast('ขออภัย เมนูนี้เพิ่งหมดครับ 😢', 'error');
+            closeModal();
+            triggerHaptic('heavy');
+            return;
+        }
+    }
+
     // --- MEAT SELECTION ---
     let meatInfo = '';
     let meatPrice = 0;
@@ -907,6 +960,7 @@ function addToCartFromModal() {
     for (let i = 0; i < modalQty; i++) {
         cart.push({
             id: Date.now() + i,
+            menuItemId: currentItem.id, // Store ID for robust validation
             name: currentItem.name,
             price: unitPrice,
             meat: meatInfo,

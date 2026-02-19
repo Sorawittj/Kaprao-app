@@ -138,6 +138,27 @@ function setupMenuRealtime() {
                     // Item updated but not in local list? Fetch all to be safe
                     fetchMenuFromSupabase();
                 }
+
+                // Check if this item is currently open in modal
+                if (window.currentItem && window.currentItem.id === newItem.id) {
+                    // Update currentItem reference
+                    // Note: renderMenu handles the list, but modal needs update too.
+                    // If sold out, close modal immediately.
+                    if (newItem.is_available === false) {
+                        showToast('เมนูนี้เพิ่งหมดครับ 😢', 'error');
+                        if (typeof closeModal === 'function') closeModal();
+                        if (typeof triggerHaptic === 'function') triggerHaptic('heavy');
+                    } else {
+                        // Update modal visual if price changed?
+                        // For now, just re-opening might be jarring. Let user continue.
+                        // Maybe update price display if price changed.
+                        if (newItem.price !== undefined && newItem.price !== window.currentItem.price) {
+                            window.currentItem.price = newItem.price;
+                            if (typeof updateModalPrice === 'function') updateModalPrice();
+                            showToast('ราคาตมีการเปลี่ยนแปลง', 'info');
+                        }
+                    }
+                }
             } else {
                 // INSERT or DELETE
                 fetchMenuFromSupabase();

@@ -211,16 +211,26 @@
             </div>
 
             <div class="flex items-center gap-4">
-                <div class="hidden md:flex flex-col items-end mr-2">
-                    <span class="text-xs text-gray-400 font-bold uppercase tracking-wider">Kitchen Time</span>
-                    <span class="text-xl font-black font-mono text-gray-800 leading-none" id="header-time">--:--</span>
+                <!-- Shop Status Toggle -->
+                <div class="hidden md:flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-xl border border-gray-200">
+                    <span class="text-xs font-bold text-gray-400 uppercase">Shop Status</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="shop-status-toggle" class="sr-only peer"
+                            onchange="toggleShopStatus(this.checked)">
+                        <div
+                            class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500">
+                        </div>
+                        <span id="shop-status-label" class="ml-2 text-xs font-bold text-gray-500">CLOSED</span>
+                    </label>
                 </div>
-                <button
-                    class="w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-amber-500 hover:border-amber-200 transition-all relative shadow-sm">
-                    <i class="fas fa-bell"></i>
-                    <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
-                </button>
-            </div>
+
+                <div class="hidden md:flex items-center gap-4">
+                    <button
+                        class="w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-amber-500 hover:border-amber-200 transition-all relative shadow-sm">
+                        <i class="fas fa-bell"></i>
+                        <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+                    </button>
+                </div>
         </header>
 
         <!-- Content Area -->
@@ -367,6 +377,114 @@
             <i class="fas fa-users text-xl mb-1"></i>
             <span class="text-[10px] font-bold">Users</span>
         </button>
+    </div>
+
+    <!-- Menu Editor Modal -->
+    <div id="menu-modal"
+        class="fixed inset-0 z-[150] bg-black/50 hidden backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-[2rem] w-full max-w-lg shadow-2xl relative overflow-hidden animate-slide-up">
+            <div class="p-6 md:p-8">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h2 class="text-2xl font-black text-gray-800" id="modal-title">Edit Menu</h2>
+                        <p class="text-sm text-gray-400">Manage your delicious food item</p>
+                    </div>
+                    <button onclick="closeMenuModal()"
+                        class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 hover:bg-gray-200 transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <form id="menu-form" onsubmit="handleMenuSubmit(event)" class="space-y-4">
+                    <input type="hidden" id="menu-id">
+
+                    <!-- Image Preview -->
+                    <div class="flex flex-col items-center mb-6">
+                        <div class="w-32 h-32 rounded-2xl bg-gray-50 border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden relative group cursor-pointer"
+                            onclick="document.getElementById('menu-img-url').focus()">
+                            <img id="menu-img-preview" src="" class="w-full h-full object-cover hidden">
+                            <div id="menu-img-placeholder" class="text-center p-4">
+                                <i class="fas fa-image text-2xl text-gray-300 mb-2"></i>
+                                <span class="text-xs text-gray-400 block">Image Preview</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Name</label>
+                            <input type="text" id="menu-name" required
+                                class="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 font-bold text-gray-800 focus:outline-none focus:border-amber-400 focus:bg-white transition-all"
+                                placeholder="e.g. Kaprao Moo">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Price</label>
+                            <input type="number" id="menu-price" required
+                                class="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 font-bold text-gray-800 focus:outline-none focus:border-amber-400 focus:bg-white transition-all"
+                                placeholder="0.00">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Category</label>
+                            <select id="menu-category" required
+                                class="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 font-bold text-gray-800 focus:outline-none focus:border-amber-400 focus:bg-white transition-all appearance-none cursor-pointer">
+                                <option value="kaprao">Kaprao</option>
+                                <option value="curry">Curry</option>
+                                <option value="garlic">Garlic</option>
+                                <option value="noodle">Noodle</option>
+                                <option value="soup">Soup</option>
+                                <option value="tray">Tray Set</option>
+                                <option value="dessert">Dessert</option>
+                                <option value="others">Others</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Options</label>
+                            <div class="flex items-center gap-2 h-[46px]">
+                                <label
+                                    class="flex items-center gap-2 cursor-pointer bg-gray-50 px-3 py-2 rounded-xl border border-gray-100 text-xs font-bold text-gray-500 hover:bg-gray-100 transition-colors flex-1 justify-center">
+                                    <input type="checkbox" id="menu-req-meat" class="accent-amber-500">
+                                    <span>Req. Meat</span>
+                                </label>
+                                <label
+                                    class="flex items-center gap-2 cursor-pointer bg-gray-50 px-3 py-2 rounded-xl border border-gray-100 text-xs font-bold text-gray-500 hover:bg-gray-100 transition-colors flex-1 justify-center">
+                                    <input type="checkbox" id="menu-rec" class="accent-amber-500">
+                                    <span>Recommend</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Image URL</label>
+                        <input type="url" id="menu-img-url" oninput="updateImagePreview(this.value)"
+                            class="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-sm font-mono text-gray-600 focus:outline-none focus:border-amber-400 focus:bg-white transition-all"
+                            placeholder="https://...">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Description
+                            (Optional)</label>
+                        <textarea id="menu-desc" rows="2"
+                            class="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-sm text-gray-600 focus:outline-none focus:border-amber-400 focus:bg-white transition-all"
+                            placeholder="Details..."></textarea>
+                    </div>
+
+                    <div class="pt-4 flex gap-3">
+                        <button type="button" id="btn-delete" onclick="handleDelete()"
+                            class="px-6 py-3 rounded-xl bg-red-50 text-red-500 font-bold hover:bg-red-100 transition-colors hidden">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                        <button type="submit"
+                            class="flex-1 py-3 rounded-xl bg-gray-900 text-white font-bold hover:bg-black shadow-lg shadow-gray-200 transition-all active:scale-[0.98]">
+                            <i class="fas fa-save mr-2"></i> Save Item
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <!-- Logic Script -->

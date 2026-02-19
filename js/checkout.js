@@ -72,6 +72,118 @@ function saveTicketToHistory(orderId, totalPrice, supabaseId) {
     return lottoNumber;
 }
 
+function openModal(item) {
+    if (!item) return;
+    if (window.isShopOpen === false) {
+        showToast('ขออภัย ร้านปิดให้บริการชั่วคราวครับ', 'error');
+        return;
+    }
+    currentItem = item;
+    if (typeof pushModalState === 'function') pushModalState('item-detail');
+    if (typeof triggerHaptic === 'function') triggerHaptic();
+    const modal = document.getElementById('item-detail-modal');
+    const sheet = document.getElementById('item-detail-sheet');
+    const img = document.getElementById('item-detail-img');
+    const name = document.getElementById('item-detail-name');
+    const desc = document.getElementById('item-detail-desc');
+    const price = document.getElementById('item-detail-price');
+    const meatOptionsContainer = document.getElementById('meat-options');
+    const addonOptionsContainer = document.getElementById('addon-options');
+    const quantityInput = document.getElementById('item-detail-quantity');
+    const addToCartBtn = document.getElementById('add-to-cart-btn');
+
+    // Reset state
+    quantityInput.value = 1;
+    selectedMeat = item.defaultMeat || null;
+    selectedAddons = [];
+
+    img.src = item.image;
+    name.innerText = item.name;
+    desc.innerText = item.description;
+    price.innerText = item.price + '.-';
+
+    // Render meat options
+    meatOptionsContainer.innerHTML = '';
+    if (item.meatOptions && item.meatOptions.length > 0) {
+        item.meatOptions.forEach(meat => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = `meat-option-btn px-3 py-1 text-sm rounded-full border transition-colors ${selectedMeat === meat ? 'bg-brand-yellow border-brand-yellow text-white' : 'bg-gray-100 border-gray-200 text-gray-700 hover:bg-gray-200'}`;
+            button.innerText = meat;
+            button.onclick = () => selectMeat(meat);
+            meatOptionsContainer.appendChild(button);
+        });
+    } else {
+        meatOptionsContainer.innerHTML = '<span class="text-gray-500 text-sm">ไม่มีตัวเลือกเนื้อสัตว์</span>';
+    }
+
+    // Render addon options
+    addonOptionsContainer.innerHTML = '';
+    if (item.addons && item.addons.length > 0) {
+        item.addons.forEach(addon => {
+            const label = document.createElement('label');
+            label.className = 'flex items-center space-x-2 text-gray-700';
+            label.innerHTML = `
+                <input type="checkbox" value="${addon.name}" data-price="${addon.price}" class="form-checkbox h-4 w-4 text-brand-yellow rounded focus:ring-brand-yellow addon-checkbox">
+                <span>${addon.name} (+${addon.price}.-)</span>
+            `;
+            addonOptionsContainer.appendChild(label);
+        });
+        document.querySelectorAll('.addon-checkbox').forEach(checkbox => {
+            checkbox.onchange = (e) => toggleAddon(e.target.value, parseInt(e.target.dataset.price));
+        });
+    } else {
+        addonOptionsContainer.innerHTML = '<span class="text-gray-500 text-sm">ไม่มีตัวเลือกเพิ่มเติม</span>';
+    }
+
+    updateAddToCartButton();
+
+    modal.classList.remove('hidden');
+    setTimeout(() => { modal.classList.remove('opacity-0'); sheet.classList.remove('translate-y-full'); }, 10);
+}
+
+function addToCartFromModal() {
+    if (window.isShopOpen === false) {
+        showToast('ขออภัย ร้านปิดให้บริการชั่วคราวครับ', 'error');
+        return;
+    }
+    if (!currentItem) return;
+
+    const quantity = parseInt(document.getElementById('item-detail-quantity').value);
+    if (isNaN(quantity) || quantity <= 0) {
+        showToast('จำนวนไม่ถูกต้อง', 'error');
+        return;
+    }
+
+    const itemToAdd = { ...currentItem };
+    itemToAdd.quantity = quantity;
+    itemToAdd.meat = selectedMeat;
+    itemToAdd.addons = selectedAddons;
+
+    // Calculate price with addons
+    let itemPrice = itemToAdd.price;
+    itemToAdd.addons.forEach(addon => {
+        const addonDetail = currentItem.addons.find(a => a.name === addon);
+        if (addonDetail) itemPrice += addonDetail.price;
+    });
+    itemToAdd.price = itemPrice; // Store the calculated price per item
+
+    for (let i = 0; i < quantity; i++) {
+        cart.push({
+            id: generateUniqueId(), // Assuming this function exists
+            name: itemToAdd.name,
+            price: itemToAdd.price,
+            meat: itemToAdd.meat,
+            addons: itemToAdd.addons,
+            image: itemToAdd.image
+        });
+    }
+
+    if (typeof updateCartBadge === 'function') updateCartBadge();
+    if (typeof showToast === 'function') showToast(`${quantity}x ${itemToAdd.name} เพิ่มในตะกร้าแล้ว`, 'success');
+    closeModal();
+}
+
 function openCheckout() {
     try {
         if (typeof pushModalState === 'function') pushModalState('checkout');
@@ -343,16 +455,28 @@ async function confirmOrder(paymentMethod) {
         return;
     }
 
+    // 0. SHOP STATUS CHECK
+    if (window.isShopOpen === false) {
+        showToast('ขออภัย ร้านปิดให้บริการชั่วคราวครับ', 'error');
+        return;
+    }
+
     // 1.1 STOCK CHECK (Crucial Update)
     if (window.menuItems && Array.isArray(window.menuItems)) {
         const soldOutItems = cart.filter(cartItem => {
-            // Match by name as we don't store ID in cart (legacy design)
-            const menuItem = window.menuItems.find(m => m.name === cartItem.name);
-            return menuItem && menuItem.soldOut;
+            // Priority: Match by ID (new cart structure)
+            if (cartItem.menuItemId) {
+                const menuItem = window.menuItems.find(m => m.id === cartItem.menuItemId);
+                if (menuItem) return menuItem.soldOut || !menuItem.is_available; // Robust check
+            }
+
+            // Fallback: Match by name (legacy cart items)
+            const menuItemByName = window.menuItems.find(m => m.name === cartItem.name);
+            return menuItemByName && (menuItemByName.soldOut || !menuItemByName.is_available);
         });
 
         if (soldOutItems.length > 0) {
-            const itemNames = soldOutItems.map(i => i.name).join(', ');
+            const itemNames = [...new Set(soldOutItems.map(i => i.name))].join(', ');
             showToast(`ขออภัย! ${itemNames} หมดแล้วครับ 😢`, 'error');
             // Optional: Highlight them in cart or ask to remove
             return;

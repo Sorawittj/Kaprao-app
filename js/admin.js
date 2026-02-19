@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
     if (isLoggedIn()) {
         initDashboard();
+        fetchShopStatus(); // Load shop status
     }
 });
 
@@ -300,6 +301,7 @@ async function fetchMenu() {
     const { data, error } = await supabaseClient
         .from('menu_items')
         .select('*')
+        .neq('category', 'system') // Hide system items
         .order('category', { ascending: false }); // simple ordering
 
     if (error) return console.error(error);
@@ -326,9 +328,11 @@ function renderMenu() {
                     ${item.image_url ? `<img src="${item.image_url}" class="w-full h-full object-cover rounded-xl">` : (item.icon || '🍛')}
                 </div>
                 <div>
+                <div>
                     <h3 class="font-bold text-gray-800 line-clamp-1">${item.name}</h3>
                     <p class="text-xs text-gray-400">${item.category}</p>
                     <div class="font-black text-lg text-amber-500 mt-1">฿${item.price}</div>
+                    ${item.req_meat ? '<span class="text-[9px] bg-orange-100 text-orange-600 px-1 rounded">Meat Req.</span>' : ''}
                 </div>
             </div>
 
@@ -353,11 +357,193 @@ async function toggleMenu(id, status) {
 // --- Menu Modal Functions (Reuse standard modal pattern) ---
 // Note: In a full implementation, I'd add create/edit modal logic here similar to previous version but cleaner.
 // For brevity in this Michelin update, I'll focus on the visual overhaul first, but keeping the core edit hook.
-function editMenu(id) {
-    alert('Edit menu ' + id + ' (Feature coming in next build)');
-}
+// --- Menu Modal Functions ---
+let currentMenuId = null;
+
 function openAddMenuModal() {
-    alert('Add menu (Feature coming in next build)');
+    currentMenuId = null;
+    document.getElementById('menu-form').reset();
+    document.getElementById('menu-id').value = '';
+    document.getElementById('modal-title').innerText = 'Add New Item';
+    document.getElementById('btn-delete').classList.add('hidden');
+    updateImagePreview('');
+
+    // Show modal
+    const modal = document.getElementById('menu-modal');
+    modal.classList.remove('hidden');
+    setTimeout(() => modal.classList.add('opacity-100'), 10);
+}
+
+function closeMenuModal() {
+    const modal = document.getElementById('menu-modal');
+    modal.classList.remove('opacity-100');
+    setTimeout(() => modal.classList.add('hidden'), 300);
+}
+
+function editMenu(id) {
+    const item = menuCache.find(i => i.id === id);
+    if (!item) return;
+
+    currentMenuId = id;
+    document.getElementById('menu-id').value = id;
+    document.getElementById('menu-name').value = item.name;
+    document.getElementById('menu-price').value = item.price;
+    document.getElementById('menu-category').value = item.category;
+    document.getElementById('menu-img-url').value = item.image || ''; // Map image_url to form
+    document.getElementById('menu-desc').value = item.description || '';
+    document.getElementById('menu-req-meat').checked = item.req_meat || false;
+    document.getElementById('menu-rec').checked = item.is_new || false; // Reuse is_new as recommend/highlight
+
+    updateImagePreview(item.image);
+
+    document.getElementById('modal-title').innerText = 'Edit Menu';
+    document.getElementById('btn-delete').classList.remove('hidden');
+
+    const modal = document.getElementById('menu-modal');
+    modal.classList.remove('hidden');
+    setTimeout(() => modal.classList.add('opacity-100'), 10);
+}
+
+function updateImagePreview(url) {
+    const img = document.getElementById('menu-img-preview');
+    const ph = document.getElementById('menu-img-placeholder');
+    if (url && url.length > 10) {
+        img.src = url;
+        img.classList.remove('hidden');
+        ph.classList.add('hidden');
+    } else {
+        img.classList.add('hidden');
+        ph.classList.remove('hidden');
+    }
+}
+
+async function handleMenuSubmit(e) {
+    e.preventDefault();
+
+    const name = document.getElementById('menu-name').value;
+    const price = document.getElementById('menu-price').value;
+    const category = document.getElementById('menu-category').value;
+    const image = document.getElementById('menu-img-url').value;
+    const desc = document.getElementById('menu-desc').value;
+    const reqMeat = document.getElementById('menu-req-meat').checked;
+    const isNew = document.getElementById('menu-rec').checked;
+
+    const payload = {
+        name,
+        price: parseFloat(price),
+        category,
+        image,
+        description: desc,
+        req_meat: reqMeat,
+        is_new: isNew,
+        // Default safe values
+        is_available: true,
+        is_tray: false,
+        kcal: 0
+    };
+
+    let error;
+    if (currentMenuId) {
+        // Update
+        const { error: err } = await supabaseClient
+            .from('menu_items')
+            .update(payload)
+            .eq('id', currentMenuId);
+        error = err;
+    } else {
+        // Insert
+        const { error: err } = await supabaseClient
+            .from('menu_items')
+            .insert([payload]); // Supabase often needs array for insert
+        error = err;
+    }
+
+    if (error) {
+        console.error(error);
+        showToast('Error saving menu', 'error');
+    } else {
+        showToast('Menu saved successfully!', 'success');
+        closeMenuModal();
+        fetchMenu(); // Refresh list
+    }
+}
+
+async function handleDelete() {
+    if (!currentMenuId) return;
+    if (!confirm('Are you sure you want to delete this item? This cannot be undone.')) return;
+
+    const { error } = await supabaseClient
+        .from('menu_items')
+        .delete()
+        .eq('id', currentMenuId);
+
+    if (error) {
+        showToast('Error deleting item', 'error');
+    } else {
+        showToast('Item deleted', 'success');
+        closeMenuModal();
+        fetchMenu();
+    }
+}
+
+// --- Shop Status (System Config) ---
+// Using a special menu item with id=99999 or name '__SHOP_STATUS__'
+const SHOP_STATUS_KEY = '__SHOP_STATUS__';
+
+async function fetchShopStatus() {
+    // Attempt to fetch status item
+    const { data, error } = await supabaseClient
+        .from('menu_items')
+        .select('*')
+        .eq('name', SHOP_STATUS_KEY)
+        .maybeSingle();
+
+    const toggle = document.getElementById('shop-status-toggle');
+    const label = document.getElementById('shop-status-label');
+
+    if (data) {
+        // is_available = true means OPEN
+        toggle.checked = data.is_available;
+        updateShopStatusUI(data.is_available);
+    } else {
+        // Init if not exists
+        await supabaseClient.from('menu_items').insert({
+            name: SHOP_STATUS_KEY,
+            category: 'system',
+            price: 0,
+            is_available: true
+        });
+        toggle.checked = true;
+        updateShopStatusUI(true);
+    }
+}
+
+async function toggleShopStatus(isOpen) {
+    updateShopStatusUI(isOpen);
+
+    // Optimistic update done, sync to DB
+    const { error } = await supabaseClient
+        .from('menu_items')
+        .update({ is_available: isOpen })
+        .eq('name', SHOP_STATUS_KEY);
+
+    if (error) {
+        showToast('Failed to update shop status', 'error');
+        // Revert UI?
+    } else {
+        showToast(isOpen ? 'Shop is now OPEN 🟢' : 'Shop is CLOSED 🔴', isOpen ? 'success' : 'warning');
+    }
+}
+
+function updateShopStatusUI(isOpen) {
+    const label = document.getElementById('shop-status-label');
+    if (isOpen) {
+        label.innerText = 'OPEN';
+        label.className = 'ml-2 text-xs font-black text-green-500 tracking-wider';
+    } else {
+        label.innerText = 'CLOSED';
+        label.className = 'ml-2 text-xs font-black text-red-500 tracking-wider';
+    }
 }
 
 // --- Customers ---
