@@ -74,12 +74,15 @@ let userOrdersSubscription = null; // New global subscription for user's orders
 function startOrderTracking(orderId, items) {
     if (!orderId) return;
 
+    // Ensure ID is string to prevent duplicates (Number vs String keys in Map)
+    const idStr = String(orderId);
+
     const now = new Date();
     // Default delivery time logic (can be updated by Supabase later)
     const deliveryDate = getNextDeliveryDate(now);
 
     const order = {
-        id: orderId,
+        id: idStr,
         items: items,
         status: ORDER_STATUS.PLACED,
         orderDate: now.getTime(),
@@ -90,14 +93,14 @@ function startOrderTracking(orderId, items) {
         ]
     };
 
-    activeOrders.set(orderId, order);
+    activeOrders.set(idStr, order);
     saveActiveOrders();
 
     // Open UI
-    openOrderTrackingSheet(orderId);
+    openOrderTrackingSheet(idStr);
 
     // Start Realtime
-    setupTrackingRealtime(orderId);
+    setupTrackingRealtime(idStr);
 
     showToast('ส่งออเดอร์เรียบร้อย! 🚀', 'success');
 }
@@ -254,7 +257,15 @@ function loadActiveOrders() {
         const saved = localStorage.getItem('kaprao_active_orders');
         if (saved) {
             const ordersArray = JSON.parse(saved);
-            activeOrders = new Map(ordersArray);
+
+            // Reconstruct Map but ensure all keys are Strings to avoid duplicates
+            activeOrders = new Map();
+            if (Array.isArray(ordersArray)) {
+                ordersArray.forEach(([key, value]) => {
+                    activeOrders.set(String(key), value);
+                });
+            }
+
             const now = Date.now();
 
             // Migration map: old status codes → new status
@@ -266,7 +277,9 @@ function loadActiveOrders() {
                 'completed': ORDER_STATUS.COMPLETED
             };
 
-            for (const [id, order] of activeOrders) {
+            // Convert to array to iterate safely while modifying
+            const entries = Array.from(activeOrders.entries());
+            for (const [id, order] of entries) {
                 // Migrate old status codes
                 if (order.status && migrationMap[order.status.code] && !ORDER_STATUS[order.status.code.toUpperCase()]) {
                     order.status = migrationMap[order.status.code];
@@ -282,6 +295,9 @@ function loadActiveOrders() {
                 }
                 if (!order.updates) order.updates = [];
 
+                // Update the map with modified order object
+                activeOrders.set(id, order);
+
                 // Auto-cleanup: remove completed orders older than 3 days
                 if (order.status.code === 'completed' && (now - order.orderDate) > 259200000) {
                     activeOrders.delete(id);
@@ -296,6 +312,7 @@ function loadActiveOrders() {
             }
         }
     } catch (e) {
+        console.error("Error loading active orders:", e);
         activeOrders = new Map();
     }
     updateActiveOrdersButton();
@@ -718,9 +735,10 @@ async function fetchOrdersFromSheet() {
                 };
 
                 const status = statusMap[row.status] || ORDER_STATUS.PLACED;
+                const idStr = String(row.id);
 
                 // Check if we already have this order
-                if (!activeOrders.has(row.id)) {
+                if (!activeOrders.has(idStr)) {
                     // Start: New Order Logic
                     // Intelligent Parsing: "Name (Meat) +Addon1,Addon2 [Note]"
                     const simulatedItems = (row.details || 'รายการอาหาร').split('\n').map(line => {
@@ -765,7 +783,7 @@ async function fetchOrdersFromSheet() {
                     const nextDelivery = getNextDeliveryDate(new Date(orderTimestamp)).getTime();
 
                     const newOrder = {
-                        id: row.id,
+                        id: idStr,
                         items: simulatedItems,
                         status: status,
                         orderDate: orderTimestamp,
@@ -776,11 +794,11 @@ async function fetchOrdersFromSheet() {
                         isRemote: true // Flag to identify remote orders
                     };
 
-                    activeOrders.set(row.id, newOrder);
+                    activeOrders.set(idStr, newOrder);
                     newOrdersCount++;
                 } else {
                     // Update existing order status if different
-                    const existing = activeOrders.get(row.id);
+                    const existing = activeOrders.get(idStr);
                     if (existing.status.code !== status.code) {
                         existing.status = status;
                         existing.updates.push({ status: status, time: Date.now(), note: 'Update from Sheet' });
