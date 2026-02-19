@@ -207,7 +207,8 @@
 
             <div class="hidden md:block">
                 <h2 class="text-xl font-bold text-gray-800" id="page-title">Dashboard Overview</h2>
-                <p class="text-xs text-gray-400 font-medium" id="header-date">Wait...</p>
+                <p class="text-xs text-gray-400 font-medium"><span id="header-time"
+                        class="mr-2 font-bold text-amber-500"></span><span id="header-date">Wait...</span></p>
             </div>
 
             <div class="flex items-center gap-4">
@@ -337,6 +338,14 @@
                         <p class="text-sm text-gray-400">Top loyal customers & points</p>
                     </div>
                     <div class="overflow-x-auto">
+                        <div class="p-4 bg-gray-50 border-b border-gray-100 flex gap-2">
+                            <div class="relative flex-1">
+                                <i class="fas fa-search absolute left-4 top-3.5 text-gray-400"></i>
+                                <input type="text" id="customer-search" oninput="debounceSearchCustomers(this.value)"
+                                    class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-amber-400 transition-all font-bold text-gray-600 placeholder-gray-300"
+                                    placeholder="Search by name or ID...">
+                            </div>
+                        </div>
                         <table class="w-full text-left">
                             <thead class="bg-gray-50 text-gray-400 text-xs uppercase tracking-wider font-bold">
                                 <tr>
@@ -485,10 +494,82 @@
                 </form>
             </div>
         </div>
-    </div>
+        <!-- Points Adjustment Modal -->
+        <div id="points-modal"
+            class="fixed inset-0 z-[150] bg-black/50 hidden backdrop-blur-sm flex items-center justify-center p-4">
+            <div class="bg-white rounded-[2rem] w-full max-w-sm shadow-2xl relative overflow-hidden animate-slide-up">
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <h2 class="text-xl font-black text-gray-800">Adjust Points</h2>
+                            <p class="text-xs text-gray-400">Give rewards or compensate</p>
+                        </div>
+                        <button onclick="closePointsModal()"
+                            class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 hover:bg-gray-200 transition-colors">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
 
-    <!-- Logic Script -->
-    <script src="js/admin.js"></script>
+                    <div class="mb-6 bg-amber-50 p-4 rounded-xl border border-amber-100 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-xl">
+                            👤</div>
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase">Customer</p>
+                            <h3 class="font-bold text-gray-800" id="points-modal-user">Loading...</h3>
+                        </div>
+                        <div class="ml-auto text-right">
+                            <p class="text-xs font-bold text-gray-400 uppercase">Current</p>
+                            <p class="font-black text-amber-500 text-lg" id="points-modal-current">0 pt</p>
+                        </div>
+                    </div>
+
+                    <form onsubmit="handlePointsSubmit(event)" class="space-y-4">
+                        <input type="hidden" id="points-user-id">
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Action</label>
+                            <div class="flex gap-4 mb-3">
+                                <label
+                                    class="flex items-center gap-2 cursor-pointer bg-green-50 px-4 py-2 rounded-xl border border-green-100 hover:bg-green-100 transition-colors flex-1 justify-center">
+                                    <input type="radio" name="point-action" value="add" checked
+                                        class="accent-green-500 w-4 h-4">
+                                    <span class="font-bold text-green-700 text-sm">Add (+)</span>
+                                </label>
+                                <label
+                                    class="flex items-center gap-2 cursor-pointer bg-red-50 px-4 py-2 rounded-xl border border-red-100 hover:bg-red-100 transition-colors flex-1 justify-center">
+                                    <input type="radio" name="point-action" value="reduce"
+                                        class="accent-red-500 w-4 h-4">
+                                    <span class="font-bold text-red-700 text-sm">Deduct (-)</span>
+                                </label>
+                            </div>
+
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Amount</label>
+                            <div class="relative">
+                                <input type="number" id="points-amount" required min="1"
+                                    class="w-full bg-gray-50 border border-gray-100 rounded-xl pl-4 pr-12 py-3 font-bold text-gray-800 focus:outline-none focus:border-amber-400 focus:bg-white transition-all text-lg"
+                                    placeholder="0">
+                                <span class="absolute right-4 top-3.5 text-gray-400 text-sm font-bold">pt</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Note (Optional)</label>
+                            <input type="text" id="points-note"
+                                class="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-sm text-gray-600 focus:outline-none focus:border-amber-400 focus:bg-white transition-all"
+                                placeholder="e.g. Birthday Gift">
+                        </div>
+
+                        <button type="submit"
+                            class="w-full py-3 rounded-xl bg-gray-900 text-white font-bold hover:bg-black shadow-lg shadow-gray-200 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+                            <i class="fas fa-coins text-amber-400"></i> Update Points
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logic Script -->
+        <script src="js/admin.js"></script>
 
 </body>
 

@@ -160,3 +160,39 @@ async function manualRefreshPoints() {
     }
     if (btn) setTimeout(() => btn.classList.remove('animate-spin-fast'), 1000);
 }
+
+// --- Realtime Points Sync for Customer ---
+function setupPointsRealtime() {
+    if (!window.supabaseClient || !userAvatar.userId) return;
+
+    window.pointsSubscription = window.supabaseClient
+        .channel('public:profiles:' + userAvatar.userId)
+        .on('postgres_changes', {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'profiles',
+            filter: `id=eq.${userAvatar.userId}`
+        }, (payload) => {
+            console.log('Realtime Points Update:', payload);
+            const newPoints = payload.new.points || 0;
+
+            // 1. Update Local Stats
+            userStats.points = newPoints;
+            localStorage.setItem(KEYS.STATS, JSON.stringify(userStats));
+
+            // 2. Update UI
+            updatePointsDisplay();
+
+            // 3. Notify User
+            showToast(`พอยต์ของคุณอัปเดตเป็น ${newPoints} แต้ม! 🎉`, 'success');
+
+            // 4. Update History (optional fetch if we want full history sync, 
+            //    but for now just showing new total is enough for immediate feedback)
+        })
+        .subscribe();
+}
+
+// Auto-start if logged in
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(setupPointsRealtime, 2000);
+});

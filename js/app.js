@@ -357,121 +357,73 @@ function closeAllModals() {
 
 // --- Modal Actions ---
 function openMoreModal() {
-    // Check login state
+    // Update LINE button based on login state
     const isGuest = userAvatar.isGuest || !userAvatar.userId;
-
-    const modal = document.createElement('div');
-    modal.id = 'more-modal';
-    modal.className = 'fixed inset-0 z-[200] bg-black/50 backdrop-blur-sm flex items-end justify-center animate-fade-in';
-
-    // Dynamic Content for Top Section
-    let authSection = '';
-
-    if (isGuest) {
-        // Show Login Button
-        authSection = `
-            <button onclick="loginWithLine(); closeMoreModal();" id="more-login-btn" 
-                class="w-full mb-4 bg-[#06C755] text-white p-4 rounded-2xl flex items-center justify-between shadow-md hover:shadow-lg transition-all btn-bounce">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl">
+    const lineBtn = document.querySelector('#more-menu-sheet .modern-line-btn');
+    
+    if (lineBtn) {
+        if (!isGuest) {
+            // Change to profile button when logged in
+            lineBtn.innerHTML = `
+                <span class="btn-content">
+                    <span class="line-icon" style="background: rgba(99, 102, 241, 0.2);">
+                        ${userAvatar.image ? `<img src="${userAvatar.image}" class="w-full h-full rounded-full object-cover">` : '<i class="fas fa-user" style="color: #6366F1;"></i>'}
+                    </span>
+                    <span class="btn-text">
+                        <span class="btn-title">${userAvatar.name || 'ลูกค้าทั่วไป'}</span>
+                        <span class="btn-subtitle">แก้ไขข้อมูลส่วนตัว</span>
+                    </span>
+                </span>
+                <i class="fas fa-chevron-right text-lg opacity-80"></i>
+            `;
+            lineBtn.onclick = () => { openAvatarModal(); closeMoreMenu(); };
+            lineBtn.style.background = 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)';
+        } else {
+            // Reset to LINE login button
+            lineBtn.innerHTML = `
+                <span class="btn-content">
+                    <span class="line-icon">
                         <i class="fab fa-line"></i>
-                    </div>
-                    <div class="text-left">
-                        <h3 class="font-bold text-lg">เข้าสู่ระบบด้วย LINE</h3>
-                        <p class="text-xs opacity-90">สะสมแต้มและดูประวัติการสั่ง</p>
-                    </div>
-                </div>
-                <i class="fas fa-chevron-right opacity-70"></i>
-            </button>
-        `;
-    } else {
-        // Show Profile Button
-        authSection = `
-            <button onclick="openAvatarModal(); closeMoreModal();" 
-                class="w-full mb-4 bg-white p-4 rounded-2xl flex items-center justify-between shadow-sm border border-gray-100 hover:border-indigo-100 transition-all">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center text-xl relative">
-                        ${userAvatar.image ? `<img src="${userAvatar.image}" class="w-full h-full rounded-full object-cover">` : '<i class="fas fa-user"></i>'}
-                        <div class="absolute -bottom-1 -right-1 bg-green-500 w-4 h-4 rounded-full border-2 border-white"></div>
-                    </div>
-                    <div class="text-left">
-                        <h3 class="font-bold text-gray-800 text-lg">${userAvatar.name || 'ลูกค้าทั่วไป'}</h3>
-                        <p class="text-xs text-indigo-500 font-medium">แก้ไขข้อมูลส่วนตัว</p>
-                    </div>
-                </div>
-                <i class="fas fa-chevron-right text-gray-300"></i>
-            </button>
-        `;
+                    </span>
+                    <span class="btn-text">
+                        <span class="btn-title">เข้าสู่ระบบด้วย LINE</span>
+                        <span class="btn-subtitle">สะสมแต้มและดูประวัติการสั่ง</span>
+                    </span>
+                </span>
+                <i class="fas fa-chevron-right text-lg opacity-80"></i>
+            `;
+            lineBtn.onclick = () => { loginWithLine(); closeMoreMenu(); };
+            lineBtn.style.background = 'var(--line-green)';
+        }
     }
 
-    modal.innerHTML = `
-        <div class="bg-white rounded-t-[2rem] w-full max-w-md p-6 animate-slide-up relative safe-area-pb" onclick="event.stopPropagation()">
-            <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6"></div>
-            
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-black text-gray-800">เมนูเพิ่มเติม</h2>
-                <button onclick="closeMoreModal()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200"><i class="fas fa-times"></i></button>
-            </div>
-            
-            ${authSection}
-
-            <h3 class="text-sm font-bold text-gray-400 mb-3 ml-1">กิจกรรมและโปรโมชั่น</h3>
-            <div class="grid grid-cols-2 gap-3 mb-6">
-                <button onclick="openWheelOfFortune(); closeMoreModal();" class="p-4 rounded-2xl bg-gradient-to-br from-pink-50 to-purple-50 border border-pink-100 flex flex-col items-center justify-center gap-2 hover:shadow-md transition-all">
-                    <div class="text-3xl filter drop-shadow-sm">🎡</div>
-                    <span class="font-bold text-gray-700 text-sm">วงล้อเสี่ยงโชค</span>
-                </button>
-                <button onclick="openMyTickets(); closeMoreModal();" class="p-4 rounded-2xl bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-100 flex flex-col items-center justify-center gap-2 hover:shadow-md transition-all">
-                    <div class="text-3xl filter drop-shadow-sm">🎫</div>
-                    <span class="font-bold text-gray-700 text-sm">ตั๋วหวยของฉัน</span>
-                </button>
-            </div>
-            
-            <h3 class="text-sm font-bold text-gray-400 mb-3 ml-1">ทั่วไป</h3>
-            <div class="space-y-3">
-                <button onclick="openPointsHistory(); closeMoreModal();" class="w-full flex items-center gap-4 p-4 rounded-xl bg-gray-50 border border-gray-100 hover:bg-white hover:shadow-sm transition-all">
-                    <div class="w-10 h-10 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center text-lg">🪙</div>
-                    <div class="text-left flex-1">
-                        <p class="font-bold text-gray-800">ประวัติพอยต์</p>
-                        <p class="text-[10px] text-gray-500">ดูรายการได้และใช้พอยต์</p>
-                    </div>
-                </button>
-                
-                <button onclick="openQuickOrderModal(); closeMoreModal();" class="w-full flex items-center gap-4 p-4 rounded-xl bg-gray-50 border border-gray-100 hover:bg-white hover:shadow-sm transition-all">
-                    <div class="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-lg">🔄</div>
-                    <div class="text-left flex-1">
-                        <p class="font-bold text-gray-800">สั่งซ้ำ (Re-order)</p>
-                        <p class="text-[10px] text-gray-500">เลือกจากประวัติการสั่ง</p>
-                    </div>
-                </button>
-
-                <!-- Admin Mode Button -->
-                <button onclick="openAdminLoginModal(); closeMoreModal();" class="w-full flex items-center gap-4 p-4 rounded-xl bg-gray-50 border border-gray-100 hover:bg-white hover:shadow-sm transition-all group">
-                    <div class="w-10 h-10 rounded-full bg-gray-200 text-gray-500 group-hover:bg-indigo-100 group-hover:text-indigo-600 flex items-center justify-center text-lg transition-colors">🔧</div>
-                    <div class="text-left flex-1">
-                        <p class="font-bold text-gray-600 group-hover:text-indigo-700 transition-colors">โหมดเจ้าของร้าน</p>
-                        <p class="text-[10px] text-gray-400">จัดการร้านค้า (Admin)</p>
-                    </div>
-                </button>
-            </div>
-            
-            <div class="mt-8 text-center">
-                <p class="text-[10px] text-gray-300">Kaprao52 App v1.0.0</p>
-            </div>
-        </div>
-    `;
-    modal.onclick = (e) => {
-        if (e.target === modal) closeMoreModal();
-    };
-    document.body.appendChild(modal);
+    // Show modal
+    const overlay = document.getElementById('more-menu-overlay');
+    const sheet = document.getElementById('more-menu-sheet');
+    if (overlay && sheet) {
+        overlay.classList.remove('hidden');
+        setTimeout(() => {
+            overlay.classList.remove('opacity-0');
+            sheet.classList.remove('translate-y-full');
+        }, 10);
+    }
 }
 
-function closeMoreModal() {
-    const modal = document.getElementById('more-modal');
-    if (modal) {
-        modal.style.opacity = '0';
-        setTimeout(() => modal.remove(), 300);
+function closeMoreMenu() {
+    const overlay = document.getElementById('more-menu-overlay');
+    const sheet = document.getElementById('more-menu-sheet');
+    if (overlay && sheet) {
+        overlay.classList.add('opacity-0');
+        sheet.classList.add('translate-y-full');
+        setTimeout(() => {
+            overlay.classList.add('hidden');
+        }, 300);
     }
+}
+
+// Alias for backward compatibility
+function closeMoreModal() {
+    closeMoreMenu();
     if (typeof setActiveNav === 'function') setActiveNav('home');
 }
 
@@ -760,17 +712,17 @@ function openModal(item) {
 
             const meatDiv = document.createElement('div');
             meatDiv.className = 'mb-4';
-            meatDiv.innerHTML = `<h4 class="text-xs font-bold text-gray-500 mb-2">${t('modal_meat_label')}</h4>`;
             meats.forEach((m, idx) => {
                 const isChecked = idx === 0 ? 'checked' : '';
-                meatDiv.innerHTML += `
-                    <label class="flex items-center justify-between p-3 border border-gray-100 rounded-xl mb-2 cursor-pointer has-checked:border-brand-yellow has-checked:bg-[#FDFBF7] transition-all">
-                        <div class="flex items-center gap-3">
-                            <input type="radio" name="meat-opt" class="w-5 h-5 accent-brand-yellow" value="${m.id}" data-price="${m.price}" ${isChecked} onchange="updateModalPrice()">
-                            <span class="text-sm font-bold text-gray-700">${m.name}</span>
-                        </div>
-                        ${m.price > 0 ? `<span class="text-xs text-brand-purple font-bold">+${m.price}</span>` : ''}
-                    </label>`;
+                const label = document.createElement('label');
+                label.className = 'modern-option';
+                if (isChecked) label.classList.add('selected');
+                label.innerHTML = `
+                    <input type="radio" name="meat-opt" value="${m.id}" data-price="${m.price}" ${isChecked} onchange="updateModalPrice(); document.querySelectorAll('input[name=\"meat-opt\"]').forEach(r => r.closest('.modern-option').classList.toggle('selected', r.checked));">
+                    <span class="option-label">${m.name}</span>
+                    ${m.price > 0 ? `<span class="option-price">+${m.price}</span>` : '<span class="option-price"></span>'}
+                `;
+                meatDiv.appendChild(label);
             });
             optionsContainer.appendChild(meatDiv);
         }
@@ -787,17 +739,16 @@ function openModal(item) {
         ];
 
         const addonDiv = document.createElement('div');
-        addonDiv.className = 'mt-4';
-        addonDiv.innerHTML = `<h4 class="text-xs font-bold text-gray-500 mb-2">${t('modal_addons_label')}</h4>`;
+        addonDiv.className = 'mt-2';
         generalAddons.forEach(a => {
-            addonDiv.innerHTML += `
-                <label class="flex items-center justify-between p-3 border border-gray-100 rounded-xl mb-2 cursor-pointer has-checked:border-brand-yellow has-checked:bg-[#FDFBF7] transition-all">
-                    <div class="flex items-center gap-3">
-                        <input type="checkbox" class="addon-checkbox w-5 h-5 accent-brand-yellow" value="${a.id}" data-price="${a.price}" data-name="${a.name}" onchange="updateModalPrice()">
-                        <span class="text-sm font-bold text-gray-700">${a.name}</span>
-                    </div>
-                    <span class="text-xs text-brand-purple font-bold">+${a.price}</span>
-                </label>`;
+            const label = document.createElement('label');
+            label.className = 'modern-option';
+            label.innerHTML = `
+                <input type="checkbox" class="addon-checkbox" value="${a.id}" data-price="${a.price}" data-name="${a.name}" onchange="updateModalPrice(); this.closest('.modern-option').classList.toggle('selected', this.checked);">
+                <span class="option-label">${a.name}</span>
+                <span class="option-price">+${a.price}</span>
+            `;
+            addonDiv.appendChild(label);
         });
         optionsContainer.appendChild(addonDiv);
     }

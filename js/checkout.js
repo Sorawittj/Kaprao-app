@@ -461,7 +461,8 @@ async function confirmOrder(paymentMethod) {
         return;
     }
 
-    // 1.1 STOCK CHECK (Crucial Update)
+    // 1.1 STOCK CHECK (Disabled Temporarily due to bug)
+    /*
     if (window.menuItems && Array.isArray(window.menuItems)) {
         const soldOutItems = cart.filter(cartItem => {
             // Priority: Match by ID (new cart structure)
@@ -482,6 +483,7 @@ async function confirmOrder(paymentMethod) {
             return;
         }
     }
+    */
 
     // 2. Network Check
     if (!navigator.onLine) {

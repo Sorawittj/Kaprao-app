@@ -235,17 +235,17 @@ function renderMenu() {
         // --- Footer Area ---
         const priceValue = (isDessert || isSoldOut || isTrayWait)
             ? `<span class="text-sm font-bold text-gray-300 line-through">${item.price}</span>`
-            : `<div class="flex items-baseline gap-0.5"><span class="text-lg font-black text-indigo-600">${item.price}</span><span class="text-xs font-bold text-gray-400">฿</span></div>`;
+            : `<div class="flex items-baseline gap-0.5"><span class="text-xl font-black text-[#FF6B00]">${item.price}</span><span class="text-xs font-bold text-gray-400">฿</span></div>`;
 
         const actionBtn = (!isDessert && !isSoldOut && !isTrayWait)
             ? `<button onclick="event.stopPropagation(); const item = menuItems.find(i => i.id === ${item.id}); if(item) openModal(item);" 
-                class="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center shadow-lg hover:bg-black hover:scale-110 active:scale-90 transition-all">
-                <i class="fas fa-plus text-xs"></i>
+                class="w-9 h-9 rounded-full bg-gradient-to-tr from-[#FF6B00] to-[#FF8C00] text-white flex items-center justify-center shadow-lg shadow-orange-200 hover:scale-110 active:scale-95 transition-all">
+                <i class="fas fa-plus text-sm"></i>
                </button>`
             : '';
 
         const footerHTML = `
-            <div class="mt-auto pt-2 flex items-center justify-between border-t border-gray-50">
+            <div class="mt-auto pt-3 flex items-center justify-between border-t border-gray-50">
                 ${priceValue}
                 ${actionBtn}
             </div>
@@ -550,13 +550,23 @@ function updateRecommendations() {
 
     topItems.forEach(item => {
         const el = document.createElement('div');
-        el.className = 'flex-shrink-0 bg-white rounded-xl p-3 border border-gray-200 cursor-pointer hover:border-yellow-400 hover:shadow-md transition-all';
-        el.style.width = '140px';
+        el.className = 'flex-shrink-0 bg-white rounded-2xl p-2 border border-gray-100 cursor-pointer shadow-sm hover:shadow-md transition-all flex flex-col gap-2 relative overflow-hidden group';
+        el.style.width = '120px';
         el.onclick = () => openModal(item);
+
+        // Mini card design
         el.innerHTML = `
-            <div class="text-3xl text-center mb-2">${item.icon}</div>
-            <p class="text-xs font-bold text-gray-800 text-center line-clamp-2">${item.name}</p>
-            <p class="text-xs text-indigo-500 text-center font-bold mt-1">${item.price} ฿</p>
+            <div class="w-full aspect-square rounded-xl bg-gray-50 relative overflow-hidden">
+                <img src="${item.image}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                    onerror="this.parentElement.innerHTML='<div class=\\'w-full h-full flex items-center justify-center text-3xl\\'>${item.icon}</div>'">
+            </div>
+            <div class="px-1 pb-1">
+                <h4 class="font-bold text-gray-800 text-xs truncate mb-0.5">${item.name}</h4>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-black text-indigo-600">${item.price}.-</span>
+                    <div class="w-5 h-5 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center text-[10px]"><i class="fas fa-plus"></i></div>
+                </div>
+            </div>
         `;
         container.appendChild(el);
     });

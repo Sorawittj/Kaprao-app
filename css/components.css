@@ -715,12 +715,12 @@ input:checked+.meat-option {
 }
 
 /* Recommended Section */
+/* Recommended Section */
 .recommended-section {
-    background: linear-gradient(135deg, #FEF3C7, #FFFBEB);
-    border-radius: 1.5rem;
-    padding: 1rem;
+    background: transparent;
+    padding: 0;
     margin-bottom: 1.5rem;
-    border: 1px solid #FCD34D;
+    border: none;
 }
 
 /* Countdown Timer */

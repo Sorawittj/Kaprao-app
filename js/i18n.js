@@ -31,6 +31,12 @@ class I18n {
         this.currentLang = lang;
         localStorage.setItem('app_lang', lang);
 
+        // Update language button display
+        const langDisplay = document.getElementById('lang-display');
+        if (langDisplay) {
+            langDisplay.textContent = lang.toUpperCase();
+        }
+
         // Trigger generic page update
         this.updatePage();
 

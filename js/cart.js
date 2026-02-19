@@ -63,45 +63,38 @@ function removeFromCart(id) {
 
 function renderCheckoutList() {
     const container = document.getElementById('cart-list-container');
+    const emptyState = document.getElementById('cart-empty-state');
     container.innerHTML = '';
 
     if (cart.length === 0) {
-        container.innerHTML = `
-            <div class="flex flex-col items-center justify-center py-8 text-center">
-                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3">
-                    <i class="fas fa-shopping-basket text-2xl text-gray-400"></i>
-                </div>
-                <p class="text-gray-500 font-bold">ตะกร้าว่างเปล่า</p>
-                <p class="text-xs text-gray-400 mt-1">ยังไม่มีรายการอาหาร</p>
-                <button onclick="closeCheckout()" class="mt-4 text-sm text-indigo-500 font-bold hover:underline">เลือกเมนูอาหาร</button>
-            </div>
-        `;
+        if (emptyState) emptyState.classList.remove('hidden');
         updateTotalSummary();
         return;
     }
 
+    if (emptyState) emptyState.classList.add('hidden');
+
     cart.forEach(item => {
         const el = document.createElement('div');
-        el.className = "bg-gray-50 p-3 rounded-xl border border-gray-100 flex justify-between items-start stagger-item";
-        let detail = item.meat ? `<span class="text-orange-600 text-xs bg-orange-100 px-1 rounded">${item.meat}</span> ` : '';
-        if (item.addons.length) detail += `<span class="text-gray-500 text-xs">+${item.addons.join(',')}</span>`;
+        el.className = "flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors";
+        let detail = item.meat ? `<span class="text-orange-600 text-xs bg-orange-50 px-2 py-0.5 rounded-full font-medium">${item.meat}</span> ` : '';
+        if (item.addons.length) detail += `<span class="text-gray-400 text-xs">+${item.addons.join(', ')}</span>`;
         el.innerHTML = `
-    <div class="flex items-start gap-3">
-        <img src="${item.image || ''}" alt="${item.name}"
-             class="w-16 h-16 rounded-xl object-cover flex-shrink-0"
-             onerror="this.style.display='none'">
-        <div>
-            <h4 class="cart-item-title font-bold text-gray-800">${item.name}</h4>
-            <div class="cart-item-details mt-1">${detail}</div>
-            ${item.note ? `<div class="text-[10px] text-gray-400 mt-1">Note: ${item.note}</div>` : ''}
-        </div>
-    </div>
-    <div class="flex flex-col items-end gap-2">
-        <span class="font-bold text-gray-800">${item.price}.-</span>
-        <button onclick="removeFromCart(${item.id})" class="text-xs text-red-500 bg-red-50 w-9 h-9 rounded flex items-center justify-center border border-red-100 btn-bounce">
-            <i class="fas fa-trash"></i>
-        </button>
-    </div>`;
+            <img src="${item.image || ''}" alt="${item.name}"
+                 class="w-16 h-16 rounded-xl object-cover flex-shrink-0 bg-gray-100"
+                 onerror="this.style.display='none'">
+            <div class="flex-1 min-w-0">
+                <h4 class="font-bold text-gray-900 text-sm mb-1">${item.name}</h4>
+                <div class="flex flex-wrap items-center gap-1 mb-1">${detail}</div>
+                ${item.note ? `<div class="text-[11px] text-gray-400">Note: ${item.note}</div>` : ''}
+            </div>
+            <div class="flex flex-col items-end gap-2 shrink-0">
+                <span class="font-bold text-gray-900">${item.price}.-</span>
+                <button onclick="removeFromCart(${item.id})" class="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-100 transition-colors">
+                    <i class="fas fa-trash text-xs"></i>
+                </button>
+            </div>
+        `;
         container.appendChild(el);
     });
     updateTotalSummary();

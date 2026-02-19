@@ -213,7 +213,10 @@ function createOrderCardHtml(order) {
                         ${order.id}
                     </div>
                     <div>
-                        <div class="font-bold text-gray-800 text-sm">${customer}</div>
+                        <div class="font-bold text-gray-800 text-sm cursor-pointer hover:text-amber-500 transition-colors" 
+                             onclick="window.openPointsModal('${order.user_id || ''}')" title="Click to adjust points">
+                            ${customer} ${order.user_id ? '<i class="fas fa-edit ml-1 text-xs opacity-50"></i>' : ''}
+                        </div>
                         <div class="text-[10px] text-gray-400 flex items-center gap-1">
                             <i class="far fa-clock"></i> ${time} 
                             <span class="bg-indigo-50 text-indigo-600 px-1.5 rounded font-bold ml-1 border border-indigo-100">🎟️ ${lotto}</span>
@@ -309,6 +312,7 @@ async function fetchMenu() {
     renderMenu();
 }
 
+
 function renderMenu() {
     const container = document.getElementById('menu-grid');
     if (!menuCache.length) {
@@ -316,37 +320,73 @@ function renderMenu() {
         return;
     }
 
-    // Group by category if desired, but grid is fine for now
+    // Add 'Reset Availability' button if not present
+    const headerBtn = document.querySelector('#section-menu .flex .gap-4');
+    if (headerBtn && !document.getElementById('btn-reset-stock')) {
+        // It's hard to inject into the button container without parsing DOM specifically. 
+        // Let's just prepend a button to the grid container temporarily or add it to the header via JS.
+        const btnContainer = document.querySelector('#section-menu button[onclick="openAddMenuModal()"]').parentNode;
+        if (btnContainer && !btnContainer.querySelector('#btn-reset-stock')) {
+            const resetBtn = document.createElement('button');
+            resetBtn.id = 'btn-reset-stock';
+            resetBtn.onclick = resetAllStock;
+            resetBtn.className = 'bg-white text-red-500 border border-red-200 font-bold py-3 px-6 rounded-xl hover:bg-red-50 transition-all active:scale-95 mr-3';
+            resetBtn.innerHTML = '<i class="fas fa-undo mr-2"></i> Reset Stock';
+            btnContainer.insertBefore(resetBtn, btnContainer.firstChild);
+        }
+    }
+
+    // Render Items
     container.innerHTML = menuCache.map(item => `
-        <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 group hover:border-amber-400 transition-all relative overflow-hidden">
-            <div class="absolute top-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
-                <button onclick="editMenu(${item.id})" class="w-8 h-8 rounded-full bg-white shadow flex items-center justify-center text-blue-500 hover:scale-110 transition-transform"><i class="fas fa-pen text-xs"></i></button>
+        <div class="bg-white rounded-[1.5rem] p-4 shadow-sm border border-gray-100 flex flex-col gap-3 group hover:border-amber-400 transition-all relative overflow-hidden h-full">
+            <div class="flex items-start justify-between gap-3">
+                 <div class="w-20 h-20 rounded-2xl bg-gray-50 flex items-center justify-center text-4xl shadow-sm text-gray-400 flex-shrink-0 overflow-hidden">
+                    ${item.image ? `<img src="${item.image}" class="w-full h-full object-cover">` : (item.icon || '🍱')}
+                </div>
+                <div class="flex-1 min-w-0">
+                     <h3 class="font-bold text-gray-800 text-base leading-tight mb-1 line-clamp-2">${item.name}</h3>
+                     <div class="flex items-center gap-2 mb-1">
+                        <span class="text-[10px] uppercase font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded tracking-wide">${item.category}</span>
+                        ${item.is_new ? '<span class="text-[10px] font-bold text-amber-500 bg-amber-50 px-1.5 py-0.5 rounded">NEW</span>' : ''}
+                     </div>
+                     <div class="font-black text-xl text-amber-500">฿${item.price}</div>
+                </div>
             </div>
             
-            <div class="flex items-center gap-4 mb-3">
-                <div class="w-16 h-16 rounded-xl bg-gray-50 flex items-center justify-center text-3xl shadow-inner text-gray-400">
-                    ${item.image_url ? `<img src="${item.image_url}" class="w-full h-full object-cover rounded-xl">` : (item.icon || '🍛')}
-                </div>
-                <div>
-                <div>
-                    <h3 class="font-bold text-gray-800 line-clamp-1">${item.name}</h3>
-                    <p class="text-xs text-gray-400">${item.category}</p>
-                    <div class="font-black text-lg text-amber-500 mt-1">฿${item.price}</div>
-                    ${item.req_meat ? '<span class="text-[9px] bg-orange-100 text-orange-600 px-1 rounded">Meat Req.</span>' : ''}
-                </div>
-            </div>
-
-            <div class="flex items-center justify-between pt-3 border-t border-gray-50">
-                <label class="flex items-center gap-2 cursor-pointer">
+            <div class="mt-auto pt-3 border-t border-gray-50 flex items-center justify-between">
+                <label class="flex items-center gap-3 cursor-pointer group/toggle select-none">
                     <div class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" class="sr-only peer" ${item.is_available ? 'checked' : ''} onchange="toggleMenu(${item.id}, this.checked)">
-                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-500"></div>
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500 shadow-inner"></div>
                     </div>
-                    <span class="text-xs font-medium ${item.is_available ? 'text-green-600' : 'text-gray-400'}">${item.is_available ? 'พร้อมขาย' : 'หมด'}</span>
+                    <span class="text-xs font-bold transition-colors ${item.is_available ? 'text-green-600' : 'text-gray-400'}">
+                        ${item.is_available ? 'พร้อมขาย' : 'หมดชั่วคราว'}
+                    </span>
                 </label>
+                
+                <button onclick="editMenu(${item.id})" class="w-9 h-9 rounded-xl bg-gray-50 text-gray-400 hover:bg-amber-50 hover:text-amber-500 transition-all flex items-center justify-center active:scale-90">
+                    <i class="fas fa-pen text-sm"></i>
+                </button>
             </div>
         </div>
     `).join('');
+}
+
+async function resetAllStock() {
+    if (!confirm('ยืนยันเปิดขาย "ทุกเมนู" หรือไม่?')) return;
+
+    // Optimistic update
+    menuCache.forEach(i => i.is_available = true);
+    renderMenu();
+    showToast('กำลังรีเซ็ตสถานะ...', 'info');
+
+    const { error } = await supabaseClient.from('menu_items').update({ is_available: true }).neq('id', 0); // Update all
+    if (error) {
+        showToast('รีเซ็ตไม่สำเร็จ', 'error');
+        fetchMenu();
+    } else {
+        showToast('เปิดขายทุกเมนูเรียบร้อยครับ! ✅', 'success');
+    }
 }
 
 async function toggleMenu(id, status) {
@@ -547,22 +587,53 @@ function updateShopStatusUI(isOpen) {
 }
 
 // --- Customers ---
-async function fetchCustomers() {
-    const { data, error } = await supabaseClient
+let searchDebounceTimer;
+
+function debounceSearchCustomers(query) {
+    clearTimeout(searchDebounceTimer);
+    searchDebounceTimer = setTimeout(() => {
+        fetchCustomers(query);
+    }, 500);
+}
+
+async function fetchCustomers(query = '') {
+    let queryBuilder = supabaseClient
         .from('profiles')
         .select('*')
-        .order('points', { ascending: false })
-        .limit(20);
+        .order('points', { ascending: false });
 
-    if (error) return;
+    if (query && query.trim() !== '') {
+        const q = query.trim();
+        // Simple search on display_name. Ideally use OR logic for multiple fields if Supabase allows easily within one query builder
+        // For simplicity: search display_name OR line_user_id via filter
+        // Note: Supabase JS library .or() syntax: 'column1.ilike.%val%,column2.ilike.%val%'
+        queryBuilder = queryBuilder.or(`display_name.ilike.%${q}%,line_user_id.ilike.%${q}%`);
+        queryBuilder = queryBuilder.limit(50);
+    } else {
+        queryBuilder = queryBuilder.limit(20);
+    }
+
+    const { data, error } = await queryBuilder;
+
+    if (error) {
+        console.error('Fetch customers error:', error);
+        return;
+    }
+
     customersCache = data || [];
     renderCustomers();
 }
 
 function renderCustomers() {
     const tbody = document.getElementById('customers-list');
+
+    if (!customersCache.length) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-gray-400">Not found</td></tr>`;
+        return;
+    }
+
     tbody.innerHTML = customersCache.map((c, idx) => `
-        <tr class="hover:bg-gray-50 border-b border-gray-50 last:border-0 transition-colors">
+        <tr class="hover:bg-gray-50 border-b border-gray-50 last:border-0 transition-colors group">
             <td class="p-4 text-center text-gray-400 font-mono text-xs">${idx + 1}</td>
             <td class="p-4">
                 <div class="font-bold text-gray-800">${c.display_name || 'Unknown'}</div>
@@ -571,7 +642,16 @@ function renderCustomers() {
             <td class="p-4 text-center">
                 <span class="inline-block px-2 py-1 rounded-lg bg-amber-50 text-amber-600 font-bold text-xs">${c.tier || 'Member'}</span>
             </td>
-            <td class="p-4 text-right font-bold text-indigo-600">${c.points} pt</td>
+            <td class="p-4 text-right">
+                <div class="flex items-center justify-end gap-2">
+                    <span class="font-bold text-indigo-600">${c.points} pt</span>
+                    <button type="button" 
+                        ${(c.id && c.id !== 'undefined' && c.id !== 'null') ? `onclick="window.openPointsModal('${c.id}')"` : 'disabled'}
+                        class="w-8 h-8 rounded-lg ${(c.id && c.id !== 'undefined' && c.id !== 'null') ? 'bg-gray-100 hover:text-amber-500 hover:bg-amber-50 cursor-pointer active:scale-95' : 'bg-gray-50 text-gray-300 cursor-not-allowed'} flex items-center justify-center text-gray-400 transition-all opacity-100 transform z-10 points-btn">
+                        <i class="fas fa-gift text-xs pointer-events-none"></i>
+                    </button>
+                </div>
+            </td>
             <td class="p-4 text-right text-gray-600">${c.total_orders || 0}</td>
         </tr>
     `).join('');
@@ -685,7 +765,152 @@ function shakeElement(el) {
 }
 
 function playNotificationSound() {
-    // Optional: Add sound file
     // const audio = new Audio('notification.mp3');
     // audio.play().catch(e => console.log('Audio blocked', e));
+}
+
+
+// --- Points Adjustment Logic ---
+
+// Explicitly attach to window to ensure global access
+window.openPointsModal = async function (userId) {
+    console.log('Attempting to open points modal for UserID:', userId);
+
+    try {
+        if (!userId || userId === 'null' || userId === 'undefined') {
+            showToast('ไม่สามารถปรับพอยต์ให้ Guest ได้', 'warning');
+            return;
+        }
+
+        let customer = customersCache.find(c => c.id === userId);
+
+        // If not in cache, fetch single user
+        if (!customer) {
+            console.log('User not in cache, fetching...');
+            // Show loading toast?
+
+            const { data, error } = await supabaseClient
+                .from('profiles')
+                .select('*')
+                .eq('id', userId)
+                .single();
+
+            if (error || !data) {
+                console.error('Fetch error:', error);
+                showToast('ไม่พบข้อมูลลูกค้า (Database Error)', 'error');
+                return;
+            }
+            customer = data;
+            customersCache.push(customer);
+        }
+
+        const currentPoints = customer.points || 0;
+        const name = customer.display_name || 'Customer';
+
+        // Check if elements exist
+        if (!document.getElementById('points-user-id')) {
+            console.error('Modal elements missing');
+            alert('System Error: Modal elements not found');
+            return;
+        }
+
+        document.getElementById('points-user-id').value = userId;
+        document.getElementById('points-modal-user').innerText = name;
+        document.getElementById('points-modal-current').innerText = currentPoints.toLocaleString() + ' pt';
+        document.getElementById('points-amount').value = '';
+        document.getElementById('points-note').value = '';
+
+        // Reset to Add
+        const addRadio = document.querySelector('input[name="point-action"][value="add"]');
+        if (addRadio) addRadio.checked = true;
+
+        const modal = document.getElementById('points-modal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            // Force reflow
+            void modal.offsetWidth;
+
+            modal.classList.remove('opacity-0');
+            modal.classList.add('opacity-100');
+
+            document.getElementById('points-amount').focus();
+        } else {
+            console.error('Points modal not found in DOM!');
+            showToast('System Error: Modal not found', 'error');
+        }
+    } catch (err) {
+        console.error('Error in openPointsModal:', err);
+        showToast('เกิดข้อผิดพลาด: ' + err.message, 'error');
+    }
+}
+
+function closePointsModal() {
+    const modal = document.getElementById('points-modal');
+    modal.classList.remove('opacity-100');
+    modal.classList.add('opacity-0');
+    setTimeout(() => modal.classList.add('hidden'), 300);
+}
+
+async function handlePointsSubmit(e) {
+    e.preventDefault();
+    const userId = document.getElementById('points-user-id').value;
+    const amountInput = document.getElementById('points-amount');
+    const rawAmount = parseInt(amountInput.value);
+    const note = document.getElementById('points-note').value;
+
+    // Get action (add/reduce)
+    const actionEl = document.querySelector('input[name="point-action"]:checked');
+    const isDeduct = actionEl && actionEl.value === 'reduce';
+
+    if (isNaN(rawAmount) || rawAmount <= 0) {
+        showToast('กรุณาระบุจำนวนพอยต์ที่ถูกต้อง (ต้องมากกว่า 0)', 'warning');
+        amountInput.focus();
+        return;
+    }
+
+    const finalAmount = isDeduct ? -rawAmount : rawAmount;
+
+    // Optimistic Update
+    const customer = customersCache.find(c => c.id === userId);
+    if (customer) {
+        const oldPoints = customer.points || 0;
+        const newPoints = Math.max(0, oldPoints + finalAmount);
+
+        if (isDeduct && oldPoints < rawAmount) {
+            if (!confirm(`ลูกค้ามีเพียง ${oldPoints} พอยต์ แต่คุณต้องการหัก ${rawAmount} พอยต์\nพอยต์จะเหลือ 0 ยืนยันหรือไม่?`)) {
+                return;
+            }
+        }
+
+        // 1. Update Profile in Supabase
+        const { error } = await supabaseClient
+            .from('profiles')
+            .update({ points: newPoints })
+            .eq('id', userId);
+
+        if (error) {
+            console.error(error);
+            showToast('ปรับพอยต์ไม่สำเร็จ: ' + error.message, 'error');
+            return;
+        }
+
+        // 2. Success Feedback
+        let msg = isDeduct
+            ? `หัก ${Math.abs(finalAmount)} พอยต์เรียบร้อย 📉`
+            : `เพิ่ม ${finalAmount} พอยต์เรียบร้อย! 🎁`;
+
+        showToast(msg, 'success');
+
+        closePointsModal();
+
+        // Refresh customer list to show new value
+        // Note: If we navigated here from Orders, fetchCustomers might wipe the "found" individual user unless we fetched all.
+        // It's safer to reload fetchCustomers() which handles the list.
+        fetchCustomers();
+
+        // Also refresh orders just in case we display points there? No we don't display user points in order card directly, only ID/Name.
+    } else {
+        // Fallback for uncached user (should be rare as openPointsModal caches it)
+        showToast('User not found in cache, please refresh', 'error');
+    }
 }

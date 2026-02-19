@@ -87,14 +87,18 @@
     <link rel="stylesheet" href="css/navigation.css">
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/redesign.css">
+<link rel="stylesheet" href="css/modern-ui.css">
 
 </head>
 
 <body class="pb-32 font-sans select-none relative overflow-x-hidden safe-area-pt">
 
-    <!-- MINIMAL BACKGROUND (Clean) -->
-    <div class="fixed inset-0 -z-10 bg-[#FDFBF7]"></div>
-    <canvas id="bg-canvas" class="fixed inset-0 -z-10 pointer-events-none"></canvas>
+    <!-- MINIMAL BACKGROUND (Clean Gradient) -->
+    <div class="fixed inset-0 -z-10 bg-gradient-to-br from-[#FDFBF7] via-[#FFFBF2] to-[#FFF0E6]"></div>
+    <div
+        class="fixed inset-0 -z-10 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none mix-blend-overlay">
+    </div>
+    <canvas id="bg-canvas" class="fixed inset-0 -z-10 pointer-events-none hidden"></canvas>
     <canvas id="confetti-canvas" class="fixed inset-0 z-[200] pointer-events-none"></canvas>
 
 
@@ -229,7 +233,7 @@
             <img src="images/logo.png" class="header-logo"
                 onerror="this.src='https://cdn-icons-png.flaticon.com/512/3448/3448609.png'" alt="Shop Logo">
             <div class="header-text">
-                <h1 class="text-[#4A403A]">KAPRAO 52</h1>
+                <h1 class="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">KAPRAO 52</h1>
                 <div class="flex items-center gap-1">
                     <p id="greeting-text">สวัสดีครับ</p>
                     <div id="vip-badge"
@@ -332,14 +336,14 @@
         <!-- Activity Stats -->
         <div class="stats-row">
             <div class="stat-card" onclick="showActiveOrdersList()">
-                <div class="stat-icon bg-blue-50 text-blue-500"><i class="fas fa-clipboard-list"></i></div>
+                <div class="stat-icon"><i class="fas fa-clipboard-list"></i></div>
                 <div class="stat-info overflow-hidden">
                     <h4>สถานะออเดอร์</h4>
-                    <p id="active-orders-count" class="text-sm truncate text-gray-400">ไม่มีออเดอร์</p>
+                    <p id="active-orders-count" class="truncate">ไม่มีออเดอร์</p>
                 </div>
             </div>
             <div class="stat-card" onclick="openPointsHistory()">
-                <div class="stat-icon bg-yellow-50 text-yellow-500"><i class="fas fa-star"></i></div>
+                <div class="stat-icon"><i class="fas fa-star"></i></div>
                 <div class="stat-info w-full">
                     <div class="flex justify-between items-center w-full gap-2">
                         <h4>พอยต์สะสม</h4>
@@ -409,46 +413,86 @@
 
             <!-- Tab Container -->
             <div id="tabs-container"
-                class="sticky top-0 z-30 pt-2 pb-4 -mx-5 px-5 flex gap-3 snap-x scroll-smooth overflow-x-auto hide-scroll transition-all">
+                class="sticky top-0 z-30 pt-2 pb-5 -mx-5 px-5 flex gap-3 snap-x scroll-smooth overflow-x-auto hide-scroll transition-all">
                 <button onclick="switchCategory('favorites')" id="tab-favorites"
-                    class="category-pill category-pill-favorites category-pill-inactive snap-start">
-                    <span class="text-xl tab-icon">❤️</span><span class="text-xs font-bold">ที่ชอบ</span>
+                    class="category-pill category-pill-favorites category-pill-inactive snap-start group">
+                    <div
+                        class="pill-icon-box bg-red-100 text-red-500 group-hover:bg-red-500 group-hover:text-white transition-colors">
+                        <i class="fas fa-heart text-lg"></i>
+                    </div>
+                    <span class="text-xs font-bold text-gray-600 group-[.active]:text-white">ที่ชอบ</span>
                 </button>
                 <button onclick="switchCategory('kaprao')" id="tab-kaprao"
-                    class="category-pill category-pill-active snap-start">
-                    <span class="text-xl tab-icon">🌶️</span><span class="text-xs">กะเพรา</span>
+                    class="category-pill category-pill-active snap-start group">
+                    <div
+                        class="pill-icon-box bg-orange-100 text-orange-500 group-hover:bg-orange-500 group-hover:text-white transition-colors">
+                        <i class="fas fa-pepper-hot text-lg"></i>
+                    </div>
+                    <span class="text-xs font-bold text-gray-600 group-[.active]:text-white">กะเพรา</span>
                 </button>
                 <button onclick="switchCategory('tray')" id="tab-tray"
-                    class="category-pill category-pill-inactive snap-start">
-                    <span class="text-xl tab-icon">🍱</span><span class="text-xs font-bold">ชุดถาด</span>
+                    class="category-pill category-pill-inactive snap-start group">
+                    <div
+                        class="pill-icon-box bg-yellow-100 text-yellow-600 group-hover:bg-yellow-500 group-hover:text-white transition-colors">
+                        <i class="fas fa-utensils text-lg"></i>
+                    </div>
+                    <span class="text-xs font-bold text-gray-600 group-[.active]:text-white">ชุดถาด</span>
                 </button>
                 <button onclick="switchCategory('garlic')" id="tab-garlic"
-                    class="category-pill category-pill-inactive snap-start">
-                    <span class="text-xl tab-icon">🧄</span><span class="text-xs">กระเทียม</span>
+                    class="category-pill category-pill-inactive snap-start group">
+                    <div
+                        class="pill-icon-box bg-amber-100 text-amber-700 group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                        <i class="fas fa-bread-slice text-lg"></i>
+                    </div>
+                    <span class="text-xs font-bold text-gray-600 group-[.active]:text-white">กระเทียม</span>
                 </button>
                 <button onclick="switchCategory('curry')" id="tab-curry"
-                    class="category-pill category-pill-inactive snap-start">
-                    <span class="text-xl tab-icon">🥘</span><span class="text-xs">พริกแกง</span>
+                    class="category-pill category-pill-inactive snap-start group">
+                    <div
+                        class="pill-icon-box bg-red-100 text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
+                        <i class="fas fa-bowl-food text-lg"></i>
+                    </div>
+                    <span class="text-xs font-bold text-gray-600 group-[.active]:text-white">พริกแกง</span>
                 </button>
                 <button onclick="switchCategory('noodle')" id="tab-noodle"
-                    class="category-pill category-pill-inactive snap-start">
-                    <span class="text-xl tab-icon">🍜</span><span class="text-xs">เมนูเส้น</span>
+                    class="category-pill category-pill-inactive snap-start group">
+                    <div
+                        class="pill-icon-box bg-yellow-50 text-yellow-600 group-hover:bg-yellow-500 group-hover:text-white transition-colors">
+                        <i class="fas fa-bacon text-lg"></i>
+                    </div>
+                    <span class="text-xs font-bold text-gray-600 group-[.active]:text-white">เมนูเส้น</span>
                 </button>
                 <button onclick="switchCategory('soup')" id="tab-soup"
-                    class="category-pill category-pill-inactive snap-start">
-                    <span class="text-xl tab-icon">🍲</span><span class="text-xs">แกง/ต้ม</span>
+                    class="category-pill category-pill-inactive snap-start group">
+                    <div
+                        class="pill-icon-box bg-emerald-100 text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+                        <i class="fas fa-mug-hot text-lg"></i>
+                    </div>
+                    <span class="text-xs font-bold text-gray-600 group-[.active]:text-white">แกง/ต้ม</span>
                 </button>
                 <button onclick="switchCategory('others')" id="tab-others"
-                    class="category-pill category-pill-inactive snap-start">
-                    <span class="text-xl tab-icon">🍳</span><span class="text-xs">อื่นๆ</span>
+                    class="category-pill category-pill-inactive snap-start group">
+                    <div
+                        class="pill-icon-box bg-gray-100 text-gray-600 group-hover:bg-gray-600 group-hover:text-white transition-colors">
+                        <i class="fas fa-utensil-spoon text-lg"></i>
+                    </div>
+                    <span class="text-xs font-bold text-gray-600 group-[.active]:text-white">อื่นๆ</span>
                 </button>
                 <button onclick="switchCategory('dessert')" id="tab-dessert"
-                    class="category-pill category-pill-inactive snap-start">
-                    <span class="text-xl tab-icon">🍨</span><span class="text-xs">ของหวาน</span>
+                    class="category-pill category-pill-inactive snap-start group">
+                    <div
+                        class="pill-icon-box bg-pink-100 text-pink-500 group-hover:bg-pink-500 group-hover:text-white transition-colors">
+                        <i class="fas fa-ice-cream text-lg"></i>
+                    </div>
+                    <span class="text-xs font-bold text-gray-600 group-[.active]:text-white">ของหวาน</span>
                 </button>
                 <button onclick="switchCategory('promotion')" id="tab-promotion"
-                    class="category-pill category-pill-promotion snap-start">
-                    <span class="text-xl tab-icon">🧧</span><span class="text-xs font-bold">ส่วนลด</span>
+                    class="category-pill category-pill-promotion snap-start group">
+                    <div
+                        class="pill-icon-box bg-purple-100 text-purple-600 group-hover:bg-purple-500 group-hover:text-white transition-colors">
+                        <i class="fas fa-tags text-lg"></i>
+                    </div>
+                    <span class="text-xs font-bold text-gray-600 group-[.active]:text-white">ส่วนลด</span>
                 </button>
             </div>
 
@@ -563,189 +607,250 @@
     </div>
 
 
-    <!-- Food Detail Modal -->
-    <div id="food-modal" class="fixed inset-0 z-[130] bg-black/40 backdrop-blur-sm hidden transition-opacity opacity-0"
+    <!-- Food Detail Modal - Modern Design -->
+    <div id="food-modal" class="fixed inset-0 z-[130] bg-black/50 backdrop-blur-sm hidden transition-opacity opacity-0"
         onclick="closeModal()"></div>
     <div id="food-sheet"
-        class="fixed bottom-0 w-full max-w-md mx-auto z-[131] transform translate-y-full transition-transform duration-300 bg-white rounded-t-[2.5rem] overflow-hidden shadow-2xl h-[90vh] flex flex-col">
-        <div class="relative h-64 bg-gray-100 shrink-0">
+        class="fixed bottom-0 w-full max-w-md mx-auto z-[131] transform translate-y-full transition-transform duration-300 bg-white overflow-hidden h-[92vh] flex flex-col animate-slide-up">
+        <!-- Image Section -->
+        <div class="relative h-72 bg-gray-100 shrink-0">
             <img id="modal-img" src="" class="w-full h-full object-cover">
-            <div
-                class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-black/30 to-transparent pointer-events-none">
-            </div>
+            <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-black/20 via-transparent to-transparent pointer-events-none"></div>
             <button onclick="closeModal()"
-                class="absolute top-4 right-4 bg-white/20 backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center text-white hover:bg-white/30 transition-all btn-bounce">
+                class="modern-close-btn absolute top-4 right-4">
                 <i class="fas fa-times"></i>
             </button>
         </div>
 
-        <div class="flex-1 overflow-y-auto px-6 py-6 space-y-6 hide-scroll relative bg-white -mt-6 rounded-t-[2.5rem]">
-            <div class="flex justify-between items-start">
-                <div>
-                    <h2 id="modal-title" class="text-2xl font-black text-gray-800 leading-tight mb-1">Title</h2>
-                    <p id="modal-desc" class="text-sm text-gray-500 line-clamp-2"></p>
-                </div>
-                <div class="flex flex-col items-end">
-                    <span id="modal-price-display" class="text-2xl font-black text-indigo-600 tracking-tight">0</span>
-                    <span class="text-xs text-gray-400">บาท</span>
-                </div>
-            </div>
-
-            <div class="border-t border-gray-100 pt-4">
-                <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2 text-sm"><i
-                        class="fas fa-utensils text-yellow-500"></i> ปรับแต่งเมนู</h3>
-                <div id="modal-options" class="space-y-3">
-                    <!-- Dynamic Options -->
+        <!-- Content Section -->
+        <div class="flex-1 overflow-y-auto hide-scroll relative bg-white" style="border-radius: 24px 24px 0 0; margin-top: -20px;">
+            <!-- Title & Price -->
+            <div class="px-6 pt-6 pb-4">
+                <div class="flex justify-between items-start gap-4">
+                    <div class="flex-1">
+                        <h2 id="modal-title" class="text-[1.6rem] font-extrabold text-gray-900 leading-tight mb-1">Title</h2>
+                        <p id="modal-desc" class="text-sm text-gray-500 leading-relaxed"></p>
+                    </div>
+                    <div class="flex flex-col items-end shrink-0">
+                        <span id="modal-price-display" class="text-[1.75rem] font-extrabold text-gray-900 tracking-tight">0</span>
+                        <span class="text-xs text-gray-400 font-medium">บาท</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="border-t border-gray-100 pt-4">
-                <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2 text-sm"><i
-                        class="fas fa-comment-dots text-indigo-400"></i> ข้อความถึงร้าน</h3>
+            <!-- Options Section -->
+            <div class="px-6 py-4 border-t border-gray-100">
+                <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2 text-base">
+                    <i class="fas fa-utensils text-orange-500"></i> 
+                    <span>ปรับแต่งเมนู</span>
+                </h3>
+                <div id="modal-options" class="space-y-2">
+                    <!-- Dynamic Options with modern-option class -->
+                </div>
+            </div>
+
+            <!-- Note Section -->
+            <div class="px-6 py-4 border-t border-gray-100">
+                <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2 text-base">
+                    <i class="fas fa-comment-dots text-indigo-500"></i>
+                    <span>ข้อความถึงร้าน</span>
+                </h3>
                 <textarea id="modal-note"
-                    class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-sm focus:border-indigo-500 focus:ring-0 outline-none resize-none h-20"
+                    class="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm focus:border-gray-900 focus:ring-0 outline-none resize-none h-24 transition-all"
                     placeholder="ไม่ใส่พริก, ข้าวน้อย, แยกน้ำ..."></textarea>
             </div>
+
+            <!-- Spacer for bottom -->
+            <div class="h-32"></div>
         </div>
 
-        <div class="p-4 bg-white border-t border-gray-100 safe-area-pb">
-            <div class="flex items-center gap-4 mb-3">
-                <div class="flex items-center bg-gray-100 rounded-full p-1 border border-gray-200">
-                    <button onclick="adjustModalQty(-1)"
-                        class="w-10 h-10 rounded-full bg-white text-gray-500 flex items-center justify-center shadow-sm hover:text-indigo-600 active:scale-90 transition-all font-bold text-lg">-</button>
-                    <span id="modal-qty" class="w-12 text-center font-black text-lg text-gray-800">1</span>
-                    <button onclick="adjustModalQty(1)"
-                        class="w-10 h-10 rounded-full bg-white text-gray-500 flex items-center justify-center shadow-sm hover:text-indigo-600 active:scale-90 transition-all font-bold text-lg">+</button>
+        <!-- Bottom Action Bar -->
+        <div class="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100 safe-area-pb" style="background: linear-gradient(to top, white 80%, transparent);">
+            <!-- Quantity Stepper -->
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-sm font-semibold text-gray-600">จำนวน</span>
+                <div class="modern-stepper">
+                    <button onclick="adjustModalQty(-1)" class="minus-btn" aria-label="ลดจำนวน"></button>
+                    <span id="modal-qty" class="qty-display">1</span>
+                    <button onclick="adjustModalQty(1)" class="plus-btn" aria-label="เพิ่มจำนวน"></button>
                 </div>
             </div>
-            <button onclick="addToCartFromModal()"
-                class="w-full btn-bounce bg-gray-900 text-white font-bold py-4 rounded-2xl shadow-xl flex items-center justify-between px-6 hover:bg-black transition-colors">
-                <span class="flex items-center gap-2"><i class="fas fa-plus"></i> เพิ่มลงตะกร้า</span>
-                <span id="modal-total-btn" class="text-indigo-300">0 ฿</span>
+            <!-- CTA Button -->
+            <button onclick="addToCartFromModal()" class="modern-cta-btn">
+                <span class="btn-text">
+                    <i class="fas fa-plus"></i>
+                    <span>เพิ่มลงตะกร้า</span>
+                </span>
+                <span id="modal-total-btn" class="btn-price">60 ฿</span>
             </button>
         </div>
     </div>
 
-    <!-- Checkout Sheet -->
+    <!-- Checkout Sheet - Modern Design -->
     <div id="checkout-overlay"
-        class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[150] hidden transition-opacity opacity-0"
+        class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[150] hidden transition-opacity opacity-0"
         onclick="closeCheckout()"></div>
     <div id="checkout-sheet"
-        class="fixed bottom-0 w-full h-[95vh] flex flex-col max-w-md mx-auto z-[150] transform translate-y-full transition-transform duration-300 bg-gray-50/95 backdrop-blur-xl rounded-t-[2rem] overflow-hidden shadow-2xl border-t border-white/20">
-        <div class="flex-none pt-5 pb-3 px-6 bg-white border-b border-gray-100 shadow-sm relative z-20">
-            <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-4"></div>
-            <div class="flex justify-between items-end">
+        class="fixed bottom-0 w-full h-[95vh] flex flex-col max-w-md mx-auto z-[150] transform translate-y-full transition-transform duration-300 bg-gray-50 overflow-hidden animate-slide-up">
+        <!-- Header -->
+        <div class="flex-none pt-5 pb-4 px-6 bg-white border-b border-gray-100 relative z-20">
+            <div class="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-4"></div>
+            <div class="flex justify-between items-center">
                 <div>
-                    <h2 class="text-2xl font-black text-gray-800 leading-none">สรุปรายการ</h2>
-                    <p class="text-xs text-gray-400 mt-1 font-medium">ตรวจสอบความถูกต้องก่อนสั่งนะคร้าบ</p>
+                    <h2 class="text-[1.5rem] font-extrabold text-gray-900">สรุปรายการ</h2>
+                    <p class="text-sm text-gray-500 mt-1">ตรวจสอบความถูกต้องก่อนสั่งนะครับ</p>
                 </div>
                 <button onclick="closeCheckout()"
-                    class="btn-bounce w-10 h-10 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center hover:bg-gray-200 transition-colors">
-                    <i class="fas fa-times text-sm"></i>
+                    class="modern-close-btn shrink-0">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
         </div>
-        <div id="checkout-scrollable" class="flex-1 overflow-y-auto hide-scroll p-5 space-y-5 pb-32">
-            <div id="order-id-banner" class="hidden"></div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                <h3 class="text-sm font-bold text-gray-400 mb-3 flex items-center gap-2"><i class="fas fa-utensils"></i>
-                    รายการอาหาร</h3>
-                <div id="cart-list-container" class="space-y-4"></div>
+        
+        <!-- Scrollable Content -->
+        <div id="checkout-scrollable" class="flex-1 overflow-y-auto hide-scroll p-5 space-y-4 pb-40">
+            <!-- Promotion Card -->
+            <div class="modern-promo-card">
+                <div class="promo-icon">🎟️</div>
+                <div class="promo-content">
+                    <div class="promo-label">สิทธิพิเศษ</div>
+                    <div class="promo-title">ลุ้นหวยกินฟรี!</div>
+                    <div class="promo-date">
+                        <i class="far fa-calendar-alt"></i>
+                        <span>งวด 1 มี.ค. 69</span>
+                    </div>
+                </div>
             </div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                <h3 class="text-sm font-bold text-gray-400 mb-3 flex items-center gap-2"><i class="fas fa-user"></i>
-                    ข้อมูลผู้สั่ง</h3>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i
-                            class="fas fa-pen text-[#B58D67]"></i></div>
-                    <input type="text" id="user-name" maxlength="20" placeholder="ชื่อเล่น / Note ถึงร้าน..."
-                        class="block w-full pl-10 pr-3 py-3 border-2 border-[#E7E5E0] rounded-xl leading-5 bg-[#FAFAF9] placeholder-gray-400 focus:outline-none focus:bg-white focus:border-[#B58D67] focus:ring-0 transition-colors sm:text-sm font-bold text-[#3F3733]">
 
+            <!-- Cart Items -->
+            <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+                <div class="px-5 py-4 border-b border-gray-100">
+                    <h3 class="text-sm font-bold text-gray-500 flex items-center gap-2">
+                        <i class="fas fa-utensils text-gray-400"></i>
+                        รายการอาหาร
+                    </h3>
+                </div>
+                <div id="cart-list-container" class="divide-y divide-gray-50">
+                    <!-- Dynamic Cart Items -->
+                </div>
+                <!-- Empty State (shown when cart is empty) -->
+                <div id="cart-empty-state" class="modern-empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-shopping-basket"></i>
+                    </div>
+                    <div class="empty-title">ตะกร้าว่างเปล่า</div>
+                    <div class="empty-subtitle">ยังไม่มีรายการอาหาร</div>
+                    <button onclick="closeCheckout(); scrollToTop();" class="mt-4 text-sm font-bold text-gray-900 underline">เลือกเมนูอาหาร</button>
                 </div>
             </div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                <h3 class="text-sm font-bold text-gray-400 mb-3 flex items-center gap-2"><i class="fas fa-tags"></i>
-                    คูปอง & พอยต์</h3>
-                <div class="flex gap-2 mb-3">
-                    <div id="code-input-container"
-                        class="flex-1 bg-gray-50 rounded-xl px-3 py-2 flex items-center gap-2 border border-gray-100">
-                        <i class="fas fa-ticket-alt text-gray-400" id="code-icon"></i>
-                        <input type="text" id="discount-code" placeholder="ใส่โค้ดลดราคา"
-                            class="bg-transparent w-full text-sm outline-none text-gray-800 placeholder:text-gray-400 uppercase font-bold">
-                    </div>
-                    <button onclick="applyDiscount()" id="btn-apply-code"
-                        class="btn-bounce bg-gray-800 text-white font-bold px-4 rounded-xl text-xs shadow-lg hover:bg-gray-700 transition-all">ใช้โค้ด</button>
+
+            <!-- User Info -->
+            <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+                <div class="px-5 py-4 border-b border-gray-100">
+                    <h3 class="text-sm font-bold text-gray-500 flex items-center gap-2">
+                        <i class="fas fa-user text-gray-400"></i>
+                        ข้อมูลผู้สั่ง
+                    </h3>
                 </div>
-                <p id="discount-msg" class="text-[10px] font-medium text-gray-500 pl-1 mb-3 min-h-[1.25rem]"></p>
-                <div
-                    class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-3 border border-yellow-100 relative overflow-hidden">
-                    <div class="flex justify-between items-center mb-2 relative z-10">
-                        <div class="flex items-center gap-2">
-                            <div
-                                class="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center text-white shadow-sm font-bold text-xs">
-                                <i class="fas fa-star"></i>
-                            </div>
-                            <div>
-                                <div class="text-[10px] text-yellow-700 font-bold uppercase tracking-wider">Kaprao
-                                    Points</div>
-                                <div class="text-xs font-bold text-gray-800" id="user-points-balance">มี <span
-                                        id="available-points">0</span> แต้ม</div>
-                            </div>
-                        </div>
-                        <button id="points-toggle-btn" onclick="togglePointsUsage()"
-                            class="text-[10px] bg-white text-yellow-600 border border-yellow-200 px-3 py-1.5 rounded-lg font-bold shadow-sm active:scale-95 transition-transform">แลกคะแนน</button>
+                <div class="p-4">
+                    <div class="modern-input-field">
+                        <i class="fas fa-pen"></i>
+                        <input type="text" id="user-name" maxlength="20" placeholder="ชื่อเล่นของคุณ...">
                     </div>
-                    <div id="points-controls-container"
-                        class="hidden pt-2 border-t border-yellow-200/50 mt-2 relative z-10 animate-fade-in-down">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-[10px] text-yellow-700">ใช้: <span id="points-used-display"
-                                    class="font-bold text-indigo-600">0</span> พอยต์</span>
-                            <span class="text-xs font-bold text-red-500">ลด <span id="points-discount-display">0</span>
-                                บาท</span>
+                </div>
+            </div>
+
+            <!-- Discount & Points -->
+            <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+                <div class="px-5 py-4 border-b border-gray-100">
+                    <h3 class="text-sm font-bold text-gray-500 flex items-center gap-2">
+                        <i class="fas fa-tags text-gray-400"></i>
+                        คูปอง & พอยต์
+                    </h3>
+                </div>
+                <div class="p-4 space-y-4">
+                    <!-- Promo Code -->
+                    <div class="flex gap-2">
+                        <div class="flex-1 relative">
+                            <i class="fas fa-ticket-alt absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="discount-code" placeholder="ใส่โค้ดลดราคา"
+                                class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold uppercase focus:border-gray-900 focus:outline-none transition-all">
                         </div>
-                        <div class="points-range-container mb-2">
+                        <button onclick="applyDiscount()" id="btn-apply-code"
+                            class="px-5 py-3 bg-gray-900 text-white font-bold text-sm rounded-xl hover:bg-gray-800 transition-all">ใช้โค้ด</button>
+                    </div>
+                    <p id="discount-msg" class="text-xs text-gray-500 pl-1 min-h-[1rem]"></p>
+                    
+                    <!-- Points Section -->
+                    <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4 border border-amber-100">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-amber-400 rounded-full flex items-center justify-center text-white shadow-sm">
+                                    <i class="fas fa-star text-sm"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-amber-700 font-bold">Kaprao Points</div>
+                                    <div class="text-sm font-bold text-gray-800">มี <span id="available-points">0</span> แต้ม</div>
+                                </div>
+                            </div>
+                            <button id="points-toggle-btn" onclick="togglePointsUsage()"
+                                class="text-xs bg-white text-amber-600 border border-amber-200 px-3 py-2 rounded-lg font-bold shadow-sm active:scale-95 transition-transform">แลกคะแนน</button>
+                        </div>
+                        <div id="points-controls-container" class="hidden pt-3 mt-3 border-t border-amber-200/50">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs text-amber-700">ใช้: <span id="points-used-display" class="font-bold text-indigo-600">0</span> พอยต์</span>
+                                <span class="text-sm font-bold text-green-600">ลด <span id="points-discount-display">0</span> บาท</span>
+                            </div>
                             <input type="range" id="points-range" min="0" max="100" value="0" step="10"
-                                class="points-range w-full h-1.5 bg-yellow-200 rounded-lg appearance-none cursor-pointer accent-yellow-500">
-                            <div class="flex justify-between text-[9px] text-yellow-600 mt-1"><span>0</span><span
-                                    id="points-max">100</span></div>
-                        </div>
-                        <div class="flex gap-2">
+                                class="w-full h-1.5 bg-amber-200 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                            <div class="flex justify-between text-[10px] text-amber-600 mt-1">
+                                <span>0</span>
+                                <span id="points-max">100</span>
+                            </div>
                             <input type="hidden" id="points-input" value="0">
-                            <div class="flex-1 text-[9px] text-yellow-600 flex items-center justify-end">*100 แต้ม =
-                                10
-                                บาท</div>
+                            <div class="text-[10px] text-amber-600 text-right mt-1">*100 แต้ม = 10 บาท</div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                <h3 class="text-sm font-bold text-gray-400 mb-3">สรุปยอดชำระ</h3>
-                <div class="space-y-2 text-sm">
-                    <div class="flex justify-between text-gray-500"><span>ยอดรวม (Subtotal)</span><span
-                            id="summary-subtotal" class="font-medium">0.-</span></div>
-                    <div id="discount-summary" class="flex justify-between text-green-500 hidden"><span><i
-                                class="fas fa-ticket-alt mr-1"></i> ส่วนลดโค้ด</span><span class="font-bold">-0.-</span>
+
+            <!-- Summary -->
+            <div class="bg-white rounded-2xl border border-gray-100 p-5">
+                <h3 class="text-sm font-bold text-gray-500 mb-4">สรุปยอดชำระ</h3>
+                <div class="space-y-3">
+                    <div class="modern-summary-row">
+                        <span class="label">ยอดรวม</span>
+                        <span id="summary-subtotal" class="value">0.-</span>
                     </div>
-                    <div id="points-summary" class="flex justify-between text-yellow-500 hidden"><span><i
-                                class="fas fa-coins mr-1"></i> ส่วนลดพอยต์</span><span class="font-bold">-0.-</span>
+                    <div id="discount-summary" class="modern-summary-row discount hidden">
+                        <span class="label"><i class="fas fa-ticket-alt mr-1"></i> ส่วนลดโค้ด</span>
+                        <span class="value">-0.-</span>
                     </div>
-                    <div class="border-t border-gray-100 my-2 pt-2 flex justify-between items-end"><span
-                            class="font-bold text-gray-800 text-lg">ยอดสุทธิ</span><span id="summary-grand-total"
-                            class="font-black text-2xl text-indigo-600 leading-none">0.-</span></div>
+                    <div id="points-summary" class="modern-summary-row discount hidden">
+                        <span class="label"><i class="fas fa-coins mr-1"></i> ส่วนลดพอยต์</span>
+                        <span class="value">-0.-</span>
+                    </div>
+                    <div class="modern-summary-row total">
+                        <span class="label">ยอดสุทธิ</span>
+                        <span id="summary-grand-total" class="value">0.-</span>
+                    </div>
                 </div>
             </div>
-            <div class="h-10"></div>
         </div>
-        <div
-            class="absolute bottom-0 left-0 right-0 p-5 bg-white border-t border-gray-100 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] safe-area-pb-plus z-30">
-            <button onclick="selectPaymentMethod()" id="btn-submit-order"
-                class="btn-bounce w-full bg-gradient-to-r from-gray-900 to-gray-800 text-white font-bold text-lg py-4 rounded-2xl shadow-xl shadow-gray-300 flex justify-between items-center px-6 group hover:shadow-2xl transition-all">
-                <span class="flex items-center gap-2 text-sm font-medium opacity-80"><i
-                        class="fab fa-line text-green-400 text-lg"></i> ยืนยันออเดอร์</span>
-                <div class="flex items-center gap-2 group-active:scale-95 transition-transform">
-                    <span>ส่งเลย</span><i
-                        class="fas fa-arrow-right bg-white/20 rounded-full w-6 h-6 flex items-center justify-center text-xs"></i>
-                </div>
+
+        <!-- Bottom Submit Button -->
+        <div class="absolute bottom-0 left-0 right-0 p-5 bg-white border-t border-gray-100 safe-area-pb-plus z-30">
+            <button onclick="selectPaymentMethod()" id="btn-submit-order" class="modern-submit-btn">
+                <span class="btn-left">
+                    <i class="fab fa-line text-green-400 text-xl"></i>
+                    <span>ยืนยันออเดอร์</span>
+                </span>
+                <span class="btn-right">
+                    <span>ส่งเลย</span>
+                    <span class="arrow-icon">
+                        <i class="fas fa-arrow-right"></i>
+                    </span>
+                </span>
             </button>
         </div>
     </div>
@@ -772,6 +877,99 @@
         <!-- Content -->
         <div id="order-tracking-content" class="flex-1 overflow-y-auto hide-scroll p-5 bg-gray-50/50 pb-24">
             <!-- Dynamic Content Routed by JS -->
+        </div>
+    </div>
+
+    <!-- More Menu Modal - Modern Design -->
+    <div id="more-menu-overlay"
+        class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[140] hidden transition-opacity opacity-0"
+        onclick="closeMoreMenu()">
+    </div>
+    <div id="more-menu-sheet"
+        class="fixed bottom-0 w-full h-[85vh] flex flex-col max-w-md mx-auto z-[141] transform translate-y-full transition-transform duration-300 bg-gray-50 overflow-hidden animate-slide-up">
+        <!-- Header -->
+        <div class="flex-none pt-5 pb-4 px-6 bg-white border-b border-gray-100">
+            <div class="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-4"></div>
+            <div class="flex justify-between items-center">
+                <h2 class="text-[1.5rem] font-extrabold text-gray-900">เมนูเพิ่มเติม</h2>
+                <button onclick="closeMoreMenu()" class="modern-close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Content -->
+        <div class="flex-1 overflow-y-auto hide-scroll p-5 space-y-6 pb-24">
+            <!-- LINE Login Button -->
+            <button onclick="loginWithLine()" class="modern-line-btn">
+                <span class="btn-content">
+                    <span class="line-icon">
+                        <i class="fab fa-line"></i>
+                    </span>
+                    <span class="btn-text">
+                        <span class="btn-title">เข้าสู่ระบบด้วย LINE</span>
+                        <span class="btn-subtitle">สะสมแต้มและดูประวัติการสั่ง</span>
+                    </span>
+                </span>
+                <i class="fas fa-chevron-right text-lg opacity-80"></i>
+            </button>
+
+            <!-- Events & Promotions -->
+            <div>
+                <h3 class="modern-section-title">กิจกรรมและโปรโมชั่น</h3>
+                <div class="modern-grid-2">
+                    <div class="modern-grid-card pink" onclick="openWheelOfFortune()">
+                        <div class="card-icon">🎡</div>
+                        <div class="card-title">วงล้อเสี่ยงโชค</div>
+                    </div>
+                    <div class="modern-grid-card blue" onclick="openMyTickets()">
+                        <div class="card-icon">🎫</div>
+                        <div class="card-title">ตั๋วหวยของฉัน</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- General Menu -->
+            <div>
+                <h3 class="modern-section-title">ทั่วไป</h3>
+                <div class="modern-list">
+                    <div class="modern-list-item yellow" onclick="openPointsHistory()">
+                        <div class="item-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="item-content">
+                            <div class="item-title">ประวัติพอยต์</div>
+                            <div class="item-subtitle">ดูรายการได้และใช้พอยต์</div>
+                        </div>
+                        <i class="fas fa-chevron-right item-arrow"></i>
+                    </div>
+                    <div class="modern-list-item green" onclick="openQuickOrderModal()">
+                        <div class="item-icon">
+                            <i class="fas fa-redo"></i>
+                        </div>
+                        <div class="item-content">
+                            <div class="item-title">สั่งซ้ำ (Re-order)</div>
+                            <div class="item-subtitle">เลือกจากประวัติการสั่ง</div>
+                        </div>
+                        <i class="fas fa-chevron-right item-arrow"></i>
+                    </div>
+                    <div class="modern-list-item gray" onclick="openAdminLoginModal()">
+                        <div class="item-icon">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <div class="item-content">
+                            <div class="item-title">โหมดเจ้าของร้าน</div>
+                            <div class="item-subtitle">จัดการร้านค้า (Admin)</div>
+                        </div>
+                        <i class="fas fa-chevron-right item-arrow"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- App Version -->
+            <div class="app-version">
+                Kaprao52 App v1.0.0
+            </div>
         </div>
     </div>
 
