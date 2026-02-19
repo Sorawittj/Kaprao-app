@@ -233,31 +233,33 @@
             <img src="images/logo.png" class="header-logo"
                 onerror="this.src='https://cdn-icons-png.flaticon.com/512/3448/3448609.png'" alt="Shop Logo">
             <div class="header-text">
-                <h1 class="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">KAPRAO 52</h1>
-                <div class="flex items-center gap-1">
-                    <p id="greeting-text">สวัสดีครับ</p>
-                    <div id="vip-badge"
-                        class="hidden text-[10px] bg-yellow-100 text-yellow-800 px-1 rounded border border-yellow-200">
-                        VIP</div>
+                <h1>KAPRAO<br>52</h1>
+                <div class="flex items-center gap-2">
+                    <p id="greeting-text">สวัสดี, น้องสี่หัว</p>
+                    <div id="vip-badge" class="hidden">VIP</div>
                 </div>
             </div>
         </div>
         <div class="header-right">
-            <button onclick="i18n.setLanguage(i18n.currentLang === 'th' ? 'en' : 'th')"
-                class="icon-btn border border-gray-200">
-                <span class="text-xs font-bold uppercase" id="lang-display">TH</span>
+            <!-- Language Button -->
+            <button onclick="i18n.setLanguage(i18n.currentLang === 'th' ? 'en' : 'th')" class="icon-btn" aria-label="เปลี่ยนภาษา">
+                <span id="lang-display">TH</span>
             </button>
-            <button onclick="openPointsHistory()" class="icon-btn">
-                <i class="fas fa-coins text-yellow-500"></i>
+            
+            <!-- Points Button -->
+            <button onclick="openPointsHistory()" class="icon-btn" aria-label="ประวัติพอยต์">
+                <i class="fas fa-coins"></i>
             </button>
-            <div class="icon-btn" onclick="openAvatarModal()" id="header-avatar-btn">
-                <img id="avatar-img" src="" class="w-full h-full rounded-full object-cover hidden" alt="Profile">
-                <i class="fas fa-user text-gray-400" id="default-avatar-icon"></i>
+            
+            <!-- Avatar Button -->
+            <div class="icon-btn" onclick="openAvatarModal()" id="header-avatar-btn" aria-label="เปลี่ยนรูปประจำตัว">
+                <img id="avatar-img" src="" class="hidden" alt="Profile">
+                <span id="default-avatar-icon">🐶</span>
             </div>
-            <button id="line-login-btn" onclick="loginWithLine()"
-                class="hidden icon-btn bg-[#06C755] text-white border-transparent w-auto px-3 rounded-full text-sm font-bold shadow-md hover:bg-[#05b34c] transition-all flex items-center gap-1">
-                <i class="fab fa-line text-lg"></i>
-                <span class="hidden sm:inline">เข้าสู่ระบบ</span>
+            
+            <!-- LINE Login Button -->
+            <button id="line-login-btn" onclick="loginWithLine()" class="hidden icon-btn" aria-label="เข้าสู่ระบบด้วย LINE">
+                <i class="fab fa-line"></i>
             </button>
         </div>
     </div>
