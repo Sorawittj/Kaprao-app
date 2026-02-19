@@ -46,6 +46,24 @@
     background: var(--modern-card);
     border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
     box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15);
+    /* Ensure modal shows above other content */
+    z-index: 131;
+}
+
+/* Bottom Action Bar - Fixed at bottom of modal */
+#food-sheet > div.absolute.bottom-0 {
+    background: white !important;
+    z-index: 10;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+/* Ensure content area scrolls properly */
+#food-sheet .flex-1.overflow-y-auto {
+    padding-bottom: 180px; /* Space for bottom action bar */
 }
 
 #food-sheet .relative.h-64 {
@@ -285,6 +303,10 @@
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: 0 4px 15px rgba(17, 24, 39, 0.2);
+    /* Ensure button is visible and clickable */
+    position: relative;
+    z-index: 1;
+    min-height: 56px;
 }
 
 .modern-cta-btn:hover {
