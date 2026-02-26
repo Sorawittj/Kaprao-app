@@ -108,7 +108,15 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
             onLoad={() => setImageLoaded(true)}
             onError={(e) => {
               setImageLoaded(true)
-                ; (e.target as HTMLImageElement).src = getValidImageUrl(null)
+              const target = e.target as HTMLImageElement;
+              const fallback = getValidImageUrl(null);
+              // Prevent infinite loop if the fallback image also fails
+              if (target.src !== new URL(fallback, window.location.href).href) {
+                target.src = fallback;
+              } else {
+                // If the fallback (logo.png) ALSO fails, use a reliable inline placeholder
+                target.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmM2YzIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmaWxsPSIjOTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+Tm8gSW1hZ2U8L3RleHQ+PC9zdmc+';
+              }
             }}
           />
 
