@@ -26,10 +26,15 @@ ON CONFLICT (key) DO NOTHING;
 ALTER TABLE public.shop_config ENABLE ROW LEVEL SECURITY;
 
 -- Policy: ทุกคนอ่านได้, แอดมินเท่านั้นที่แก้ไขได้
+DROP POLICY IF EXISTS "shop_config_select_all" ON public.shop_config;
 CREATE POLICY "shop_config_select_all" ON public.shop_config FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "shop_config_update_admin" ON public.shop_config;
 CREATE POLICY "shop_config_update_admin" ON public.shop_config FOR UPDATE USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
 );
+
+DROP POLICY IF EXISTS "shop_config_insert_admin" ON public.shop_config;
 CREATE POLICY "shop_config_insert_admin" ON public.shop_config FOR INSERT WITH CHECK (
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
 );
@@ -86,9 +91,16 @@ CREATE INDEX IF NOT EXISTS idx_reviews_created_at ON public.reviews(created_at D
 ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.review_votes ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "reviews_select_all" ON public.reviews;
 CREATE POLICY "reviews_select_all" ON public.reviews FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "reviews_insert_own" ON public.reviews;
 CREATE POLICY "reviews_insert_own" ON public.reviews FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "reviews_update_own" ON public.reviews;
 CREATE POLICY "reviews_update_own" ON public.reviews FOR UPDATE USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "reviews_delete_admin" ON public.reviews;
 CREATE POLICY "reviews_delete_admin" ON public.reviews FOR DELETE USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
 );
@@ -138,12 +150,18 @@ CREATE INDEX IF NOT EXISTS idx_coupon_usages_coupon ON public.coupon_usages(coup
 ALTER TABLE public.coupons ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.coupon_usages ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "coupons_select_active" ON public.coupons;
 CREATE POLICY "coupons_select_active" ON public.coupons FOR SELECT USING (is_active = true AND (expires_at IS NULL OR expires_at > now()));
+
+DROP POLICY IF EXISTS "coupons_admin_all" ON public.coupons;
 CREATE POLICY "coupons_admin_all" ON public.coupons FOR ALL USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
 );
 
+DROP POLICY IF EXISTS "coupon_usages_select_own" ON public.coupon_usages;
 CREATE POLICY "coupon_usages_select_own" ON public.coupon_usages FOR SELECT USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "coupon_usages_insert_own" ON public.coupon_usages;
 CREATE POLICY "coupon_usages_insert_own" ON public.coupon_usages FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 -- ============================================================
@@ -195,7 +213,10 @@ $$;
 
 -- RLS
 ALTER TABLE public.order_slots ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "order_slots_select_all" ON public.order_slots;
 CREATE POLICY "order_slots_select_all" ON public.order_slots FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "order_slots_update_admin" ON public.order_slots;
 CREATE POLICY "order_slots_update_admin" ON public.order_slots FOR UPDATE USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
 );
@@ -254,19 +275,28 @@ ALTER TABLE public.inventory_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.menu_item_ingredients ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.inventory_transactions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "inventory_select_all" ON public.inventory_items;
 CREATE POLICY "inventory_select_all" ON public.inventory_items FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "inventory_admin_all" ON public.inventory_items;
 CREATE POLICY "inventory_admin_all" ON public.inventory_items FOR ALL USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
 );
 
+DROP POLICY IF EXISTS "menu_item_ingredients_select_all" ON public.menu_item_ingredients;
 CREATE POLICY "menu_item_ingredients_select_all" ON public.menu_item_ingredients FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "menu_item_ingredients_admin_all" ON public.menu_item_ingredients;
 CREATE POLICY "menu_item_ingredients_admin_all" ON public.menu_item_ingredients FOR ALL USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
 );
 
+DROP POLICY IF EXISTS "inventory_transactions_select_admin" ON public.inventory_transactions;
 CREATE POLICY "inventory_transactions_select_admin" ON public.inventory_transactions FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
 );
+
+DROP POLICY IF EXISTS "inventory_transactions_insert_admin" ON public.inventory_transactions;
 CREATE POLICY "inventory_transactions_insert_admin" ON public.inventory_transactions FOR INSERT WITH CHECK (
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
 );
@@ -359,8 +389,13 @@ CREATE INDEX IF NOT EXISTS idx_push_tokens_user ON public.push_tokens(user_id);
 CREATE INDEX IF NOT EXISTS idx_push_tokens_active ON public.push_tokens(is_active);
 
 ALTER TABLE public.push_tokens ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "push_tokens_select_own" ON public.push_tokens;
 CREATE POLICY "push_tokens_select_own" ON public.push_tokens FOR SELECT USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "push_tokens_insert_own" ON public.push_tokens;
 CREATE POLICY "push_tokens_insert_own" ON public.push_tokens FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "push_tokens_delete_own" ON public.push_tokens;
 CREATE POLICY "push_tokens_delete_own" ON public.push_tokens FOR DELETE USING (auth.uid() = user_id);
 
 -- ============================================================
@@ -383,7 +418,10 @@ CREATE INDEX IF NOT EXISTS idx_notifications_user ON public.notifications(user_i
 CREATE INDEX IF NOT EXISTS idx_notifications_unread ON public.notifications(user_id, is_read);
 
 ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "notifications_select_own" ON public.notifications;
 CREATE POLICY "notifications_select_own" ON public.notifications FOR SELECT USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "notifications_update_own" ON public.notifications;
 CREATE POLICY "notifications_update_own" ON public.notifications FOR UPDATE USING (auth.uid() = user_id);
 
 -- ============================================================
@@ -403,6 +441,7 @@ CREATE TABLE IF NOT EXISTS public.backup_logs (
 );
 
 ALTER TABLE public.backup_logs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "backup_logs_admin" ON public.backup_logs;
 CREATE POLICY "backup_logs_admin" ON public.backup_logs FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
 );
