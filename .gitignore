@@ -1,6 +1,6 @@
 # Images - keep local only
-/images/*
-!/images/.gitkeep
+/_local_images/*
+!/_local_images/.gitkeep
 
 # Dependencies
 node_modules/
