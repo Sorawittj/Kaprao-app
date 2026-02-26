@@ -98,7 +98,7 @@ export function CartDrawer() {
                         src={getValidImageUrl(item.menuItem.imageUrl)}
                         alt={item.menuItem.name}
                         className="w-[72px] h-[72px] rounded-xl object-cover flex-shrink-0"
-                        onError={(e) => { (e.target as HTMLImageElement).src = '/images/logo.png' }}
+                        onError={(e) => { (e.target as HTMLImageElement).src = getValidImageUrl(null) }}
                       />
 
                       <div className="flex-1 min-w-0">

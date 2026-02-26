@@ -216,7 +216,7 @@ export default function CartPage() {
                         alt={item.menuItem.name}
                         className="w-20 h-20 rounded-xl object-cover bg-gray-100"
                         onError={(e) => {
-                          (e.target as HTMLImageElement).src = '/images/logo.png'
+                          (e.target as HTMLImageElement).src = getValidImageUrl(null)
                         }}
                       />
                       <div className="flex-1 min-w-0">

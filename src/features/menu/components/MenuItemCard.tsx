@@ -108,7 +108,7 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
             onLoad={() => setImageLoaded(true)}
             onError={(e) => {
               setImageLoaded(true)
-                ; (e.target as HTMLImageElement).src = '/images/logo.png'
+                ; (e.target as HTMLImageElement).src = getValidImageUrl(null)
             }}
           />
 
