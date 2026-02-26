@@ -88,7 +88,7 @@ export async function loginWithLine(): Promise<void> {
   }
 
   if (!liffInstance.isLoggedIn()) {
-    liffInstance.login({ redirectUri: window.location.origin })
+    liffInstance.login({ redirectUri: window.location.href })
   }
 }
 

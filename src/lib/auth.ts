@@ -5,6 +5,20 @@ import { useAuthStore } from '@/store'
 // ─── Login with LINE ──────────────────────────────────────────────────────────
 export async function loginWithLine(): Promise<void> {
   try {
+    // Development mock to prevent 400 Bad Request on localhost
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      console.log('🚧 Dev mode: mocking LINE login...')
+      sessionStorage.removeItem('kaprao_guest_mode')
+      localStorage.setItem('kaprao_user_data', JSON.stringify({
+        userId: 'local-dev-' + Math.random().toString(36).slice(2, 8),
+        lineUserId: 'local-dev-line-' + Math.random().toString(36).slice(2, 8),
+        name: 'Dev User 🧑‍💻',
+        image: `https://api.dicebear.com/7.x/avataaars/svg?seed=${Date.now()}`
+      }))
+      window.location.reload()
+      return
+    }
+
     if (!isLiffInitialized()) {
       const initialized = await initLiff()
       if (!initialized) {
@@ -15,7 +29,7 @@ export async function loginWithLine(): Promise<void> {
     const liff = (await import('@line/liff')).default
 
     if (!liff.isLoggedIn()) {
-      liff.login({ redirectUri: window.location.origin })
+      liff.login({ redirectUri: window.location.href })
     }
   } catch (error) {
     console.error('LINE Login Error:', error)
