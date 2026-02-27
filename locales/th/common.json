@@ -1,0 +1,163 @@
+{
+  "app": {
+    "name": "Kaprao52",
+    "tagline": "กะเพราอร่อยที่สุดในซอย",
+    "description": "สั่งอาหารออนไลน์ สะสมแต้ม ลุ้นหวยกินฟรี"
+  },
+  "nav": {
+    "home": "หน้าแรก",
+    "menu": "เมนู",
+    "cart": "ตะกร้า",
+    "orders": "รายการสั่งซื้อ",
+    "profile": "โปรไฟล์",
+    "admin": "แอดมิน"
+  },
+  "auth": {
+    "login": "เข้าสู่ระบบ",
+    "logout": "ออกจากระบบ",
+    "loginWithLine": "เข้าสู่ระบบด้วย LINE",
+    "guest": "ดูเมนูก่อน (ไม่ต้อง Login)",
+    "welcome": "ยินดีต้อนรับ!",
+    "welcomeSubtitle": "กะเพรา 52 — เมนูเด็ด สั่งง่าย ส่งไวถึงที่",
+    "loginBenefits": {
+      "points": "สะสมแต้ม",
+      "lottery": "ลุ้นหวย",
+      "rewards": "แลกรางวัล"
+    }
+  },
+  "menu": {
+    "categories": {
+      "favorites": "รายการโปรด",
+      "kaprao": "กะเพรา",
+      "curry": "แกง",
+      "noodle": "เส้น",
+      "bamboo": "หน่อไม้",
+      "garlic": "กระเทียม",
+      "others": "อื่นๆ"
+    },
+    "search": "ค้นหาเมนู...",
+    "addToCart": "เพิ่มลงตะกร้า",
+    "customize": "ปรับแต่ง",
+    "spicyLevel": "ระดับความเผ็ด",
+    "egg": "ไข่",
+    "meat": "เนื้อสัตว์",
+    "extra": "ท็อปปิ้งเพิ่มเติม",
+    "note": "หมายเหตุพิเศษ"
+  },
+  "cart": {
+    "title": "ตะกร้าสินค้า",
+    "empty": "ตะกร้าว่างเปล่า",
+    "emptyMessage": "เพิ่มเมนูโปรดของคุณ",
+    "itemCount": "{{count}} รายการ",
+    "subtotal": "ยอดรวม",
+    "discount": "ส่วนลด",
+    "pointsDiscount": "ส่วนลดจากพอยต์",
+    "total": "ยอดสุทธิ",
+    "checkout": "สั่งซื้อ",
+    "continueShopping": "เลือกเมนูต่อ",
+    "applyCoupon": "ใช้คูปอง",
+    "usePoints": "ใช้พอยต์",
+    "pointsAvailable": "พอยต์ที่มี"
+  },
+  "checkout": {
+    "title": "ยืนยันการสั่งซื้อ",
+    "customerInfo": "ข้อมูลผู้สั่งซื้อ",
+    "name": "ชื่อ-นามสกุล",
+    "phone": "เบอร์โทรศัพท์",
+    "address": "ที่อยู่จัดส่ง",
+    "deliveryMethod": "วิธีรับอาหาร",
+    "workplace": "ส่งที่ทำงาน",
+    "workplaceDesc": "ในวันทำการถัดไป",
+    "village": "ส่งในหมู่บ้าน",
+    "villageDesc": "กรุณาระบุบ้านเลขที่และซอย",
+    "paymentMethod": "วิธีชำระเงิน",
+    "cash": "เงินสด",
+    "cashDesc": "ชำระเงินสดเมื่อรับอาหาร",
+    "transfer": "โอนเงิน",
+    "transferDesc": "สแกน QR Code เพื่อชำระเงิน",
+    "specialInstructions": "หมายเหตุเพิ่มเติม",
+    "placeOrder": "ยืนยันการสั่งซื้อ",
+    "processing": "กำลังประมวลผล...",
+    "rewards": "รางวัลที่จะได้รับ",
+    "pointsEarned": "รับ {{points}} พอยต์",
+    "ticketsEarned": "รับ {{tickets}} ตั๋วหวย"
+  },
+  "order": {
+    "success": "สั่งซื้อสำเร็จ!",
+    "orderNumber": "ออเดอร์ #{{id}}",
+    "thankYou": "ขอบคุณที่อุดหนุน",
+    "viewDetails": "ดูรายละเอียดออเดอร์",
+    "viewAllOrders": "ดูรายการสั่งซื้อทั้งหมด",
+    "status": {
+      "pending": "รอดำเนินการ",
+      "placed": "สั่งซื้อแล้ว",
+      "confirmed": "รับออเดอร์",
+      "preparing": "กำลังปรุง",
+      "ready": "พร้อมรับ",
+      "delivered": "จัดส่งแล้ว",
+      "cancelled": "ยกเลิก"
+    },
+    "tracking": "ติดตามสถานะ",
+    "estimatedTime": "เวลาที่คาดว่าจะเสร็จ"
+  },
+  "points": {
+    "title": "พอยต์",
+    "balance": "พอยต์คงเหลือ",
+    "earn": "สะสมพอยต์",
+    "redeem": "แลกพอยต์",
+    "history": "ประวัติ",
+    "tier": {
+      "member": "สมาชิก",
+      "silver": "Silver",
+      "gold": "Gold",
+      "vip": "VIP"
+    },
+    "earnRate": "ทุก 10 บาท = 1 พอยต์",
+    "redeemRate": "10 พอยต์ = 1 บาท"
+  },
+  "lottery": {
+    "title": "ลุ้นหวย",
+    "myTickets": "ตั๋วของฉัน",
+    "drawDate": "งวดวันที่ {{date}}",
+    "winningNumber": "เลขที่ออก",
+    "myNumber": "เลขของคุณ",
+    "howItWorks": "ทุกออเดอร์ 100 บาท ได้รับ 1 ตั๋วหวย",
+    "prizes": {
+      "last2": "เลขท้าย 2 ตัว",
+      "first3": "เลขหน้า 3 ตัว",
+      "jackpot": "รางวัลที่ 1"
+    }
+  },
+  "errors": {
+    "generic": "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง",
+    "network": "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์",
+    "timeout": "การเชื่อมต่อหมดเวลา",
+    "unauthorized": "กรุณาเข้าสู่ระบบใหม่",
+    "validation": "ข้อมูลไม่ถูกต้อง",
+    "notFound": "ไม่พบข้อมูล",
+    "rateLimited": "คุณส่งคำขอมากเกินไป กรุณารอสักครู่",
+    "offline": "คุณอยู่ในโหมดออฟไลน์"
+  },
+  "common": {
+    "loading": "กำลังโหลด...",
+    "save": "บันทึก",
+    "cancel": "ยกเลิก",
+    "delete": "ลบ",
+    "edit": "แก้ไข",
+    "close": "ปิด",
+    "confirm": "ยืนยัน",
+    "back": "กลับ",
+    "next": "ถัดไป",
+    "search": "ค้นหา",
+    "filter": "กรอง",
+    "sort": "เรียง",
+    "all": "ทั้งหมด",
+    "none": "ไม่มี",
+    "yes": "ใช่",
+    "no": "ไม่",
+    "or": "หรือ",
+    "and": "และ",
+    "from": "จาก",
+    "to": "ถึง"
+  }
+}

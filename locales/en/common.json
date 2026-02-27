@@ -1,0 +1,163 @@
+{
+  "app": {
+    "name": "Kaprao52",
+    "tagline": "The Best Street Food in Town",
+    "description": "Order food online, earn points, win lottery prizes"
+  },
+  "nav": {
+    "home": "Home",
+    "menu": "Menu",
+    "cart": "Cart",
+    "orders": "Orders",
+    "profile": "Profile",
+    "admin": "Admin"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "loginWithLine": "Login with LINE",
+    "guest": "Browse Menu (No Login)",
+    "welcome": "Welcome!",
+    "welcomeSubtitle": "Kaprao 52 — Delicious food, easy ordering, fast delivery",
+    "loginBenefits": {
+      "points": "Earn Points",
+      "lottery": "Win Lottery",
+      "rewards": "Redeem Rewards"
+    }
+  },
+  "menu": {
+    "categories": {
+      "favorites": "Favorites",
+      "kaprao": "Kaprao",
+      "curry": "Curry",
+      "noodle": "Noodles",
+      "bamboo": "Bamboo Shoot",
+      "garlic": "Garlic",
+      "others": "Others"
+    },
+    "search": "Search menu...",
+    "addToCart": "Add to Cart",
+    "customize": "Customize",
+    "spicyLevel": "Spice Level",
+    "egg": "Egg",
+    "meat": "Meat",
+    "extra": "Extra Toppings",
+    "note": "Special Instructions"
+  },
+  "cart": {
+    "title": "Shopping Cart",
+    "empty": "Your cart is empty",
+    "emptyMessage": "Add your favorite items",
+    "itemCount": "{{count}} items",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "pointsDiscount": "Points Discount",
+    "total": "Total",
+    "checkout": "Checkout",
+    "continueShopping": "Continue Shopping",
+    "applyCoupon": "Apply Coupon",
+    "usePoints": "Use Points",
+    "pointsAvailable": "Available Points"
+  },
+  "checkout": {
+    "title": "Confirm Order",
+    "customerInfo": "Customer Information",
+    "name": "Full Name",
+    "phone": "Phone Number",
+    "address": "Delivery Address",
+    "deliveryMethod": "Delivery Method",
+    "workplace": "Workplace Delivery",
+    "workplaceDesc": "Next business day",
+    "village": "Village Delivery",
+    "villageDesc": "Please specify house number and soi",
+    "paymentMethod": "Payment Method",
+    "cash": "Cash",
+    "cashDesc": "Pay cash on delivery",
+    "transfer": "Bank Transfer",
+    "transferDesc": "Scan QR code to pay",
+    "specialInstructions": "Special Instructions",
+    "placeOrder": "Place Order",
+    "processing": "Processing...",
+    "rewards": "Rewards You'll Earn",
+    "pointsEarned": "Earn {{points}} points",
+    "ticketsEarned": "Get {{tickets}} lottery tickets"
+  },
+  "order": {
+    "success": "Order Successful!",
+    "orderNumber": "Order #{{id}}",
+    "thankYou": "Thank you for your order",
+    "viewDetails": "View Order Details",
+    "viewAllOrders": "View All Orders",
+    "status": {
+      "pending": "Pending",
+      "placed": "Placed",
+      "confirmed": "Confirmed",
+      "preparing": "Preparing",
+      "ready": "Ready",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
+    },
+    "tracking": "Track Order",
+    "estimatedTime": "Estimated completion"
+  },
+  "points": {
+    "title": "Points",
+    "balance": "Points Balance",
+    "earn": "Earn Points",
+    "redeem": "Redeem Points",
+    "history": "History",
+    "tier": {
+      "member": "Member",
+      "silver": "Silver",
+      "gold": "Gold",
+      "vip": "VIP"
+    },
+    "earnRate": "10 THB spent = 1 point",
+    "redeemRate": "10 points = 1 THB discount"
+  },
+  "lottery": {
+    "title": "Lottery",
+    "myTickets": "My Tickets",
+    "drawDate": "Draw Date: {{date}}",
+    "winningNumber": "Winning Number",
+    "myNumber": "Your Number",
+    "howItWorks": "Every 100 THB order gets 1 lottery ticket",
+    "prizes": {
+      "last2": "Last 2 Digits",
+      "first3": "First 3 Digits",
+      "jackpot": "Grand Prize"
+    }
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "network": "Unable to connect to server",
+    "timeout": "Connection timed out",
+    "unauthorized": "Please log in again",
+    "validation": "Invalid information",
+    "notFound": "Not found",
+    "rateLimited": "Too many requests. Please wait a moment.",
+    "offline": "You are offline"
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "all": "All",
+    "none": "None",
+    "yes": "Yes",
+    "no": "No",
+    "or": "or",
+    "and": "and",
+    "from": "from",
+    "to": "to"
+  }
+}

@@ -1,0 +1,76 @@
+{
+    "name": "Kaprao52 - กะเพราอร่อยที่สุดในซอย",
+    "short_name": "Kaprao52",
+    "description": "สั่งอาหารออนไลน์ สะสมแต้ม ลุ้นหวยกินฟรี",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#FDFBF7",
+    "theme_color": "#FF6B00",
+    "orientation": "portrait",
+    "scope": "./",
+    "categories": [
+        "food",
+        "lifestyle",
+        "shopping"
+    ],
+    "lang": "th",
+    "icons": [
+        {
+            "src": "assets/icons/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "assets/icons/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "/screenshots/screenshot1.png",
+            "sizes": "750x1334",
+            "type": "image/png",
+            "form_factor": "narrow"
+        },
+        {
+            "src": "/screenshots/screenshot2.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "form_factor": "wide"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "สั่งอาหาร",
+            "short_name": "สั่งอาหาร",
+            "description": "สั่งอาหารทันที",
+            "url": "/index.html?action=order",
+            "icons": [
+                {
+                    "src": "/icons/shortcut-order.png",
+                    "sizes": "96x96"
+                }
+            ]
+        },
+        {
+            "name": "ตะกร้า",
+            "short_name": "ตะกร้า",
+            "description": "ดูตะกร้าสินค้า",
+            "url": "/index.html?action=cart",
+            "icons": [
+                {
+                    "src": "/icons/shortcut-cart.png",
+                    "sizes": "96x96"
+                }
+            ]
+        }
+    ],
+    "related_applications": [
+        {
+            "platform": "play",
+            "url": "https://play.google.com/store/apps/details?id=com.kaprao52.app"
+        }
+    ],
+    "prefer_related_applications": false
+}
