@@ -1,19 +1,19 @@
 import { useState, useRef, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { 
-  Plus, Search, Edit2, Eye, EyeOff, Trash2, X, Check, 
-  Image as ImageIcon, DollarSign, 
+import {
+  Plus, Search, Edit2, Eye, EyeOff, Trash2, X, Check,
+  Image as ImageIcon, DollarSign,
   Star, ChefHat, Save, ArrowUpDown,
   AlertTriangle,
   Flame
 } from 'lucide-react'
 import { useMenuItems } from '@/features/menu/hooks/useMenu'
 import { categories } from '@/features/menu/api/menuApi'
-import { 
-  useCreateMenuItem, 
-  useUpdateMenuItem, 
+import {
+  useCreateMenuItem,
+  useUpdateMenuItem,
   useDeleteMenuItem,
-  useToggleMenuItemAvailability 
+  useToggleMenuItemAvailability
 } from '@/features/admin/hooks/useAdmin'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
@@ -22,6 +22,7 @@ import { useToast } from '@/app/providers/ToastProvider'
 import { formatPrice } from '@/utils/formatPrice'
 import { cn } from '@/utils/cn'
 import type { MenuItem, CategoryType } from '@/types'
+import { getValidImageUrl } from '@/utils/getImageUrl'
 
 const categoryOptions = [
   { value: 'all', label: 'ทั้งหมด', icon: ChefHat },
@@ -63,13 +64,13 @@ export default function AdminMenuPage() {
   const [availabilityFilter, setAvailabilityFilter] = useState<'all' | 'available' | 'unavailable'>('all')
   const [sortBy, setSortBy] = useState<'name' | 'price' | 'category'>('name')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
-  
+
   const [showModal, setShowModal] = useState(false)
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null)
   const [formData, setFormData] = useState<MenuFormData>(initialFormData)
   const [imagePreview, setImagePreview] = useState<string>('')
   const fileInputRef = useRef<HTMLInputElement>(null)
-  
+
   const { data: menuItems, isLoading } = useMenuItems()
   const createMutation = useCreateMenuItem()
   const updateMutation = useUpdateMenuItem()
@@ -79,17 +80,17 @@ export default function AdminMenuPage() {
   // Filter and sort items
   const filteredItems = useMemo(() => {
     if (!menuItems) return []
-    
+
     let items = menuItems.filter((item) => {
       const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase())
       const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory
-      const matchesAvailability = 
-        availabilityFilter === 'all' || 
+      const matchesAvailability =
+        availabilityFilter === 'all' ||
         (availabilityFilter === 'available' && item.isAvailable) ||
         (availabilityFilter === 'unavailable' && !item.isAvailable)
       return matchesSearch && matchesCategory && matchesAvailability
     })
-    
+
     // Sort
     items = [...items].sort((a, b) => {
       let comparison = 0
@@ -102,7 +103,7 @@ export default function AdminMenuPage() {
       }
       return sortOrder === 'asc' ? comparison : -comparison
     })
-    
+
     return items
   }, [menuItems, searchQuery, selectedCategory, availabilityFilter, sortBy, sortOrder])
 
@@ -161,7 +162,7 @@ export default function AdminMenuPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     const itemData = {
       ...formData,
       price: parseFloat(formData.price) || 0,
@@ -195,7 +196,7 @@ export default function AdminMenuPage() {
 
   const handleDelete = async (item: MenuItem) => {
     if (!confirm(`คุณแน่ใจหรือไม่ที่จะลบ "${item.name}"?`)) return
-    
+
     try {
       await deleteMutation.mutateAsync(item.id)
       showToast({
@@ -214,9 +215,9 @@ export default function AdminMenuPage() {
 
   const handleToggleAvailability = async (item: MenuItem) => {
     try {
-      await toggleAvailabilityMutation.mutateAsync({ 
-        id: item.id, 
-        isAvailable: !item.isAvailable 
+      await toggleAvailabilityMutation.mutateAsync({
+        id: item.id,
+        isAvailable: !item.isAvailable
       })
       showToast({
         type: 'success',
@@ -240,8 +241,8 @@ export default function AdminMenuPage() {
           <h1 className="text-2xl font-bold text-gray-800">จัดการเมนู</h1>
           <p className="text-gray-500">เพิ่ม แก้ไข และจัดการรายการอาหาร</p>
         </div>
-        
-        <button 
+
+        <button
           onClick={() => handleOpenModal()}
           className="flex items-center justify-center gap-2 px-6 py-3 bg-brand-500 text-white rounded-xl font-bold hover:bg-brand-600 transition-colors shadow-lg shadow-brand-500/25"
         >
@@ -253,27 +254,27 @@ export default function AdminMenuPage() {
       {/* Stats */}
       {stats && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard 
-            label="เมนูทั้งหมด" 
-            value={stats.total} 
+          <StatCard
+            label="เมนูทั้งหมด"
+            value={stats.total}
             icon={ChefHat}
             color="bg-blue-100 text-blue-600"
           />
-          <StatCard 
-            label="พร้อมจำหน่าย" 
-            value={stats.available} 
+          <StatCard
+            label="พร้อมจำหน่าย"
+            value={stats.available}
             icon={Check}
             color="bg-green-100 text-green-600"
           />
-          <StatCard 
-            label="หมดชั่วคราว" 
-            value={stats.unavailable} 
+          <StatCard
+            label="หมดชั่วคราว"
+            value={stats.unavailable}
             icon={AlertTriangle}
             color="bg-red-100 text-red-600"
           />
-          <StatCard 
-            label="แนะนำ" 
-            value={stats.recommended} 
+          <StatCard
+            label="แนะนำ"
+            value={stats.recommended}
             icon={Star}
             color="bg-yellow-100 text-yellow-600"
           />
@@ -293,7 +294,7 @@ export default function AdminMenuPage() {
             className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-brand-500"
           />
         </div>
-        
+
         {/* Category Filter */}
         <div className="flex gap-2 overflow-x-auto hide-scrollbar">
           {categoryOptions.map((cat) => (
@@ -382,8 +383,8 @@ export default function AdminMenuPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           <AnimatePresence mode="popLayout">
             {filteredItems?.map((item) => (
-              <MenuAdminCard 
-                key={item.id} 
+              <MenuAdminCard
+                key={item.id}
                 item={item}
                 onEdit={() => handleOpenModal(item)}
                 onDelete={() => handleDelete(item)}
@@ -415,7 +416,7 @@ export default function AdminMenuPage() {
 }
 
 // Stat Card Component
-function StatCard({ label, value, icon: Icon, color }: { 
+function StatCard({ label, value, icon: Icon, color }: {
   label: string
   value: number
   icon: React.ElementType
@@ -456,19 +457,19 @@ function MenuAdminCard({ item, onEdit, onDelete, onToggleAvailability }: MenuAdm
         {/* Image */}
         <div className="relative aspect-video bg-gray-100 rounded-t-xl overflow-hidden">
           <img
-            src={item.imageUrl || '/placeholder-food.jpg'}
+            src={getValidImageUrl(item.imageUrl) || '/placeholder-food.jpg'}
             alt={item.name}
             className="w-full h-full object-cover"
           />
           <div className="absolute top-2 right-2 flex gap-2">
-            <button 
+            <button
               onClick={onEdit}
               className="w-8 h-8 bg-white/90 rounded-full flex items-center justify-center text-gray-600 hover:bg-white transition-colors"
             >
               <Edit2 className="w-4 h-4" />
             </button>
           </div>
-          
+
           {!item.isAvailable && (
             <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
               <span className="bg-red-500 text-white font-bold px-3 py-1 rounded-full text-sm">
@@ -476,7 +477,7 @@ function MenuAdminCard({ item, onEdit, onDelete, onToggleAvailability }: MenuAdm
               </span>
             </div>
           )}
-          
+
           {item.isRecommended && item.isAvailable && (
             <div className="absolute top-2 left-2">
               <span className="bg-yellow-400 text-yellow-900 font-bold px-2 py-1 rounded-lg text-xs flex items-center gap-1">
@@ -486,7 +487,7 @@ function MenuAdminCard({ item, onEdit, onDelete, onToggleAvailability }: MenuAdm
             </div>
           )}
         </div>
-        
+
         {/* Content */}
         <div className="p-4 flex-1 flex flex-col">
           <div className="flex-1">
@@ -499,12 +500,12 @@ function MenuAdminCard({ item, onEdit, onDelete, onToggleAvailability }: MenuAdm
                 {formatPrice(item.price)}
               </span>
             </div>
-            
+
             {item.description && (
               <p className="text-sm text-gray-400 line-clamp-2 mb-3">{item.description}</p>
             )}
           </div>
-          
+
           {/* Actions */}
           <div className="flex items-center justify-between pt-3 border-t border-gray-100 mt-3">
             <div className="flex gap-2">
@@ -512,28 +513,28 @@ function MenuAdminCard({ item, onEdit, onDelete, onToggleAvailability }: MenuAdm
                 <Badge variant="default" className="text-[10px]">เลือกเนื้อได้</Badge>
               )}
             </div>
-            
+
             <div className="flex gap-2">
               <button
                 onClick={onToggleAvailability}
                 className={cn(
                   'p-2 rounded-lg transition-colors',
-                  item.isAvailable 
-                    ? 'bg-green-100 text-green-600 hover:bg-green-200' 
+                  item.isAvailable
+                    ? 'bg-green-100 text-green-600 hover:bg-green-200'
                     : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
                 )}
                 title={item.isAvailable ? 'ทำให้หมดชั่วคราว' : 'ทำให้พร้อมจำหน่าย'}
               >
                 {item.isAvailable ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
               </button>
-              
+
               <button
                 onClick={onEdit}
                 className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
               >
                 <Edit2 className="w-4 h-4" />
               </button>
-              
+
               <button
                 onClick={onDelete}
                 className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
@@ -561,14 +562,14 @@ interface MenuModalProps {
   isLoading: boolean
 }
 
-function MenuModal({ 
-  formData, 
-  setFormData, 
-  imagePreview, 
-  fileInputRef, 
+function MenuModal({
+  formData,
+  setFormData,
+  imagePreview,
+  fileInputRef,
   isEditing,
-  onClose, 
-  onSubmit, 
+  onClose,
+  onSubmit,
   onImageChange,
   isLoading
 }: MenuModalProps) {
@@ -596,7 +597,7 @@ function MenuModal({
             {/* Image Upload */}
             <div className="md:col-span-2">
               <label className="block text-sm font-bold text-gray-700 mb-2">รูปภาพ</label>
-              <div 
+              <div
                 onClick={() => fileInputRef.current?.click()}
                 className="relative aspect-video bg-gray-100 rounded-xl overflow-hidden cursor-pointer border-2 border-dashed border-gray-300 hover:border-brand-500 transition-colors"
               >
@@ -691,7 +692,7 @@ function MenuModal({
                   />
                   <span className="text-sm">พร้อมจำหน่าย</span>
                 </label>
-                
+
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
@@ -704,7 +705,7 @@ function MenuModal({
                     แนะนำ
                   </span>
                 </label>
-                
+
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"

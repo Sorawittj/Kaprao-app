@@ -6,7 +6,7 @@ import { useUIStore } from '@/store'
 import { useMenuItems } from '@/features/menu/hooks/useMenu'
 import type { MenuItem } from '@/types'
 import { cn } from '@/utils/cn'
-
+import { getValidImageUrl } from '@/utils/getImageUrl'
 interface VoiceOrderProps {
   isOpen: boolean
   onClose: () => void
@@ -278,7 +278,7 @@ export function VoiceOrder({ isOpen, onClose, onSelect }: VoiceOrderProps) {
                   >
                     <div className="w-12 h-12 rounded-lg bg-gray-200 overflow-hidden flex-shrink-0">
                       {item.imageUrl ? (
-                        <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+                        <img src={getValidImageUrl(item.imageUrl)} alt={item.name} className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-xl">🍱</div>
                       )}

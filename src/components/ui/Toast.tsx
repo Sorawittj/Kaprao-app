@@ -3,7 +3,7 @@ import { X, CheckCircle, AlertCircle, Info, ShoppingCart } from 'lucide-react'
 import { useUIStore } from '@/store'
 import type { Toast as ToastType } from '@/types'
 import { toastSlideUp } from '@/animations/variants'
-
+import { getValidImageUrl } from '@/utils/getImageUrl'
 interface ToastProps {
   toast: ToastType
 }
@@ -67,9 +67,18 @@ export function Toast({ toast }: ToastProps) {
         {/* Image or Icon */}
         {toast.imageUrl ? (
           <img
-            src={toast.imageUrl}
+            src={getValidImageUrl(toast.imageUrl)}
             alt=""
             className="w-11 h-11 rounded-xl object-cover ring-2 ring-white/20 flex-shrink-0"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              const fallback = getValidImageUrl(null);
+              if (target.src !== new URL(fallback, window.location.href).href) {
+                target.src = fallback;
+              } else {
+                target.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmM2YzIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmaWxsPSIjOTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+Tm8gSW1hZ2U8L3RleHQ+PC9zdmc+';
+              }
+            }}
           />
         ) : (
           <div

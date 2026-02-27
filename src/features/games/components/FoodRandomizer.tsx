@@ -7,6 +7,7 @@ import { useUIStore } from '@/store'
 import type { MenuItem } from '@/types'
 import { useMenuItems } from '@/features/menu/hooks/useMenu'
 import { cn } from '@/utils/cn'
+import { getValidImageUrl } from '@/utils/getImageUrl'
 
 interface FoodRandomizerProps {
   isOpen: boolean
@@ -137,7 +138,7 @@ export function FoodRandomizer({ isOpen, onClose, onSelect }: FoodRandomizerProp
                     >
                       {displayItem.imageUrl ? (
                         <img
-                          src={displayItem.imageUrl}
+                          src={getValidImageUrl(displayItem.imageUrl)}
                           alt={displayItem.name}
                           className="w-full h-full object-cover"
                         />

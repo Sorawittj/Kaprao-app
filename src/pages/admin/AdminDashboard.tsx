@@ -1,10 +1,10 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { 
-  ClipboardList, 
-  Flame, 
-  CheckCircle, 
+import {
+  ClipboardList,
+  Flame,
+  CheckCircle,
   Coins,
   TrendingUp,
   Users,
@@ -29,6 +29,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { queryKeys } from '@/lib/queryClient'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import type { RecentActivity, TopSellingItem } from '@/types'
+import { getValidImageUrl } from '@/utils/getImageUrl'
 
 
 
@@ -36,11 +37,11 @@ export default function AdminDashboard() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [selectedPeriod, setSelectedPeriod] = useState<'today' | 'week' | 'month'>('today')
-  
+
   const { data: stats, isLoading, refetch } = useAdminStats(selectedPeriod)
   const { data: activities } = useRecentActivity(10)
   const { data: topItems } = useTopSellingItems(5)
-  
+
   // Subscribe to realtime order updates
   useAllOrdersRealtime()
 
@@ -58,7 +59,7 @@ export default function AdminDashboard() {
     if (!stats) return null
     return {
       revenue: stats.todayRevenue > stats.yesterdayRevenue ? 'up' : 'down',
-      revenuePercent: stats.yesterdayRevenue > 0 
+      revenuePercent: stats.yesterdayRevenue > 0
         ? Math.round(((stats.todayRevenue - stats.yesterdayRevenue) / stats.yesterdayRevenue) * 100)
         : 0,
       orders: stats.totalOrdersToday > 0 ? 'up' : 'stable',
@@ -80,37 +81,37 @@ export default function AdminDashboard() {
   }, [stats])
 
   const statCards = [
-    { 
-      title: 'ออเดอร์ใหม่', 
-      value: stats?.pendingOrders || 0, 
-      icon: ClipboardList, 
+    {
+      title: 'ออเดอร์ใหม่',
+      value: stats?.pendingOrders || 0,
+      icon: ClipboardList,
       color: 'bg-amber-100 text-amber-600',
       trend: '+12%',
       hasAction: true,
       onClick: () => navigate('/admin/orders?status=placed')
     },
-    { 
-      title: 'กำลังทำ', 
-      value: stats?.cookingOrders || 0, 
-      icon: Flame, 
+    {
+      title: 'กำลังทำ',
+      value: stats?.cookingOrders || 0,
+      icon: Flame,
       color: 'bg-orange-100 text-orange-600',
       trend: '+5%',
       hasAction: true,
       onClick: () => navigate('/admin/orders?status=preparing')
     },
-    { 
-      title: 'พร้อมเสิร์ฟ', 
-      value: stats?.readyOrders || 0, 
-      icon: Package, 
+    {
+      title: 'พร้อมเสิร์ฟ',
+      value: stats?.readyOrders || 0,
+      icon: Package,
       color: 'bg-blue-100 text-blue-600',
       trend: stats?.readyOrders && stats.readyOrders > 0 ? 'รอรับ' : '-',
       hasAction: true,
       onClick: () => navigate('/admin/orders?status=ready')
     },
-    { 
-      title: 'เสร็จสิ้นวันนี้', 
-      value: stats?.completedOrders || 0, 
-      icon: CheckCircle, 
+    {
+      title: 'เสร็จสิ้นวันนี้',
+      value: stats?.completedOrders || 0,
+      icon: CheckCircle,
       color: 'bg-green-100 text-green-600',
       trend: '+23%',
       hasAction: true,
@@ -158,28 +159,28 @@ export default function AdminDashboard() {
   ]
 
   const quickActions = [
-    { 
-      label: 'ดูออเดอร์', 
-      icon: Utensils, 
+    {
+      label: 'ดูออเดอร์',
+      icon: Utensils,
       color: 'bg-blue-500',
       action: () => navigate('/admin/orders'),
       badge: stats?.pendingOrders || 0
     },
-    { 
-      label: 'จัดการเมนู', 
-      icon: ChefHat, 
+    {
+      label: 'จัดการเมนู',
+      icon: ChefHat,
       color: 'bg-orange-500',
       action: () => navigate('/admin/menu')
     },
-    { 
-      label: 'ลูกค้า', 
-      icon: Users, 
+    {
+      label: 'ลูกค้า',
+      icon: Users,
       color: 'bg-green-500',
       action: () => navigate('/admin/customers')
     },
-    { 
-      label: 'รายงาน', 
-      icon: BarChart3, 
+    {
+      label: 'รายงาน',
+      icon: BarChart3,
       color: 'bg-purple-500',
       action: () => navigate('/admin/reports')
     },
@@ -204,11 +205,11 @@ export default function AdminDashboard() {
           <h1 className="text-2xl font-bold text-gray-800">ภาพรวมร้านค้า</h1>
           <p className="text-gray-500 flex items-center gap-2">
             <Calendar className="w-4 h-4" />
-            {new Date().toLocaleDateString('th-TH', { 
-              weekday: 'long', 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
+            {new Date().toLocaleDateString('th-TH', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
             })}
           </p>
         </div>
@@ -219,11 +220,10 @@ export default function AdminDashboard() {
               <button
                 key={period}
                 onClick={() => setSelectedPeriod(period)}
-                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
-                  selectedPeriod === period
-                    ? 'bg-brand-500 text-white'
-                    : 'text-gray-600 hover:bg-gray-50'
-                }`}
+                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${selectedPeriod === period
+                  ? 'bg-brand-500 text-white'
+                  : 'text-gray-600 hover:bg-gray-50'
+                  }`}
               >
                 {period === 'today' && 'วันนี้'}
                 {period === 'week' && 'สัปดาห์'}
@@ -231,7 +231,7 @@ export default function AdminDashboard() {
               </button>
             ))}
           </div>
-          <button 
+          <button
             onClick={handleRefresh}
             disabled={isLoading}
             className="px-4 py-2 bg-brand-500 text-white rounded-xl font-bold text-sm hover:bg-brand-600 transition-colors disabled:opacity-50 flex items-center gap-2"
@@ -250,8 +250,8 @@ export default function AdminDashboard() {
         className="grid grid-cols-2 lg:grid-cols-4 gap-4"
       >
         {statCards.map((stat) => (
-          <motion.div 
-            key={stat.title} 
+          <motion.div
+            key={stat.title}
             variants={fadeInUp}
             onClick={stat.onClick}
             className={stat.hasAction ? 'cursor-pointer' : ''}
@@ -263,11 +263,10 @@ export default function AdminDashboard() {
                     <stat.icon className="w-6 h-6" />
                   </div>
                   {stat.trend && (
-                    <span className={`text-xs font-bold px-2 py-1 rounded-full ${
-                      stat.trend.startsWith('+') 
-                        ? 'bg-green-50 text-green-600' 
-                        : 'bg-gray-50 text-gray-500'
-                    }`}>
+                    <span className={`text-xs font-bold px-2 py-1 rounded-full ${stat.trend.startsWith('+')
+                      ? 'bg-green-50 text-green-600'
+                      : 'bg-gray-50 text-gray-500'
+                      }`}>
                       {stat.trend}
                     </span>
                   )}
@@ -299,9 +298,8 @@ export default function AdminDashboard() {
                   <div className={`w-10 h-10 rounded-xl ${stat.color} flex items-center justify-center`}>
                     <stat.icon className="w-5 h-5" />
                   </div>
-                  <div className={`flex items-center gap-1 text-xs font-bold ${
-                    stat.trendUp ? 'text-green-600' : 'text-red-600'
-                  }`}>
+                  <div className={`flex items-center gap-1 text-xs font-bold ${stat.trendUp ? 'text-green-600' : 'text-red-600'
+                    }`}>
                     {stat.trendUp ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
                     {stat.trend}
                   </div>
@@ -361,14 +359,14 @@ export default function AdminDashboard() {
                     <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
                     <XAxis dataKey="label" stroke="#9ca3af" fontSize={12} />
                     <YAxis stroke="#9ca3af" fontSize={12} tickFormatter={(value) => `฿${value}`} />
-                    <Tooltip 
+                    <Tooltip
                       formatter={(value: number) => formatPrice(value)}
                       contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
                     />
-                    <Line 
-                      type="monotone" 
-                      dataKey="value" 
-                      stroke="#f97316" 
+                    <Line
+                      type="monotone"
+                      dataKey="value"
+                      stroke="#f97316"
                       strokeWidth={3}
                       dot={{ fill: '#f97316', strokeWidth: 2, r: 4 }}
                       activeDot={{ r: 6 }}
@@ -434,7 +432,7 @@ export default function AdminDashboard() {
                 <h3 className="font-bold text-gray-800">เมนูขายดี</h3>
                 <p className="text-sm text-gray-500">5 อันดับยอดนิยม</p>
               </div>
-              <button 
+              <button
                 onClick={() => navigate('/admin/menu')}
                 className="text-sm text-brand-600 font-bold hover:underline"
               >
@@ -491,16 +489,15 @@ function TopSellingItemRow({ item, index }: { item: TopSellingItem; index: numbe
       transition={{ delay: index * 0.1 }}
       className="p-4 flex items-center gap-4 hover:bg-gray-50 transition-colors"
     >
-      <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm ${
-        index === 0 ? 'bg-yellow-100 text-yellow-600' :
+      <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm ${index === 0 ? 'bg-yellow-100 text-yellow-600' :
         index === 1 ? 'bg-gray-200 text-gray-600' :
-        index === 2 ? 'bg-orange-100 text-orange-600' :
-        'bg-gray-100 text-gray-500'
-      }`}>
+          index === 2 ? 'bg-orange-100 text-orange-600' :
+            'bg-gray-100 text-gray-500'
+        }`}>
         {index + 1}
       </div>
-      <img 
-        src={item.imageUrl || '/placeholder-food.jpg'} 
+      <img
+        src={getValidImageUrl(item.imageUrl) || '/placeholder-food.jpg'}
         alt={item.name}
         className="w-12 h-12 rounded-lg object-cover"
       />
@@ -524,16 +521,16 @@ function ActivityItem({ activity }: { activity: RecentActivity }) {
     menu: ChefHat,
     system: AlertCircle
   }
-  
+
   const colors = {
     order: 'bg-blue-100 text-blue-600',
     customer: 'bg-green-100 text-green-600',
     menu: 'bg-orange-100 text-orange-600',
     system: 'bg-gray-100 text-gray-600'
   }
-  
+
   const Icon = icons[activity.type]
-  
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}

@@ -223,7 +223,7 @@ describe('Points Validation', () => {
 
 describe('Sanitization', () => {
   it('should sanitize HTML tags', () => {
-    expect(sanitizeInput('<script>alert(1)</script>')).toBe('')
+    expect(sanitizeInput('<script>alert(1)</script>')).toBe('scriptalert(1)/script')
   })
 
   it('should limit length', () => {

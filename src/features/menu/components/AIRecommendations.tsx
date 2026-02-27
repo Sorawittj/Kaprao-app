@@ -5,6 +5,7 @@ import { useMenuStore, useAuthStore } from '@/store'
 import { recommendationEngine } from '@/features/ai/hooks/useAIRecommendations'
 import { useMenuItems } from '../hooks/useMenu'
 import type { AIRecommendation } from '@/types'
+import { getValidImageUrl } from '@/utils/getImageUrl'
 
 export function AIRecommendations() {
   const { user } = useAuthStore()
@@ -80,7 +81,7 @@ export function AIRecommendations() {
               className="bg-white/10 backdrop-blur-sm rounded-xl p-3 flex gap-3"
             >
               <img
-                src={rec.menuItem.imageUrl}
+                src={getValidImageUrl(rec.menuItem.imageUrl)}
                 alt={rec.menuItem.name}
                 className="w-16 h-16 rounded-lg object-cover"
               />
