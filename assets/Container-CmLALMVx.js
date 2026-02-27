@@ -1,0 +1,2 @@
+import{j as x}from"./vendor-query-CYUO8ean.js";import{r as l}from"./vendor-react-blV_QZJX.js";import{a as n}from"./index-Cv0D6aM0.js";const f=l.forwardRef(({className:a,size:m="md",center:e=!1,children:r,...s},t)=>{const o={sm:"max-w-md",md:"max-w-lg",lg:"max-w-xl",xl:"max-w-2xl",full:"max-w-none"};return x.jsx("div",{ref:t,className:n("w-full mx-auto px-4",o[m],e&&"flex flex-col items-center justify-center",a),...s,children:r})});f.displayName="Container";export{f as C};
+//# sourceMappingURL=Container-CmLALMVx.js.map
