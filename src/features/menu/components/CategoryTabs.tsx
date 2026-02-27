@@ -30,7 +30,7 @@ const categoryGradientMap: Record<string, [string, string]> = {
   amber: ['#D97706', '#F59E0B'],
   emerald: ['#059669', '#34D399'],
   pink: ['#EC4899', '#F472B6'],
-  emerald: ['#059669', '#C084FC'],
+  purple: ['#059669', '#C084FC'],
   gray: ['#4B5563', '#9CA3AF'],
 }
 
