@@ -30,7 +30,6 @@ import {
   createUnifiedOrder,
   getOrCreateGuestIdentity,
 } from '@/features/v2/api/unifiedOrderApi'
-import { useGenerateOrderTickets } from '@/features/v2/hooks/useLotteryV2'
 import { GuestConversionPanel } from '@/features/v2/components/GuestConversionPanel'
 import { CouponInputCompact } from '@/features/coupons/components/CouponInput'
 
@@ -329,7 +328,6 @@ export default function CheckoutPage() {
   } = useCartStore()
 
   const { mutateAsync: addPoints } = useAddPoints()
-  const { mutateAsync: generateOrderTickets } = useGenerateOrderTickets()
   const { calculateEarned } = usePointsCalculator()
 
   // Form state
@@ -504,29 +502,9 @@ export default function CheckoutPage() {
         }
       }
 
-      // ✅ Generate lottery tickets for both members and guests (order total >= 100)
-      if (ticketsToEarn > 0) {
-        try {
-          console.log('🎫 Generating lottery tickets:', ticketsToEarn)
-          if (user?.id) {
-            // Member: use existing function
-            await generateOrderTickets({
-              userId: user.id,
-              orderId: order.id,
-              orderAmount: finalTotal,
-            })
-          } else if (guestId) {
-            // Guest: generate tickets with guestId
-            await generateOrderTickets({
-              guestId: guestId,
-              orderId: order.id,
-              orderAmount: finalTotal,
-            })
-          }
-        } catch (e) {
-          console.error('⚠️ Error generating tickets:', e)
-        }
-      }
+      // Note: Lottery tickets are generated automatically by the database trigger
+      // tr_create_lotto_ticket on the orders table. No need for manual generation here.
+
 
       setCreatedOrder(order)
       clearCart()
@@ -589,7 +567,7 @@ export default function CheckoutPage() {
     } finally {
       setIsProcessing(false)
     }
-  }, [addPoints, addToast, address, clearCart, couponCode, customerName, deliveryMethod, discountAmount, finalTotal, generateOrderTickets, items, paymentMethod, phoneNumber, pointsToEarn, pointsUsed, specialInstructions, subtotal, ticketsToEarn, user])
+  }, [addPoints, addToast, address, clearCart, couponCode, customerName, deliveryMethod, discountAmount, finalTotal, items, paymentMethod, phoneNumber, pointsToEarn, pointsUsed, specialInstructions, subtotal, ticketsToEarn, user])
 
   if (showSuccess && createdOrder) {
     return <OrderSuccess order={createdOrder} onContinue={() => navigate('/orders')} />
