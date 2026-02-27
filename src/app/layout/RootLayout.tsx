@@ -10,8 +10,7 @@ export function RootLayout() {
       <GlobalLoadingBar />
 
       {/* Background gradient */}
-      <div className="fixed inset-0 -z-10 bg-gradient-to-br from-[#FDFBF7] via-[#FFFBF2] to-[#FFF0E6]" />
-      <div className="fixed inset-0 -z-10 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none mix-blend-overlay" />
+      <div className="fixed inset-0 -z-10 bg-[#FAFAF9]" />
 
       {/* Main content */}
       <main className="pb-24 safe-area-x">
